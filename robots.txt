@@ -1,0 +1,28 @@
+# AcreetionOS Website - Search Engine Optimization Policy
+# Allow all major search engines, block AI training bots only
+
+# Block AI training bots
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+# Allow all other legitimate crawlers (DuckDuckGo, Yandex, Baidu, etc.)
+User-agent: *
+Disallow:
+Allow: /
+
+# Sitemap location
+Sitemap: https://acreetionos.org/sitemap.xml

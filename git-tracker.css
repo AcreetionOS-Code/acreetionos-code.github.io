@@ -1,0 +1,133 @@
+body {
+    font-family: 'Roboto', 'Fira Code', monospace, sans-serif;
+    background: linear-gradient(135deg, #232526 0%, #2ecc71 100%);
+    color: #e5e5e5;
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+.tracker-hero {
+    position: relative;
+    text-align: center;
+    padding: 4rem 1rem 2rem 1rem;
+    background: rgba(46,204,113,0.10);
+    box-shadow: 0 4px 32px rgba(46,204,113,0.18);
+    border-bottom: 2px solid #2ecc71;
+    overflow: hidden;
+}
+.tracker-title {
+    font-size: 3.2rem;
+    font-family: 'Fira Code', monospace;
+    color: #2ecc71;
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 16px #222, 0 0 32px #2ecc71;
+    z-index: 2;
+}
+.tracker-subtitle {
+    font-size: 1.4rem;
+    color: #b2b2b2;
+    margin-bottom: 2rem;
+    z-index: 2;
+}
+.glow {
+    position: absolute;
+    top: 10%; left: 50%;
+    width: 600px; height: 200px;
+    background: radial-gradient(circle, #2ecc71 0%, transparent 70%);
+    filter: blur(60px);
+    opacity: 0.5;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+#repo-search {
+    padding: 0.8rem 1.2rem;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: none;
+    background: rgba(34,34,34,0.85);
+    color: #e5e5e5;
+    box-shadow: 0 2px 12px rgba(46,204,113,0.12);
+    margin-bottom: 1.5rem;
+    width: 320px;
+    max-width: 90vw;
+    outline: none;
+    transition: box-shadow 0.2s;
+}
+/* Action buttons next to the search */
+#action-buttons {
+    display: flex;
+    gap: 0.6rem;
+    justify-content: center;
+}
+.tracker-btn {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background: #2ecc71;
+    color: #232526;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(46,204,113,0.16);
+}
+.tracker-btn:hover { background: #61afef; color: #fff; }
+#repo-search:focus {
+    box-shadow: 0 0 0 2px #2ecc71;
+}
+.repo-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    :root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222222;--acreetion-box-border:#333333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46, 204, 113, 0.1);--storm-color:#61afef;--flasher-color:#f39c12;--acreetion-purple:#9b59b6;--font-sans:'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;--font-mono:'Fira Code', monospace;}
+
+    *, *::before, *::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;margin:0;min-height:100vh}
+
+    /* Hero */
+    .tracker-hero{background-color:var(--acreetion-panel-bg);border-bottom:2px solid var(--acreetion-green);padding:3rem 1rem;text-align:center}
+    .tracker-title{font-family:var(--font-mono);color:var(--acreetion-green);font-size:2.4rem;margin-bottom:0.5rem}
+    .tracker-subtitle{color:var(--acreetion-text);margin-bottom:1rem}
+
+    /* Search + action buttons */
+    #repo-search{padding:0.8rem 1rem;border-radius:8px;border:none;background:var(--acreetion-box-bg);color:var(--acreetion-text);box-shadow:0 2px 12px rgba(0,0,0,0.4);width:320px;max-width:90vw;outline:none}
+    #repo-search:focus{box-shadow:0 0 0 2px rgba(46,204,113,0.12)}
+    #action-buttons{display:flex;gap:0.6rem;justify-content:center;margin-top:0.75rem}
+    .tracker-btn{padding:0.6rem 1rem;border-radius:8px;border:none;background:var(--acreetion-green);color:#232526;font-weight:700;cursor:pointer}
+    .tracker-btn:hover{background:var(--storm-color);color:#fff}
+
+    /* Repo grid */
+    #repo-list{max-width:1400px;margin:2rem auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.5rem;padding:0 1rem}
+    .repo-card{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem;box-shadow:0 8px 20px rgba(0,0,0,0.5);cursor:pointer;transition:transform .15s,box-shadow .15s}
+    .repo-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,0.6)}
+    .repo-card .repo-title{font-family:var(--font-mono);color:var(--acreetion-green);font-size:1.25rem;margin-bottom:0.5rem}
+    .repo-card .repo-desc{color:var(--acreetion-text);margin-bottom:0.8rem}
+    .repo-meta{display:flex;flex-wrap:wrap;gap:0.8rem;font-size:0.95rem;color:var(--acreetion-text)}
+    .repo-meta span{background:rgba(255,255,255,0.02);padding:0.25rem .6rem;border-radius:6px}
+    .repo-link{display:inline-block;margin-top:0.75rem;color:var(--storm-color);font-weight:700;text-decoration:none}
+    .repo-link:hover{color:var(--acreetion-green)}
+
+    .loading-status{text-align:center;color:var(--flasher-color);font-style:italic;margin:2rem 0}
+
+    /* Event cards for recent activity */
+    .event-card{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1rem;margin-bottom:0.75rem;display:flex;gap:0.75rem;align-items:flex-start;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+    .event-icon{font-size:1.5rem;margin-top:0.1rem}
+    .event-content{flex:1}
+    .event-header{display:flex;flex-wrap:wrap;gap:0.25rem 0.5rem;align-items:center;font-size:0.95rem}
+    .event-actor{color:var(--acreetion-green);font-weight:600}
+    .event-action{color:var(--acreetion-text)}
+    .event-repo{color:var(--storm-color);font-weight:500;text-decoration:none}
+    .event-repo:hover{color:var(--acreetion-green)}
+    .event-details{color:var(--acreetion-text);margin:0.25rem 0;font-size:0.9rem;font-style:italic}
+    .event-time{color:var(--acreetion-text);font-size:0.8rem;opacity:0.7;margin-top:0.25rem}
+
+    /* Modal - keep consistent with site */
+    .modal{display:flex;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;padding:1rem}
+    .modal-content{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);padding:1.5rem;border-radius:12px;max-width:700px;width:100%;color:var(--acreetion-text)}
+    .modal-close{position:absolute;top:0.5rem;right:0.5rem;background:var(--acreetion-green);color:#000;border:none;border-radius:50%;width:36px;height:36px;font-weight:700;cursor:pointer}
+    .modal-close:hover{background:#d15c64;color:#fff}
+    .modal-section{margin-bottom:1rem}
+    .modal-section h3{color:var(--acreetion-green);font-family:var(--font-mono);margin-bottom:0.5rem}
+    .modal-section a{color:var(--storm-color)}
+
+    @media (max-width:900px){.tracker-title{font-size:1.6rem}.repo-card{min-width:90vw;max-width:98vw;padding:1rem}}
+    font-size: 1rem;

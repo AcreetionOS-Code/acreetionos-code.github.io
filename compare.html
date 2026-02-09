@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<!-- Removed invalid http-equiv meta tags for HTML validation -->
+<title>Compare Linux Distros - AcreetionOS vs Ubuntu vs Fedora vs Manjaro</title>
+<meta name="description" content="Compare AcreetionOS with Ubuntu, Fedora, Manjaro, Linux Mint, and Arch Linux. Find the best Linux distribution for desktop, server, and development. Detailed feature comparison." />
+<meta name="keywords" content="compare Linux distros, AcreetionOS vs Ubuntu, best Linux distribution, Linux comparison, Arch vs Ubuntu, Manjaro vs AcreetionOS, Linux distro comparison chart, which Linux to choose" />
+<link rel="canonical" href="https://acreetionos.org/compare.html" />
+<link rel="stylesheet" href="contact.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.95rem;
+}
+.comparison-table thead {
+  background-color: #222;
+}
+.comparison-table th {
+  padding: 1rem;
+  text-align: left;
+  color: var(--acreetion-text-bright);
+  font-weight: 700;
+  border-bottom: 2px solid var(--acreetion-green);
+}
+.comparison-table td {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--acreetion-box-border);
+  color: var(--acreetion-text);
+}
+.comparison-table tr:hover {
+  background-color: rgba(46, 204, 113, 0.05);
+}
+.comparison-table .distro-name {
+  font-weight: 700;
+  color: var(--acreetion-text-bright);
+}
+.comparison-table .highlight {
+  background-color: rgba(46, 204, 113, 0.15);
+  font-weight: 700;
+  color: var(--acreetion-green);
+}
+.check { color: var(--acreetion-green); font-weight: 700; }
+.cross { color: var(--gnome-color); }
+.rating { color: var(--flasher-color); font-weight: 700; }
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+.feature-card {
+  background: var(--acreetion-panel-bg);
+  padding: 1.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--acreetion-box-border);
+}
+.feature-card h3 {
+  color: var(--acreetion-green);
+  margin-bottom: 0.5rem;
+}
+.feature-card p {
+  color: var(--acreetion-text);
+  font-size: 0.9rem;
+}
+</style>
+<script>
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});})}
+</script>
+</head>
+<body>
+<div id="background-grid"></div>
+
+<header class="page-header">
+<div class="header-content">
+<a href="index.html" class="logo">
+<img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" />
+<span class="logo-text">Acreetion<span>OS</span></span>
+</a>
+<nav class="main-nav">
+<a href="index.html">Home</a>
+<a href="install.html">Install</a>
+<a href="compare.html" class="active">Compare</a>
+<a href="faq.html">FAQ</a>
+<a href="blog.html">Blog</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<div class="page-wrapper">
+<div class="main-column">
+<div class="content-box">
+<div class="box-header">
+<h1>Linux Distribution Comparison</h1>
+</div>
+<div class="box-body">
+<p style="font-size: 1.1rem; margin-bottom: 2rem;">Compare AcreetionOS with other popular Linux distributions. See why AcreetionOS is the perfect balance of power, stability, and ease of use.</p>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Quick Comparison Chart</h2>
+
+<div style="overflow-x: auto;">
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Distribution</th>
+<th>Base</th>
+<th>Desktop</th>
+<th>Package Manager</th>
+<th>Release Model</th>
+<th>User Friendliness</th>
+<th>Package Count</th>
+</tr>
+</thead>
+<tbody>
+<tr class="highlight">
+<td class="distro-name">AcreetionOS</td>
+<td>Arch Linux</td>
+<td>Cinnamon</td>
+<td>Pacman + AUR</td>
+<td>Rolling</td>
+<td class="rating">★★★★★</td>
+<td>80,000+ (AUR)</td>
+</tr>
+<tr>
+<td class="distro-name">Ubuntu</td>
+<td>Debian</td>
+<td>GNOME</td>
+<td>APT</td>
+<td>Fixed (6 mo)</td>
+<td class="rating">★★★★☆</td>
+<td>50,000+</td>
+</tr>
+<tr>
+<td class="distro-name">Fedora</td>
+<td>Independent</td>
+<td>GNOME</td>
+<td>DNF</td>
+<td>Fixed (6 mo)</td>
+<td class="rating">★★★☆☆</td>
+<td>30,000+</td>
+</tr>
+<tr>
+<td class="distro-name">Linux Mint</td>
+<td>Ubuntu</td>
+<td>Cinnamon</td>
+<td>APT</td>
+<td>Fixed (2 yr)</td>
+<td class="rating">★★★★★</td>
+<td>50,000+</td>
+</tr>
+<tr>
+<td class="distro-name">Manjaro</td>
+<td>Arch Linux</td>
+<td>KDE/XFCE/GNOME</td>
+<td>Pacman</td>
+<td>Rolling</td>
+<td class="rating">★★★★☆</td>
+<td>80,000+</td>
+</tr>
+<tr>
+<td class="distro-name">Arch Linux</td>
+<td>Independent</td>
+<td>None (DIY)</td>
+<td>Pacman + AUR</td>
+<td>Rolling</td>
+<td class="rating">★★☆☆☆</td>
+<td>80,000+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Detailed Comparisons</h2>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Ubuntu</h3>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>AcreetionOS</th>
+<th>Ubuntu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="distro-name">Rolling Release</td>
+<td class="check">✓ Always latest software</td>
+<td class="cross">✗ Fixed releases every 6 months</td>
+</tr>
+<tr>
+<td class="distro-name">Package Availability</td>
+<td class="check">✓ 80,000+ via AUR</td>
+<td>50,000+ via APT/Snap</td>
+</tr>
+<tr>
+<td class="distro-name">Resource Usage</td>
+<td class="check">✓ Lightweight (700MB RAM idle)</td>
+<td>Heavy (1.5GB RAM idle)</td>
+</tr>
+<tr>
+<td class="distro-name">Customization</td>
+<td class="check">✓ Full control</td>
+<td>Limited by Snap/GNOME</td>
+</tr>
+<tr>
+<td class="distro-name">Corporate Influence</td>
+<td class="check">✓ Community-driven</td>
+<td class="cross">✗ Canonical Ltd.</td>
+</tr>
+<tr>
+<td class="distro-name">Boot Speed</td>
+<td class="check">✓ ~5-8 seconds</td>
+<td>~15-20 seconds</td>
+</tr>
+</tbody>
+</table>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Linux Mint</h3>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>AcreetionOS</th>
+<th>Linux Mint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="distro-name">Software Updates</td>
+<td class="check">✓ Daily updates (rolling)</td>
+<td>Slow (based on Ubuntu LTS)</td>
+</tr>
+<tr>
+<td class="distro-name">Cinnamon Version</td>
+<td class="check">✓ Latest Cinnamon</td>
+<td>Often 1-2 versions behind</td>
+</tr>
+<tr>
+<td class="distro-name">Package Manager</td>
+<td class="check">✓ Pacman (fast) + AUR</td>
+<td>APT (slower)</td>
+</tr>
+<tr>
+<td class="distro-name">Target Audience</td>
+<td>Intermediate to advanced</td>
+<td>Beginners</td>
+</tr>
+<tr>
+<td class="distro-name">Performance</td>
+<td class="check">✓ Optimized for speed</td>
+<td>Good, but heavier base</td>
+</tr>
+</tbody>
+</table>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Manjaro</h3>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>AcreetionOS</th>
+<th>Manjaro</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="distro-name">Arch Compatibility</td>
+<td class="check">✓ Pure Arch repos</td>
+<td>Delayed repos (stability testing)</td>
+</tr>
+<tr>
+<td class="distro-name">Desktop Environment</td>
+<td class="check">✓ Cinnamon (polished)</td>
+<td>KDE/XFCE/GNOME (choose on download)</td>
+</tr>
+<tr>
+<td class="distro-name">Update Speed</td>
+<td class="check">✓ Same-day Arch updates</td>
+<td>2-4 week delay</td>
+</tr>
+<tr>
+<td class="distro-name">Bloatware</td>
+<td class="check">✓ Minimal pre-installed</td>
+<td>More pre-installed software</td>
+</tr>
+<tr>
+<td class="distro-name">Stability vs Bleeding Edge</td>
+<td class="check">✓ Balanced approach</td>
+<td>More conservative</td>
+</tr>
+</tbody>
+</table>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Arch Linux</h3>
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Feature</th>
+<th>AcreetionOS</th>
+<th>Arch Linux</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="distro-name">Installation</td>
+<td class="check">✓ GUI installer (Calamares)</td>
+<td class="cross">✗ Command-line only</td>
+</tr>
+<tr>
+<td class="distro-name">Pre-configured Desktop</td>
+<td class="check">✓ Cinnamon ready to use</td>
+<td class="cross">✗ You install everything</td>
+</tr>
+<tr>
+<td class="distro-name">Setup Time</td>
+<td class="check">✓ 10-15 minutes</td>
+<td>2-4 hours for beginners</td>
+</tr>
+<tr>
+<td class="distro-name">Learning Curve</td>
+<td class="check">✓ Beginner-friendly</td>
+<td>Steep (requires Linux knowledge)</td>
+</tr>
+<tr>
+<td class="distro-name">Package Repos</td>
+<td>✓ Same (Arch + AUR)</td>
+<td>✓ Same (Arch + AUR)</td>
+</tr>
+<tr>
+<td class="distro-name">Customization</td>
+<td>High (pre-configured base)</td>
+<td class="check">✓ Ultimate (build from scratch)</td>
+</tr>
+</tbody>
+</table>
+
+<h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Why Choose AcreetionOS?</h2>
+
+<div class="feature-grid">
+<div class="feature-card">
+<h3>🚀 Rolling Release</h3>
+<p>Always get the latest software without reinstalling. No version upgrades, just continuous updates.</p>
+</div>
+
+<div class="feature-card">
+<h3>📦 Massive Package Library</h3>
+<p>Access 80,000+ packages via Pacman and AUR. If it exists for Linux, you can install it.</p>
+</div>
+
+<div class="feature-card">
+<h3>⚡ Lightning Fast</h3>
+<p>Optimized boot times, minimal bloat, and efficient resource usage. Perfect for old and new hardware.</p>
+</div>
+
+<div class="feature-card">
+<h3>🎨 Beautiful Cinnamon Desktop</h3>
+<p>Familiar, polished interface. Windows users feel right at home. Highly customizable.</p>
+</div>
+
+<div class="feature-card">
+<h3>🛡️ Secure by Design</h3>
+<p>Regular security updates, minimal attack surface, and community-audited code.</p>
+</div>
+
+<div class="feature-card">
+<h3>👥 Community Driven</h3>
+<p>No corporate control. Built by users, for users. Join our Discord and shape the future!</p>
+</div>
+</div>
+
+<div style="margin-top: 3rem; padding: 2rem; background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--acreetion-green); border-radius: 4px;">
+<h3 style="color: var(--acreetion-green); margin-bottom: 1rem;">Ready to Switch?</h3>
+<p style="margin-bottom: 1rem;">AcreetionOS combines the power of Arch Linux with the ease of Ubuntu. Try it risk-free with a live USB!</p>
+<a href="index.html#manual-downloads" class="btn">Download AcreetionOS</a>
+<a href="install.html" class="btn" style="background-color: var(--storm-color);">Installation Guide</a>
+</div>
+</div>
+</div>
+</div>
+
+<div class="sidebar-column">
+<div class="content-box">
+<div class="box-header">
+<h3>Use Case Guide</h3>
+</div>
+<div class="box-body">
+<p><strong>For Beginners:</strong> Linux Mint or Ubuntu</p>
+<p style="margin-top: 0.5rem;"><strong>For Power Users:</strong> AcreetionOS or Arch</p>
+<p style="margin-top: 0.5rem;"><strong>For Developers:</strong> AcreetionOS or Fedora</p>
+<p style="margin-top: 0.5rem;"><strong>For Gaming:</strong> AcreetionOS or Pop!_OS</p>
+<p style="margin-top: 0.5rem;"><strong>For Servers:</strong> Ubuntu Server or Debian</p>
+</div>
+</div>
+
+<div class="content-box">
+<div class="box-header">
+<h3>Still Deciding?</h3>
+</div>
+<div class="box-body">
+<ul class="resource-list">
+<li><a href="requirements.html">System Requirements</a></li>
+<li><a href="faq.html">Frequently Asked Questions</a></li>
+<li><a href="install.html">Installation Guide</a></li>
+<li><a href="contact.html">Ask the Community</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<footer class="page-footer">
+<p>&copy; 2026 AcreetionOS Project. Free and Open Source Software.</p>
+<p>Licensed under GNU General Public License v3.0</p>
+</footer>
+
+</body>
+</html>

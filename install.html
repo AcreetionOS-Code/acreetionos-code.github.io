@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<!-- Removed invalid http-equiv meta tags for HTML validation -->
+<title>Installation Guide - How to Install AcreetionOS Linux Step-by-Step</title>
+<meta name="description" content="Complete step-by-step guide to install AcreetionOS Linux. Learn how to install Linux on your computer, create bootable USB, partition drives, and configure your new Arch-based Linux system." />
+<meta name="keywords" content="install Linux, Linux installation guide, how to install AcreetionOS, install Arch Linux, Linux setup, bootable USB Linux, dual boot Linux, Linux tutorial, install operating system" />
+<link rel="canonical" href="https://acreetionos.org/install.html" />
+<link rel="stylesheet" href="contact.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<script>
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});})}
+</script>
+</head>
+<body>
+<div id="background-grid"></div>
+
+<header class="page-header">
+<div class="header-content">
+<a href="index.html" class="logo">
+<img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" />
+<span class="logo-text">Acreetion<span>OS</span></span>
+</a>
+<nav class="main-nav">
+<a href="index.html">Home</a>
+<a href="install.html" class="active">Install</a>
+<a href="compare.html">Compare</a>
+<a href="faq.html">FAQ</a>
+<a href="blog.html">Blog</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<div class="page-wrapper">
+<div class="main-column">
+<div class="content-box">
+<div class="box-header">
+<h1>Complete Installation Guide</h1>
+</div>
+<div class="box-body">
+<p style="font-size: 1.1rem; margin-bottom: 2rem;">Follow this comprehensive guide to install AcreetionOS Linux on your computer. This guide works for beginners and advanced users alike.</p>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 1: Download AcreetionOS ISO</h2>
+<p>Visit our <a href="index.html#manual-downloads">download page</a> and get the latest AcreetionOS ISO file.</p>
+<ul style="margin-left: 2rem; margin-top: 0.5rem;">
+<li><strong>File size:</strong> ~2.5 GB</li>
+<li><strong>Architecture:</strong> x86_64 (64-bit)</li>
+<li><strong>Desktop:</strong> Cinnamon</li>
+</ul>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 2: Create Bootable USB Drive</h2>
+<p><strong>Required:</strong> USB drive with at least 4GB capacity</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On Linux:</h3>
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<code># Replace /dev/sdX with your USB device (check with lsblk)
+sudo dd if=acreetionos-*.iso of=/dev/sdX bs=4M status=progress && sync</code>
+</pre>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On Windows:</h3>
+<p>Use <a href="https://rufus.ie/" target="_blank">Rufus</a> or <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a></p>
+<ol style="margin-left: 2rem; margin-top: 0.5rem;">
+<li>Download and run Rufus</li>
+<li>Select your USB drive</li>
+<li>Select the AcreetionOS ISO file</li>
+<li>Click "START" and wait for completion</li>
+</ol>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On macOS:</h3>
+<p>Use <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a> (easiest) or Terminal:</p>
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<code># Find your USB device
+diskutil list
+
+# Unmount it (replace diskN with your device)
+diskutil unmountDisk /dev/diskN
+
+# Write ISO
+sudo dd if=acreetionos-*.iso of=/dev/rdiskN bs=1m</code>
+</pre>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 3: Boot from USB</h2>
+<ol style="margin-left: 2rem;">
+<li>Insert the USB drive into your computer</li>
+<li>Restart your computer</li>
+<li>Press the boot menu key during startup:
+<ul style="margin-left: 2rem; margin-top: 0.5rem;">
+<li><strong>Dell:</strong> F12</li>
+<li><strong>HP:</strong> F9 or Esc</li>
+<li><strong>Lenovo:</strong> F12 or F8</li>
+<li><strong>Asus:</strong> F8 or Esc</li>
+<li><strong>Acer:</strong> F12</li>
+<li><strong>MSI:</strong> F11</li>
+<li><strong>Generic:</strong> F2, F10, F11, F12, Del, or Esc</li>
+</ul>
+</li>
+<li>Select your USB drive from the boot menu</li>
+<li>AcreetionOS will boot into the live environment</li>
+</ol>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 4: Start the Installer</h2>
+<p>Once booted into AcreetionOS live environment:</p>
+<ol style="margin-left: 2rem;">
+<li>Look for the <strong>"Install AcreetionOS"</strong> icon on the desktop</li>
+<li>Double-click to launch the installer</li>
+<li>The Calamares installer will guide you through the process</li>
+</ol>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 5: Configure Installation</h2>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Choose Your Language & Region</h3>
+<p>Select your preferred language, timezone, and keyboard layout.</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Partition Your Drive</h3>
+<p><strong>⚠ WARNING:</strong> Partitioning will erase data. Back up important files first!</p>
+
+<p><strong>Option 1: Erase Entire Disk</strong> (Recommended for beginners)</p>
+<ul style="margin-left: 2rem;">
+<li>Select "Erase disk"</li>
+<li>Choose your target drive</li>
+<li>The installer will automatically create partitions</li>
+</ul>
+
+<p style="margin-top: 1rem;"><strong>Option 2: Manual Partitioning</strong> (Advanced users)</p>
+<ul style="margin-left: 2rem;">
+<li><strong>EFI System Partition:</strong> 512 MB, FAT32, mounted at /boot/efi</li>
+<li><strong>Root Partition:</strong> 30+ GB, ext4, mounted at /</li>
+<li><strong>Home Partition (optional):</strong> Remaining space, ext4, mounted at /home</li>
+<li><strong>Swap (optional):</strong> 2-8 GB depending on RAM</li>
+</ul>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Create User Account</h3>
+<ul style="margin-left: 2rem;">
+<li>Enter your full name</li>
+<li>Choose a username (lowercase, no spaces)</li>
+<li>Set a strong password</li>
+<li>Choose whether to auto-login</li>
+</ul>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 6: Install</h2>
+<ol style="margin-left: 2rem;">
+<li>Review your installation summary</li>
+<li>Click <strong>"Install"</strong></li>
+<li>Wait 5-15 minutes for installation to complete</li>
+<li>Installation will copy files, install bootloader, and configure system</li>
+</ol>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 7: Reboot & Enjoy</h2>
+<ol style="margin-left: 2rem;">
+<li>Click <strong>"Restart Now"</strong> when prompted</li>
+<li>Remove the USB drive when asked</li>
+<li>Your computer will boot into AcreetionOS</li>
+<li>Log in with the credentials you created</li>
+</ol>
+
+<h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Post-Installation Steps</h2>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Update Your System</h3>
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<code>sudo pacman -Syu</code>
+</pre>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Install Additional Software</h3>
+<p>Use the built-in Pamac package manager or command line:</p>
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<code>sudo pacman -S firefox vlc gimp libreoffice</code>
+</pre>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Enable AUR (Arch User Repository)</h3>
+<p>AUR is already configured in AcreetionOS! Just use Pamac GUI or install an AUR helper:</p>
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<code>sudo pacman -S yay
+yay -S google-chrome spotify</code>
+</pre>
+</div>
+</div>
+</div>
+
+<div class="sidebar-column">
+<div class="content-box">
+<div class="box-header">
+<h3>System Requirements</h3>
+</div>
+<div class="box-body">
+<p><a href="requirements.html" class="btn">View Full Requirements →</a></p>
+<p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Minimum:</strong> 2GB RAM, 20GB storage, 64-bit processor</p>
+</div>
+</div>
+
+<div class="content-box">
+<div class="box-header">
+<h3>Need Help?</h3>
+</div>
+<div class="box-body">
+<ul class="resource-list">
+<li><a href="faq.html">
+<span class="resource-title">FAQ</span>
+</a></li>
+<li><a href="contact.html">
+<span class="resource-title">Get Support</span>
+</a></li>
+<li><a href="https://github.com/AcreetionOS-Linux" target="_blank">
+<span class="resource-title">GitHub</span>
+</a></li>
+<li><a href="https://discord.gg/AJ6uuvtDXY" target="_blank">
+<span class="resource-title">Discord Community</span>
+</a></li>
+</ul>
+</div>
+</div>
+
+<div class="content-box">
+<div class="box-header">
+<h3>Video Tutorial</h3>
+</div>
+<div class="box-body">
+<p>Coming soon! Subscribe to our YouTube channel for installation walkthroughs.</p>
+</div>
+</div>
+</div>
+</div>
+
+<footer class="page-footer">
+<p>&copy; 2026 AcreetionOS Project. Free and Open Source Software.</p>
+<p>Licensed under GNU General Public License v3.0</p>
+</footer>
+
+</body>
+</html>
