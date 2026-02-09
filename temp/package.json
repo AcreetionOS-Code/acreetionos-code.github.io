@@ -1,0 +1,17 @@
+{
+  "name": "git-graph-viewer",
+  "version": "1.0.0",
+  "description": "A web-based Git graph visualizer for the acreetionos repository.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "simple-git": "^3.19.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<!-- Removed invalid http-equiv meta tags for HTML validation -->
+<title>Blog & News - AcreetionOS Linux Updates and Announcements</title>
+<meta name="description" content="Latest AcreetionOS Linux news, release notes, updates, and announcements. Stay informed about new features, bug fixes, and development progress." />
+<meta name="keywords" content="AcreetionOS news, Linux updates, AcreetionOS releases, Linux blog, open source news, Arch Linux updates, AcreetionOS changelog" />
+<link rel="canonical" href="https://acreetionos.org/blog.html" />
+<link rel="stylesheet" href="contact.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+.blog-post {
+  background: var(--acreetion-panel-bg);
+  border: 1px solid var(--acreetion-box-border);
+  border-radius: 4px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.blog-post h2 {
+  color: var(--acreetion-green);
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+.blog-meta {
+  color: var(--acreetion-text);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.blog-tag {
+  background: rgba(46, 204, 113, 0.2);
+  color: var(--acreetion-green);
+  padding: 0.2rem 0.6rem;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+.blog-content {
+  color: var(--acreetion-text);
+  line-height: 1.7;
+}
+.blog-content h3 {
+  color: var(--acreetion-text-bright);
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+.blog-content ul {
+  margin-left: 2rem;
+  margin-top: 0.5rem;
+}
+.blog-content code {
+  background: var(--acreetion-code-bg);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--acreetion-text);
+  font-size: 1.1rem;
+}
+.github-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--acreetion-panel-bg);
+  border: 1px solid var(--acreetion-box-border);
+  border-radius: 4px;
+  padding: 1rem;
+  text-align: center;
+}
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--acreetion-green);
+}
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--acreetion-text);
+  margin-top: 0.3rem;
+}
+</style>
+<script>
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});})}
+
+// Fetch GitHub stats and activity
+async function loadGitHubActivity() {
+  const postsContainer = document.getElementById('blog-posts');
+  const statsContainer = document.getElementById('github-stats');
+  
+  try {
+    // Fetch repository info
+    const repoResponse = await fetch('https://api.github.com/repos/AcreetionOS-Linux/acreetionos-linux.github.io');
+    const repoData = await repoResponse.json();
+    
+    // Display stats
+    if (statsContainer && repoData) {
+      statsContainer.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-number">${repoData.stargazers_count || 0}</div>
+          <div class="stat-label">GitHub Stars</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${repoData.forks_count || 0}</div>
+          <div class="stat-label">Forks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${repoData.open_issues_count || 0}</div>
+          <div class="stat-label">Open Issues</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">${repoData.watchers_count || 0}</div>
+          <div class="stat-label">Watchers</div>
+        </div>
+      `;
+    }
+    
+    // Fetch commits for blog posts
+    const commitsResponse = await fetch('https://api.github.com/repos/AcreetionOS-Linux/acreetionos/commits?per_page=10');
+    const commits = await commitsResponse.json();
+    
+    if (postsContainer && Array.isArray(commits)) {
+      postsContainer.innerHTML = commits.map(commit => {
+        const date = new Date(commit.commit.author.date);
+        const formattedDate = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const message = commit.commit.message;
+        const author = commit.commit.author.name;
+        
+        // Parse conventional commit format (feat:, fix:, docs:, etc.)
+        let tag = 'update';
+        let title = message.split('\\n')[0];
+        if (title.includes('feat:') || title.includes('feat(')) tag = 'feature';
+        if (title.includes('fix:') || title.includes('fix(')) tag = 'bugfix';
+        if (title.includes('docs:') || title.includes('docs(')) tag = 'documentation';
+        if (title.includes('perf:') || title.includes('perf(')) tag = 'performance';
+        
+        return `
+          <div class="blog-post">
+            <h2>${title}</h2>
+            <div class="blog-meta">
+              <span>📅 ${formattedDate}</span>
+              <span>👤 ${author}</span>
+              <span class="blog-tag">${tag}</span>
+            </div>
+            <div class="blog-content">
+              <p>${message.split('\\n').slice(1).join('\\n') || 'See commit details on GitHub.'}</p>
+              <a href="${commit.html_url}" target="_blank" style="color: var(--acreetion-green); font-weight: 500;">View on GitHub →</a>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      postsContainer.innerHTML = '<p class="loading">No recent updates found.</p>';
+    }
+  } catch (error) {
+    console.error('Failed to load GitHub data:', error);
+    if (postsContainer) {
+      postsContainer.innerHTML = `
+        <div class="blog-post">
+          <h2>Welcome to AcreetionOS Blog</h2>
+          <div class="blog-meta">
+            <span>📅 January 11, 2026</span>
+            <span class="blog-tag">announcement</span>
+          </div>
+          <div class="blog-content">
+            <p>Stay tuned for the latest updates, release notes, and announcements about AcreetionOS development!</p>
+            <p>Follow our <a href="https://github.com/AcreetionOS-Linux" target="_blank" style="color: var(--acreetion-green);">GitHub organization</a> for real-time updates.</p>
+          </div>
+        </div>
+      `;
+    }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadGitHubActivity);
+</script>
+</head>
+<body>
+<div id="background-grid"></div>
+
+<header class="page-header">
+<div class="header-content">
+<a href="index.html" class="logo">
+<img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" />
+<span class="logo-text">Acreetion<span>OS</span></span>
+</a>
+<nav class="main-nav">
+<a href="index.html">Home</a>
+<a href="install.html">Install</a>
+<a href="compare.html">Compare</a>
+<a href="faq.html">FAQ</a>
+<a href="blog.html" class="active">Blog</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<div class="page-wrapper">
+<div class="main-column">
+<div class="content-box">
+<div class="box-header">
+<h1>News & Updates</h1>
+</div>
+<div class="box-body">
+<p style="font-size: 1.1rem; margin-bottom: 2rem;">Latest news, development updates, and release announcements for AcreetionOS. All updates are automatically pulled from our GitHub activity.</p>
+
+<div id="github-stats" class="github-stats">
+<div class="stat-card">
+<div class="stat-number">...</div>
+<div class="stat-label">Loading...</div>
+</div>
+</div>
+
+<div id="blog-posts">
+<p class="loading">Loading latest updates from GitHub...</p>
+</div>
+</div>
+</div>
+</div>
+
+<div class="sidebar-column">
+<div class="content-box">
+<div class="box-header">
+<h3>Subscribe for Updates</h3>
+</div>
+<div class="box-body">
+<p>Stay informed about AcreetionOS development:</p>
+<ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--acreetion-text);">
+<li><a href="https://github.com/AcreetionOS-Linux" target="_blank">GitHub</a> - Watch our repos</li>
+<li><a href="https://discord.gg/AJ6uuvtDXY" target="_blank">Discord</a> - Join the community</li>
+<li>RSS Feed (Coming Soon)</li>
+</ul>
+</div>
+</div>
+
+<div class="content-box">
+<div class="box-header">
+<h3>Categories</h3>
+</div>
+<div class="box-body">
+<p><span class="blog-tag">feature</span> New features</p>
+<p style="margin-top: 0.5rem;"><span class="blog-tag">bugfix</span> Bug fixes</p>
+<p style="margin-top: 0.5rem;"><span class="blog-tag">performance</span> Optimizations</p>
+<p style="margin-top: 0.5rem;"><span class="blog-tag">documentation</span> Docs updates</p>
+<p style="margin-top: 0.5rem;"><span class="blog-tag">update</span> General updates</p>
+</div>
+</div>
+
+<div class="content-box">
+<div class="box-header">
+<h3>Release Schedule</h3>
+</div>
+<div class="box-body">
+<p style="color: var(--acreetion-text);">As a rolling release distro, AcreetionOS receives continuous updates.</p>
+<p style="margin-top: 1rem;"><strong>Daily:</strong> Package updates</p>
+<p style="margin-top: 0.5rem;"><strong>Weekly:</strong> Security patches</p>
+<p style="margin-top: 0.5rem;"><strong>Monthly:</strong> ISO snapshots</p>
+</div>
+</div>
+</div>
+</div>
+
+<footer class="page-footer">
+<p>&copy; 2026 AcreetionOS Project. Free and Open Source Software.</p>
+<p>Licensed under GNU General Public License v3.0</p>
+</footer>
+
+</body>
+</html>

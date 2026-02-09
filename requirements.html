@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<!-- Removed invalid http-equiv meta tags for HTML validation -->
+<title>System Requirements - AcreetionOS Linux Minimum & Recommended Specs</title>
+<meta name="description" content="AcreetionOS Linux system requirements. Check if your computer can run AcreetionOS. Minimum and recommended hardware specifications for desktop, laptop, and server installations." />
+<meta name="keywords" content="AcreetionOS requirements, Linux system requirements, can my computer run Linux, minimum specs Linux, Linux hardware requirements, Linux for old computers, Linux RAM requirements" />
+<link rel="canonical" href="https://acreetionos.org/requirements.html" />
+<link rel="stylesheet" href="contact.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+.req-table {
+  width: 100%;
+  margin: 1.5rem 0;
+  border-collapse: collapse;
+}
+.req-table td {
+  padding: 0.9rem;
+  border-bottom: 1px solid var(--acreetion-box-border);
+}
+.req-table td:first-child {
+  font-weight: 700;
+  color: var(--acreetion-text-bright);
+  width: 35%;
+}
+.req-table td:last-child {
+  color: var(--acreetion-text);
+}
+.req-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+.req-card {
+  background: var(--acreetion-panel-bg);
+  border: 1px solid var(--acreetion-box-border);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+.req-card h3 {
+  color: var(--acreetion-green);
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+.spec-badge {
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  background: rgba(46, 204, 113, 0.2);
+  color: var(--acreetion-green);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin: 0.2rem;
+}
+.warn-badge {
+  background: rgba(243, 156, 18, 0.2);
+  color: var(--flasher-color);
+}
+</style>
+<script>
+if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});})}
+</script>
+</head>
+<body>
+<div id="background-grid"></div>
+
+<header class="page-header">
+<div class="header-content">
+<a href="index.html" class="logo">
+<img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" />
+<span class="logo-text">Acreetion<span>OS</span></span>
+</a>
+<nav class="main-nav">
+<a href="index.html">Home</a>
+<a href="install.html">Install</a>
+<a href="compare.html">Compare</a>
+<a href="faq.html">FAQ</a>
+<a href="blog.html">Blog</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<div class="page-wrapper">
+<div class="main-column">
+<div class="content-box">
+<div class="box-header">
+<h1>System Requirements</h1>
+</div>
+<div class="box-body">
+<p style="font-size: 1.1rem; margin-bottom: 2rem;">AcreetionOS is optimized to run on a wide range of hardware, from older laptops to modern gaming PCs. Check the requirements below to ensure compatibility.</p>
+
+<div class="req-grid">
+<div class="req-card">
+<h3>🎯 Minimum Requirements</h3>
+<table class="req-table">
+<tr>
+<td>Processor (CPU)</td>
+<td>64-bit x86_64 processor<br/><span class="spec-badge">1.5 GHz+</span></td>
+</tr>
+<tr>
+<td>Memory (RAM)</td>
+<td><span class="spec-badge">2 GB</span> minimum</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td><span class="spec-badge">20 GB</span> free disk space</td>
+</tr>
+<tr>
+<td>Graphics</td>
+<td>Any GPU with 256MB VRAM<br/>Integrated graphics supported</td>
+</tr>
+<tr>
+<td>Display</td>
+<td>1024×768 resolution minimum</td>
+</tr>
+<tr>
+<td>Boot Mode</td>
+<td>UEFI or Legacy BIOS</td>
+</tr>
+</table>
+<p style="margin-top: 1rem; font-size: 0.9rem; color: var(--acreetion-text);">
+<strong>Note:</strong> System will be functional but may feel sluggish with heavy multitasking.
+</p>
+</div>
+
+<div class="req-card">
+<h3>✅ Recommended Requirements</h3>
+<table class="req-table">
+<tr>
+<td>Processor (CPU)</td>
+<td>Modern 64-bit dual-core<br/><span class="spec-badge">2.0 GHz+</span></td>
+</tr>
+<tr>
+<td>Memory (RAM)</td>
+<td><span class="spec-badge">4 GB</span> or more</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td><span class="spec-badge">40 GB+</span> SSD recommended<br/>(NVMe for best performance)</td>
+</tr>
+<tr>
+<td>Graphics</td>
+<td>Dedicated GPU with 512MB+ VRAM<br/>Intel/AMD/NVIDIA supported</td>
+</tr>
+<tr>
+<td>Display</td>
+<td>1920×1080 (Full HD) or higher</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>Ethernet or Wi-Fi adapter</td>
+</tr>
+</table>
+<p style="margin-top: 1rem; font-size: 0.9rem; color: var(--acreetion-text);">
+<strong>Best for:</strong> Smooth multitasking, development, light gaming, and daily use.
+</p>
+</div>
+</div>
+
+<h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Hardware Compatibility</h2>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Processors (CPUs)</h3>
+<p><span class="spec-badge">✓ Intel</span> Core 2 Duo and newer, Pentium 4+ (64-bit), Celeron, Atom (x86_64 only)</p>
+<p><span class="spec-badge">✓ AMD</span> Athlon 64 and newer, Ryzen series, EPYC, Threadripper</p>
+<p><span class="spec-badge warn-badge">✗ 32-bit</span> AcreetionOS is x86_64 only. 32-bit CPUs are not supported.</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Graphics Cards (GPUs)</h3>
+<p><span class="spec-badge">✓ Intel</span> Integrated graphics (HD Graphics 2000+) - Open source drivers built-in</p>
+<p><span class="spec-badge">✓ AMD</span> Radeon HD 2000+ - Excellent open source support (AMDGPU/RadeonSI)</p>
+<p><span class="spec-badge">✓ NVIDIA</span> GeForce 8 series+ - Proprietary drivers available via Pamac</p>
+<p style="margin-top: 0.5rem; font-size: 0.9rem;"><strong>Note:</strong> NVIDIA users should install proprietary drivers for best performance:<br/>
+<code style="background: var(--acreetion-code-bg); padding: 0.2rem 0.5rem; border-radius: 3px;">sudo pacman -S nvidia nvidia-utils</code></p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Wi-Fi Adapters</h3>
+<p>Most Wi-Fi cards work out of the box. Some Broadcom and Realtek adapters may require additional drivers:</p>
+<ul style="margin-left: 2rem; margin-top: 0.5rem;">
+<li><strong>Intel:</strong> Excellent support (iwlwifi)</li>
+<li><strong>Atheros:</strong> Excellent support (ath9k/ath10k)</li>
+<li><strong>Broadcom:</strong> May need <code style="background: var(--acreetion-code-bg); padding: 0.2rem 0.5rem;">broadcom-wl</code> package</li>
+<li><strong>Realtek:</strong> Usually works, some models need <code style="background: var(--acreetion-code-bg); padding: 0.2rem 0.5rem;">rtl88xxau-aircrack-dkms-git</code></li>
+</ul>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Storage</h3>
+<p><span class="spec-badge">✓ HDD</span> Traditional hard drives work fine (slower boot/load times)</p>
+<p><span class="spec-badge">✓ SSD</span> SATA SSDs provide excellent performance boost</p>
+<p><span class="spec-badge">✓ NVMe</span> Best performance for boot and applications</p>
+<p><span class="spec-badge">✓ eMMC</span> Embedded storage on budget laptops/tablets supported</p>
+
+<h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Performance Benchmarks</h2>
+
+<table class="req-table" style="margin-top: 1rem;">
+<tr>
+<td>Idle RAM Usage</td>
+<td><strong>700 MB - 900 MB</strong> (Cinnamon desktop + system services)</td>
+</tr>
+<tr>
+<td>Boot Time (SSD)</td>
+<td><strong>5-8 seconds</strong> (UEFI, systemd-boot)</td>
+</tr>
+<tr>
+<td>Boot Time (HDD)</td>
+<td><strong>12-18 seconds</strong></td>
+</tr>
+<tr>
+<td>ISO File Size</td>
+<td><strong>~2.5 GB</strong> (includes Cinnamon + essential tools)</td>
+</tr>
+<tr>
+<td>Install Size</td>
+<td><strong>~8-10 GB</strong> after installation</td>
+</tr>
+</table>
+
+<h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Recommended Specs by Use Case</h2>
+
+<div class="req-grid">
+<div class="req-card">
+<h3>💼 Office & Web Browsing</h3>
+<ul style="margin-left: 1.5rem; color: var(--acreetion-text);">
+<li>CPU: Dual-core 2GHz+</li>
+<li>RAM: 4 GB</li>
+<li>Storage: 40 GB SSD</li>
+<li>GPU: Integrated</li>
+</ul>
+<p style="margin-top: 1rem; font-size: 0.9rem;">Perfect for LibreOffice, Firefox, email, and light multitasking.</p>
+</div>
+
+<div class="req-card">
+<h3>💻 Software Development</h3>
+<ul style="margin-left: 1.5rem; color: var(--acreetion-text);">
+<li>CPU: Quad-core 2.5GHz+</li>
+<li>RAM: 8 GB</li>
+<li>Storage: 120 GB SSD</li>
+<li>GPU: Integrated (discrete for GPU compute)</li>
+</ul>
+<p style="margin-top: 1rem; font-size: 0.9rem;">Run VS Code, Docker, VMs, compile code smoothly.</p>
+</div>
+
+<div class="req-card">
+<h3>🎮 Gaming</h3>
+<ul style="margin-left: 1.5rem; color: var(--acreetion-text);">
+<li>CPU: Quad-core 3GHz+ (or Ryzen 5+)</li>
+<li>RAM: 16 GB</li>
+<li>Storage: 250 GB+ NVMe SSD</li>
+<li>GPU: NVIDIA GTX 1060+ or AMD RX 580+</li>
+</ul>
+<p style="margin-top: 1rem; font-size: 0.9rem;">Steam, Proton, native games. Install <code style="background: var(--acreetion-code-bg); padding: 0.2rem 0.4rem;">steam</code> and <code style="background: var(--acreetion-code-bg); padding: 0.2rem 0.4rem;">gamemode</code>.</p>
+</div>
+
+<div class="req-card">
+<h3>🎨 Content Creation</h3>
+<ul style="margin-left: 1.5rem; color: var(--acreetion-text);">
+<li>CPU: 6+ cores, 3GHz+</li>
+<li>RAM: 16-32 GB</li>
+<li>Storage: 500 GB+ NVMe SSD</li>
+<li>GPU: Dedicated with 4GB+ VRAM</li>
+</ul>
+<p style="margin-top: 1rem; font-size: 0.9rem;">Video editing (DaVinci Resolve, Kdenlive), Blender, GIMP, Inkscape.</p>
+</div>
+</div>
+
+<h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Frequently Asked Questions</h2>
+
+<div style="margin-top: 1.5rem;">
+<h3 style="color: var(--acreetion-text-bright); margin-bottom: 0.5rem;">Can I run AcreetionOS on old hardware?</h3>
+<p>Yes! AcreetionOS runs on hardware from 2008+. As long as you have a 64-bit CPU and 2GB RAM, it will work. Performance will be best with 4GB+ RAM and an SSD.</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Does AcreetionOS support ARM processors (Raspberry Pi)?</h3>
+<p>Not yet. AcreetionOS currently only supports x86_64 architecture. ARM support is on our roadmap for future releases.</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">How much RAM does AcreetionOS really need?</h3>
+<p>The desktop environment uses ~700-900MB at idle. With Firefox and a few apps open, expect 2-3GB usage. We recommend 4GB minimum for a comfortable experience.</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Can I dual boot with Windows?</h3>
+<p>Yes! AcreetionOS installer (Calamares) detects Windows and can set up dual boot automatically. Just choose "Install alongside Windows" during partitioning.</p>
+
+<h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Will my laptop's touchpad and function keys work?</h3>
+<p>Most modern laptops have excellent Linux support. Touchpads, keyboard backlights, brightness/volume keys typically work out of the box.</p>
+</div>
+
+<div style="margin-top: 3rem; padding: 2rem; background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--acreetion-green); border-radius: 4px;">
+<h3 style="color: var(--acreetion-green); margin-bottom: 1rem;">Not Sure? Try It Live!</h3>
+<p style="margin-bottom: 1rem;">You can test AcreetionOS without installing it! Boot from USB and run it in "live mode" to check hardware compatibility.</p>
+<a href="install.html" class="btn">Create Live USB</a>
+<a href="index.html#manual-downloads" class="btn" style="background-color: var(--storm-color);">Download ISO</a>
+</div>
+</div>
+</div>
+</div>
+
+<div class="sidebar-column">
+<div class="content-box">
+<div class="box-header">
+<h3>Quick Check</h3>
+</div>
+<div class="box-body">
+<p style="margin-bottom: 1rem;"><strong>Can your computer run AcreetionOS?</strong></p>
+<p style="font-size: 0.9rem; margin-bottom: 0.5rem;">✓ 64-bit processor?</p>
+<p style="font-size: 0.9rem; margin-bottom: 0.5rem;">✓ At least 2GB RAM?</p>
+<p style="font-size: 0.9rem; margin-bottom: 0.5rem;">✓ 20GB+ free space?</p>
+<p style="margin-top: 1rem; font-weight: 700; color: var(--acreetion-green);">If yes to all three, you're good to go!</p>
+</div>
+</div>
+
+<div class="content-box">
+<div class="box-header">
+<h3>Need Help?</h3>
+</div>
+<div class="box-body">
+<ul class="resource-list">
+<li><a href="install.html">Installation Guide</a></li>
+<li><a href="faq.html">FAQ</a></li>
+<li><a href="contact.html">Ask Community</a></li>
+<li><a href="https://discord.gg/AJ6uuvtDXY" target="_blank">Discord Support</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<footer class="page-footer">
+<p>&copy; 2026 AcreetionOS Project. Free and Open Source Software.</p>
+<p>Licensed under GNU General Public License v3.0</p>
+</footer>
+
+</body>
+</html>

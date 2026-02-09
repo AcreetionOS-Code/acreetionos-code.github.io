@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Protocol Mismatch // AcreetionOS 404</title>
+
+    <!-- IMPORTANT: This adds the logo to your browser tab (favicon) -->
+    <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+
+    <!-- External fonts: Inter + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Consolidated Internal Stylesheet -->
+    <style>
+        /* Using external fonts: Inter + JetBrains Mono */
+        :root {
+            /* --- AcreetionOS Soft Dark Palette (No Blinding Whites) --- */
+            --acreetion-green: #2ecc71; /* Main brand green */
+            --acreetion-body-bg: #111111; /* Even darker for a techy feel */
+            --acreetion-panel-bg: #0a0a0a; /* Almost black */
+            --acreetion-box-bg: #1c1c1c; /* Dark grey for contrast */
+            --acreetion-box-border: #333333; /* Softer border */
+            --acreetion-text-bright: #e0e0e0; /* Brighter "white" */
+            --acreetion-text: #a0a0a0;       /* Medium grey for secondary text */
+            --acreetion-code-bg: rgba(46, 204, 113, 0.1); /* Subtle green for code */
+
+            /* --- Accent colors (from existing theme, good for AI/status) --- */
+            --gnome-color: #e06c75; /* Red for errors */
+            --storm-color: #61afef; /* Blue for prompts/status */
+            
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            /* AI Glow/Shadow */
+            --ai-glow: 0 0 15px rgba(46, 204, 113, 0.6), 0 0 30px rgba(46, 204, 113, 0.3);
+            --ai-text-glow: 0 0 8px rgba(46, 204, 113, 0.4);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--acreetion-body-bg);
+            color: var(--acreetion-text-bright);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out forwards;
+            position: relative; /* For background grid */
+            overflow: hidden; /* Prevent scrollbar from bg grid */
+        }
+
+        /* Animated Background Grid */
+        #background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: 
+                linear-gradient(to right, rgba(46, 204, 113, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(46, 204, 113, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px; /* Larger grid for subtle effect */
+            animation: pan-grid 90s linear infinite; /* Slower pan */
+            opacity: 0.3; /* More subtle */
+        }
+
+        @keyframes pan-grid {
+            0% { background-position: 0 0; }
+            100% { background-position: -500px -500px; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body.fade-out { animation: fadeOut 0.5s ease-in-out forwards; }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+        /* --- HEADER --- */
+        .page-header { background-color: var(--acreetion-panel-bg); border-bottom: 4px solid var(--acreetion-green); }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0.75rem 2rem; }
+        .logo { 
+            display: flex; align-items: center; gap: 1rem; 
+            font-family: var(--font-sans); 
+            font-size: 2rem; font-weight: 700; 
+            color: var(--acreetion-text-bright); text-decoration: none; 
+            text-shadow: var(--ai-text-glow); /* Text glow */
+        }
+        .logo-img { height: 45px; }
+        .logo-text span { color: var(--acreetion-green); }
+        .main-nav a { 
+            color: var(--acreetion-text); text-decoration: none; 
+            margin-left: 2rem; font-weight: 500; 
+            transition: color 0.2s, text-shadow 0.2s; 
+        }
+        .main-nav a:hover { 
+            color: var(--acreetion-text-bright); 
+            text-shadow: 0 0 5px rgba(255,255,255,0.2); 
+        }
+
+        /* --- 404 CONTENT --- */
+        .error-wrapper {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-container {
+            max-width: 700px;
+            width: 100%;
+            background-color: var(--acreetion-box-bg); 
+            border: 1px solid var(--acreetion-box-border);
+            border-radius: 8px;
+            padding: 2.5rem;
+            box-shadow: var(--ai-glow); /* AI glow */
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .error-title {
+            font-size: 2.5rem; 
+            font-weight: 700;
+            color: var(--acreetion-green); 
+            margin-bottom: 1rem;
+            text-shadow: var(--ai-text-glow); 
+        }
+
+        .error-message {
+            color: var(--acreetion-text);
+            margin-bottom: 2.5rem; 
+            max-width: 550px; 
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1.1em; 
+        }
+        
+        .btn {
+            display: inline-block;
+            color: black;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+            background-color: var(--acreetion-green);
+            margin-top: 1rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2); /* Slight shadow for button text */
+        }
+        .btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 10px rgba(46, 204, 113, 0.4); /* Button specific glow */
+        }
+
+        /* --- PACMAN TERMINAL ANIMATION --- */
+        .pacman-terminal {
+            font-family: var(--font-mono);
+            background-color: var(--acreetion-panel-bg);
+            border: 1px solid var(--acreetion-box-border);
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-bottom: 2.5rem;
+            text-align: left;
+            overflow-x: auto; 
+            font-size: 0.9em; 
+            box-shadow: 0 0 10px rgba(46, 204, 113, 0.2); /* Subtle terminal glow */
+        }
+        .pacman-terminal .line {
+            white-space: pre-wrap;
+            opacity: 0;
+            animation: appear 0.1s forwards;
+            line-height: 1.5; 
+        }
+        .pacman-terminal .line:nth-child(1) { animation-delay: 0.5s; }
+        .pacman-terminal .line:nth-child(2) { animation-delay: 1.5s; }
+        .pacman-terminal .line:nth-child(3) { animation-delay: 2.5s; }
+        .pacman-terminal .line:nth-child(4) { animation-delay: 3.5s; }
+        .pacman-terminal .line:nth-child(5) { animation-delay: 4.5s; }
+
+        .prompt { color: var(--storm-color); } /* Blue for AI prompt */
+        .command { color: var(--acreetion-text-bright); }
+        .comment { color: var(--acreetion-text); opacity: 0.7; }
+        .error { color: var(--gnome-color); font-weight: bold; text-shadow: 0 0 5px rgba(224, 108, 117, 0.5); } /* Red error with glow */
+        .highlight { color: var(--acreetion-green); font-weight: bold; text-shadow: 0 0 5px rgba(46, 204, 113, 0.5); } /* Green highlight with glow */
+        .ai-log { color: var(--acreetion-text); } /* For AI.Log messages */
+
+
+        .cursor {
+            display: inline-block;
+            background-color: var(--acreetion-text-bright);
+            width: 10px;
+            height: 1.2em;
+            vertical-align: middle;
+            animation: blink 1s step-end infinite;
+        }
+        
+        @keyframes appear {
+            to { opacity: 1; }
+        }
+        
+        @keyframes blink {
+            from, to { background-color: transparent }
+            50% { background-color: var(--acreetion-text-bright); }
+        }
+
+        /* --- FOOTER --- */
+        .page-footer { 
+            text-align: center; padding: 2rem; margin-top: auto; 
+            border-top: 1px solid var(--acreetion-box-border); 
+            color: #777; font-size: 0.9rem; 
+            background-color: var(--acreetion-panel-bg); /* Match header */
+            position: relative;
+            z-index: 1; /* Ensure it's above the grid */
+        }
+        .page-footer p { color: #777; margin-bottom: 0.5rem; }
+        .page-footer a { color: var(--acreetion-green); text-decoration: none; }
+        .page-footer a:hover { text-decoration: underline; }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; gap: 1rem; }
+            .main-nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+            .main-nav a { margin-left: 0; }
+            .error-title { font-size: 2rem; }
+            .pacman-terminal { padding: 1rem; }
+            .error-container { padding: 2rem 1.5rem; }
+        }
+
+        @media (max-width: 480px) {
+            .error-container { padding: 1.5rem; }
+            .error-title { font-size: 1.8rem; }
+            .error-message { font-size: 1em; }
+            .btn { padding: 0.7rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="background-grid"></div>
+
+    <header class="page-header">
+        <div class="header-content">
+            <a href="index.html" class="logo transition-link">
+                <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" loading="lazy" decoding="async">
+                <span class="logo-text">Acreetion<span>OS</span></span>
+            </a>
+            <nav class="main-nav">
+                <a href="index.html">Home</a>
+                <a href="install.html">Install</a>
+                <a href="compare.html">Compare</a>
+                <a href="faq.html">FAQ</a>
+                <a href="blog.html">Blog</a>
+                <a href="contact.html">Contact & Support</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="error-wrapper">
+        <div class="error-container">
+            <h1 class="error-title">AI Protocol Mismatch: Resource Not Found</h1>
+            
+            <div class="pacman-terminal">
+                <div class="line"><span class="prompt">[acreetionAI@core ~]$</span> <span class="command">systemctl locate-resource /path/to/page</span><span class="cursor"></span></div>
+                <div class="line"><span class="ai-log">[AI.Log]: Initiating data stream validation...</span></div>
+                <div class="line"><span class="highlight">[AI.Status]: Network index check: OK</span></div>
+                <div class="line"><span class="highlight">[AI.Status]: Local cache integrity: OK</span></div>
+                <div class="line"><span class="error">[AI.Error]:</span> <span class="command">Target resource hash mismatch. Query "/path/to/page" not found.</span></div>
+            </div>
+
+            <p class="error-message">Our automated retrieval systems encountered an unexpected termination. The requested data stream could not be reconciled with available network indices. This may indicate a corrupted link, a relocated resource, or a decommissioned data point. Please verify your query or return to base.</p>
+            <a href="index.html" class="btn transition-link">Return to Homepage</a>
+        </div>
+    </main>
+
+    <footer class="page-footer">
+        <p>AcreetionOS is an independent project that builds upon the solid foundation of Arch Linux. Visit <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">archlinux.org</a> to learn more about our base.</p>
+        <p>Arch Linux™ is a trademark of Judd Vinet.</p>
+        <p>© 2025 AcreetionOS Project. Powered by AI-assisted development.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- AUTOMATIC REDIRECT ---
+            // Redirect the user back to the homepage after 12 seconds
+            setTimeout(() => {
+                document.body.classList.add('fade-out');
+                 setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 500); // Wait for fade-out animation to complete
+            }, 12000);
+
+            // --- PAGE TRANSITION LOGIC ---
+            // Handles the fade-out effect when a link is clicked
+            const transitionLinks = document.querySelectorAll('.transition-link');
+            transitionLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetUrl = this.href;
+                    document.body.classList.add('fade-out');
+                    setTimeout(() => {
+                        window.location.href = targetUrl;
+                    }, 250); // Should match the CSS animation duration
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

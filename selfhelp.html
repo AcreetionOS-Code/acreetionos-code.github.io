@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Help Info Tool // AcreetionOS</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+
+    <!-- Vue.js Library -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- External fonts: Inter + JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --acreetion-green: #2ecc71;
+            --acreetion-body-bg: #1c1c1c;
+            --acreetion-panel-bg: #111111;
+            --acreetion-box-bg: #2a2a2a;
+            --acreetion-box-border: #444444;
+            --acreetion-text-bright: #d1d1d1;
+            /* Softer, non-blinding "white" */
+            --acreetion-text: #a9a9a9;
+            /* Softer grey for secondary text */
+            --acreetion-code-bg: rgba(46, 204, 113, 0.1);
+
+            /* --- Accent colors --- */
+            --gnome-color: #e06c75;
+            /* Red */
+            --storm-color: #61afef;
+            /* Blue */
+
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        body.fade-out {
+            animation: fadeOut 0.5s ease-in-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0;
+            }
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--acreetion-body-bg);
+            color: var(--acreetion-text-bright);
+            line-height: 1.6;
+            overflow-x: hidden;
+            animation: fadeIn 0.5s ease-out forwards;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        #background-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-image: linear-gradient(rgba(46, 204, 113, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(46, 204, 113, 0.07) 1px, transparent 1px);
+            background-size: 40px 40px;
+            animation: bg-pan 60s linear infinite;
+        }
+
+        @keyframes bg-pan {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: -400px -400px;
+            }
+        }
+
+        #app [v-cloak] {
+            display: none;
+        }
+
+        /* --- HEADER & FOOTER (from main site) --- */
+        .page-header {
+            background-color: var(--acreetion-panel-bg);
+            border-bottom: 4px solid var(--acreetion-green);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-sans);
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--acreetion-text-bright);
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 45px;
+        }
+
+        .logo-text span {
+            color: var(--acreetion-green);
+        }
+
+        .main-nav a {
+            color: var(--acreetion-text);
+            text-decoration: none;
+            margin-left: 2rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .main-nav a:hover,
+        .main-nav a.active {
+            color: var(--acreetion-text-bright);
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: auto;
+            border-top: 1px solid var(--acreetion-box-border);
+            color: #777;
+            font-size: 0.9rem;
+            background-color: var(--acreetion-panel-bg);
+        }
+
+        .page-footer p {
+            color: #777;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-footer a {
+            color: var(--acreetion-green);
+            text-decoration: none;
+        }
+
+        .page-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* --- MAIN CONTENT FOR THIS PAGE --- */
+        .search-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 4rem 25px 80px 25px;
+            flex-grow: 1;
+        }
+
+        .search-logo {
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            font-size: clamp(2rem, 6vw, 4rem);
+            color: var(--acreetion-text-bright);
+            margin-bottom: 30px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(46, 204, 113, 0.2), 0 0 20px var(--acreetion-green);
+            line-height: 1.2;
+        }
+
+        .search-form {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 18px 60px 18px 25px;
+            font-family: var(--font-mono);
+            font-size: 1.2em;
+            color: var(--acreetion-text-bright);
+            background-color: var(--acreetion-box-bg);
+            border: 2px solid var(--acreetion-box-border);
+            border-radius: 50px;
+            outline: none;
+            transition: all .3s ease;
+        }
+
+        #searchInput:focus {
+            border-color: var(--acreetion-green);
+            box-shadow: 0 0 25px rgba(46, 204, 113, 0.3);
+        }
+
+        #searchButton {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 48px;
+            height: 48px;
+            background: var(--acreetion-green);
+            /* Using single green for simplicity */
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform .3s ease;
+        }
+
+        #searchButton:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .results-wrapper {
+            width: 100%;
+            max-width: 900px;
+            padding: 0 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .result-item {
+            background: var(--acreetion-box-bg);
+            border: 1px solid var(--acreetion-box-border);
+            padding: 25px;
+            border-radius: 10px;
+            position: relative;
+            animation: fadeInResult 0.5s ease forwards;
+            transition: transform .3s ease, box-shadow .3s ease;
+            cursor: pointer;
+        }
+
+        .is-chromium .result-item {
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes fadeInResult {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(46, 204, 113, 0.3);
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .result-source-tag {
+            font-family: var(--font-mono);
+            /* Changed from Orbitron */
+            font-size: 0.8em;
+            padding: 4px 10px;
+            border-radius: 5px;
+            color: #fff;
+            /* White text on colored tag */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .result-title-link {
+            text-decoration: none;
+            color: var(--acreetion-green);
+        }
+
+        .result-title {
+            font-size: 1.25em;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .result-item:hover .result-title-link {
+            color: var(--acreetion-text-bright);
+            text-decoration: underline;
+        }
+
+        .result-snippet {
+            font-size: 0.95em;
+            color: var(--acreetion-text);
+            opacity: 0.8;
+        }
+
+        .result-snippet .searchmatch {
+            font-weight: bold;
+            color: var(--acreetion-green);
+            background-color: var(--acreetion-code-bg);
+        }
+
+        .ai-controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .ai-button {
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            font-size: 1em;
+            padding: 10px 25px;
+            border-radius: 50px;
+            border: 2px solid var(--acreetion-green);
+            color: var(--acreetion-text-bright);
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-button:hover {
+            background: var(--acreetion-green);
+            color: var(--acreetion-body-bg);
+            /* Dark text for contrast on bright green */
+            border-color: var(--acreetion-green);
+        }
+
+        .ai-button:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(80%);
+        }
+
+        /* General Modal Styles (shared with AI modal) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(28, 28, 28, 0.8);
+            /* Using body-bg with transparency */
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        .is-chromium .modal-overlay {
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-box {
+            background: var(--acreetion-box-bg);
+            border: 1px solid var(--acreetion-green);
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(46, 204, 113, 0.3);
+            position: relative;
+        }
+
+        .modal-box h2 {
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--acreetion-green);
+        }
+
+        .modal-box p {
+            margin-bottom: 15px;
+            opacity: 0.9;
+            line-height: 1.8;
+        }
+
+        .modal-box strong {
+            color: var(--acreetion-green);
+        }
+
+        .modal-button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            font-size: 1.1em;
+            border: none;
+            border-radius: 8px;
+            background: var(--acreetion-green);
+            color: var(--acreetion-body-bg);
+            /* Dark text for contrast */
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .countdown {
+            margin-top: 20px;
+            font-family: var(--font-mono);
+            opacity: 0.7;
+            font-size: 0.9em;
+        }
+
+        /* Article Modal Specific Styles */
+        .article-modal-box {
+            max-width: 800px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .article-modal-box h2 {
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .article-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding-right: 15px;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .article-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .article-content::-webkit-scrollbar-track {
+            background: var(--acreetion-box-bg);
+            border-radius: 10px;
+        }
+
+        .article-content::-webkit-scrollbar-thumb {
+            background: var(--acreetion-green);
+            border-radius: 10px;
+        }
+
+        .article-content::-webkit-scrollbar-thumb:hover {
+            background: var(--acreetion-green);
+        }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 15px auto;
+            border-radius: 5px;
+        }
+
+        .article-content a {
+            color: var(--acreetion-green);
+            text-decoration: none;
+        }
+
+        .article-content a:hover {
+            text-decoration: underline;
+        }
+
+        .article-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        .article-content th,
+        .article-content td {
+            border: 1px solid var(--acreetion-box-border);
+            padding: 8px;
+            text-align: left;
+        }
+
+        .article-content pre,
+        .article-content code {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 5px 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+        }
+
+        .article-content pre {
+            display: block;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.8em;
+            color: var(--acreetion-text-bright);
+            cursor: pointer;
+            line-height: 1;
+            padding: 5px;
+            transition: color 0.2s ease;
+        }
+
+        .close-button:hover {
+            color: var(--acreetion-green);
+        }
+
+        .external-search-section {
+            margin-top: 40px;
+        }
+
+        .external-search-section h3 {
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            text-align: center;
+            margin-bottom: 20px;
+            opacity: 0.8;
+            font-size: 1.4em;
+        }
+
+        .external-link {
+            display: flex;
+            align-items: center;
+            background: var(--acreetion-box-bg);
+            border: 1px solid var(--acreetion-box-border);
+            border-radius: 10px;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: var(--acreetion-text-bright);
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            /* Added spacing */
+        }
+
+        .external-link.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(80%);
+        }
+
+        .external-link:not(.disabled):hover {
+            border-color: var(--acreetion-green);
+        }
+
+        .external-link .source-name {
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            font-size: 1.1em;
+            flex-shrink: 0;
+            margin-right: 20px;
+        }
+
+        .external-link .query-display {
+            flex-grow: 1;
+            text-align: left;
+            font-family: var(--font-mono);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.6;
+        }
+
+        .external-link .action-btn {
+            flex-shrink: 0;
+            margin-left: 20px;
+            padding: 10px 20px;
+            background-color: var(--acreetion-green);
+            /* Using main green */
+            color: var(--acreetion-body-bg);
+            /* Dark text for contrast */
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-sans);
+            /* Changed from Orbitron */
+            transition: background-color 0.3s;
+        }
+
+        .external-link:hover .action-btn {
+            background-color: var(--acreetion-green);
+        }
+
+        .notice {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.1em;
+            font-family: var(--font-mono);
+            opacity: 0.7;
+        }
+
+        .notice-query {
+            font-weight: bold;
+            color: var(--acreetion-green);
+        }
+    </style>
+    <script>
+        (function () { document.documentElement.classList.add(navigator.userAgent.includes("Firefox") ? "is-firefox" : "is-chromium"); })();
+    </script>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <header class="page-header">
+            <div class="header-content">
+                <a href="index.html" class="logo transition-link">
+                    <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" loading="lazy"
+                        decoding="async">
+                    <span class="logo-text">Acreetion<span>OS</span></span>
+                </a>
+                <nav class="main-nav">
+                    <a href="index.html" class="transition-link">Home</a>
+                    <a href="install.html">Install</a>
+                    <a href="compare.html">Compare</a>
+                    <a href="faq.html">FAQ</a>
+                    <a href="blog.html">Blog</a>
+                    <a href="contact.html" class="transition-link">Contact & Support</a>
+                </nav>
+            </div>
+        </header>
+
+        <div id="background-grid"></div>
+
+        <!-- AI Helper Modal -->
+        <div class="modal-overlay" v-if="showAiModal">
+            <div class="modal-box">
+                <h2>Transferring to Google AI Studio</h2>
+                <p>For security, this page cannot automatically run Gemini for you. Instead, we will do the next best
+                    thing:</p>
+                <p><strong>A detailed prompt has been copied to your clipboard.</strong> Simply paste it into AI Studio
+                    to get your answer.</p>
+                <div class="countdown">Redirecting in {{ countdown }} seconds...</div>
+                <button class="modal-button" @click="proceedToAi">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.72" />
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.72-1.72" />
+                    </svg>
+                    Copy & Go Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Article Viewer Modal -->
+        <div class="modal-overlay" v-if="showArticleModal">
+            <div class="modal-box article-modal-box">
+                <button class="close-button" @click="closeArticleModal">×</button>
+                <h2 v-if="currentArticle">{{ currentArticle.title }}</h2>
+                <div v-if="currentArticle" class="article-content">
+                    <div v-html="currentArticle.content"></div>
+                    <p v-if="currentArticle.external" style="margin-top: 20px; text-align: center;">
+                        <a :href="currentArticle.url" target="_blank" rel="noopener noreferrer" class="modal-button">
+                            View on {{ currentArticle.source }}
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                <polyline points="15 3 21 3 21 9" />
+                                <line x1="10" y1="14" x2="21" y2="3" />
+                            </svg>
+                        </a>
+                    </p>
+                </div>
+                <div v-else class="notice">Loading article...</div>
+            </div>
+        </div>
+
+        <main class="search-wrapper">
+            <h1 class="search-logo">Self-Help Info Tool</h1>
+
+            <form class="search-form" @submit.prevent="performSearch">
+                <input type="text" id="searchInput" placeholder="Search Gentoo and Microsoft Docs..." autocomplete="off"
+                    v-model="searchQuery">
+                <button type="submit" id="searchButton" aria-label="Submit search">
+                    <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"
+                        style="width:20px;height:20px; color: white;">
+                        <path d="M16.67 16.64L21 21M19 11c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8 8 3.58 8 8Z" />
+                    </svg>
+                </button>
+            </form>
+
+            <div class="results-wrapper">
+                <div class="ai-controls" v-if="hasSearched && !isLoading">
+                    <button @click="startAiProcess" class="ai-button" :disabled="!searchQuery">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+                        </svg>
+                        Ask AI in Google Studio
+                    </button>
+                </div>
+
+                <div v-if="isLoading" class="notice">Searching...</div>
+
+                <template v-else-if="results.length > 0">
+                    <div v-for="(result, index) in results" :key="result.pageid + result.sourceKey" class="result-item"
+                        :style="{animationDelay: index * 40 + 'ms'}" @click="openArticleModal(result)">
+                        <div class="result-header">
+                            <span class="result-source-tag"
+                                :style="{ backgroundColor: SOURCES[result.sourceKey].color }">{{
+                                SOURCES[result.sourceKey].name }}</span>
+                        </div>
+                        <h3 class="result-title"><a :href="result.pageUrl" target="_blank" rel="noopener noreferrer"
+                                class="result-title-link" @click.stop>{{ result.title }}</a></h3>
+                        <div class="result-snippet" v-html="result.snippet"></div>
+                    </div>
+                </template>
+
+                <div v-else-if="infoMessage" class="notice" v-html="infoMessage"></div>
+
+                <div v-if="hasSearched" class="external-search-section">
+                    <h3>External Search</h3>
+                    <p style="text-align: center; margin-bottom: 15px; font-size: 0.9em; opacity: 0.8;">
+                        Direct search API for some sources may be unavailable. Use these links to search externally.
+                    </p>
+                    <a v-for="source in externalSources" :key="source.key" :href="generateExternalUrl(source.key)"
+                        target="_blank" rel="noopener noreferrer" class="external-link"
+                        :class="{ 'disabled': !searchQuery }">
+                        <span class="source-name">{{ source.name }}</span>
+                        <span class="query-display">{{ searchQuery }}</span>
+                        <span class="action-btn">Search</span>
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="page-footer">
+            <p>AcreetionOS is an independent project proudly built on the powerful and flexible foundation of <a
+                    href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. We are
+                immensely grateful to the Arch community for their incredible work.</p>
+            <p>Follow our development on <a href="https://github.com/acreetionos-linux/" target="_blank"
+                    rel="noopener noreferrer">GitHub</a>.</p>
+            <p>© 2025 AcreetionOS Project. Arch Linux™ is a trademark of Judd Vinet. We are not affiliated with the Arch
+                Linux project.</p>
+        </footer>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, watch } = Vue;
+
+        createApp({
+            setup() {
+                // --- DATA SOURCES ---
+                const SOURCES = {
+                    arch: { name: 'Arch Wiki', type: 'external', searchDomain: 'wiki.archlinux.org', color: '#2ecc71' }, // Acreetion Green
+                    gentoo: { name: 'Gentoo Wiki', type: 'wiki', api: 'https://wiki.gentoo.org/api.php', color: '#e06c75' }, // Gnome Color (Red) for variety
+                    microsoft: { name: 'Microsoft Docs', type: 'external', searchDomain: 'learn.microsoft.com', color: '#61afef' } // Storm Color (Blue)
+                };
+
+                // --- STATE MANAGEMENT ---
+                const searchQuery = ref('');
+                const results = ref([]);
+                const isLoading = ref(false);
+                const hasSearched = ref(false);
+                let debounceTimer = null;
+
+                // AI Modal State
+                const showAiModal = ref(false);
+                const countdown = ref(15);
+                let countdownTimer = null;
+
+                // Article Modal State
+                const showArticleModal = ref(false);
+                const currentArticle = ref(null); // { title, content, url, source, external? }
+
+                // --- COMPUTED PROPERTIES ---
+                const wikiSources = computed(() => Object.entries(SOURCES).filter(([_, s]) => s.type === 'wiki').map(([key, val]) => ({ key, ...val })));
+                const externalSources = computed(() => Object.entries(SOURCES).filter(([_, s]) => s.type === 'external').map(([key, val]) => ({ key, ...val })));
+                const infoMessage = computed(() => {
+                    if (!hasSearched.value) return 'Enter a query to begin.';
+                    // If there are no results AND there are still 'wiki' sources we attempted to search
+                    if (results.value.length === 0 && wikiSources.value.length > 0) {
+                        return `No direct results found for '<span class="notice-query">${searchQuery.value}</span>' from available wiki sources. Please check external search options below.`;
+                    }
+                    return '';
+                });
+
+                // --- METHODS ---
+                const fetchWikiResults = async (source, query) => {
+                    const url = `${source.api}?action=query&list=search&srsearch=${encodeURIComponent(query)}&srprop=snippet&format=json&origin=*`;
+                    try {
+                        const response = await fetch(url, { signal: AbortSignal.timeout(8000) });
+                        if (!response.ok) {
+                            console.error(`API for ${source.name} failed with status: ${response.status}`);
+                            return [];
+                        }
+                        const data = await response.json();
+                        return (data.query?.search || []).map(result => ({ ...result, sourceKey: source.key, pageUrl: `${new URL(source.api).origin}/index.php?title=${encodeURIComponent(result.title)}` }));
+                    } catch (error) {
+                        console.error(`Failed to fetch search results from ${source.name}:`, error);
+                        return [];
+                    }
+                };
+
+                const fetchArticleContent = async (source, title) => {
+                    const url = `${source.api}?action=parse&page=${encodeURIComponent(title)}&format=json&prop=text&origin=*`;
+                    try {
+                        const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
+                        if (!response.ok) throw new Error(`API for ${source.name} article failed with status: ${response.status}`);
+                        const data = await response.json();
+                        if (data.parse && data.parse.text) {
+                            return data.parse.text['*'];
+                        }
+                        return null;
+                    } catch (error) {
+                        console.error(`Failed to fetch article content from ${source.name}:`, error);
+                        return `<p>Could not load content from ${source.name}. Please try visiting the <a href="${source.pageUrl}" target="_blank">original page</a>.</p>`;
+                    }
+                };
+
+                const performSearch = async () => {
+                    const query = searchQuery.value.trim();
+                    if (!query) {
+                        results.value = [];
+                        hasSearched.value = false;
+                        return;
+                    }
+                    isLoading.value = true;
+                    hasSearched.value = true;
+                    results.value = [];
+
+                    const settledResults = await Promise.allSettled(wikiSources.value.map(s => fetchWikiResults(s, query)));
+                    let combinedResults = settledResults.flatMap(res => (res.status === 'fulfilled' ? res.value : []));
+                    combinedResults.sort((a, b) => (b.snippet.includes('searchmatch') ? 1 : 0) - (a.snippet.includes('searchmatch') ? 1 : 0));
+
+                    results.value = combinedResults;
+                    isLoading.value = false;
+                };
+
+                const generateExternalUrl = (sourceKey) => {
+                    if (!searchQuery.value) return '#';
+                    const source = SOURCES[sourceKey];
+                    const fullQuery = `site:${source.searchDomain} ${searchQuery.value}`;
+                    return `https://duckduckgo.com/?q=${encodeURIComponent(fullQuery)}`;
+                };
+
+                // --- AI METHOD: "Copy & Go with Countdown" ---
+                const constructAiPrompt = () => {
+                    const query = searchQuery.value.trim();
+                    const searchContext = results.value.length > 0
+                        ? results.value
+                            .map(r => `Title: ${r.title}\nSnippet: ${r.snippet.replace(/<[^>]*>/g, '')}`)
+                            .join('\n\n---\n\n')
+                        : 'No specific search results were found, please answer based on general knowledge.';
+
+                    return `Act as an expert technical assistant. Based on the context below, provide a comprehensive answer for the user's query. Use Markdown for formatting, such as lists, code blocks, and bold text.\n\n## User Query:\n"${query}"\n\n## Context from Search Results:\n${searchContext}`;
+                };
+
+                const startAiProcess = () => {
+                    if (countdownTimer) clearInterval(countdownTimer);
+
+                    showAiModal.value = true;
+                    countdown.value = 15;
+
+                    countdownTimer = setInterval(() => {
+                        countdown.value--;
+                        if (countdown.value <= 0) {
+                            proceedToAi();
+                        }
+                    }, 1000);
+                };
+
+                const proceedToAi = () => {
+                    if (countdownTimer) clearInterval(countdownTimer);
+                    const prompt = constructAiPrompt();
+
+                    navigator.clipboard.writeText(prompt).then(() => {
+                        window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank');
+                        showAiModal.value = false;
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        alert("Failed to copy prompt to clipboard. The AI Studio will still open.");
+                        window.open('https://aistudio.google.com/app/prompts/new_chat', '_blank');
+                        showAiModal.value = false;
+                    });
+                };
+
+                // --- Article Modal Methods ---
+                const openArticleModal = async (result) => {
+                    currentArticle.value = null;
+                    showArticleModal.value = true;
+
+                    const source = SOURCES[result.sourceKey];
+
+                    if (source.type === 'wiki') {
+                        const content = await fetchArticleContent(source, result.title);
+                        currentArticle.value = {
+                            title: result.title,
+                            content: content || '<p>Failed to load article content.</p>',
+                            url: result.pageUrl,
+                            source: source.name,
+                            external: false
+                        };
+                    } else if (source.type === 'external') {
+                        currentArticle.value = {
+                            title: result.title,
+                            content: '<p>Content from this external source cannot be displayed directly here due to security and cross-origin policy restrictions.</p><p>Please click the button below to view the article on its original site.</p>',
+                            url: result.pageUrl,
+                            source: source.name,
+                            external: true
+                        };
+                    }
+                };
+
+                const closeArticleModal = () => {
+                    showArticleModal.value = false;
+                    currentArticle.value = null;
+                };
+
+                // --- WATCHER ---
+                watch(searchQuery, (newQuery) => {
+                    clearTimeout(debounceTimer);
+                    if (newQuery.trim()) {
+                        debounceTimer = setTimeout(performSearch, 500);
+                    } else {
+                        results.value = [];
+                        hasSearched.value = false;
+                    }
+                });
+
+                // --- PAGE TRANSITION LOGIC ---
+                // Must be outside Vue setup
+                document.querySelectorAll('.transition-link').forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        const targetUrl = this.href;
+                        document.body.classList.add('fade-out');
+                        setTimeout(() => {
+                            window.location.href = targetUrl;
+                        }, 250); // Should match the animation duration
+                    });
+                });
+
+                return {
+                    SOURCES, searchQuery, results, isLoading, hasSearched, infoMessage,
+                    externalSources, performSearch, generateExternalUrl,
+                    showAiModal, countdown, startAiProcess, proceedToAi,
+                    showArticleModal, currentArticle, openArticleModal, closeArticleModal
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+
+</html>
