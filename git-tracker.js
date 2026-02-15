@@ -14,7 +14,7 @@ const repoSearch = document.getElementById('repo-search');
 const modal = document.getElementById('modal');
 
 // Use the GitHub organization name (lowercase is conventional)
-const ORG = 'acreetionos-linux';
+const ORG = 'AcreetionOS-Code';
 const API_URL = `https://api.github.com/orgs/${ORG}/repos`;
 
 let allRepos = [];
