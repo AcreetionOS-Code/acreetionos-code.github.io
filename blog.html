@@ -100,7 +100,7 @@ async function loadGitHubActivity() {
   
   try {
     // Fetch repository info
-    const repoResponse = await fetch('https://api.github.com/repos/AcreetionOS-Linux/acreetionos-linux.github.io');
+    const repoResponse = await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io');
     const repoData = await repoResponse.json();
     
     // Display stats
@@ -126,7 +126,7 @@ async function loadGitHubActivity() {
     }
     
     // Fetch commits for blog posts
-    const commitsResponse = await fetch('https://api.github.com/repos/AcreetionOS-Linux/acreetionos/commits?per_page=10');
+    const commitsResponse = await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos/commits?per_page=10');
     const commits = await commitsResponse.json();
     
     if (postsContainer && Array.isArray(commits)) {
@@ -174,7 +174,7 @@ async function loadGitHubActivity() {
           </div>
           <div class="blog-content">
             <p>Stay tuned for the latest updates, release notes, and announcements about AcreetionOS development!</p>
-            <p>Follow our <a href="https://github.com/AcreetionOS-Linux" target="_blank" style="color: var(--acreetion-green);">GitHub organization</a> for real-time updates.</p>
+            <p>Follow our <a href="https://github.com/AcreetionOS-Code" target="_blank" style="color: var(--acreetion-green);">GitHub organization</a> for real-time updates.</p>
           </div>
         </div>
       `;
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', loadGitHubActivity);
 <div class="box-body">
 <p>Stay informed about AcreetionOS development:</p>
 <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--acreetion-text);">
-<li><a href="https://github.com/AcreetionOS-Linux" target="_blank">GitHub</a> - Watch our repos</li>
+<li><a href="https://github.com/AcreetionOS-Code" target="_blank">GitHub</a> - Watch our repos</li>
 <li><a href="https://discord.gg/AJ6uuvtDXY" target="_blank">Discord</a> - Join the community</li>
 <li>RSS Feed (Coming Soon)</li>
 </ul>
