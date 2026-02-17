@@ -121,4 +121,60 @@ test.describe('Mobile Responsiveness', () => {
     const nameInput = page.locator('input[name="name"]');
     await expect(nameInput).toBeVisible();
   });
+
+  test('install.html scales properly on mobile (375px)', async ({ page }) => {
+    // Set mobile viewport (iPhone SE size)
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/install.html');
+    
+    // Verify page is accessible
+    await expect(page).toHaveTitle(/Installation Guide/);
+    
+    // Verify main heading is visible
+    const heading = page.locator('h1').first();
+    await expect(heading).toBeVisible();
+    await expect(heading).toContainText('Installation Guide');
+    
+    // Verify code blocks are visible and have overflow-x handling
+    const codeBlocks = page.locator('pre');
+    await expect(codeBlocks.first()).toBeVisible();
+    
+    // Verify lists are visible
+    const lists = page.locator('.box-body ul, .box-body ol');
+    await expect(lists.first()).toBeVisible();
+  });
+
+  test('install.html scales properly on extra small mobile (320px)', async ({ page }) => {
+    // Set very small mobile viewport (iPhone 5/SE)
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/install.html');
+    
+    // Verify critical elements are still visible
+    await expect(page).toHaveTitle(/Installation Guide/);
+    
+    // Verify logo is visible
+    const logo = page.locator('.logo-img');
+    await expect(logo).toBeVisible();
+    
+    // Verify content is readable
+    const heading = page.locator('h1').first();
+    await expect(heading).toBeVisible();
+  });
+
+  test('install.html scales properly on tablet (768px)', async ({ page }) => {
+    // Set tablet viewport (iPad size)
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto('/install.html');
+    
+    // Verify page layout adapts
+    await expect(page).toHaveTitle(/Installation Guide/);
+    
+    // Verify content boxes are visible
+    const contentBox = page.locator('.content-box').first();
+    await expect(contentBox).toBeVisible();
+    
+    // Verify sidebar is visible on tablet
+    const sidebar = page.locator('.sidebar-column');
+    await expect(sidebar).toBeVisible();
+  });
 });
