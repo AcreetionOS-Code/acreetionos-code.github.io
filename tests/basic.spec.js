@@ -122,46 +122,39 @@ test.describe('Mobile Responsiveness', () => {
     await expect(nameInput).toBeVisible();
   });
 
-  test('FAQ page renders correctly on mobile (375px)', async ({ page }) => {
-    // Set mobile viewport (iPhone size)
+  test('compare page tables are scrollable on mobile', async ({ page }) => {
+    // Set mobile viewport (iPhone SE size)
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/faq.html');
+    await page.goto('/compare.html');
     
     // Verify page loads
-    await expect(page).toHaveTitle(/FAQ/);
+    await expect(page).toHaveTitle(/Compare/);
     
-    // Verify FAQ sections are visible
-    const faqSection = page.locator('.faq-section').first();
-    await expect(faqSection).toBeVisible();
+    // Verify all comparison tables have overflow wrappers
+    const overflowWrappers = page.locator('div[style*="overflow-x: auto"]');
+    const count = await overflowWrappers.count();
+    expect(count).toBeGreaterThanOrEqual(5); // Should have 5 tables with overflow wrappers (1 quick comparison + 4 detailed)
     
-    // Verify FAQ questions are clickable
-    const faqQuestion = page.locator('.faq-question').first();
-    await expect(faqQuestion).toBeVisible();
+    // Verify tables are visible
+    const tables = page.locator('.comparison-table');
+    const tableCount = await tables.count();
+    expect(tableCount).toBeGreaterThan(0);
     
-    // Verify table of contents is visible
-    const faqToc = page.locator('.faq-toc');
-    await expect(faqToc).toBeVisible();
+    // Verify first table is visible
+    await expect(tables.first()).toBeVisible();
   });
 
-  test('FAQ page renders correctly on very small mobile (320px)', async ({ page }) => {
-    // Set very small mobile viewport
-    await page.setViewportSize({ width: 320, height: 568 });
-    await page.goto('/faq.html');
+  test('compare page feature cards stack on mobile', async ({ page }) => {
+    // Set mobile viewport
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/compare.html');
     
-    // Verify page loads
-    await expect(page).toHaveTitle(/FAQ/);
+    // Verify feature cards are visible
+    const featureCards = page.locator('.feature-card');
+    const cardCount = await featureCards.count();
+    expect(cardCount).toBeGreaterThan(0);
     
-    // Verify critical elements are still visible and accessible
-    const faqSection = page.locator('.faq-section').first();
-    await expect(faqSection).toBeVisible();
-    
-    // Verify code blocks don't cause horizontal scrolling issues
-    const preBlocks = page.locator('.faq-answer pre');
-    const count = await preBlocks.count();
-    expect(count).toBeGreaterThan(0);
-    
-    // Verify buttons are visible
-    const buttons = page.locator('.btn');
-    await expect(buttons.first()).toBeVisible();
+    // Verify first card is visible
+    await expect(featureCards.first()).toBeVisible();
   });
 });
