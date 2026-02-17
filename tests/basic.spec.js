@@ -121,4 +121,40 @@ test.describe('Mobile Responsiveness', () => {
     const nameInput = page.locator('input[name="name"]');
     await expect(nameInput).toBeVisible();
   });
+
+  test('compare page tables are scrollable on mobile', async ({ page }) => {
+    // Set mobile viewport (iPhone SE size)
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/compare.html');
+    
+    // Verify page loads
+    await expect(page).toHaveTitle(/Compare/);
+    
+    // Verify all comparison tables have overflow wrappers
+    const overflowWrappers = page.locator('div[style*="overflow-x: auto"]');
+    const count = await overflowWrappers.count();
+    expect(count).toBeGreaterThanOrEqual(5); // Should have at least 5 tables with overflow wrappers
+    
+    // Verify tables are visible
+    const tables = page.locator('.comparison-table');
+    const tableCount = await tables.count();
+    expect(tableCount).toBeGreaterThan(0);
+    
+    // Verify first table is visible
+    await expect(tables.first()).toBeVisible();
+  });
+
+  test('compare page feature cards stack on mobile', async ({ page }) => {
+    // Set mobile viewport
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/compare.html');
+    
+    // Verify feature cards are visible
+    const featureCards = page.locator('.feature-card');
+    const cardCount = await featureCards.count();
+    expect(cardCount).toBeGreaterThan(0);
+    
+    // Verify first card is visible
+    await expect(featureCards.first()).toBeVisible();
+  });
 });
