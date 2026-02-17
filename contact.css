@@ -642,6 +642,12 @@ body {
         margin: 0 0.5rem;
     }
     
+    /* Footer mobile optimization */
+    .page-footer {
+        padding: 1.5rem 1rem;
+        font-size: 0.85rem;
+    }
+    
     /* Mobile optimizations for install.html content
      * Note: !important is required here to override inline styles in install.html
      * These inline styles (e.g., style="margin-top: 2rem") cannot be removed as they
@@ -745,6 +751,16 @@ body {
     .form-group input,
     .form-group textarea {
         font-size: 0.95rem;
+    }
+    
+    /* Footer mobile optimization for small screens */
+    .page-footer {
+        padding: 1rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .page-footer p {
+        margin-bottom: 0.4rem;
     }
     
     /* Enhanced mobile optimizations for install.html on extra small screens
