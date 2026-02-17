@@ -97,24 +97,24 @@
     padding: 1rem;
   }
   
-  .box-header h1 {
+  .content-box .box-header h1 {
     font-size: 1.5rem;
   }
   
-  .box-body h2 {
-    font-size: 1.3rem !important;
-    margin-top: 2rem !important;
-    margin-bottom: 1rem !important;
+  .content-box .box-body h2 {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
   }
   
-  .box-body h3 {
-    font-size: 1.1rem !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 0.75rem !important;
+  .content-box .box-body h3 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
   }
   
-  .box-body > p:first-child {
-    font-size: 1rem !important;
+  .content-box .box-body > p:first-child {
+    font-size: 1rem;
   }
 }
 
@@ -136,38 +136,38 @@
     font-size: 0.85rem;
   }
   
-  .box-header h1 {
+  .content-box .box-header h1 {
     font-size: 1.3rem;
   }
   
-  .box-body h2 {
-    font-size: 1.1rem !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 0.75rem !important;
+  .content-box .box-body h2 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
   }
   
-  .box-body h3 {
-    font-size: 1rem !important;
-    margin-top: 1rem !important;
-    margin-bottom: 0.5rem !important;
+  .content-box .box-body h3 {
+    font-size: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
   }
   
-  .box-body > p:first-child {
-    font-size: 0.95rem !important;
-    margin-bottom: 1.5rem !important;
+  .content-box .box-body > p:first-child {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
   }
   
-  .box-body > div[style*="margin-top: 3rem"] {
-    margin-top: 2rem !important;
-    padding: 1rem !important;
+  .cta-section {
+    margin-top: 2rem;
+    padding: 1rem;
   }
   
-  .box-body > div[style*="margin-top: 3rem"] h3 {
-    font-size: 1rem !important;
+  .cta-section h3 {
+    font-size: 1rem;
   }
   
-  .box-body > div[style*="margin-top: 3rem"] p {
-    font-size: 0.9rem !important;
+  .cta-section p {
+    font-size: 0.9rem;
   }
 }
 </style>
@@ -484,7 +484,7 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 </div>
 </div>
 
-<div style="margin-top: 3rem; padding: 2rem; background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--acreetion-green); border-radius: 4px;">
+<div class="cta-section" style="margin-top: 3rem; padding: 2rem; background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--acreetion-green); border-radius: 4px;">
 <h3 style="color: var(--acreetion-green); margin-bottom: 1rem;">Ready to Switch?</h3>
 <p style="margin-bottom: 1rem;">AcreetionOS combines the power of Arch Linux with the ease of Ubuntu. Try it risk-free with a live USB!</p>
 <a href="index.html#manual-downloads" class="btn">Download AcreetionOS</a>
