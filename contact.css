@@ -642,7 +642,11 @@ body {
         margin: 0 0.5rem;
     }
     
-    /* Mobile optimizations for install.html content */
+    /* Mobile optimizations for install.html content
+     * Note: !important is required here to override inline styles in install.html
+     * These inline styles (e.g., style="margin-top: 2rem") cannot be removed as they
+     * are intentional for desktop layout, but need to be overridden for mobile readability.
+     */
     .box-body h2 {
         margin-top: 1.5rem !important;
         margin-bottom: 0.75rem !important;
@@ -743,7 +747,11 @@ body {
         font-size: 0.95rem;
     }
     
-    /* Enhanced mobile optimizations for install.html */
+    /* Enhanced mobile optimizations for install.html on extra small screens
+     * Note: !important is required to override inline styles for better mobile readability
+     * These styles are more aggressive than the 768px breakpoint to ensure proper
+     * text scaling and spacing on the smallest mobile devices (320px width).
+     */
     .box-body h2 {
         margin-top: 1.25rem !important;
         margin-bottom: 0.5rem !important;
