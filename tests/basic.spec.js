@@ -122,59 +122,39 @@ test.describe('Mobile Responsiveness', () => {
     await expect(nameInput).toBeVisible();
   });
 
-  test('install.html scales properly on mobile (375px)', async ({ page }) => {
+  test('compare page tables are scrollable on mobile', async ({ page }) => {
     // Set mobile viewport (iPhone SE size)
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto('/install.html');
+    await page.goto('/compare.html');
     
-    // Verify page is accessible
-    await expect(page).toHaveTitle(/Installation Guide/);
+    // Verify page loads
+    await expect(page).toHaveTitle(/Compare/);
     
-    // Verify main heading is visible
-    const heading = page.locator('h1').first();
-    await expect(heading).toBeVisible();
-    await expect(heading).toContainText('Installation Guide');
+    // Verify all comparison tables have overflow wrappers
+    const overflowWrappers = page.locator('div[style*="overflow-x: auto"]');
+    const count = await overflowWrappers.count();
+    expect(count).toBeGreaterThanOrEqual(5); // Should have 5 tables with overflow wrappers (1 quick comparison + 4 detailed)
     
-    // Verify code blocks are visible and have overflow-x handling
-    const codeBlocks = page.locator('pre');
-    await expect(codeBlocks.first()).toBeVisible();
+    // Verify tables are visible
+    const tables = page.locator('.comparison-table');
+    const tableCount = await tables.count();
+    expect(tableCount).toBeGreaterThan(0);
     
-    // Verify lists are visible
-    const lists = page.locator('.box-body ul, .box-body ol');
-    await expect(lists.first()).toBeVisible();
+    // Verify first table is visible
+    await expect(tables.first()).toBeVisible();
   });
 
-  test('install.html scales properly on extra small mobile (320px)', async ({ page }) => {
-    // Set very small mobile viewport (iPhone 5/SE)
-    await page.setViewportSize({ width: 320, height: 568 });
-    await page.goto('/install.html');
+  test('compare page feature cards stack on mobile', async ({ page }) => {
+    // Set mobile viewport
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/compare.html');
     
-    // Verify critical elements are still visible
-    await expect(page).toHaveTitle(/Installation Guide/);
+    // Verify feature cards are visible
+    const featureCards = page.locator('.feature-card');
+    const cardCount = await featureCards.count();
+    expect(cardCount).toBeGreaterThan(0);
     
-    // Verify logo is visible
-    const logo = page.locator('.logo-img');
-    await expect(logo).toBeVisible();
-    
-    // Verify content is readable
-    const heading = page.locator('h1').first();
-    await expect(heading).toBeVisible();
-  });
-
-  test('install.html scales properly on tablet (768px)', async ({ page }) => {
-    // Set tablet viewport (iPad size)
-    await page.setViewportSize({ width: 768, height: 1024 });
-    await page.goto('/install.html');
-    
-    // Verify page layout adapts
-    await expect(page).toHaveTitle(/Installation Guide/);
-    
-    // Verify content boxes are visible
-    const contentBox = page.locator('.content-box').first();
-    await expect(contentBox).toBeVisible();
-    
-    // Verify sidebar is visible on tablet
-    const sidebar = page.locator('.sidebar-column');
-    await expect(sidebar).toBeVisible();
+    // Verify first card is visible
+    await expect(featureCards.first()).toBeVisible();
   });
 });

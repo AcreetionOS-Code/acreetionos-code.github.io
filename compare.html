@@ -77,6 +77,23 @@
   margin: 1rem 0;
 }
 
+.cta-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: rgba(46, 204, 113, 0.1);
+  border-left: 4px solid var(--acreetion-green);
+  border-radius: 4px;
+}
+
+.cta-section h3 {
+  color: var(--acreetion-green);
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 768px) {
   .comparison-table {
     font-size: 0.85rem;
@@ -96,6 +113,26 @@
   .feature-card {
     padding: 1rem;
   }
+  
+  .content-box .box-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .content-box .box-body h2 {
+    font-size: 1.3rem;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .content-box .box-body h3 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .content-box .box-body > p:first-child {
+    font-size: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -114,6 +151,40 @@
   
   .feature-card p {
     font-size: 0.85rem;
+  }
+  
+  .content-box .box-header h1 {
+    font-size: 1.3rem;
+  }
+  
+  .content-box .box-body h2 {
+    font-size: 1.1rem;
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .content-box .box-body h3 {
+    font-size: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .content-box .box-body > p:first-child {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .cta-section {
+    margin-top: 2rem;
+    padding: 1rem;
+  }
+  
+  .cta-section h3 {
+    font-size: 1rem;
+  }
+  
+  .cta-section p {
+    font-size: 0.9rem;
   }
 }
 </style>
@@ -227,6 +298,7 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 <h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Detailed Comparisons</h2>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Ubuntu</h3>
+<div style="overflow-x: auto;">
 <table class="comparison-table">
 <thead>
 <tr>
@@ -268,8 +340,10 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 </tr>
 </tbody>
 </table>
+</div>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Linux Mint</h3>
+<div style="overflow-x: auto;">
 <table class="comparison-table">
 <thead>
 <tr>
@@ -306,8 +380,10 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 </tr>
 </tbody>
 </table>
+</div>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Manjaro</h3>
+<div style="overflow-x: auto;">
 <table class="comparison-table">
 <thead>
 <tr>
@@ -344,8 +420,10 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 </tr>
 </tbody>
 </table>
+</div>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 2rem; margin-bottom: 1rem;">AcreetionOS vs Arch Linux</h3>
+<div style="overflow-x: auto;">
 <table class="comparison-table">
 <thead>
 <tr>
@@ -387,6 +465,7 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 </tr>
 </tbody>
 </table>
+</div>
 
 <h2 style="color: var(--acreetion-green); margin-top: 3rem; margin-bottom: 1rem;">Why Choose AcreetionOS?</h2>
 
@@ -422,9 +501,9 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 </div>
 </div>
 
-<div style="margin-top: 3rem; padding: 2rem; background: rgba(46, 204, 113, 0.1); border-left: 4px solid var(--acreetion-green); border-radius: 4px;">
-<h3 style="color: var(--acreetion-green); margin-bottom: 1rem;">Ready to Switch?</h3>
-<p style="margin-bottom: 1rem;">AcreetionOS combines the power of Arch Linux with the ease of Ubuntu. Try it risk-free with a live USB!</p>
+<div class="cta-section">
+<h3>Ready to Switch?</h3>
+<p>AcreetionOS combines the power of Arch Linux with the ease of Ubuntu. Try it risk-free with a live USB!</p>
 <a href="index.html#manual-downloads" class="btn">Download AcreetionOS</a>
 <a href="install.html" class="btn" style="background-color: var(--storm-color);">Installation Guide</a>
 </div>
