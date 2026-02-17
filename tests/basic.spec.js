@@ -133,7 +133,7 @@ test.describe('Mobile Responsiveness', () => {
     // Verify all comparison tables have overflow wrappers
     const overflowWrappers = page.locator('div[style*="overflow-x: auto"]');
     const count = await overflowWrappers.count();
-    expect(count).toBeGreaterThanOrEqual(5); // Should have at least 5 tables with overflow wrappers
+    expect(count).toBeGreaterThanOrEqual(5); // Should have 5 tables with overflow wrappers (1 quick comparison + 4 detailed)
     
     // Verify tables are visible
     const tables = page.locator('.comparison-table');
