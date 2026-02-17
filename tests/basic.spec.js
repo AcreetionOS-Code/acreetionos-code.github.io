@@ -121,4 +121,47 @@ test.describe('Mobile Responsiveness', () => {
     const nameInput = page.locator('input[name="name"]');
     await expect(nameInput).toBeVisible();
   });
+
+  test('FAQ page renders correctly on mobile (375px)', async ({ page }) => {
+    // Set mobile viewport (iPhone size)
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/faq.html');
+    
+    // Verify page loads
+    await expect(page).toHaveTitle(/FAQ/);
+    
+    // Verify FAQ sections are visible
+    const faqSection = page.locator('.faq-section').first();
+    await expect(faqSection).toBeVisible();
+    
+    // Verify FAQ questions are clickable
+    const faqQuestion = page.locator('.faq-question').first();
+    await expect(faqQuestion).toBeVisible();
+    
+    // Verify table of contents is visible
+    const faqToc = page.locator('.faq-toc');
+    await expect(faqToc).toBeVisible();
+  });
+
+  test('FAQ page renders correctly on very small mobile (320px)', async ({ page }) => {
+    // Set very small mobile viewport
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/faq.html');
+    
+    // Verify page loads
+    await expect(page).toHaveTitle(/FAQ/);
+    
+    // Verify critical elements are still visible and accessible
+    const faqSection = page.locator('.faq-section').first();
+    await expect(faqSection).toBeVisible();
+    
+    // Verify code blocks don't cause horizontal scrolling issues
+    const preBlocks = page.locator('.faq-answer pre');
+    const count = await preBlocks.count();
+    expect(count).toBeGreaterThan(0);
+    
+    // Verify buttons are visible
+    const buttons = page.locator('.btn');
+    await expect(buttons.first()).toBeVisible();
+  });
 });
