@@ -107,6 +107,53 @@
   color: var(--acreetion-green);
   text-decoration: underline;
 }
+
+@media (max-width: 768px) {
+  .faq-section h2 {
+    font-size: 1.3rem;
+  }
+  
+  .faq-question {
+    font-size: 1rem;
+  }
+  
+  .faq-answer {
+    margin-left: 1rem;
+    font-size: 0.95rem;
+  }
+  
+  .faq-toc {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .faq-section h2 {
+    font-size: 1.1rem;
+  }
+  
+  .faq-question {
+    font-size: 0.95rem;
+  }
+  
+  .faq-answer {
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .faq-answer pre {
+    padding: 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .faq-toc {
+    padding: 0.75rem;
+  }
+  
+  .faq-toc h3 {
+    font-size: 1rem;
+  }
+}
 </style>
 <script>
 if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});})}

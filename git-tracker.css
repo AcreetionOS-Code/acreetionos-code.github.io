@@ -129,5 +129,24 @@ body {
     .modal-section h3{color:var(--acreetion-green);font-family:var(--font-mono);margin-bottom:0.5rem}
     .modal-section a{color:var(--storm-color)}
 
-    @media (max-width:900px){.tracker-title{font-size:1.6rem}.repo-card{min-width:90vw;max-width:98vw;padding:1rem}}
+    @media (max-width:900px){
+        .tracker-title{font-size:1.6rem}
+        .tracker-subtitle{font-size:1.1rem}
+        .repo-card{min-width:90vw;max-width:98vw;padding:1rem}
+        #repo-list{padding:0 0.5rem;gap:1rem}
+    }
+    
+    @media (max-width:600px){
+        .tracker-hero{padding:2rem 0.5rem}
+        .tracker-title{font-size:1.3rem}
+        .tracker-subtitle{font-size:1rem}
+        #repo-search{width:100%;font-size:1rem;padding:0.7rem 0.9rem}
+        .tracker-btn{padding:0.5rem 0.8rem;font-size:0.9rem}
+        #action-buttons{flex-wrap:wrap}
+        .repo-card{padding:0.75rem}
+        .repo-card .repo-title{font-size:1.1rem}
+        .repo-meta{font-size:0.85rem}
+        .event-card{padding:0.75rem;font-size:0.9rem}
+        .modal-content{padding:1rem;margin:0.5rem}
+    }
     font-size: 1rem;
