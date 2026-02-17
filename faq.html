@@ -60,6 +60,8 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .faq-answer.active {
   max-height: 1000px;
@@ -70,6 +72,8 @@
   padding: 0.2rem 0.5rem;
   border-radius: 3px;
   font-family: var(--font-mono);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .faq-answer pre {
   background: var(--acreetion-code-bg);
@@ -77,6 +81,12 @@
   border-radius: 4px;
   overflow-x: auto;
   margin: 0.5rem 0;
+  max-width: 100%;
+}
+.faq-answer pre code {
+  word-wrap: normal;
+  overflow-wrap: normal;
+  white-space: pre;
 }
 .faq-answer ul {
   margin-left: 2rem;
@@ -125,6 +135,14 @@
   .faq-toc {
     padding: 1rem;
   }
+  
+  .box-body .btn {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    margin-right: 0;
+  }
 }
 
 @media (max-width: 480px) {
@@ -144,6 +162,7 @@
   .faq-answer pre {
     padding: 0.75rem;
     font-size: 0.85rem;
+    overflow-x: auto;
   }
   
   .faq-toc {
@@ -152,6 +171,50 @@
   
   .faq-toc h3 {
     font-size: 1rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .faq-section h2 {
+    font-size: 1rem;
+  }
+  
+  .faq-question {
+    font-size: 0.9rem;
+    gap: 0.3rem;
+  }
+  
+  .faq-answer {
+    margin-left: 0.3rem;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  
+  .faq-answer pre {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .faq-answer code {
+    font-size: 0.8rem;
+    padding: 0.1rem 0.3rem;
+  }
+  
+  .faq-answer ul {
+    margin-left: 1.2rem;
+  }
+  
+  .faq-toc {
+    padding: 0.5rem;
+  }
+  
+  .faq-toc h3 {
+    font-size: 0.95rem;
+  }
+  
+  .faq-toc li {
+    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
   }
 }
 </style>
