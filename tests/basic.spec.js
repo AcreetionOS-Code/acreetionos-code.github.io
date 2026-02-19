@@ -64,6 +64,40 @@ test.describe('AcreetionOS Website', () => {
     const rel = await firstLink.getAttribute('rel');
     expect(rel).toContain('noopener');
   });
+
+  test('Root link appears in index.html sidebar', async ({ page }) => {
+    await page.goto('/');
+    
+    // Verify Root link exists in sidebar
+    const rootLink = page.locator('a[href="https://root.acreetionos.org"]');
+    await expect(rootLink).toBeVisible();
+    
+    // Verify link text
+    await expect(rootLink).toContainText('Root');
+    
+    // Verify link has proper security attributes
+    const rel = await rootLink.getAttribute('rel');
+    expect(rel).toContain('noopener noreferrer');
+    const target = await rootLink.getAttribute('target');
+    expect(target).toBe('_blank');
+  });
+
+  test('Root links appear in contact.html', async ({ page }) => {
+    await page.goto('/contact.html');
+    
+    // Verify Root link exists in sidebar
+    const rootLinks = page.locator('a[href="https://root.acreetionos.org"]');
+    const count = await rootLinks.count();
+    expect(count).toBeGreaterThanOrEqual(2); // Should have at least 2: button and sidebar link
+    
+    // Verify "Create a Ticket on Root" button exists
+    const rootTicketButton = page.locator('a[href="https://root.acreetionos.org"]:has-text("Create a Ticket on Root")');
+    await expect(rootTicketButton).toBeVisible();
+    
+    // Verify sidebar link exists
+    const sidebarRootLink = page.locator('aside a[href="https://root.acreetionos.org"]');
+    await expect(sidebarRootLink).toBeVisible();
+  });
 });
 
 test.describe('Mobile Responsiveness', () => {
