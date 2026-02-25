@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<title>Ermin - The Future of Project Management | AcreetionOS</title>
+<meta name="description" content="Ermin: Our custom fork of the Stoat codebase, redesigned to meet our quality standards. A free and open source alternative for community collaboration." />
+<link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet">
+<style>
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222222;--acreetion-box-border:#333333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46, 204, 113, 0.1);--storm-color:#61afef;--font-sans:'Roboto', -apple-system, sans-serif;--font-mono:'Fira Code', monospace;}
+*, *::before, *::after{box-sizing: border-box; margin: 0; padding: 0;}
+body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;}
+.page-header{background-color:var(--acreetion-panel-bg);border-bottom:2px solid var(--acreetion-green);padding: 1rem 0;}
+.header-content{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:0 2rem;}
+.logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none;}
+.logo span{color:var(--acreetion-green);}
+.main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500;}
+.main-nav a:hover{color:var(--acreetion-text-bright);}
+.container{max-width:900px;margin:4rem auto;padding:0 2rem;}
+h1{font-size:3rem;color:var(--acreetion-green);margin-bottom:1.5rem;font-family:var(--font-mono);}
+h2{font-size:2rem;color:var(--storm-color);margin-top:2.5rem;margin-bottom:1rem;font-family:var(--font-mono);}
+p{margin-bottom:1.5rem;font-size:1.1rem;color:var(--acreetion-text);}
+.highlight-box{background:var(--acreetion-panel-bg);border-left:4px solid var(--acreetion-green);padding:2rem;margin:2rem 0;}
+.footer{text-align:center;padding:4rem 0;border-top:1px solid var(--acreetion-box-border);margin-top:4rem;color:var(--acreetion-text);font-size:0.9rem;}
+code{font-family:var(--font-mono);background:var(--acreetion-code-bg);padding:0.2rem 0.4rem;border-radius:3px;color:var(--acreetion-green);}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+<div class="header-content">
+<a href="index.html" class="logo">Acreetion<span>OS</span></a>
+<nav class="main-nav">
+<a href="index.html">Home</a>
+<a href="TrumpOS/index.html">TrumpOS</a>
+<a href="faq.html">FAQ</a>
+<a href="developers.html">Developers</a>
+<a href="contact.html">Contact</a>
+</nav>
+</div>
+</header>
+
+<div class="container">
+<h1>Ermin: The Evolution</h1>
+<p>In our pursuit of excellence, we have made a significant architectural decision regarding our project management and community collaboration tools. While we previously utilized the Stoat codebase, it became clear that it did not meet our rigorous quality standards.</p>
+
+<div class="highlight-box">
+<h2>The Failure of Stoat's Self-Hosting</h2>
+<p>Self-hosting is a core value of the AcreetionOS project, but <strong>Stoat was simply not the right choice.</strong> Its implementation of self-hosting was fundamentally flawed. It was overly complex, fragile, and difficult to maintain. A self-hosted solution should empower the user, not burden them with a convoluted setup and a codebase that lacks modern security standards.</p>
+<p>Stoat's architecture made it nearly impossible to implement the high-performance features we require while maintaining a secure environment. It didn't respect the time of the developers or the privacy of the users.</p>
+</div>
+
+<div class="highlight-box">
+<h2>From Stoat to Ermin</h2>
+<p>We have officially forked off the <strong>Stoat</strong> codebase. This new project is called <strong>Ermin</strong>. We are rebuilding it from the ground up to ensure it meets the technical integrity and user experience standards required for the AcreetionOS ecosystem.</p>
+</div>
+
+<h2>Why Ermin?</h2>
+<p>Ermin is more than just a task tracker. It is being built as a <strong>free and open source alternative to Discord and Root</strong>. We believe in decentralization and user freedom, and we need a tool that reflects those values without compromising on performance.</p>
+
+<h2>The Fallback Strategy</h2>
+<p>While we currently utilize various community platforms, Ermin serves as a critical fallback. In the event that Root—or any other major platform—decides to follow the path of "Discord 2.0" (introducing restrictive policies, telemetry, or walled gardens), Ermin will be ready to serve as the primary hub for the AcreetionOS community.</p>
+
+<h2>Status: Under Development</h2>
+<p>Ermin is currently in active development. We are focusing on security, stability, and a clean, efficient codebase that can scale with our community.</p>
+
+<p>Stay tuned for updates as we work toward the first stable release of Ermin.</p>
+</div>
+
+<footer class="footer">
+<p>&copy; 2026 AcreetionOS Project. Ermin is Free and Open Source Software.</p>
+</footer>
+
+</body>
+</html>

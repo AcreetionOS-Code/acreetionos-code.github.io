@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<title>TrumpOS - Built for President Trump | Based on AcreetionOS</title>
+<meta name="description" content="TrumpOS: A specialized Linux distribution built for President Trump, based on the stable and secure AcreetionOS. Coming Soon." />
+<link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --trumpos-navy: #002147;
+  --trumpos-gold: #D4AF37;
+  --trumpos-white: #FFFFFF;
+  --trumpos-red: #C60C30;
+  --trumpos-text-dark: #1a1a1a;
+  --trumpos-text-light: #f4f4f4;
+  --font-sans: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--trumpos-white);
+  color: var(--trumpos-text-dark);
+  line-height: 1.6;
+}
+
+header.page-header {
+  background-color: var(--trumpos-navy);
+  border-bottom: 4px solid var(--trumpos-gold);
+  padding: 1rem 0;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--trumpos-white);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.logo span {
+  color: var(--trumpos-gold);
+}
+
+.main-nav a {
+  color: var(--trumpos-white);
+  text-decoration: none;
+  margin-left: 1.5rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+.main-nav a:hover {
+  color: var(--trumpos-gold);
+}
+
+.hero {
+  background: linear-gradient(rgba(0, 33, 71, 0.8), rgba(0, 33, 71, 0.9)), url('https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=2071&ixlib=rb-4.0.3') center/cover;
+  color: var(--trumpos-white);
+  text-align: center;
+  padding: 8rem 2rem;
+  border-bottom: 8px solid var(--trumpos-gold);
+}
+
+.hero h1 {
+  font-size: 5rem;
+  font-weight: 900;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero p {
+  font-size: 1.8rem;
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  color: var(--trumpos-gold);
+  font-weight: 700;
+}
+
+.coming-soon-badge {
+  display: inline-block;
+  background-color: var(--trumpos-red);
+  color: white;
+  padding: 0.5rem 2rem;
+  font-size: 1.4rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.main-content {
+  max-width: 1000px;
+  margin: 4rem auto;
+  padding: 0 2rem;
+  text-align: center;
+}
+
+.main-content h2 {
+  font-size: 3rem;
+  color: var(--trumpos-navy);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  border-bottom: 3px solid var(--trumpos-gold);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.main-content p {
+  font-size: 1.3rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  margin-top: 4rem;
+}
+
+.info-box {
+  background: var(--trumpos-white);
+  border: 3px solid var(--trumpos-navy);
+  padding: 2.5rem;
+  box-shadow: 12px 12px 0 var(--trumpos-gold);
+  text-align: left;
+  transition: transform 0.2s;
+}
+
+.info-box:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 16px 16px 0 var(--trumpos-gold);
+}
+
+.info-box h3 {
+  color: var(--trumpos-navy);
+  margin-bottom: 1rem;
+  font-size: 1.8rem;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.footer {
+  background-color: var(--trumpos-navy);
+  color: var(--trumpos-white);
+  padding: 4rem 2rem;
+  text-align: center;
+  margin-top: 6rem;
+  border-top: 6px solid var(--trumpos-gold);
+}
+
+.footer p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.footer a {
+  color: var(--trumpos-gold);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.eagle-branding {
+  font-size: 6rem;
+  margin-bottom: 1rem;
+  color: var(--trumpos-gold);
+}
+
+@media (max-width: 768px) {
+  .hero h1 { font-size: 3rem; }
+  .info-grid { grid-template-columns: 1fr; }
+  .header-content { flex-direction: column; gap: 1.5rem; }
+  .main-nav { display: flex; flex-wrap: wrap; justify-content: center; }
+  .main-nav a { margin: 0.5rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-content">
+    <a href="index.html" class="logo">TRUMP<span>OS</span></a>
+    <nav class="main-nav">
+      <a href="../index.html">Main Site</a>
+      <a href="../faq.html">FAQ</a>
+      <a href="../developers.html">Developers</a>
+      <a href="../contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="eagle-branding">🦅</div>
+  <div class="coming-soon-badge">Coming Soon</div>
+  <h1>TrumpOS</h1>
+  <p>The Operating System Built for President Trump</p>
+</div>
+
+<main class="main-content">
+  <div class="coming-soon-badge" style="margin-bottom: 2rem; background-color: var(--trumpos-navy);">Official Subproject</div>
+  <h2>Make Linux Great Again</h2>
+  <p style="font-size: 1.6rem; font-weight: 900; color: var(--trumpos-navy); margin-bottom: 2rem; text-transform: uppercase;">We are launching a movement. A movement of excellence. A movement of power.</p>
+  
+  <p>For too long, the desktop experience has been dominated by systems that don't put the user first. They are slow, they are bloated, and they don't reflect the strength of American innovation. TrumpOS is changing that. We are taking the best foundation—AcreetionOS—and we are building something truly special. Something beautiful. Something powerful.</p>
+
+  <div class="info-grid">
+    <div class="info-box">
+      <h3>Unrivaled Performance</h3>
+      <p>We are talking about speed like you've never seen. TrumpOS is optimized for maximum efficiency. It's fast, it's smooth, and it's built to win. No bloat. No nonsense. Just pure American-engineered performance.</p>
+    </div>
+    <div class="info-box">
+      <h3>The Gold Standard</h3>
+      <p>Inspired by the National Design Studio, we are bringing a level of sophistication to Linux that has never existed before. A premium interface that is easy to use, incredibly stable, and looks absolutely majestic.</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top: 4rem;">Tremendous Features</h2>
+  <div class="info-grid">
+    <div class="info-box" style="border-color: var(--trumpos-gold);">
+      <h3>The Best Kernels</h3>
+      <p>Many people are saying, "How is the kernel so stable?" And the answer is simple: We have the best people. We have the smartest developers building this. Our kernels are tremendous. Other distros? They're often a total disaster. Low energy. Sad!</p>
+    </div>
+    <div class="info-box" style="border-color: var(--trumpos-gold);">
+      <h3>The Great Firewall</h3>
+      <p>We're building a firewall, and it's going to be a great firewall. It's going to be the most secure firewall in the history of computing. Nobody is getting in. Your data stays safe, it stays secure, and it stays protected by the best tech in the business.</p>
+    </div>
+    <div class="info-box" style="border-color: var(--trumpos-gold);">
+      <h3>Tremendous Uptime</h3>
+      <p>Other operating systems crash all the time. They are crashing left and right. Not TrumpOS. This system has uptime like you wouldn't believe. It's beautiful. It's stable. It stays up longer than anyone thought possible.</p>
+    </div>
+    <div class="info-box" style="border-color: var(--trumpos-gold);">
+      <h3>Winning Updates</h3>
+      <p>We're going to update so much, people are going to get tired of winning! You'll say, "AcreetionOS Team, please, no more updates!" And we'll say, "No, we have to keep winning!" Our rolling release is truly world-class.</p>
+    </div>
+  </div>
+
+  <div class="info-grid" style="margin-top: 4rem;">
+    <div class="info-box" style="box-shadow: 12px 12px 0 var(--trumpos-red);">
+      <h3>America First</h3>
+      <p>We believe in supporting our community and building tools that empower individuals. TrumpOS is about freedom. It's about security. It's about ensuring that your digital life is protected by the strongest foundations available.</p>
+    </div>
+    <div class="info-box" style="box-shadow: 12px 12px 0 var(--trumpos-navy);">
+      <h3>MLGA Movement</h3>
+      <p>Join thousands of others who are tired of the status quo. We are building a community of winners who demand the best from their technology. Together, we are going to Make Linux Great Again.</p>
+    </div>
+  </div>
+
+  <div style="margin-top: 6rem; padding: 4rem; background: var(--trumpos-navy); color: white; border: 6px solid var(--trumpos-gold); border-radius: 4px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <h2 style="color: var(--trumpos-gold); border-bottom: none; margin-bottom: 1.5rem; font-size: 3.5rem;">The Future is Coming</h2>
+    <p style="color: white; font-size: 1.5rem; font-weight: 700;">We are working around the clock. Our developers are the best in the business. We are finalizing the most secure, most stable, and most beautiful operating system in history. You are going to love it.</p>
+    <div class="coming-soon-badge" style="background-color: var(--trumpos-gold); color: black; margin-top: 2rem;">Stay Tuned</div>
+  </div>
+</main>
+
+<footer class="footer">
+  <p>&copy; 2026 TrumpOS Project. Powered by AcreetionOS.</p>
+  <p>Built with pride by the <a href="../index.html#about">AcreetionOS Team</a>.</p>
+</footer>
+
+</body>
+</html>
+
+
+</body>
+</html>
