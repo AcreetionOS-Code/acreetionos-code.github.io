@@ -49,18 +49,24 @@ code{font-family:var(--font-mono);background:var(--acreetion-code-bg);padding:0.
 <p>In our pursuit of excellence, we have made a significant architectural decision regarding our project management and community collaboration tools. While we previously utilized the Stoat codebase, it became clear that it did not meet our rigorous quality standards.</p>
 
 <div class="highlight-box">
-<h2>The Failure of Stoat's Self-Hosting</h2>
-<p>Self-hosting is a core value of the AcreetionOS project, but <strong>Stoat was simply not the right choice.</strong> Its implementation of self-hosting was fundamentally flawed. It was overly complex, fragile, and difficult to maintain. A self-hosted solution should empower the user, not burden them with a convoluted setup and a codebase that lacks modern security standards.</p>
-<p>Stoat's architecture made it nearly impossible to implement the high-performance features we require while maintaining a secure environment. It didn't respect the time of the developers or the privacy of the users.</p>
+<h2>The Technical Failure of Stoat</h2>
+<p>In our pursuit of excellence, it became clear that Stoat did not meet our rigorous standards. Technically, the platform is unoptimized: users are forced to download over 7.2 MB of data just to reach the login screen—nearly half of which is wasted on a single file for fonts and icons. This level of bloat is inexcusable for a "lightweight" app and places a significant burden on both user battery life and the project's server costs.</p>
+<p>More critically, we discovered that Stoat exposed direct origin IP addresses in network traffic. For a project claiming to be privacy-focused, exposing the "home address" of its servers is a massive security failure that makes the platform vulnerable to targeted attacks.</p>
+</div>
+
+<div class="highlight-box">
+<h2>A Disregard for User Privacy</h2>
+<p>Stoat is marketed as privacy-respecting, yet it forces a hidden background "location check" (GPS ping) at launch without user consent. For users with hardened privacy settings or VPNs, this causes a "welp" error in the background. When we offered to fix this by writing code for a manual region selector, the developers gave us a flat "no."</p>
+<p>They claimed they "legally" must track GPS location for age-restricted content—a claim that falls apart under scrutiny. Compliance is traditionally handled on the server side via IP addresses; forced background GPS polling is a choice, not a legal requirement. We refuse to build on a foundation that uses "the law" as a shield to justify forced tracking and poor engineering.</p>
 </div>
 
 <div class="highlight-box">
 <h2>From Stoat to Ermin</h2>
-<p>We have officially forked off the <strong>Stoat</strong> codebase. This new project is called <strong>Ermin</strong>. We are rebuilding it from the ground up to ensure it meets the technical integrity and user experience standards required for the AcreetionOS ecosystem.</p>
+<p>We have officially forked the <strong>Stoat</strong> codebase to create <strong>Ermin</strong>. We are stripping out the 7.2 MB of bloat, correctly hiding origin IPs, and removing all secret tracking. Ermin is being rebuilt from the ground up to ensure it is fast, transparent, and actually respects the privacy it claims to protect.</p>
 </div>
 
 <h2>Why Ermin?</h2>
-<p>Ermin is more than just a task tracker. It is being built as a <strong>free and open source alternative to Discord and Root</strong>. We believe in decentralization and user freedom, and we need a tool that reflects those values without compromising on performance.</p>
+<p>Ermin is more than just a task tracker. It is being built as a <strong>free and open source alternative to Discord and <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Root</a></strong>. We believe in decentralization and user freedom, and we need a tool that reflects those values without compromising on performance.</p>
 
 <h2>The Fallback Strategy</h2>
 <p>While we currently utilize various community platforms, Ermin serves as a critical fallback. In the event that Root—or any other major platform—decides to follow the path of "Discord 2.0" (introducing restrictive policies, telemetry, or walled gardens), Ermin will be ready to serve as the primary hub for the AcreetionOS community.</p>
