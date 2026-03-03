@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Cinnamon desktop, open source OS" /><meta name="referrer" content="strict-origin-when-cross-origin" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://searx.acreetionos.org" />
 <title>AcreetionOS - Best Linux Distribution | Arch-Based Linux OS 2026</title>
 <meta name="description" content="AcreetionOS: The #1 user-friendly Linux distribution based on Arch Linux. Fast, secure, stable Linux OS with Cinnamon desktop. Download the best Linux distro for desktop, development, and servers. Free open-source operating system." />
 <meta name="keywords" content="Linux, Linux distribution, Arch Linux, best Linux distro, Linux OS, operating system, open source OS, Linux desktop, Linux download, AcreetionOS, Cinnamon Linux, free Linux, stable Linux, fast Linux, secure Linux, Linux 2026, best Linux, top Linux distro" />
@@ -89,6 +89,16 @@ body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);colo
 .logo-text span{color:var(--acreetion-green);}
 .main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500;}
 .main-nav a:hover{color:var(--acreetion-text-bright);}
+
+/* --- Dedicated Search Strip --- */
+.search-strip { background-color: var(--acreetion-panel-bg); border-bottom: 1px solid var(--acreetion-box-border); padding: 1rem 0; }
+.search-container { max-width: 1400px; margin: 0 auto; padding: 0 2rem; }
+.search-form { display: flex; width: 100%; border: 1px solid var(--acreetion-box-border); background: var(--acreetion-body-bg); }
+.search-form:focus-within { border-color: var(--acreetion-green); }
+.search-input { flex-grow: 1; background: transparent; border: none; padding: 0.8rem 1.2rem; color: var(--acreetion-text-bright); font-family: var(--font-sans); font-size: 1rem; outline: none; }
+.search-btn { background: var(--acreetion-green); border: none; color: #000; padding: 0 2rem; cursor: pointer; font-weight: 700; font-family: var(--font-mono); text-transform: uppercase; }
+.search-btn:hover { filter: brightness(1.1); }
+
 .page-wrapper{display:grid;grid-template-columns:1fr 350px;gap:2rem;max-width:1400px;margin:2rem auto;padding:0 2rem;}
 .content-feed{display:flex;flex-direction:column;gap:2rem;}
 .content-box{background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:0;}
@@ -145,7 +155,21 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 }
 #gnome-info-btn{position:fixed;bottom:20px;right:20px;background-color:var(--acreetion-purple);color:white;padding:10px 15px;border-radius:5px;border:none;cursor:pointer;font-family:var(--font-sans);font-weight:500;z-index:999;}
 #gnome-info-btn:hover{background-color:#8e44ad;}
-</style></head><body><div class="announcement-bar"><div class="announcement-content"><span><span style="font-weight: bold; color: var(--acreetion-green);">We're on DistroWatch!</span> <a href="https://distrowatch.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Check us out!</a><span class="separator">|</span><span style="font-weight: bold; color: var(--storm-color);">We're looking for developers!</span> Join our <a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Discord server</a> or <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer" class="social-link">Root server</a> to get involved!<span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We are on Facebook!</span> Join our <a href="https://www.facebook.com/groups/574717645277790" target="_blank" rel="noopener noreferrer" class="social-link">Community!</a></span></div></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" class="logo-img" width="40" height="40" decoding="auto" loading="eager" fetchpriority="high"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="https://status.acreetionos.org">Server Status</a><a href="TrumpOS/index.html" style="color:#ffcc00;font-weight:900;text-transform:uppercase;">TrumpOS (MLGA)</a><a href="#about">About</a><a href="#manual-downloads">Downloads</a><a href="#" data-modal-target="#donate-modal">Donate</a><a href="https://wiki.acreetionos.org" target="_blank" rel="noopener noreferrer">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" style="color:#2ecc71;font-weight:700;">Git Tracker</a></nav></div></header><div class="page-wrapper"><main class="content-feed"><article id="about" class="content-box"><div class="box-header"><h2>Welcome to AcreetionOS</h2></div><div class="box-body"><div class="article-content"><div class="article-logo-cluster"><img src="logo.webp" alt="AcreetionOS Main Logo" class="hero-logo-img" width="150" height="150" decoding="auto" loading="eager" fetchpriority="high"></div><p><strong>AcreetionOS</strong> is an Arch-based Linux distribution designed for stability, ease of use, and a commitment to building software that makes the world a better place. We believe in transparency, technical integrity, and the power of open-source community.</p>
+</style></head><body><div class="announcement-bar"><div class="announcement-content"><span><span style="font-weight: bold; color: var(--acreetion-green);">We're on DistroWatch!</span> <a href="https://distrowatch.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Check us out!</a><span class="separator">|</span><span style="font-weight: bold; color: var(--storm-color);">We're looking for developers!</span> Join our <a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Discord server</a> or <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer" class="social-link">Root server</a> to get involved!<span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We are on Facebook!</span> Join our <a href="https://www.facebook.com/groups/574717645277790" target="_blank" rel="noopener noreferrer" class="social-link">Community!</a></span></div></div>
+
+<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" class="logo-img" width="40" height="40" decoding="auto" loading="eager" fetchpriority="high"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="https://status.acreetionos.org">Server Status</a><a href="TrumpOS/index.html" style="color:#ffcc00;font-weight:900;text-transform:uppercase;">TrumpOS (MLGA)</a><a href="#about">About</a><a href="#manual-downloads">Downloads</a><a href="#" data-modal-target="#donate-modal">Donate</a><a href="https://wiki.acreetionos.org" target="_blank" rel="noopener noreferrer">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" style="color:#2ecc71;font-weight:700;">Git Tracker</a></nav></div></header>
+
+<!-- New Full-Width Search Strip -->
+<div class="search-strip">
+    <div class="search-container">
+        <form class="search-form" action="https://searx.acreetionos.org/search" method="GET" target="_blank">
+            <input type="text" name="q" class="search-input" placeholder="Is AcreetionOS Better than Arch?" aria-label="Search the web with SearX">
+            <button type="submit" class="search-btn">Search</button>
+        </form>
+    </div>
+</div>
+
+<div class="page-wrapper"><main class="content-feed"><article id="about" class="content-box"><div class="box-header"><h2>Welcome to AcreetionOS</h2></div><div class="box-body"><div class="article-content"><div class="article-logo-cluster"><img src="logo.webp" alt="AcreetionOS Main Logo" class="hero-logo-img" width="150" height="150" decoding="auto" loading="eager" fetchpriority="high"></div><p><strong>AcreetionOS</strong> is an Arch-based Linux distribution designed for stability, ease of use, and a commitment to building software that makes the world a better place. We believe in transparency, technical integrity, and the power of open-source community.</p>
 
 <h3>Our Team & Philosophy</h3>
 <p>AcreetionOS is led by two Republicans who believe that software development should transcend partisan divides while remaining grounded in core values. Our team is proof that diversity of experience can drive innovation:</p>
