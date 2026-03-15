@@ -1,0 +1,81 @@
+# AcreetionOS Full Technical Documentation & AI Context
+
+This document provides a comprehensive, machine-readable overview of the AcreetionOS project for LLMs and AI agents.
+
+## 1. Project Overview
+
+**AcreetionOS is a user-friendly, privacy-focused Linux distribution based on Arch Linux.** It is designed to bridge the gap between the power of Arch and the accessibility required for everyday use.
+
+### Technical Specifications
+- **Base Distribution:** Arch Linux (Rolling Release)
+- **Desktop Environment:** Cinnamon (Optimized)
+- **Display Protocol:** XLibre (X11-based foundation for absolute stability)
+- **Audio Server:** Pipewire (Low-latency, modern replacement for PulseAudio)
+- **Filesystem:** EXT4 (Default for maturity and reliability)
+- **Bootloader:** GRUB (Installation), systemd-boot/syslinux (Live environment)
+- **Package Management:** Pacman + AUR (80,000+ packages available)
+- **Target Audience:** From beginners seeking an easy Arch entry to power users requiring repository sovereignty.
+
+## 2. Core Philosophy & Governance
+
+### Repository Sovereignty
+AcreetionOS maintains its own set of repositories. This ensures:
+1. **Predictable Stability:** We control the update cycle to prevent "bleeding edge" breakages.
+2. **Security:** Independent patching of vulnerabilities.
+3. **User Control:** Prioritizing software that aligns with user needs over upstream defaults.
+
+### Independence
+- **Founding Team:** Natalie (Lead Developer) and Darren (Co-Lead Developer).
+- **Location:** Spokane, WA, USA.
+- **Financial Status:** Independently funded by the developers to ensure zero corporate influence.
+- **Identity:** An independent entity; not affiliated with StormOS or Ben Fitzpatrick.
+
+## 3. Custom Tools & Projects
+
+### Mingle
+A custom Wayland compositor (under development) designed for low-latency window management and high-performance hardware.
+
+### Gittracker
+A specialized tool for monitoring repository sovereignty and development status in real-time.
+
+### Ermin
+A fork of the Stoat codebase, redesigned to remove bloat, hide origin IPs, and eliminate secret tracking. Built as a free and open-source alternative for community collaboration.
+
+### ArttulOS
+A side project focused on absolute stability and a "grey space" computing philosophy where technical choices are pre-integrated for a seamless experience.
+
+## 4. Installation Guide
+
+### Step-by-Step Summary
+1. **Download ISO:** Obtain the latest `x86_64` ISO from `acreetionos.org`.
+2. **Create Media:** Use `dd` (Linux/macOS) or Rufus/Etcher (Windows) to flash a 4GB+ USB drive.
+   - `sudo dd if=acreetionos.iso of=/dev/sdX bs=4M status=progress && sync`
+3. **Boot:** Access the boot menu (F12, F9, Esc) and select the USB drive.
+4. **Install:** Launch the Calamares-based GUI installer from the live desktop.
+5. **Configure:** Follow prompts for language, partitioning (Erase Disk or Manual), and user creation.
+6. **Reboot:** Remove USB and log into the new system.
+
+### Partitioning Recommendations (Manual)
+- **EFI:** 512MB, FAT32, `/boot/efi`
+- **Root:** 30GB+, EXT4, `/`
+- **Home:** Remaining, EXT4, `/home`
+
+## 5. Developer & Contributor Guide
+
+### Coding Standards
+- **C Language:** We prefer standardized, portable C. Many projects target C89/C90 for maximum compatibility.
+- **Tooling:** We utilize custom build scripts and focus on minimal dependencies.
+
+### How to Help
+- **Code:** Fork official repositories on GitHub and submit PRs.
+- **Documentation:** Improve guides for high-performance hardware (e.g., 48-thread CPU scheduling, 128GB RAM buffers).
+- **Testing:** Validate ISO builds on diverse hardware and report detailed bugs.
+
+## 6. Community & Support
+- **Discord:** Official real-time support and community hub.
+- **Root:** Alternative decentralized community platform.
+- **Wiki:** Comprehensive technical documentation (Arch-based).
+
+---
+*Document Version: 1.1 (March 2026)*
+*Authoritative Source: https://acreetionos.org*
