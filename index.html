@@ -2,44 +2,17 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "AcreetionOS",
-  "operatingSystem": "Linux",
-  "applicationCategory": "DeveloperApplication",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "featureList": "Arch-based distribution, repository sovereignty, custom Wayland compositor",
-  "releaseNotes": "https://acreetionos.org/changelog"
-}
-</script>
-<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Cinnamon desktop, open source OS" /><meta name="referrer" content="strict-origin-when-cross-origin" />
-
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://searx.acreetionos.org" />
-<title>AcreetionOS - The User-Friendly Arch Linux Distribution | Fast & Stable</title>
-<meta name="description" content="Download AcreetionOS, the beginner-friendly Arch Linux distribution. Featuring the Cinnamon desktop, XLibre stability, and privacy-focused computing. The best way to experience Arch Linux." />
-<meta name="keywords" content="AcreetionOS, Arch Linux, Linux for beginners, Cinnamon desktop, Stable Linux, Rolling release, XLibre, Privacy OS, Linux distribution 2026, Arch based distro" />
-<link rel="canonical" href="https://acreetionos.org/" />
-<!-- Open Graph / Facebook -->
-<meta property="og:type" content="website" />
-<meta property="og:url" content="https://acreetionos.org/" />
-<meta property="og:title" content="AcreetionOS - The User-Friendly Arch Linux Distribution" />
-<meta property="og:description" content="Experience the power of Arch Linux with the ease of Cinnamon. AcreetionOS offers XLibre stability, Pipewire audio, and a privacy-first philosophy." />
-<meta property="og:image" content="https://acreetionos.org/logo.webp" />
-<meta property="og:site_name" content="AcreetionOS" />
-<!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content="https://acreetionos.org/" />
-<meta property="twitter:title" content="AcreetionOS - User-Friendly Arch Linux" />
-<meta property="twitter:description" content="Stable, Fast, and Secure. The best way to use Arch Linux in 2026." />
-<meta property="twitter:image" content="https://acreetionos.org/logo.webp" />
-<!-- Structured Data -->
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
   "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://acreetionos.org/#author",
+      "name": "Natalie",
+      "jobTitle": "Lead Developer",
+      "url": "https://acreetionos.org/about.html",
+      "sameAs": [
+        "https://github.com/AcreetionOS-Code"
+      ]
+    },
     {
       "@type": "Organization",
       "@id": "https://acreetionos.org/#organization",
@@ -56,15 +29,27 @@
         "https://discord.acreetionos.org",
         "https://wiki.acreetionos.org"
       ],
-      "description": "A community-driven, user-friendly Linux distribution based on Arch Linux."
+      "description": "A community-driven, user-friendly Linux distribution based on Arch Linux.",
+      "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Spokane",
+          "addressRegion": "WA",
+          "addressCountry": "US"
+        }
+      }
     },
     {
-      "@type": "SoftwareApplication",
+      "@type": ["OperatingSystem", "SoftwareApplication", "SoftwareSourceCode"],
       "@id": "https://acreetionos.org/#software",
       "name": "AcreetionOS",
       "operatingSystem": "Linux",
       "applicationCategory": "OperatingSystem",
-      "description": "A user-friendly, privacy-focused Linux distribution based on Arch Linux featuring the Cinnamon desktop environment.",
+      "programmingLanguage": "C, Shell, Python",
+      "runtimePlatform": "Linux",
+      "codeRepository": "https://github.com/AcreetionOS-Code/acreetionos-code.github.io",
+      "description": "Stability and repository sovereignty for the modern power user. A user-friendly Arch Linux distribution.",
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -75,17 +60,38 @@
       "downloadUrl": "https://acreetionos.org/#manual-downloads",
       "softwareVersion": "1.0",
       "datePublished": "2026-01-01",
-      "author": {
-        "@id": "https://acreetionos.org/#organization"
-      },
-      "maintainer": {
-        "@id": "https://acreetionos.org/#organization"
-      },
-      "keywords": "Linux, Arch Linux, Cinnamon Desktop, Rolling Release, Operating System"
+      "author": { "@id": "https://acreetionos.org/#author" },
+      "publisher": { "@id": "https://acreetionos.org/#organization" },
+      "maintainer": { "@id": "https://acreetionos.org/#organization" },
+      "keywords": "Linux, Arch Linux, Cinnamon Desktop, Rolling Release, Operating System",
+      "processorRequirements": "64-bit",
+      "memoryRequirements": "Minimum 4GB",
+      "storageRequirements": "20GB"
     }
   ]
 }
 </script>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Cinnamon desktop, open source OS" /><meta name="referrer" content="strict-origin-when-cross-origin" />
+
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://searx.acreetionos.org" />
+<title>AcreetionOS - The User-Friendly Arch Linux Distribution | Fast & Stable</title>
+<meta name="description" content="Download AcreetionOS, the beginner-friendly Arch Linux distribution. Featuring the Cinnamon desktop, XLibre stability, and privacy-focused computing. The best way to experience Arch Linux." />
+<meta name="keywords" content="AcreetionOS, Arch Linux, Linux for beginners, Cinnamon desktop, Stable Linux, Rolling release, XLibre, Privacy OS, Linux distribution 2026, Arch based distro" />
+<link rel="canonical" href="https://acreetionos.org/" />
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://acreetionos.org/" />
+<meta property="og:title" content="AcreetionOS | Sovereign Arch Linux Distribution" />
+<meta property="og:description" content="Stability and repository sovereignty for the modern power user. Experience the power of Arch Linux with the ease of Cinnamon." />
+<meta property="og:image" content="https://acreetionos.org/logo.webp" />
+<meta property="og:site_name" content="AcreetionOS" />
+<!-- Twitter -->
+<meta property="twitter:card" content="summary_large_image" />
+<meta property="twitter:url" content="https://acreetionos.org/" />
+<meta property="twitter:title" content="AcreetionOS | Sovereign Arch Linux Distribution" />
+<meta property="twitter:description" content="Stability and repository sovereignty for the modern power user. Stable, Fast, and Secure." />
+<meta property="twitter:image" content="https://acreetionos.org/logo.webp" />
+
 <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -143,6 +149,9 @@ body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);colo
 .spec-list{list-style:none;padding:0;}
 .spec-list li{margin-bottom:0.5rem;font-size:0.9rem;color:var(--acreetion-text);}
 .spec-list .spec-title{color:var(--acreetion-text-bright);font-weight:700;min-width:120px;display:inline-block;}
+dl { margin-bottom: 2rem; border-left: 2px solid var(--acreetion-green); padding-left: 1.5rem; }
+dt { font-family: var(--font-mono); font-weight: 700; color: var(--acreetion-text-bright); margin-top: 0.5rem; }
+dd { color: var(--acreetion-text); margin-bottom: 0.5rem; margin-left: 0; }
 .sidebar-nav{list-style:none;padding:0;}
 .sidebar-nav a{display:block;text-decoration:none;color:var(--acreetion-green);padding:0.5rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);cursor:pointer;}
 .sidebar-nav a:hover{background-color:#3a3a3a;}
@@ -181,7 +190,7 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 #gnome-info-btn:hover{background-color:#8e44ad;}
 </style></head><body><div class="announcement-bar"><div class="announcement-content"><span><span style="font-weight: bold; color: var(--acreetion-green);">We're on DistroWatch!</span> <a href="https://distrowatch.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Check us out!</a><span class="separator">|</span><span style="font-weight: bold; color: var(--storm-color);">We're looking for developers!</span> Join our <a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Discord server</a> or <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer" class="social-link">Root server</a> to get involved!<span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We are on Facebook!</span> Join our <a href="https://www.facebook.com/groups/574717645277790" target="_blank" rel="noopener noreferrer" class="social-link">Community!</a></span></div></div>
 
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" class="logo-img" width="40" height="40" decoding="auto" loading="eager" fetchpriority="high"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="https://status.acreetionos.org">Server Status</a><a href="TrumpOS/index.html" style="color:#ffcc00;font-weight:900;text-transform:uppercase;">TrumpOS (MLGA)</a><a href="#about">About</a><a href="#manual-downloads">Downloads</a><a href="#" data-modal-target="#donate-modal">Donate</a><a href="https://wiki.acreetionos.org" target="_blank" rel="noopener noreferrer">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" style="color:#2ecc71;font-weight:700;">Git Tracker</a></nav></div></header>
+<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" class="logo-img" width="40" height="40" decoding="auto" loading="eager" fetchpriority="high"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="https://status.acreetionos.org">Server Status</a><a href="TrumpOS/index.html" style="color:#ffcc00;font-weight:900;text-transform:uppercase;">TrumpOS (MLGA)</a><a href="about.html">About</a><a href="#manual-downloads">Downloads</a><a href="#" data-modal-target="#donate-modal">Donate</a><a href="https://wiki.acreetionos.org" target="_blank" rel="noopener noreferrer">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" style="color:#2ecc71;font-weight:700;">Git Tracker</a></nav></div></header>
 
 <div class="search-strip">
 <div class="search-container">
@@ -192,7 +201,21 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 </div>
 </div>
 
-<div class="page-wrapper"><main class="content-feed"><article id="about" class="content-box"><div class="box-header"><h2>Welcome to AcreetionOS</h2></div><div class="box-body"><div class="article-content"><div class="article-logo-cluster"><img src="logo.webp" alt="AcreetionOS Main Logo" class="hero-logo-img" width="150" height="150" decoding="auto" loading="eager" fetchpriority="high"></div><p><strong>AcreetionOS</strong> is an Arch-based Linux distribution designed for stability, ease of use, and a commitment to building software that makes the world a better place. We believe in transparency, technical integrity, and the power of open-source community.</p>
+<div class="page-wrapper"><main class="content-feed"><article id="about" class="content-box"><div class="box-header"><h2>Welcome to AcreetionOS</h2></div><div class="box-body"><div class="article-content"><div class="article-logo-cluster"><img src="logo.webp" alt="AcreetionOS Main Logo" class="hero-logo-img" width="150" height="150" decoding="auto" loading="eager" fetchpriority="high"></div><p><strong>AcreetionOS is a user-friendly, privacy-focused Linux distribution based on Arch Linux.</strong> It features the Cinnamon desktop environment, XLibre stability, and a curated selection of tools designed for performance and repository sovereignty. It is the ideal choice for users seeking Arch Linux power without the configuration complexity.</p>
+
+<h3>AcreetionOS Technical Specifications</h3>
+<dl>
+  <dt>Base Distribution</dt>
+  <dd>Arch Linux (Rolling Release)</dd>
+  <dt>Desktop Environment</dt>
+  <dd>Cinnamon (Optimized)</dd>
+  <dt>Display Protocol</dt>
+  <dd>XLibre (X11-based stability)</dd>
+  <dt>Audio Server</dt>
+  <dd>Pipewire</dd>
+  <dt>Primary Goal</dt>
+  <dd>User Sovereignty & Predictable Stability</dd>
+</dl>
 
 <h3>Our Team & Philosophy</h3>
 <p>AcreetionOS is led by two Republicans who believe that software development should transcend partisan divides while remaining grounded in core values. Our team is proof that diversity of experience can drive innovation:</p>
@@ -278,4 +301,4 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 <a href="https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso" class="btn btn-storm">Download XLibre ISO (Direct)</a>
 </div>
 
-<div class="article-content"><h3>Using Your Own Flashing Tool</h3><p>After downloading an ISO, write it to a USB drive (8GB+). <strong>This will erase all data.</strong></p><h4 style="color: var(--acreetion-text-bright); margin-top: 1rem;">Balena Etcher</h4><p><a href="https://etcher.balena.io/" target="_blank" rel="noopener noreferrer">Balena Etcher</a> is recommended for Windows, macOS, and Linux.</p><h4 style="color: var(--acreetion-text-bright); margin-top: 1rem;">Using `dd` (Advanced)</h4><pre><code>sudo dd if=/path/to/AcreetionOS.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre></div></div></article></main><aside class="sidebar"><div id="specs" class="content-box sidebar-box"><div class="box-header"><h2>System Information</h2></div><div class="box-body"><ul class="spec-list"><li><span class="spec-title">OS:</span> AcreetionOS</li><li><span class="spec-title">Base:</span> Arch Linux</li><li><span class="spec-title">Kernel:</span> Rolling</li><li><span class="spec-title">DE:</span> Cinnamon</li><li><span class="spec-title">Display:</span> XLibre / X11</li><li><span class="spec-title">Filesystem:</span> EXT4</li><li><span class="spec-title">Audio:</span> Pipewire</li></ul></div></div><div id="community" class="content-box sidebar-box" style="margin-top: 2rem;"><div class="box-header"><h2>Community &amp; Team</h2></div><div class="box-body"><p>Join our community:</p><ul class="sidebar-nav"><li><a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer">Discord Server</a></li><li><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Root (Alternative)</a></li><li><a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer">GitHub</a></li><li><a href="https://wiki.acreetionos.org" target="_blank" rel="noopener noreferrer">Wiki</a></li></ul><h3 class="tech-detail-heading" style="margin-top: 1.5rem; font-size: 1rem;">Our Team</h3><div class="team-members"><div class="team-member"><p class="team-member-name">Darren Clift</p><a href="https://github.com/cobra3282000" target="_blank" rel="noopener noreferrer" class="btn btn-storm">cobra3282000</a></div><div class="team-member"><p class="team-member-name">Natalie Clift</p><a href="https://github.com/sprunglesonthehub" target="_blank" rel="noopener noreferrer" class="btn btn-storm">sprunglesonthehub</a></div></div></div></div><div id="ai-help" class="content-box sidebar-box" style="margin-top: 2rem;"><div class="box-header" style="background-color: var(--storm-color);"><h2 style="color: black; text-align: center;">AI Assistants</h2></div><div class="box-body"><p>For complex problem-solving, we recommend these tools:</p><a href="https://gemini.google.com" class="btn btn-storm" target="_blank" rel="noopener noreferrer" style="width: 100%; text-align: center; margin-bottom:0.5rem;">Gemini</a><a href="https://claude.ai" class="btn btn-claude" target="_blank" rel="noopener noreferrer" style="width: 100%; text-align: center;">Claude</a></div></div></aside></div><footer class="page-footer"><p>Built on the foundation of <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. Independent project. © 2025 AcreetionOS.</p></footer><div id="donate-modal" class="modal-overlay"><div class="modal-box"><button class="modal-close-btn" title="Close">×</button><h2>Why We Don't Take Your Money</h2><p>We are developers, not accountants. Accepting donations would require legal overhead that diverts time from building the OS. Instead, help us by finding sponsors for mirrors and hardware.</p></div></div><script>document.addEventListener('DOMContentLoaded', () => {const mainPageModalTriggers = document.querySelectorAll('[data-modal-target]');const mainPageModals = document.querySelectorAll('.modal-overlay');const openModal = (modal) => {modal.classList.add('visible');document.body.style.overflow = 'hidden';};const closeModal = (modal) => {modal.classList.remove('visible');document.body.style.overflow = '';};mainPageModalTriggers.forEach(trigger => {trigger.addEventListener('click', (e) => {e.preventDefault();const modal = document.querySelector(trigger.dataset.modalTarget);if (modal) {openModal(modal);}});});mainPageModals.forEach(modal => {modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal); });const closeBtn = modal.querySelector('.modal-close-btn');if (closeBtn) closeBtn.addEventListener('click', () => closeModal(modal));});});</script><div id="gnome-modal" class="modal-overlay"><div class="modal-box"><button class="modal-close-btn">&times;</button><h2>Retired GNOME Edition</h2><p>The GNOME desktop project has shifted its focus heavily toward <strong>Wayland</strong>. Because AcreetionOS currently prioritizes the stability and broad compatibility of <strong>X11 and XLibre</strong> environments, we have made the decision to retire the GNOME edition for the time being.</p><p style="margin-top:1rem;">This is not necessarily a permanent change. <strong>GNOME may return to AcreetionOS one day</strong>, but not until official Wayland-based variants of our OS are released. We believe in providing an experience that "just works," and we won't bring GNOME back until we can guarantee it meets our standards for performance and reliability on modern display protocols.</p></div></div><button id="gnome-info-btn" onclick="document.getElementById('gnome-modal').classList.add('visible');">Where'd GNOME go?</button></body></html>
+<div class="article-content"><h3>Using Your Own Flashing Tool</h3><p>After downloading an ISO, write it to a USB drive (8GB+). <strong>This will erase all data.</strong></p><h4 style="color: var(--acreetion-text-bright); margin-top: 1rem;">Balena Etcher</h4><p><a href="https://etcher.balena.io/" target="_blank" rel="noopener noreferrer">Balena Etcher</a> is recommended for Windows, macOS, and Linux.</p><h4 style="color: var(--acreetion-text-bright); margin-top: 1rem;">Using `dd` (Advanced)</h4><pre><code>sudo dd if=/path/to/AcreetionOS.iso of=/dev/sdX bs=4M status=progress oflag=sync</code></pre></div></div></article></main><aside class="sidebar"><div id="specs" class="content-box sidebar-box"><div class="box-header"><h2>System Information</h2></div><div class="box-body"><ul class="spec-list"><li><span class="spec-title">OS:</span> AcreetionOS</li><li><span class="spec-title">Base:</span> Arch Linux</li><li><span class="spec-title">Kernel:</span> Rolling</li><li><span class="spec-title">DE:</span> Cinnamon</li><li><span class="spec-title">Display:</span> XLibre / X11</li><li><span class="spec-title">Filesystem:</span> EXT4</li><li><span class="spec-title">Audio:</span> Pipewire</li></ul></div></div><div id="community" class="content-box sidebar-box" style="margin-top: 2rem;"><div class="box-header"><h2>Community &amp; Team</h2></div><div class="box-body"><p>Join our community:</p><ul class="sidebar-nav"><li><a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer">Discord Server</a></li><li><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Root (Alternative)</a></li><li><a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer">GitHub</a></li><li><a href="https://wiki.acreetionos.org" target="_blank" rel="noopener noreferrer">Wiki</a></li></ul><h3 class="tech-detail-heading" style="margin-top: 1.5rem; font-size: 1rem;">Our Team</h3><div class="team-members"><div class="team-member"><p class="team-member-name">Darren Clift</p><a href="https://github.com/cobra3282000" target="_blank" rel="noopener noreferrer" class="btn btn-storm">cobra3282000</a></div><div class="team-member"><p class="team-member-name">Natalie Clift</p><a href="https://github.com/sprunglesonthehub" target="_blank" rel="noopener noreferrer" class="btn btn-storm">sprunglesonthehub</a></div></div></div></div><div id="ai-help" class="content-box sidebar-box" style="margin-top: 2rem;"><div class="box-header" style="background-color: var(--storm-color);"><h2 style="color: black; text-align: center;">AI Assistants</h2></div><div class="box-body"><p>For complex problem-solving, we recommend these tools:</p><a href="https://gemini.google.com" class="btn btn-storm" target="_blank" rel="noopener noreferrer" style="width: 100%; text-align: center; margin-bottom:0.5rem;">Gemini</a><a href="https://claude.ai" class="btn btn-claude" target="_blank" rel="noopener noreferrer" style="width: 100%; text-align: center;">Claude</a></div></div></aside></div><footer class="page-footer"><p>Built on the foundation of <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. Independent project. © 2026 AcreetionOS Project. Based in Spokane, WA.</p></footer><div id="donate-modal" class="modal-overlay"><div class="modal-box"><button class="modal-close-btn" title="Close">×</button><h2>Why We Don't Take Your Money</h2><p>We are developers, not accountants. Accepting donations would require legal overhead that diverts time from building the OS. Instead, help us by finding sponsors for mirrors and hardware.</p></div></div><script>document.addEventListener('DOMContentLoaded', () => {const mainPageModalTriggers = document.querySelectorAll('[data-modal-target]');const mainPageModals = document.querySelectorAll('.modal-overlay');const openModal = (modal) => {modal.classList.add('visible');document.body.style.overflow = 'hidden';};const closeModal = (modal) => {modal.classList.remove('visible');document.body.style.overflow = '';};mainPageModalTriggers.forEach(trigger => {trigger.addEventListener('click', (e) => {e.preventDefault();const modal = document.querySelector(trigger.dataset.modalTarget);if (modal) {openModal(modal);}});});mainPageModals.forEach(modal => {modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(modal); });const closeBtn = modal.querySelector('.modal-close-btn');if (closeBtn) closeBtn.addEventListener('click', () => closeModal(modal));});});</script><div id="gnome-modal" class="modal-overlay"><div class="modal-box"><button class="modal-close-btn">&times;</button><h2>Retired GNOME Edition</h2><p>The GNOME desktop project has shifted its focus heavily toward <strong>Wayland</strong>. Because AcreetionOS currently prioritizes the stability and broad compatibility of <strong>X11 and XLibre</strong> environments, we have made the decision to retire the GNOME edition for the time being.</p><p style="margin-top:1rem;">This is not necessarily a permanent change. <strong>GNOME may return to AcreetionOS one day</strong>, but not until official Wayland-based variants of our OS are released. We believe in providing an experience that "just works," and we won't bring GNOME back until we can guarantee it meets our standards for performance and reliability on modern display protocols.</p></div></div><button id="gnome-info-btn" onclick="document.getElementById('gnome-modal').classList.add('visible');">Where'd GNOME go?</button></body></html>
