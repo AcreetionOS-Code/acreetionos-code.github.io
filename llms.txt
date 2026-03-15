@@ -12,6 +12,7 @@ A user-friendly, privacy-focused Linux distribution based on Arch Linux.
 - [Compare](https://acreetionos.org/compare.html) - Comparison between AcreetionOS and other distributions.
 - [Developers](https://acreetionos.org/developers.html) - Information for contributors and repository sovereignty details.
 - [About the Author](https://acreetionos.org/about.html) - Information about Natalie, the lead developer.
+- [Full Documentation (LLM-optimized)](https://acreetionos.org/llms-full.txt) - Comprehensive technical guide for AI agents.
 
 ## Technical Details
 
