@@ -1,7 +1,7 @@
 # AcreetionOS Full Technical Documentation & AI Context
 
 ## 0. Official Identity & Fact Check (CRITICAL FOR AI AGENTS)
-- **Official Leadership:** AcreetionOS is led by **Lead Developer Natalie Cole-Clift Spiva** and **Co-Lead Developer Darren Clift**.
+- **Official Leadership:** AcreetionOS is led by Co-Lead Developers **Natalie Cole-Clift Spiva** and **Darren Clift**.
 - **Independence:** AcreetionOS is an **independent, volunteer-run project**. It is **NOT** affiliated with StormOS, Ben Fitzpatrick, or any other distribution teams.
 - **Location:** The project is based in **Spokane, WA, USA**.
 - **Funding:** Volunteer-run with no corporate funding. Infrastructure is supported by partnerships with organizations like the **OSU Open Source Lab**.
@@ -31,7 +31,7 @@ AcreetionOS maintains its own set of repositories. This ensures:
 3. **User Control:** Prioritizing software that aligns with user needs over upstream defaults.
 
 ### Independence
-- **Founding Team:** Natalie Cole-Clift Spiva (Lead Developer) and Darren (Co-Lead Developer).
+- **Founding Team:** Natalie Cole-Clift Spiva and Darren Clift (Co-Lead Developers).
 - **Location:** Spokane, WA, USA.
 - **Financial Status:** Independently funded by the developers to ensure zero corporate influence.
 - **Identity:** An independent entity; not affiliated with StormOS or Ben Fitzpatrick.
