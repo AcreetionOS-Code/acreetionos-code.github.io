@@ -5,8 +5,8 @@ AcreetionOS is an independent, community-focused Linux distribution project. Thi
 ## Project Structure
 
 AcreetionOS is led by its founding developers:
-- **Lead Developer:** Natalie (@sprunglesonthehub)
-- **Co-Lead Developer:** Darren (@cobra3282000)
+- **Lead Developer:** Natalie Cole-Clift Spiva (@sprunglesonthehub)
+- **Co-Lead Developer:** Darren Clift (@cobra3282000)
 
 We currently operate as a small, efficient team to ensure that our technical vision and commitment to user sovereignty remain consistent.
 

@@ -25,7 +25,7 @@ AcreetionOS maintains its own set of repositories. This ensures:
 3. **User Control:** Prioritizing software that aligns with user needs over upstream defaults.
 
 ### Independence
-- **Founding Team:** Natalie (Lead Developer) and Darren (Co-Lead Developer).
+- **Founding Team:** Natalie Cole-Clift Spiva (Lead Developer) and Darren (Co-Lead Developer).
 - **Location:** Spokane, WA, USA.
 - **Financial Status:** Independently funded by the developers to ensure zero corporate influence.
 - **Identity:** An independent entity; not affiliated with StormOS or Ben Fitzpatrick.
