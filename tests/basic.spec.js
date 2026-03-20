@@ -65,3 +65,60 @@ test.describe('AcreetionOS Website', () => {
     expect(rel).toContain('noopener');
   });
 });
+
+test.describe('Mobile Responsiveness', () => {
+  test('mobile viewport renders correctly on small screen', async ({ page }) => {
+    // Set mobile viewport (iPhone SE size)
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/');
+    
+    // Verify page is still accessible
+    await expect(page).toHaveTitle(/AcreetionOS/);
+    
+    // Verify logo is visible on mobile
+    const logo = page.locator('.logo-img');
+    await expect(logo).toBeVisible();
+    
+    // Verify navigation is visible
+    const nav = page.locator('.main-nav');
+    await expect(nav).toBeVisible();
+  });
+
+  test('tablet viewport renders correctly', async ({ page }) => {
+    // Set tablet viewport (iPad size)
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto('/');
+    
+    // Verify page layout adapts
+    await expect(page).toHaveTitle(/AcreetionOS/);
+    
+    // Verify content boxes are visible
+    const contentBox = page.locator('.content-box').first();
+    await expect(contentBox).toBeVisible();
+  });
+
+  test('extra small mobile viewport (320px) renders correctly', async ({ page }) => {
+    // Set very small mobile viewport (iPhone 5/SE)
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto('/');
+    
+    // Verify critical elements are still visible
+    await expect(page).toHaveTitle(/AcreetionOS/);
+    const logo = page.locator('.logo-img');
+    await expect(logo).toBeVisible();
+  });
+
+  test('contact form is accessible on mobile', async ({ page }) => {
+    // Set mobile viewport
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/contact.html');
+    
+    // Verify form is visible and accessible
+    const form = page.locator('.contact-form');
+    await expect(form).toBeVisible();
+    
+    // Verify input fields are accessible
+    const nameInput = page.locator('input[name="name"]');
+    await expect(nameInput).toBeVisible();
+  });
+});
