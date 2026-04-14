@@ -90,7 +90,7 @@ CSS variables defined in `:root`:
 - Enables PWA-like experience
 
 ### Search (index.html)
-- Form posts to SearX instance at `https://searx.acreetionos.org`
+- Form posts to Qwant at `https://www.qwant.com/`
 - Uses `target="_blank"` for search results
 
 ### Modals
