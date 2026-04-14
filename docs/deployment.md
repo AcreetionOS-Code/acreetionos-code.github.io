@@ -45,7 +45,8 @@ See `wrangler.jsonc` for project settings.
 - Large ISOs mirrored by partners:
   - OSUOSL (Oregon State University)
   - RWTH Aachen University
-  - Community mirrors (France, Romania)
+  - Community mirrors (France)
+  <!-- Romania mirror removed due to excessive downtime -->
 
 ### External Services
 - SearX: `searx.acreetionos.org` (search)
