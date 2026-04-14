@@ -1,4 +1,11 @@
-# Contributing to AcreetionOS
+<html>
+<head>
+<link rel="stylesheet" href="contact.css">
+<title>Contributing to AcreetionOS</title>
+</head>
+<body class="acreetionos-md">
+<div class="md-content">
+<h1>Contributing to AcreetionOS</h1>
 
 Thank you for your interest in contributing to AcreetionOS! As a community-driven project run by a small team, your contributions are vital to our success.
 
@@ -35,5 +42,7 @@ AcreetionOS maintains its own repositories to ensure that our users always have 
 ## Attribution
 Contributors will be recognized in our project documentation and repository history.
 
----
-*Last Updated: March 2026*
+</div>
+<footer class="footer">&copy; 2026 AcreetionOS Project. All rights reserved.</footer>
+</body>
+</html>

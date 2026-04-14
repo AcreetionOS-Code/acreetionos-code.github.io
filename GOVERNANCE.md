@@ -1,4 +1,11 @@
-# AcreetionOS Project Governance
+<html>
+<head>
+<link rel="stylesheet" href="contact.css">
+<title>AcreetionOS Project Governance</title>
+</head>
+<body class="acreetionos-md">
+<div class="md-content">
+<h1>AcreetionOS Project Governance</h1>
 
 AcreetionOS is an independent, community-focused Linux distribution project. This document outlines our governance model, decision-making process, and commitment to transparency.
 
@@ -33,5 +40,7 @@ We maintain our own set of repositories. This is not just a technical choice; it
 
 As the project grows, we aim to transition to a more formalized community governance model. Our long-term goal is to establish a sustainable, independent organization that can maintain AcreetionOS for decades.
 
----
-*Last Updated: March 2026*
+</div>
+<footer class="footer">&copy; 2026 AcreetionOS Project. All rights reserved.</footer>
+</body>
+</html>
