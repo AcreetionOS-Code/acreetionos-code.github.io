@@ -49,7 +49,7 @@ See `wrangler.jsonc` for project settings.
   <!-- Romania mirror removed due to excessive downtime -->
 
 ### External Services
-- SearX: `searx.acreetionos.org` (search)
+- Qwant: `https://www.qwant.com/` (search)
 - Nextcloud: `nextcloud.acreetionos.org` (file hosting)
 
 ## DNS Configuration
@@ -58,7 +58,7 @@ See `wrangler.jsonc` for project settings.
 acreetionos.org          A       [Cloudflare IP]
 www.acreetionos.org      CNAME   acreetionos.org
 iso.acreetionos.org      CNAME   [ISO server]
-searx.acreetionos.org    CNAME   [SearX instance]
+# searx.acreetionos.org    CNAME   [SearX instance] (deprecated, replaced by Qwant)
 ```
 
 ## Maintenance
