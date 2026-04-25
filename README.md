@@ -67,7 +67,7 @@ bash tests/run_firefox_local.sh
 AcreetionOS is a community-driven project. We believe in transparency and the separation of identity from technical merit.
 
 - **[Discord Community](https://discord.acreetionos.org)**
-- **[Wiki Documentation](https://wiki.conf)**
+- **[Wiki Documentation](wiki.html)**
 - **[Source Code](https://github.com/AcreetionOS-Code)**
 
 ## License
