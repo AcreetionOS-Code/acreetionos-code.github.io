@@ -20,7 +20,7 @@ test.describe('AcreetionOS Website', () => {
     await page.goto('/');
     
     // Check main nav links exist
-    await expect(page.locator('a[href="#about"]')).toBeVisible();
+    await expect(page.locator('a[href="about.html"]')).toBeVisible();
     await expect(page.locator('a[href="#manual-downloads"]')).toBeVisible();
   });
 
