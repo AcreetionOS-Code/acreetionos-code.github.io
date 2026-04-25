@@ -139,7 +139,7 @@ body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);colo
 .social-link{padding:0.2rem 0.5rem;border-radius: 0.75rem;transition:background-color 0.3s ease;}
 .social-link:hover{background-color:rgba(255,255,255,0.1);animation:pulse 1s infinite;}
 @keyframes pulse{0%{transform:scale(1);}50%{transform:scale(1.05);}100%{transform:scale(1);}}
-.page-header {background-color:var(--acreetion-panel-bg);border-bottom:2px solid var(--acreetion-green); border-radius: 0 0 16px 16px;}
+.page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000;}
 .header-content{display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto;padding:0.75rem 2rem;}
 .logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none;}
 .logo-img{height:40px;width: auto;will-change:transform;contain:layout;}
@@ -217,6 +217,10 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 #gnome-info-btn:hover{background-color:#8e44ad;}
 #aiden-notification-banner{display:none;position:fixed;top:0;left:0;right:0;background:linear-gradient(90deg, var(--acreetion-green), #27ae60);color:#121212;padding:1rem;text-align:center;font-weight:bold;font-size:1.1rem;z-index:1001;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,0.3);}
 #aiden-notification-banner:hover{background:linear-gradient(90deg, #27ae60, var(--acreetion-green));}
+
+::-webkit-scrollbar{width:10px;}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212);}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71);}
+.btn{transition:all 0.3s ease;}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px);}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease;}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);will-change:opacity, transform;}.reveal.active{opacity:1;transform:translateY(0);}
 </style></head><body>
 <div id="aiden-notification-banner"></div>
 <div class="announcement-bar"><div class="announcement-content"><span style="font-weight: bold; color: #e74c3c;">⚠️ We are in the middle of VPS migrations. Repositories and installation should work, but other services may be temporarily down. During install, do not install extra software for the time being. Once you are in the OS, feel free! ⚠️</span><span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We're on DistroWatch!</span> <a href="https://distrowatch.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Check us out!</a><span class="separator">|</span><span style="font-weight: bold; color: var(--storm-color);">We're looking for developers!</span> Join our <a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Discord server</a> or <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer" class="social-link">Root server</a> to get involved!<span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We are on Facebook!</span> Join our <a href="https://www.facebook.com/groups/574717645277790" target="_blank" rel="noopener noreferrer" class="social-link">Community!</a></span></div></div>
@@ -383,5 +387,22 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
         });
     }
 })();
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
+    document.querySelectorAll('.content-box, .dev-card, .event-card, .repo-card').forEach(el => {
+        el.classList.add('reveal');
+        observer.observe(el);
+    });
+});
 </script>
 </body></html>
