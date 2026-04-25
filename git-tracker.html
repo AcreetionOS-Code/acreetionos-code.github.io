@@ -54,7 +54,7 @@
         .announcement-bar a { color: var(--acreetion-green); font-weight: bold; text-decoration: none; }
         .separator { margin: 0 1.5rem; color: var(--acreetion-box-border); }
 
-        .page-header { background-color: var(--acreetion-panel-bg); border-bottom: 2px solid var(--acreetion-green);  border-radius: 0 0 16px 16px;}
+        .page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000;}
         .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0.75rem 2rem; }
         .logo { display: flex; align-items: center; gap: 1rem; font-family: var(--font-mono); font-size: 1.8rem; font-weight: 700; color: var(--acreetion-text-bright); text-decoration: none; }
         .logo span { color: var(--acreetion-green); }
@@ -186,7 +186,11 @@
         footer { text-align: center; padding: 2rem; border-top: 1px solid var(--acreetion-box-border); color: #777; margin-top: 4rem; }
 
         @media (max-width: 1024px) { .page-wrapper { grid-template-columns: 1fr; } .sidebar { order: 1; } }
-    </style>
+    
+::-webkit-scrollbar{width:10px;}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212);}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71);}
+.btn{transition:all 0.3s ease;}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px);}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease;}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);will-change:opacity, transform;}.reveal.active{opacity:1;transform:translateY(0);}
+</style>
 </head>
 <body>
     <div class="announcement-bar">
@@ -452,5 +456,22 @@
         // Start
         initTracker();
     </script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
+    document.querySelectorAll('.content-box, .dev-card, .event-card, .repo-card').forEach(el => {
+        el.classList.add('reveal');
+        observer.observe(el);
+    });
+});
+</script>
 </body>
 </html>

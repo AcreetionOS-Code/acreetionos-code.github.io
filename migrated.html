@@ -9,7 +9,11 @@
   <link rel="canonical" href="https://acreetionos.org/migrated.html" />
   <meta http-equiv="refresh" content="2; url=index.html">
   <link rel="stylesheet" href="contact.css">
-<style>body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}a{color:var(--acreetion-green);} nav{display:flex;gap:1rem;margin-bottom:1rem;}</style>
+<style>body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0}a{color:var(--acreetion-green);} nav{display:flex;gap:1rem;margin-bottom:1rem;}
+::-webkit-scrollbar{width:10px;}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212);}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71);}
+.btn{transition:all 0.3s ease;}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px);}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease;}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);will-change:opacity, transform;}.reveal.active{opacity:1;transform:translateY(0);}
+</style>
 </head>
 <body>
   <nav>
@@ -25,5 +29,22 @@
     <h1>Moved</h1>
     <p>This page was migrated — redirecting you back. <a href="index.html">Go now</a></p>
   </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
+    document.querySelectorAll('.content-box, .dev-card, .event-card, .repo-card').forEach(el => {
+        el.classList.add('reveal');
+        observer.observe(el);
+    });
+});
+</script>
 </body>
 </html>

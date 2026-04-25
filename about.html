@@ -33,7 +33,7 @@
 :root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222222;--acreetion-box-border:#333333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46, 204, 113, 0.1);--storm-color:#61afef;--font-sans:'Roboto', -apple-system, sans-serif;--font-mono:'Fira Code', monospace;}
 *, *::before, *::after{box-sizing: border-box; margin: 0; padding: 0;}
 body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;}
-.page-header {background-color:var(--acreetion-panel-bg);border-bottom:2px solid var(--acreetion-green);padding: 1rem 0; border-radius: 0 0 16px 16px;}
+.page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000;}
 .header-content{display:flex;justify-content:space-between;align-items:center;max-width:1200px;margin:0 auto;padding:0 2rem;}
 .logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none;}
 .logo span{color:var(--acreetion-green);}
@@ -48,6 +48,10 @@ p{margin-bottom:1.5rem;font-size:1.1rem;color:var(--acreetion-text);}
 .profile-img { width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--acreetion-green); margin-bottom: 2rem; object-fit: cover; }
 ul { list-style: none; padding-left: 0; }
 li { margin-bottom: 0.5rem; }
+
+::-webkit-scrollbar{width:10px;}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212);}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71);}
+.btn{transition:all 0.3s ease;}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px);}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease;}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);will-change:opacity, transform;}.reveal.active{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
@@ -96,5 +100,22 @@ li { margin-bottom: 0.5rem; }
 <p>&copy; 2026 Natalie Cole-Clift Spiva / AcreetionOS Project. Based in Spokane, WA.</p>
 </footer>
 
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
+    document.querySelectorAll('.content-box, .dev-card, .event-card, .repo-card').forEach(el => {
+        el.classList.add('reveal');
+        observer.observe(el);
+    });
+});
+</script>
 </body>
 </html>
