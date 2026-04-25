@@ -91,7 +91,7 @@ if('serviceWorker'in navigator){window.addEventListener('load',()=>{navigator.se
 <p><strong>Required:</strong> USB drive with at least 4GB capacity</p>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On Linux:</h3>
-<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code># Replace /dev/sdX with your USB device (check with lsblk)
 sudo dd if=acreetionos-*.iso of=/dev/sdX bs=4M status=progress && sync</code>
 </pre>
@@ -107,7 +107,7 @@ sudo dd if=acreetionos-*.iso of=/dev/sdX bs=4M status=progress && sync</code>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On macOS:</h3>
 <p>Use <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a> (easiest) or Terminal:</p>
-<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code># Find your USB device
 diskutil list
 
@@ -195,19 +195,19 @@ sudo dd if=acreetionos-*.iso of=/dev/rdiskN bs=1m</code>
 <h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Post-Installation Steps</h2>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Update Your System</h3>
-<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code>sudo pacman -Syu</code>
 </pre>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Install Additional Software</h3>
 <p>Use the built-in Pamac package manager or command line:</p>
-<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code>sudo pacman -S firefox vlc gimp libreoffice</code>
 </pre>
 
 <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">Enable AUR (Arch User Repository)</h3>
 <p>AUR is already configured in AcreetionOS! Just use Pamac GUI or install an AUR helper:</p>
-<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 4px; overflow-x: auto; margin: 1rem 0;">
+<pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code>sudo pacman -S yay
 yay -S google-chrome spotify</code>
 </pre>
