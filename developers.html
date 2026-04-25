@@ -86,11 +86,29 @@ body{background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 
 
 .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem;}
 
+
+
+/* Unify container pages with index.html design language */
+.container{display:grid;grid-template-columns:1fr;gap:2rem;max-width:900px;margin:2rem auto;padding:0 2rem;width:100%;}
+.container > h1,.container > h2,.container > h3{padding:0 0.5rem;}
+.container > p{padding:0 0.5rem;}
+.container > img,.container > .profile-img{margin:0 0.5rem 2rem;}
+.container .highlight-box{background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:0;margin:0;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.3s ease,box-shadow 0.3s ease;}
+.container .highlight-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
+.container .highlight-box h1,.container .highlight-box h2,.container .highlight-box h3{padding:0.8rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);background-color:#1a1a1a;margin:0;font-size:1.3rem;color:var(--acreetion-text-bright);font-family:var(--font-mono);}
+.container .highlight-box p{padding:1.5rem;margin:0;font-size:1rem;}
+.container .highlight-box ul{padding:0 1.5rem 1.5rem;margin:0;list-style:none;}
+.container .highlight-box li{margin-bottom:0.5rem;}
+.page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem;}
+.page-footer p{color:#777;margin-bottom:0.5rem;}
+.page-footer a{color:var(--acreetion-green);text-decoration:none;}
+.page-footer a:hover{text-decoration:underline;}
+
 </style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
-<a href="#main-content" class="skip-link">Skip to main content</a>
+
 
 <header class="page-header">
 <div class="header-content">
@@ -105,7 +123,7 @@ body{background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 
 </div>
 </header>
 
-<div class="container">
+<div class="container" id="main-content">
 <h1>The Team</h1>
 <div class="intro-text">
     <p>AcreetionOS is a labor of love, developed by a father-daughter team dedicated to technical excellence and community support. Darren and Natalie together run every aspect of the project—from the frontend design to the complex backend infrastructure.</p>
@@ -167,7 +185,7 @@ body{background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 
 
 </div>
 
-<footer class="footer">
+<footer class="page-footer">
 <p>&copy; 2026 AcreetionOS Project. Built with pride by the father-daughter team, Darren and Natalie.</p>
 </footer>
 
