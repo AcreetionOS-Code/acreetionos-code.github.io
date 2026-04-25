@@ -221,7 +221,31 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 ::-webkit-scrollbar{width:10px;}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212);}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px;}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71);}
 .btn{transition:all 0.3s ease;}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px);}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease;}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5);}
 .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);will-change:opacity, transform;}.reveal.active{opacity:1;transform:translateY(0);}
+
+
+html{scroll-behavior:smooth;}
+::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff);}
+:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px;}
+a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;}
+.skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0;}
+.skip-link:focus{top:0;}
+@media (prefers-reduced-motion: reduce) {
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+
+
+@keyframes pageLoadFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+body{animation:pageLoadFade 0.6s ease-out;}
+@media (prefers-reduced-motion: reduce){body{animation:none;}}
+
+
+a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative;}
+a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px;}
+
 </style></head><body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <div id="aiden-notification-banner"></div>
 <div class="announcement-bar"><div class="announcement-content"><span style="font-weight: bold; color: #e74c3c;">⚠️ We are in the middle of VPS migrations. Repositories and installation should work, but other services may be temporarily down. During install, do not install extra software for the time being. Once you are in the OS, feel free! ⚠️</span><span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We're on DistroWatch!</span> <a href="https://distrowatch.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Check us out!</a><span class="separator">|</span><span style="font-weight: bold; color: var(--storm-color);">We're looking for developers!</span> Join our <a href="https://discord.acreetionos.org" target="_blank" rel="noopener noreferrer" class="social-link">Discord server</a> or <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer" class="social-link">Root server</a> to get involved!<span class="separator">|</span><span style="font-weight: bold; color: var(--acreetion-green);">We are on Facebook!</span> Join our <a href="https://www.facebook.com/groups/574717645277790" target="_blank" rel="noopener noreferrer" class="social-link">Community!</a></span></div></div>
 
@@ -239,7 +263,7 @@ pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-
 </div>
 </div>
 
-<div class="page-wrapper"><main class="content-feed"><article id="about" class="content-box"><div class="box-header"><h2>Welcome to AcreetionOS</h2></div><div class="box-body"><div class="article-content"><div class="article-logo-cluster"><img src="logo.webp" alt="AcreetionOS Cinnamon Desktop Interface: A polished, user-friendly environment running on an Arch Linux base" class="hero-logo-img" width="150" height="150" decoding="auto" loading="eager" fetchpriority="high"></div><p><strong>AcreetionOS is a user-friendly, privacy-focused Linux distribution based on Arch Linux.</strong> It features the Cinnamon desktop environment, XLibre stability, and a curated selection of tools designed for performance and repository sovereignty. It is the ideal choice for users seeking Arch Linux power without the configuration complexity.</p>
+<div class="page-wrapper"><main id="main-content" class="content-feed"><article id="about" class="content-box"><div class="box-header"><h2>Welcome to AcreetionOS</h2></div><div class="box-body"><div class="article-content"><div class="article-logo-cluster"><img src="logo.webp" alt="AcreetionOS Cinnamon Desktop Interface: A polished, user-friendly environment running on an Arch Linux base" class="hero-logo-img" width="150" height="150" decoding="auto" loading="eager" fetchpriority="high"></div><p><strong>AcreetionOS is a user-friendly, privacy-focused Linux distribution based on Arch Linux.</strong> It features the Cinnamon desktop environment, XLibre stability, and a curated selection of tools designed for performance and repository sovereignty. It is the ideal choice for users seeking Arch Linux power without the configuration complexity.</p>
 
 <h3>AcreetionOS Technical Specifications</h3>
 <dl>
