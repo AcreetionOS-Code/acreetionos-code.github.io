@@ -184,7 +184,7 @@ body {
 .page-header {
     background-color: var(--acreetion-panel-bg);
     border-bottom: 4px solid var(--acreetion-green);
-}
+ border-radius: 0 0 16px 16px;}
 
 .header-content {
     display: flex;
@@ -269,7 +269,7 @@ body {
 .content-box {
     background-color: var(--acreetion-box-bg);
     border: 1px solid var(--acreetion-box-border);
-    border-radius: 4px;
+    border-radius: 12px;
 }
 
 .box-header {
@@ -312,7 +312,7 @@ body {
     background-color: var(--acreetion-green);
     color: black;
     padding: 0.6rem 1.2rem;
-    border-radius: 4px;
+    border-radius: 12px;
     text-decoration: none;
     margin-right: 0.5rem;
     margin-top: 0.5rem;
@@ -378,7 +378,7 @@ body {
     align-items: center;
     gap: 1rem;
     padding: 0.75rem;
-    border-radius: 4px;
+    border-radius: 12px;
     text-decoration: none;
     color: var(--acreetion-text-bright);
     transition: background-color 0.2s;
@@ -481,7 +481,7 @@ body {
     width: 100%;
     background-color: var(--acreetion-panel-bg);
     border: 1px solid var(--acreetion-box-border);
-    border-radius: 4px;
+    border-radius: 12px;
     padding: 0.75rem;
     color: var(--acreetion-text-bright);
     font-size: 1rem;
@@ -519,7 +519,7 @@ body {
     border: 1px solid var(--acreetion-box-border);
     padding: 2rem 3rem;
     max-width: 600px;
-    border-radius: 4px;
+    border-radius: 12px;
 }
 
 .modal-close-btn {
@@ -721,7 +721,7 @@ body {
     background-color: var(--acreetion-green);
     color: black;
     padding: 0.6rem 1.2rem;
-    border-radius: 4px;
+    border-radius: 12px;
     text-decoration: none;
     font-weight: 700;
 }
