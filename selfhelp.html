@@ -784,13 +784,37 @@
                 padding: 40px 15px;
             }
         }
-    </style>
+    
+
+html{scroll-behavior:smooth;}
+::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff);}
+:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px;}
+a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;}
+.skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0;}
+.skip-link:focus{top:0;}
+@media (prefers-reduced-motion: reduce) {
+  html{scroll-behavior:auto;}
+  *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important;}
+}
+
+
+@keyframes pageLoadFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+body{animation:pageLoadFade 0.6s ease-out;}
+@media (prefers-reduced-motion: reduce){body{animation:none;}}
+
+
+a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative;}
+a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px;}
+
+</style>
     <script>
         (function () { document.documentElement.classList.add(navigator.userAgent.includes("Firefox") ? "is-firefox" : "is-chromium"); })();
     </script>
 </head>
 
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="app" v-cloak>
         <header class="page-header">
             <div class="header-content">
@@ -857,7 +881,7 @@
             </div>
         </div>
 
-        <main class="search-wrapper">
+        <main id="main-content" class="search-wrapper">
             <h1 class="search-logo">Self-Help Info Tool</h1>
 
             <form class="search-form" @submit.prevent="performSearch">
