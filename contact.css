@@ -748,7 +748,14 @@ a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:u
 #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4);}
 
 
-body{background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);background-size:40px 40px;}
+body{background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);background-size:40px 40px;}
 
 
 .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem;}
+
+/* Social media icon bar */
+.acreetion-social-bar{display:flex;justify-content:center;gap:0.5rem;padding:0.75rem 1rem;flex-wrap:wrap}
+.acreetion-social-link{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--acreetion-box-bg,#222);border:1px solid var(--acreetion-box-border,#333);color:var(--acreetion-text,#b2b2b2);text-decoration:none;transition:all 0.2s ease;font-size:1.1rem}
+.acreetion-social-link:hover{color:var(--acreetion-green,#2ecc71);border-color:var(--acreetion-green,#2ecc71);transform:translateY(-2px);box-shadow:0 4px 12px rgba(46,204,113,0.2)}
+.acreetion-social-link:hover i{transform:scale(1.1)}
+.acreetion-social-link i{transition:transform 0.2s ease}

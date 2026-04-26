@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-    <style>
+    <style>::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212)}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71)} .btn{transition:all 0.3s ease}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px)}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5)} .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);will-change:opacity,transform}.reveal.active{opacity:1;transform:translateY(0)} html{scroll-behavior:smooth} ::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff)} :focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px} a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px} .skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0} .skip-link:focus{top:0} @media (prefers-reduced-motion:reduce) {html{scroll-behavior:auto} *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}} /* removed pageLoadFade keyframes */ /* removed pageLoadFade body animation */ @media (prefers-reduced-motion:reduce){body{animation:none}} a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative} a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px} #back-to-top{position:fixed;bottom:30px;right:30px;background:var(--acreetion-green,#2ecc71);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px} #back-to-top.visible{opacity:1;visibility:visible} #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)} body{background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px} .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem} 
         .blog-post {
             background: var(--acreetion-panel-bg);
             border: 1px solid var(--acreetion-box-border);
@@ -106,7 +106,7 @@
 
         /* removed pageLoadFade animation to prevent flash of unstyled content */
     </style>
-</head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></head>
 
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -114,18 +114,18 @@
     <header class="page-header">
         <div class="header-content">
             <a href="index.html" class="logo">
-                <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img">
+                <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" loading="eager">
                 <span class="logo-text">Acreetion<span>OS</span></span>
             </a>
             <nav class="main-nav">
-                <a href="index.html">Home</a>
+                <a href="index.html" class="transition-link">Home</a>
                 <a href="TrumpOS/index.html" style="background-color: #ffcc00; color: #222; font-weight:900; text-transform:uppercase;">TrumpOS (MLGA)</a>
                 <a href="install.html">Install</a>
                 <a href="compare.html">Compare</a>
                 <a href="faq.html">FAQ</a>
-                <a href="blog.html">Blog</a>
+                <a href="blog.html" class="active transition-link" aria-current="page">Blog</a>
                 <a href="developers.html">Developers</a>
-                <a href="contact.html">Contact & Support</a>
+                <a href="contact.html" class="transition-link">Contact & Support</a>
             </nav>
         </div>
     </header>
@@ -134,8 +134,44 @@
         <main id="main-content" class="main-column">
             
             <div id="blog-content">
-        		<p>I did it!</p>
-		<p>We have a brand new, from-scratch built front end interface. I hope you guys all like it as much as I do. Please give us some feedback on how we can further imporove it!</p>
+                <article class="blog-post">
+                    <h2>Brand New Front End — From Scratch</h2>
+                    <div class="blog-meta">
+                        <span>April 26, 2026</span>
+                        <span class="blog-tag">Release</span>
+                        <span class="blog-tag">UI</span>
+                    </div>
+                    <div class="blog-content">
+                        <p>We built a brand new front end experience for AcreetionOS from the ground up. The site now ships a modern, responsive interface that better reflects the project's goals: clarity, accessibility, and an inviting experience for new users.</p>
+
+                        <h3>What’s New</h3>
+                        <ul>
+                            <li>Redesigned landing pages with clearer calls-to-action and faster load times.</li>
+                            <li>Interactive demo that emulates the AcreetionOS desktop experience — try it from mobile or desktop.</li>
+                            <li>Built-in AIDEN assistant powered by OpenRouter via our server proxy (no API keys in the browser).</li>
+                            <li>Live visitor counter and nicer social links, plus a refreshed docs/wiki layout.</li>
+                            <li>Improved accessibility: skip links, focus-visible styles, and reduced-motion preferences respected.</li>
+                        </ul>
+
+                        <h3>Try The Demo</h3>
+                        <p>Head to the <a href="demo.html">interactive demo</a> for a short, teaser experience that emulates the AcreetionOS desktop — keyboard friendly and mobile responsive.</p>
+
+                        <h3>We Want Your Feedback</h3>
+                        <p>This redesign is for the community. If something feels off, or you have ideas (layout, copy, features), please let us know:</p>
+                        <ul>
+                            <li>Open an issue on our <a href="https://github.com/AcreetionOS-Code" target="_blank">GitHub</a>.</li>
+                            <li>Join our <a href="https://discord.acreetionos.org" target="_blank">Discord</a> and drop a screenshot.</li>
+                            <li>Use the feedback form on the <a href="contact.html">Contact</a> page.</li>
+                        </ul>
+
+                        <h3>Mobile Friendly</h3>
+                        <p>The site is now fully responsive. Navigation collapses, buttons are finger-friendly, and the demo is usable on small screens. If you spot layout issues on a particular device, tell us the device and browser so we can reproduce it.</p>
+
+                        <p>Thanks to everyone who contributed design tweaks, testing, and the relentless patience while we rebuilt this. We’ll continue iterating — next up: performance budgets and a subtler onboarding flow for new users.</p>
+
+                        <p><em>— The AcreetionOS Team</em></p>
+                    </div>
+                </article>
             </div>
         </main>
         <aside class="sidebar-column">
@@ -157,5 +193,6 @@
         <p>&copy; 2026 AcreetionOS Project. Free and Open Source Software.</p>
         <p>Licensed under GNU General Public License v3.0</p>
     </footer>
+<script>document.addEventListener('DOMContentLoaded',() => {const observer = new IntersectionObserver((entries) => {entries.forEach(entry => {if(entry.isIntersecting) {entry.target.classList.add('active');observer.unobserve(entry.target)}})},{threshold:0.05,rootMargin:"0px 0px -30px 0px"});document.querySelectorAll('.content-box,.dev-card,.event-card,.repo-card').forEach(el => {el.classList.add('reveal');observer.observe(el)})});</script><button id="back-to-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'});">↑</button><script>document.addEventListener('DOMContentLoaded',() => {const btn = document.getElementById('back-to-top');if(!btn) return;window.addEventListener('scroll',() => {if(window.scrollY > 400){btn.classList.add('visible')} else{btn.classList.remove('visible')}})});</script><script src="social-icons.js"></script><script src="user-counter.js"></script>
 </body>
 </html>

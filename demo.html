@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Cache-Control" content="max-age=3600">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcreetionOS Interactive Demo — See It in Action</title>
+<meta name="description" content="Take an interactive tour of AcreetionOS. See the Cinnamon desktop, Pamac package manager, terminal, and key features in action.">
+<link rel="canonical" href="https://acreetionos.org/demo.html">
+<link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+<link rel="stylesheet" href="contact.css">
+<link rel="stylesheet" href="ai-chat.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans),'Roboto',sans-serif;background:var(--acreetion-body-bg,#121212);color:var(--acreetion-text-bright,#e5e5e5);min-height:100vh;overflow-x:hidden}
+
+/* Demo container */
+.demo-hero{text-align:center;padding:3rem 1rem 2rem;background:linear-gradient(180deg,rgba(46,204,113,0.08),transparent)}
+.demo-hero h1{font-size:2.5rem;color:var(--acreetion-green);font-family:var(--font-mono),monospace;margin-bottom:0.5rem}
+.demo-hero p{color:var(--acreetion-text);font-size:1.15rem;max-width:700px;margin:0 auto 2rem}
+
+/* Slides */
+.demo-stage{max-width:900px;margin:0 auto 3rem;padding:0 1.5rem}
+.demo-slide{display:none;background:var(--acreetion-panel-bg,#1a1a1a);border:1px solid var(--acreetion-box-border,#333);border-radius:16px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,0.5);animation:slideIn 0.6s cubic-bezier(0.2,0.8,0.2,1)}
+.demo-slide.active{display:block}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.slide-header{background:var(--acreetion-box-bg,#222);padding:0.6rem 1rem;display:flex;align-items:center;gap:0.5rem;border-bottom:1px solid var(--acreetion-box-border)}
+.slide-dot{width:12px;height:12px;border-radius:50%}
+.slide-dot.red{background:#e06c75}.slide-dot.yellow{background:#f39c12}.slide-dot.green{background:#2ecc71}
+.slide-title{font-size:0.85rem;color:var(--acreetion-text);margin-left:0.5rem;font-family:var(--font-mono),monospace}
+
+.slide-body{padding:2rem;text-align:center;min-height:340px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* Boot screen */
+.boot-logo{width:120px;height:120px;margin-bottom:1rem;animation:bootPulse 2s ease-in-out infinite}
+@keyframes bootPulse{0%,100%{transform:scale(1);opacity:0.7}50%{transform:scale(1.05);opacity:1}}
+.boot-bar{width:300px;max-width:80%;height:6px;background:var(--acreetion-box-border);border-radius:6px;overflow:hidden;margin:1rem 0}
+.boot-fill{height:100%;background:var(--acreetion-green);border-radius:6px;width:0;animation:bootFill 3s ease forwards}
+@keyframes bootFill{0%{width:0}30%{width:25%}60%{width:65%}100%{width:100%}}
+.boot-text{color:var(--acreetion-text);font-family:var(--font-mono),monospace;font-size:0.85rem;animation:blinkText 0.8s infinite alternate}
+@keyframes blinkText{from{opacity:0.4}to{opacity:1}}
+
+/* Desktop grid */
+.desktop-icons{display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;max-width:500px;margin:0 auto}
+.desktop-icon{text-align:center;cursor:pointer;transition:transform 0.2s;animation:iconPopup 0.5s ease backwards}
+.desktop-icon:nth-child(1){animation-delay:0.1s}.desktop-icon:nth-child(2){animation-delay:0.2s}.desktop-icon:nth-child(3){animation-delay:0.3s}.desktop-icon:nth-child(4){animation-delay:0.4s}
+.desktop-icon:hover{transform:translateY(-4px)}
+@keyframes iconPopup{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+.desktop-icon-box{width:64px;height:64px;margin:0 auto 0.5rem;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem}
+.desktop-icon-box.files{background:rgba(46,204,113,0.15);color:#2ecc71}
+.desktop-icon-box.terminal{background:rgba(97,175,239,0.15);color:#61afef}
+.desktop-icon-box.browser{background:rgba(155,89,182,0.15);color:#9b59b6}
+.desktop-icon-box.settings{background:rgba(243,156,18,0.15);color:#f39c12}
+.desktop-icon-label{font-size:0.78rem;color:var(--acreetion-text)}
+
+/* Terminal */
+.terminal-body{text-align:left;width:100%;max-width:600px;background:#0a0a0a;border-radius:8px;padding:1.25rem;font-family:var(--font-mono),'Fira Code',monospace;font-size:0.85rem;color:var(--acreetion-green)}
+.terminal-line{margin-bottom:0.4rem;opacity:0;animation:typeIn 0.15s ease forwards}
+.terminal-line:nth-child(1){animation-delay:0.3s}.terminal-line:nth-child(2){animation-delay:0.6s}.terminal-line:nth-child(3){animation-delay:0.9s}.terminal-line:nth-child(4){animation-delay:1.2s}.terminal-line:nth-child(5){animation-delay:1.5s}
+@keyframes typeIn{from{opacity:0;transform:translateX(-4px)}to{opacity:1;transform:translateX(0)}}
+.terminal-prompt{color:var(--storm-color)}.terminal-cmd{color:var(--acreetion-text-bright)}.terminal-output{color:var(--acreetion-text)}
+
+/* Pamac store */
+.pamac-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;width:100%;max-width:650px}
+.pamac-app{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1rem;text-align:center;transition:transform 0.2s,box-shadow 0.2s;animation:appPop 0.4s ease backwards}
+.pamac-app:nth-child(1){animation-delay:0.1s}.pamac-app:nth-child(2){animation-delay:0.2s}.pamac-app:nth-child(3){animation-delay:0.3s}.pamac-app:nth-child(4){animation-delay:0.4s}.pamac-app:nth-child(5){animation-delay:0.5s}.pamac-app:nth-child(6){animation-delay:0.6s}
+.pamac-app:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.15)}
+@keyframes appPop{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+.pamac-app-icon{font-size:2rem;margin-bottom:0.5rem}
+.pamac-app-name{font-weight:600;color:var(--acreetion-text-bright);font-size:0.9rem;margin-bottom:0.25rem}
+.pamac-app-desc{font-size:0.75rem;color:var(--acreetion-text)}
+
+/* Key features */
+.feature-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;width:100%;max-width:700px}
+.feature-item{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1rem;text-align:left;animation:featureSlide 0.5s ease backwards}
+.feature-item:nth-child(1){animation-delay:0.1s}.feature-item:nth-child(2){animation-delay:0.2s}.feature-item:nth-child(3){animation-delay:0.3s}.feature-item:nth-child(4){animation-delay:0.4s}.feature-item:nth-child(5){animation-delay:0.5s}.feature-item:nth-child(6){animation-delay:0.6s}
+@keyframes featureSlide{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:translateX(0)}}
+.feature-icon{font-size:1.5rem;margin-bottom:0.4rem}
+.feature-name{font-weight:700;color:var(--acreetion-text-bright);font-size:0.95rem;margin-bottom:0.25rem}
+.feature-desc{font-size:0.8rem;color:var(--acreetion-text)}
+
+/* Navigation */
+.demo-nav{display:flex;justify-content:center;gap:0.75rem;margin-bottom:2rem;flex-wrap:wrap}
+.demo-dot-btn{width:12px;height:12px;border-radius:50%;background:var(--acreetion-box-border);border:none;cursor:pointer;transition:all 0.3s}
+.demo-dot-btn.active{background:var(--acreetion-green);transform:scale(1.3);box-shadow:0 0 8px rgba(46,204,113,0.5)}
+.demo-arrows{display:flex;justify-content:center;gap:1rem;margin-top:1.5rem}
+.demo-arrow-btn{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);color:var(--acreetion-text-bright);padding:0.6rem 1.5rem;border-radius:20px;cursor:pointer;font-size:0.9rem;transition:all 0.2s}
+.demo-arrow-btn:hover{background:var(--acreetion-green);color:#000;border-color:var(--acreetion-green)}
+.demo-arrow-btn:disabled{opacity:0.3;cursor:not-allowed}
+
+/* CTA */
+.demo-cta{text-align:center;padding:2rem 1rem 4rem}
+.demo-cta .btn{margin:0.5rem}
+
+@media(max-width:600px){
+  .demo-hero h1{font-size:1.6rem}
+  .desktop-icons{grid-template-columns:repeat(2,1fr)}
+  .feature-list{grid-template-columns:1fr}
+  .pamac-grid{grid-template-columns:repeat(2,1fr)}
+  .slide-body{padding:1rem}
+}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header class="page-header">
+  <div class="header-content">
+    <a href="index.html" class="logo">
+      <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" loading="eager">
+      <span class="logo-text">Acreetion<span>OS</span></span>
+    </a>
+    <nav class="main-nav">
+      <a href="index.html">Home</a>
+      <a href="install.html">Install</a>
+      <a href="demo.html" class="active" aria-current="page">Demo</a>
+      <a href="faq.html">FAQ</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main-content">
+<section class="demo-hero">
+  <h1>See AcreetionOS in Action</h1>
+  <p>An interactive tour of the user-friendly Arch Linux experience — from first boot to daily use.</p>
+  <div class="demo-nav" id="demo-nav"></div>
+</section>
+
+<div class="demo-stage">
+
+  <!-- Slide 1: Boot -->
+  <div class="demo-slide active" data-slide="0">
+    <div class="slide-header">
+      <span class="slide-dot red"></span><span class="slide-dot yellow"></span><span class="slide-dot green"></span>
+      <span class="slide-title">AcreetionOS — Booting...</span>
+    </div>
+    <div class="slide-body">
+      <img src="acreetionoslogo.webp" alt="Logo" class="boot-logo" width="120" height="120">
+      <h2 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem;">AcreetionOS 1.0</h2>
+      <p style="color:var(--acreetion-text);margin-bottom:1rem;">Starting your sovereign Arch experience...</p>
+      <div class="boot-bar"><div class="boot-fill"></div></div>
+      <span class="boot-text">Loading Cinnamon desktop environment</span>
+    </div>
+  </div>
+
+  <!-- Slide 2: Desktop -->
+  <div class="demo-slide" data-slide="1">
+    <div class="slide-header">
+      <span class="slide-dot red"></span><span class="slide-dot yellow"></span><span class="slide-dot green"></span>
+      <span class="slide-title">Cinnamon Desktop</span>
+    </div>
+    <div class="slide-body">
+      <h3 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem;">Clean, Familiar, Productive</h3>
+      <p style="color:var(--acreetion-text);margin-bottom:1.5rem;">The Cinnamon desktop gives you a traditional, intuitive interface that just works.</p>
+      <div class="desktop-icons">
+        <div class="desktop-icon"><div class="desktop-icon-box files">📁</div><div class="desktop-icon-label">Files</div></div>
+        <div class="desktop-icon"><div class="desktop-icon-box terminal">⬛</div><div class="desktop-icon-label">Terminal</div></div>
+        <div class="desktop-icon"><div class="desktop-icon-box browser">🌐</div><div class="desktop-icon-label">Firefox</div></div>
+        <div class="desktop-icon"><div class="desktop-icon-box settings">⚙️</div><div class="desktop-icon-label">Settings</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3: Terminal -->
+  <div class="demo-slide" data-slide="2">
+    <div class="slide-header">
+      <span class="slide-dot red"></span><span class="slide-dot yellow"></span><span class="slide-dot green"></span>
+      <span class="slide-title">Terminal — pacman + AUR</span>
+    </div>
+    <div class="slide-body">
+      <h3 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem;">Full Arch Power at Your Fingertips</h3>
+      <p style="color:var(--acreetion-text);margin-bottom:1rem;">Pacman and the AUR give you access to thousands of packages. One command does it all.</p>
+      <div class="terminal-body">
+        <div class="terminal-line"><span class="terminal-prompt">user@acreetionos ~ $</span> <span class="terminal-cmd">sudo pacman -Syu</span></div>
+        <div class="terminal-line"><span class="terminal-output">:: Synchronizing package databases...</span></div>
+        <div class="terminal-line"><span class="terminal-output">core is up to date</span></div>
+        <div class="terminal-line"><span class="terminal-output">extra is up to date</span></div>
+        <div class="terminal-line"><span class="terminal-prompt">user@acreetionos ~ $</span> <span class="terminal-cmd">yay -S google-chrome</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: Pamac -->
+  <div class="demo-slide" data-slide="3">
+    <div class="slide-header">
+      <span class="slide-dot red"></span><span class="slide-dot yellow"></span><span class="slide-dot green"></span>
+      <span class="slide-title">Pamac — Graphical Package Manager</span>
+    </div>
+    <div class="slide-body">
+      <h3 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem;">Install Software Without the Terminal</h3>
+      <p style="color:var(--acreetion-text);margin-bottom:1rem;">Pamac gives you one-click access to official repos, AUR, Flatpak, and Snap — all in one place.</p>
+      <div class="pamac-grid">
+        <div class="pamac-app"><div class="pamac-app-icon">🦊</div><div class="pamac-app-name">Firefox</div><div class="pamac-app-desc">Web Browser</div></div>
+        <div class="pamac-app"><div class="pamac-app-icon">🎬</div><div class="pamac-app-name">VLC</div><div class="pamac-app-desc">Media Player</div></div>
+        <div class="pamac-app"><div class="pamac-app-icon">🖼️</div><div class="pamac-app-name">GIMP</div><div class="pamac-app-desc">Image Editor</div></div>
+        <div class="pamac-app"><div class="pamac-app-icon">📝</div><div class="pamac-app-name">LibreOffice</div><div class="pamac-app-desc">Office Suite</div></div>
+        <div class="pamac-app"><div class="pamac-app-icon">💬</div><div class="pamac-app-name">Discord</div><div class="pamac-app-desc">Chat</div></div>
+        <div class="pamac-app"><div class="pamac-app-icon">🎮</div><div class="pamac-app-name">Steam</div><div class="pamac-app-desc">Gaming</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: Features -->
+  <div class="demo-slide" data-slide="4">
+    <div class="slide-header">
+      <span class="slide-dot red"></span><span class="slide-dot yellow"></span><span class="slide-dot green"></span>
+      <span class="slide-title">Key Features</span>
+    </div>
+    <div class="slide-body">
+      <h3 style="color:var(--acreetion-text-bright);margin-bottom:1rem;">Why Choose AcreetionOS?</h3>
+      <div class="feature-list">
+        <div class="feature-item"><div class="feature-icon">🚀</div><div class="feature-name">Rolling Release</div><div class="feature-desc">Install once, update forever. Always current.</div></div>
+        <div class="feature-item"><div class="feature-icon">🛡️</div><div class="feature-name">XLibre Stable</div><div class="feature-desc">X11-based display for rock-solid compatibility.</div></div>
+        <div class="feature-item"><div class="feature-icon">🔊</div><div class="feature-name">PipeWire Audio</div><div class="feature-desc">Modern low-latency audio server.</div></div>
+        <div class="feature-item"><div class="feature-icon">📦</div><div class="feature-name">AUR Access</div><div class="feature-desc">Thousands of community packages.</div></div>
+        <div class="feature-item"><div class="feature-icon">🖥️</div><div class="feature-name">Graphical Installer</div><div class="feature-desc">Calamares makes setup easy for everyone.</div></div>
+        <div class="feature-item"><div class="feature-icon">🔒</div><div class="feature-name">Privacy Focused</div><div class="feature-desc">No telemetry. Your data is yours.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-arrows">
+    <button class="demo-arrow-btn" id="prev-btn" disabled>← Previous</button>
+    <button class="demo-arrow-btn" id="next-btn">Next →</button>
+  </div>
+</section>
+
+<section class="demo-cta">
+  <h2 style="color:var(--acreetion-text-bright);margin-bottom:1rem;">Ready to Try It Yourself?</h2>
+  <p style="color:var(--acreetion-text);margin-bottom:1.5rem;">Download AcreetionOS and experience the power of Arch Linux made easy.</p>
+  <a href="install.html" class="btn">Download & Install →</a>
+</section>
+</main>
+
+<footer class="page-footer">
+  <p>&copy; 2026 AcreetionOS Project. Free and Open Source Software.</p>
+</footer>
+
+<script src="ai-chat.js"></script>
+<script>
+(function(){
+  var slides = document.querySelectorAll('.demo-slide');
+  var total = slides.length;
+  var current = 0;
+  var prevBtn = document.getElementById('prev-btn');
+  var nextBtn = document.getElementById('next-btn');
+
+  // Build nav dots
+  var nav = document.getElementById('demo-nav');
+  for (var i = 0; i < total; i++) {
+    (function(idx){
+      var dot = document.createElement('button');
+      dot.className = 'demo-dot-btn' + (idx === 0 ? ' active' : '');
+      dot.setAttribute('aria-label', 'Slide ' + (idx + 1));
+      dot.addEventListener('click', function(){ goTo(idx); });
+      nav.appendChild(dot);
+    })(i);
+  }
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    nav.children[current].classList.remove('active');
+    current = idx;
+    slides[current].classList.add('active');
+    nav.children[current].classList.add('active');
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === total - 1;
+    // Re-trigger boot animation if going to slide 0
+    if (current === 0) {
+      var fill = slides[0].querySelector('.boot-fill');
+      if (fill) { fill.style.animation = 'none'; fill.offsetHeight; fill.style.animation = ''; }
+    }
+  }
+
+  prevBtn.addEventListener('click', function(){ if (current > 0) goTo(current - 1); });
+  nextBtn.addEventListener('click', function(){ if (current < total - 1) goTo(current + 1); });
+
+  // Keyboard navigation
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' && current < total - 1) goTo(current + 1);
+    if (e.key === 'ArrowLeft' && current > 0) goTo(current - 1);
+  });
+})();
+</script>
+<script src="social-icons.js"></script><script src="user-counter.js"></script>
+</body>
+</html>
