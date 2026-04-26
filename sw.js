@@ -1,9 +1,15 @@
 // Service Worker for aggressive caching and offline support
+// Also serves as AIDEN fallback proxy — intercepts /api/chat and forwards to OpenRouter
 const CACHE_VERSION = 'v2';
 const CACHE_NAME = `acreetionos-${CACHE_VERSION}`;
 
 const AIDEN_URL = 'https://aiden.acreetionos.org';
 const CHECK_INTERVAL = 5 * 60 * 1000;
+
+// NOTE: Do NOT store API keys here. The Service Worker will proxy /api/chat
+// to the site's backend (Cloudflare Worker or origin) which holds the key
+// securely in server-side environment variables. This prevents exposing
+// secrets to the browser or in client-side code.
 
 const STATIC_ASSETS = [
   '/',
@@ -43,8 +49,19 @@ self.addEventListener('activate', (event) => {
   scheduleAidenCheck();
 });
 
-// Fetch event - serve from cache, fallback to network
+// Fetch event - serve from cache, proxy /api/chat to OpenRouter
 self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // AIDEN fallback proxy: intercept POST /api/chat and forward to the
+  // origin /api/chat endpoint. The origin/Cloudflare Worker holds the
+  // OpenRouter API key — the SW only forwards the request.
+  if (event.request.method === 'POST' && url.pathname === '/api/chat') {
+    event.respondWith(fetch(event.request.clone()));
+    return;
+  }
+
+  // Normal caching for everything else
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
@@ -62,6 +79,17 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// The Service Worker no longer performs OpenRouter requests itself. Requests
+// to /api/chat are forwarded to the origin/Cloudflare Worker where the
+// OpenRouter API key is stored in a server-side environment variable.
+// This function is kept for historical reasons but is no longer used.
+async function handleAidenFallback() {
+  return new Response(JSON.stringify({ error: 'Service Worker fallback disabled' }), {
+    status: 501,
+    headers: { 'Content-Type': 'application/json' }
+  });
+}
 
 let checkTimer = null;
 

@@ -1,0 +1,11 @@
+Natalie Spiva (spivanatalie64)
+Darren Clift (cobra3282000)
+
+AIDEN (AcreetionOS Assistant) maintainer team. For project updates, support, and
+bug reports please reach out at the AcreetionOS community channels or via the
+project website: https://acreetionos.org.
+
+This repository contains the front-end demo and a Cloudflare Worker proxy that
+routes AI requests to OpenRouter using a server-side secret. The worker is
+published by GitHub Actions; add the required secrets to the repository settings
+before running the workflow.

@@ -9,3 +9,15 @@ playwright-report/
 temp/
 *.tmp
 *.log
+
+# API keys and secrets
+.env
+.env.local
+*.secret
+secrets/
+
+# Flasher build output
+flasher/dist/
+flasher/node_modules/
+*.pem
+.cache

@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 
-    <style>
+    <style>::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212)}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71)} .btn{transition:all 0.3s ease}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px)}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5)} .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);will-change:opacity,transform}.reveal.active{opacity:1;transform:translateY(0)} html{scroll-behavior:smooth} ::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff)} :focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px} a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px} .skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0} .skip-link:focus{top:0} @media (prefers-reduced-motion:reduce) {html{scroll-behavior:auto} *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}} /* removed pageLoadFade keyframes */ /* removed pageLoadFade body animation */ @media (prefers-reduced-motion:reduce){body{animation:none}}a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative} a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px} #back-to-top{position:fixed;bottom:30px;right:30px;background:var(--acreetion-green,#2ecc71);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px} #back-to-top.visible{opacity:1;visibility:visible} #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)} body{background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px} .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem} 
         
         /* removed pageLoadFade animation to prevent flash of unstyled content */
         .reveal {
@@ -31,8 +31,8 @@
             opacity: 1;
             transform: translateY(0)
         }
-    </style>
-</head>
+     .btn.btn-storm{background-color:var(--storm-color);color:#000}.btn.btn-cinnamon{background-color:var(--acreetion-green);color:#000} .btn-flasher{background-color:var(--flasher-color,#f39c12);color:#000}</style>
+<link rel="stylesheet" href="ai-chat.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"></head>
 
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -40,18 +40,18 @@
     <header class="page-header">
         <div class="header-content">
             <a href="index.html" class="logo">
-                <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img">
+                <img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" loading="eager">
                 <span class="logo-text">Acreetion<span>OS</span></span>
             </a>
             <nav class="main-nav">
-                <a href="index.html">Home</a>
-                <a href="TrumpOS/index.html" style="color:#ffcc00;font-weight:900;text-transform:uppercase;">TrumpOS (MLGA)</a>
-                <a href="install.html" class="active" aria-current="page">Install</a>
+                <a href="index.html" class="transition-link">Home</a>
+                <a href="TrumpOS/index.html" class="transition-link" style="background-color:#ffcc00;color:#222;font-weight:900;text-transform:uppercase;">TrumpOS (MLGA)</a>
+                <a href="install.html" class="active transition-link" aria-current="page">Install</a>
                 <a href="compare.html">Compare</a>
-                <a href="faq.html">FAQ</a>
+                <a href="faq.html">FAQ</a><a href="demo.html">Demo</a>
                 <a href="blog.html">Blog</a>
                 <a href="developers.html">Developers</a>
-                <a href="contact.html">Contact</a>
+                <a href="contact.html" class="transition-link">Contact</a>
             </nav>
         </div>
     </header>
@@ -65,20 +65,45 @@
                 <div class="box-body">
                     <p style="font-size: 1.1rem; margin-bottom: 2rem;">Follow this comprehensive guide to install AcreetionOS Linux on your computer. This guide works for beginners and advanced users alike.</p>
                     <h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 1: Download AcreetionOS ISO</h2>
-                    <p>Visit our <a href="index.html#manual-downloads">download page</a> and get the latest AcreetionOS ISO file.</p>
-                    <ul style="margin-left: 2rem; margin-top: 0.5rem;">
-                        <li><strong>File size:</strong> ~2.5 GB</li>
-                        <li><strong>Architecture:</strong> x86_64 (64-bit)</li>
-                        <li><strong>Desktop:</strong> Cinnamon</li>
-                    </ul>
+                    <p>Choose your edition and download from one of our mirrors. <strong>All editions are 64-bit (x86_64) only.</strong></p>
+                    <h3 style="color: var(--acreetion-green); margin-top: 1.5rem; margin-bottom: 0.5rem;">Cinnamon Edition (Main)</h3>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem;">
+                        <a href="https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso" class="btn">Direct Download</a>
+                        <a href="https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso" class="btn">OSUOSL Mirror</a>
+                        <a href="https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS-1.0-x86_64.iso" class="btn">RWTH Aachen Mirror</a>
+                        <a href="https://acreetionos-mirror-2-ro.privacy11.xyz/iso/AcreetionOS-1.0-x86_64.iso" class="btn">Romania Mirror</a>
+                    </div>
+                    <h3 style="color: var(--storm-color); margin-top: 1.5rem; margin-bottom: 0.5rem;">AcreetionOS XL (XLibre Edition)</h3>
+                    <p style="margin-bottom: 0.5rem;">This is an <strong>experimental image</strong>, but it has been working <strong>pretty great so far</strong>. This version uses XLibre (X11-based) for users who prefer traditional display protocols over Wayland.</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1.5rem;">
+                        <a href="https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso" class="btn btn-storm">XLibre Direct</a>
+                        <a href="https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso" class="btn btn-storm">XLibre OSUOSL</a>
+                        <a href="https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS-1.0-x86_64.iso" class="btn btn-storm">XLibre RWTH Aachen</a>
+                        <a href="https://acreetionos-mirror-2-ro.privacy11.xyz/iso/AcreetionOS_XL-1.0-x86_64.iso" class="btn btn-storm">XLibre Romania</a>
+                    </div>
+                    <div style="background: rgba(155,89,182,0.1); border: 1px solid var(--acreetion-purple); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                        <p style="color: var(--acreetion-text-bright); margin: 0;"><strong>Note:</strong> We finished migrating to XLibre! :D The Cinnamon Edition is our stable primary release; the XLibre Edition is experimental but functional.</p>
+                    </div>
                     <h2 style="color: var(--acreetion-green); margin-top: 2rem; margin-bottom: 1rem;">Step 2: Create Bootable USB Drive</h2>
-                    <p><strong>Required:</strong> USB drive with at least 4GB capacity</p>
+<div style="background:rgba(46,204,113,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem;margin-bottom:1.5rem;">
+<p style="color:var(--acreetion-text-bright);font-weight:700;margin-bottom:0.5rem;">Recommended: AcreetionOS USB Flasher</p>
+<p style="color:var(--acreetion-text);margin-bottom:1rem;">Our own flasher tool is the easiest way. It auto-detects your OS:</p>
+<div id="flasher-download-area" style="display:flex;flex-wrap:wrap;gap:10px;">
+<a id="flasher-dl-linux" href="https://iso.acreetionos.org:8448/Flashing_Utility/dist/AcreetionOS%20USB%20Flasher-1.0.0.AppImage" class="btn btn-flasher" style="display:none;">Download Flasher for Linux (.AppImage)</a>
+<a id="flasher-dl-win" href="https://iso.acreetionos.org:8448/Flashing_Utility/dist/AcreetionOS_USB_Flasher_Setup_1.0.0.exe" class="btn btn-flasher" style="display:none;">Download Flasher for Windows (.exe)</a>
+<a id="flasher-dl-mac" href="https://www.balena.io/etcher/" target="_blank" rel="noopener" class="btn btn-flasher" style="display:none;">Download Balena Etcher for macOS</a>
+<span id="flasher-os-detect" style="color:var(--acreetion-text);font-size:0.9rem;">Detecting your operating system...</span>
+</div>
+<p id="flasher-instructions" style="color:var(--acreetion-text);margin-top:0.75rem;font-size:0.9rem;display:none;"></p>
+</div>
+<script>!function(){var u=navigator.userAgent||navigator.platform||'',d=document.getElementById('flasher-os-detect'),l=document.getElementById('flasher-dl-linux'),w=document.getElementById('flasher-dl-win'),m=document.getElementById('flasher-dl-mac'),i=document.getElementById('flasher-instructions');d.style.display='block';if(u.indexOf('Win')!==-1){w.style.display='inline-block';d.textContent='Detected: Windows';i.textContent='Download the installer, run it, select your ISO and USB drive, then click Flash.';i.style.display='block'}else if(u.indexOf('Mac')!==-1){m.style.display='inline-block';d.textContent='Detected: macOS';i.textContent='We recommend Balena Etcher for macOS. Download, open, select your ISO and USB drive, and click Flash.';i.style.display='block'}else{l.style.display='inline-block';d.textContent='Detected: Linux';i.textContent='Download the AppImage. Make it executable with chmod +x, then double-click to run. Select your ISO and USB drive, then click Flash.';i.style.display='block'}}();</script>
+                    <p><strong>Required:</strong> USB drive with at least 8GB capacity</p>
                     <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On Linux:</h3>
                     <pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code># Replace /dev/sdX with your USB device (check with lsblk)
 sudo dd if=acreetionos-*.iso of=/dev/sdX bs=4M status=progress && sync</code></pre>
                     <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On Windows:</h3>
-                    <p>Use <a href="https://rufus.ie/" target="_blank">Rufus</a> or <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a></p>
+                    <p>Use <a href="https://rufus.ie/" target="_blank" rel="noopener noreferrer">Rufus</a> or <a href="https://etcher.balena.io/" target="_blank" rel="noopener noreferrer">Balena Etcher</a> (recommended for all platforms)</p>
                     <ol style="margin-left: 2rem; margin-top: 0.5rem;">
                         <li>Download and run Rufus</li>
                         <li>Select your USB drive</li>
@@ -86,7 +111,7 @@ sudo dd if=acreetionos-*.iso of=/dev/sdX bs=4M status=progress && sync</code></p
                         <li>Click "START" and wait for completion</li>
                     </ol>
                     <h3 style="color: var(--acreetion-text-bright); margin-top: 1.5rem; margin-bottom: 0.5rem;">On macOS:</h3>
-                    <p>Use <a href="https://www.balena.io/etcher/" target="_blank">Balena Etcher</a> (easiest) or Terminal:</p>
+                    <p>Use <a href="https://etcher.balena.io/" target="_blank" rel="noopener noreferrer">Balena Etcher</a> (recommended) or Terminal:</p>
                     <pre style="background: var(--acreetion-code-bg); padding: 1rem; border-radius: 12px; overflow-x: auto; margin: 1rem 0;">
 <code># Find your USB device
 diskutil list
@@ -183,7 +208,7 @@ yay -S google-chrome spotify</code></pre>
                 </div>
                 <div class="box-body">
                     <p><a href="requirements.html" class="btn">View Full Requirements →</a></p>
-                    <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Minimum:</strong> 2GB RAM, 20GB storage, 64-bit processor</p>
+                    <p style="margin-top: 1rem; font-size: 0.9rem;"><strong>Minimum:</strong> 2GB RAM, 20GB storage, 64-bit processor<br/><strong>Recommended:</strong> 4GB RAM, 40GB storage (SSD)</p>
                 </div>
             </div>
             <div class="content-box">
@@ -205,10 +230,18 @@ yay -S google-chrome spotify</code></pre>
             </div>
             <div class="content-box">
                 <div class="box-header">
-                    <h3>Video Tutorial</h3>
+                    <h3>Technical Specs</h3>
                 </div>
                 <div class="box-body">
-                    <p>Coming soon! Subscribe to our YouTube channel for installation walkthroughs.</p>
+                    <ul style="list-style:none;padding:0;font-size:0.9rem;">
+                        <li style="margin-bottom:0.5rem;"><strong>Base:</strong> Arch Linux (Rolling)</li>
+                        <li style="margin-bottom:0.5rem;"><strong>Desktop:</strong> Cinnamon</li>
+                        <li style="margin-bottom:0.5rem;"><strong>Display:</strong> XLibre</li>
+                        <li style="margin-bottom:0.5rem;"><strong>Audio:</strong> Pipewire</li>
+                        <li style="margin-bottom:0.5rem;"><strong>Live Boot:</strong> systemd-boot + syslinux</li>
+                        <li style="margin-bottom:0.5rem;"><strong>Installed:</strong> GRUB bootloader</li>
+                        <li style="margin-bottom:0.5rem;"><strong>Filesystem:</strong> EXT4</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -237,6 +270,7 @@ yay -S google-chrome spotify</code></pre>
             })
         });
     </script>
+<script src="ai-chat.js"></script><script src="social-icons.js"></script><script src="user-counter.js"></script>
 </body>
 
 </html>

@@ -26,8 +26,7 @@ for (const file of files) {
   // 1. Replace PNG logos with WebP (massive size savings)
   content = content.replace(/acreetionoslogo\.png/g, 'acreetionoslogo.webp');
   content = content.replace(/logo\.png/g, 'logo.webp');
-  content = content.replace(/Natalie\.jpg/g, 'Natalie.webp');
-  content = content.replace(/Bella\.png/g, 'Bella.webp');
+  // Keep original formats — actual files are Natalie.jpg and Bella.png
 
   // 2. Add dns-prefetch and preconnect for external resources
   if (content.includes('fonts.googleapis.com') && !content.includes('dns-prefetch')) {
