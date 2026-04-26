@@ -198,7 +198,10 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
       addMessage('ai', response);
     } catch (err) {
       showTyping(false);
-      addError('AI request failed — the site proxy or backend may be unreachable. Refresh and try again.', retryLastMessage);
+      // Surface server-provided error when available to help debugging (do not expose secrets)
+      console.error('AIDEN request error:', err);
+      var msg = (err && err.message) ? err.message : 'AI request failed — the site proxy or backend may be unreachable. Refresh and try again.';
+      addError(msg, retryLastMessage);
     }
 
     // Cooldown
@@ -217,15 +220,33 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
 
   // ── OpenRouter (via site proxy) ──
   async function callFallback() {
-    var res = await fetch(FALLBACK_PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: messages, max_tokens: 600 })
-    });
-    if (!res.ok) throw new Error('Fallback error: ' + res.status);
-    var data = await res.json();
-    if (data.error) throw new Error(data.error);
-    return data.content;
+    var res;
+    try {
+      res = await fetch(FALLBACK_PROXY, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: messages, max_tokens: 600 })
+      });
+    } catch (networkErr) {
+      throw new Error('Network error when contacting site proxy: ' + networkErr.message);
+    }
+
+    var text = await res.text();
+    var data = null;
+    try { data = JSON.parse(text); } catch (e) { /* non-json response */ }
+
+    if (!res.ok) {
+      var errMsg = (data && data.error) ? data.error : ('Fallback error: HTTP ' + res.status + ' - ' + (text || 'no details'));
+      throw new Error(errMsg);
+    }
+
+    if (data && data.error) throw new Error(data.error);
+    if (data && data.content) return data.content;
+
+    // If server returned a plain string, use that
+    if (typeof text === 'string' && text.trim().length) return text;
+
+    throw new Error('Unexpected response from AI proxy');
   }
 
   // ── Retry last message ──
