@@ -10,7 +10,7 @@ ISO_URL="${1:-https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.
 ISO_NAME="TrumpOS-1.0-x86_64.iso"
 WORK=$(mktemp -d)
 ISO_DIR="$WORK/iso"
-SCRIPT_DIR="$(dirname "$0"):abs"
+SCRIPT_DIR="$(dirname "$0")"
 BRAND_DIR="$SCRIPT_DIR/branding/TrumpOS"
 
 echo "=== TrumpOS Build ==="
