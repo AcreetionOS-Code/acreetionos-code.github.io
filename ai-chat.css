@@ -303,3 +303,84 @@
     font-size: 1.2rem;
   }
 }
+
+/* Trump AI overrides — gold & navy theme for TrumpOS page */
+body.trumpos-theme #aiden-bubble {
+  background: #D4AF37;
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.45);
+  color: #002147;
+  font-weight: 900;
+}
+body.trumpos-theme #aiden-bubble:hover {
+  box-shadow: 0 6px 28px rgba(212, 175, 55, 0.65);
+}
+body.trumpos-theme #aiden-panel {
+  background: #002147;
+  border-color: #D4AF37;
+}
+body.trumpos-theme #aiden-header {
+  background: #D4AF37;
+  color: #002147;
+}
+body.trumpos-theme #aiden-header-title span {
+  color: #002147;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+body.trumpos-theme #aiden-status-dot {
+  background: #002147;
+}
+body.trumpos-theme #aiden-clear-btn,
+body.trumpos-theme #aiden-close-btn {
+  color: #002147;
+}
+body.trumpos-theme #aiden-messages {
+  background: #0a1a2f;
+}
+body.trumpos-theme .aiden-msg.ai {
+  background: rgba(212, 175, 55, 0.12);
+  color: #f0d060;
+  border-color: rgba(212, 175, 55, 0.3);
+}
+body.trumpos-theme .aiden-msg.user {
+  background: #D4AF37;
+  color: #002147;
+}
+body.trumpos-theme .aiden-msg.error {
+  background: rgba(198, 12, 48, 0.15);
+  color: #ff6b6b;
+  border-color: rgba(198, 12, 48, 0.3);
+}
+body.trumpos-theme .aiden-chip {
+  background: rgba(212, 175, 55, 0.15);
+  color: #D4AF37;
+  border-color: rgba(212, 175, 55, 0.3);
+}
+body.trumpos-theme .aiden-chip:hover {
+  background: #D4AF37;
+  color: #002147;
+}
+body.trumpos-theme #aiden-input {
+  background: rgba(0, 33, 71, 0.6);
+  color: #D4AF37;
+  border-color: rgba(212, 175, 55, 0.4);
+}
+body.trumpos-theme #aiden-input::placeholder {
+  color: rgba(212, 175, 55, 0.5);
+}
+body.trumpos-theme #aiden-send {
+  background: #D4AF37;
+  color: #002147;
+}
+body.trumpos-theme #aiden-backend-info {
+  color: rgba(212, 175, 55, 0.6);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+body.trumpos-theme #aiden-backend-info a {
+  color: #D4AF37;
+}
+body.trumpos-theme .aiden-retry-btn {
+  background: #D4AF37;
+  color: #002147;
+}

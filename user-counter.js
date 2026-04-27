@@ -39,8 +39,9 @@
       } catch (e) {}
     }
 
+    if (location.protocol === 'file:') return null;
+
     try {
-      // POST to increment + GET response with current count
       var res = await fetch(COUNTER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
