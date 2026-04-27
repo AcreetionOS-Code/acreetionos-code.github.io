@@ -116,59 +116,18 @@ echo "  ✓ TrumpOS branding applied"
 # 4. Build the final ISO with mkarchiso (mirroring AcreetionOS)
 # -------------------------------------------------
 echo "[4/5] Building final ISO with mkarchiso..."
-# Create the mkarchiso config file on‑the‑fly
-CONFIG_DIR="$WORK/archiso-config"
-mkdir -p "$CONFIG_DIR"
-cat > "$WORK/mkarchiso.conf" <<'EOF'
-# ----------------------------------------------
-# mkarchiso configuration – identical to the one used by AcreetionOS
-# ----------------------------------------------
-installkernel="arg:"
-
-isodate="combat-hang:yes"
-
-pacman_opts="--noconfirm --overwrite --noprompt"
-
-# Packages to install after the base system
-packages="
-    linux
-    linux-firmware
-    vim
-    sudo
-    networkmanager
-    dhcpcd
-    xfce4
-    xfce4-goodies
-    lightdm
-    gdm
-    sddm
-    xorg-server
-    xorg-apps
-    mesa
-    firefox
-    thunderbird
-    git
-    wget
-    curl
-"
-
-# Extra repositories (if any)
-# extra_repos=()
-
-# Compression options
-compress_options="-comp xz -noappend"
-
-# Volume ID and labels
-volume_id="TRUMPOS"
-image_name="TrumpOS-${isodate}"
-EOF
-
-# Launch mkarchiso (need to run inside Arch container)
-echo "  Running mkarchiso to generate final ISO..."
-if ! mkarchiso -c "$WORK/mkarchiso.conf" -w "$WORK" -D "$ISO_DIR" -o "$ISO_NAME"; then
+# Remove mkarchiso config section (lines 119-164)
+# Mkarchiso will use default settings and the prepared ISO_DIR
+# -------------------------------------------------
+# 4. Build the final ISO with mkarchiso
+# -------------------------------------------------
+echo "[4/5] Building final ISO with mkarchiso..."
+# Use the prepared ISO_DIR directly as the profile directory
+if ! mkarchiso -w "$WORK" -D "$ISO_DIR" -o "$ISO_NAME"; then
   echo "ERROR: mkarchiso failed"
   exit 1
 fi
+
 
 # -------------------------------------------------
 # 5. Verify and finish
