@@ -7,12 +7,19 @@ on:
 jobs:
   build-trumpos:
     runs-on: ubuntu-latest
+    container: archlinux:latest
+    
     steps:
       - uses: actions/checkout@v4
-
+      
+      - name: Setup Arch build environment
+        run: |
+          pacman -Syu --noconfirm
+          pacman -S --noconfirm mkarchiso squashfs-tools xorriso git wget p7zip
+      
       - name: Build TrumpOS ISO
-        run: bash TrumpOS/build.sh
-
+        run: bash TrumpOS/build-arch.sh
+      
       - name: Upload to GitLab Package Registry
         env:
           GITLAB_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
@@ -27,14 +34,14 @@ jobs:
                --upload-file "$ISO_FILE" \
                "https://gitlab.acreetionos.org/api/v4/projects/acreetionos-code%2Ftrumpos/packages/generic/trumpos/1.0/$(basename $ISO_FILE)" \
                || echo "GitLab upload failed (may need project setup)"
-
+      
       - name: Upload artifact (backup)
         uses: actions/upload-artifact@v4
         with:
           name: trump-os-iso
           path: TrumpOS-*.iso
           retention-days: 7
-
+  
   notify-fail:
     if: failure()
     needs: build-trumpos
