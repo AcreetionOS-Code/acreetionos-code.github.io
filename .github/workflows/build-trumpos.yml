@@ -1,24 +1,7 @@
-name: Build TrumpOS ISO
-on:
-  schedule:
-    - cron: '0 4 * * 6'  # Saturday 04:00 UTC
-  workflow_dispatch:
-
-jobs:
-  build-trumpos:
-    runs-on: ubuntu-latest
-    container: archlinux:latest
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Initialize pacman and install build tools
+      - name: Setup Arch build environment
         run: |
-          # Initialize keys first
           pacman-key --init
           pacman-key --populate archlinux
-          
-          # Sync and install packages
           pacman -Sy --noconfirm
           pacman -S --noconfirm --needed \
             base-devel \
@@ -28,52 +11,16 @@ jobs:
             git \
             wget \
             p7zip
-      
-      - name: Verify mkarchiso is available
-        run: |
-          which mkarchiso || (echo "ERROR: mkarchiso not found" && exit 1)
-          mkarchiso --help || true
+          # Ensure mkarchiso is available (sometimes a symlink is needed)
+          MKISO=$(command -v mkarchiso 2>/dev/null || find /usr -name 'mkarchiso*' -type f 2>/dev/null | head -1)
+          if [ -n "$MKISO" ]; then
+            echo "mkarchiso found at: $MKISO"
+          else
+            echo "ERROR: mkarchiso not found after install" && exit 1
+          fi
       
       - name: Build TrumpOS ISO
-        run: bash TrumpOS/build.sh
-      
-      - name: Upload to GitLab Package Registry
-        env:
-          GITLAB_TOKEN: ${{ secrets.GITLAB_REGISTRY_TOKEN }}
         run: |
-          ISO_FILE=$(ls TrumpOS-*.iso 2>/dev/null | head -1)
-          if [ -z "$ISO_FILE" ]; then
-            echo "ERROR: No ISO produced"
-            exit 1
-          fi
-          echo "Uploading $ISO_FILE to GitLab..."
-          curl --header "PRIVATE-TOKEN: $GITLAB_TOKEN" \
-               --upload-file "$ISO_FILE" \
-               "https://gitlab.acreetionos.org/api/v4/projects/acreetionos-code%2Ftrumpos/packages/generic/trumpos/1.0/$(basename $ISO_FILE)" \
-               || echo "GitLab upload failed (may need project setup)"
-      
-      - name: Upload artifact (backup)
-        uses: actions/upload-artifact@v4
-        with:
-          name: trump-os-iso
-          path: TrumpOS-*.iso
-          retention-days: 7
-  
-  notify-fail:
-    if: failure()
-    needs: build-trumpos
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create failure issue
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            await github.rest.issues.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              title: `[CI] TrumpOS ISO build failed — ${new Date().toISOString().split('T')[0]}`,
-              body: `Build failed. [View run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`,
-              assignees: ['spivanatalie64'],
-              labels: ['build-failure']
-            });
+          # Use the explicit path to avoid PATH issues
+          MKISO=$(find /usr -name 'mkarchiso*' -type f 2>/dev/null | head -1)
+          "$MKISO" -C "$WORK/mkarchiso.conf" -w "$WORK" -D "$ISO_DIR" -O "$OUTPUT"
