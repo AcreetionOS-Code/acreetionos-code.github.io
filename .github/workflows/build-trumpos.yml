@@ -20,7 +20,12 @@
           fi
       
       - name: Build TrumpOS ISO
+        env:
+          WORK_DIR: "${{ runner.temp }}/trumpos-work"
         run: |
-          # Use the explicit path to avoid PATH issues
-          MKISO=$(find /usr -name 'mkarchiso*' -type f 2>/dev/null | head -1)
-          "$MKISO" -C "$WORK/mkarchiso.conf" -w "$WORK" -D "$ISO_DIR" -O "$OUTPUT"
+          mkdir -p "$WORK_DIR"
+          bash TrumpOS/build.sh
+        # Ensure ISO output is moved back to workspace
+        if [ -f TrumpOS-*.iso ]; then
+          cp TrumpOS-*.iso "${{ runner.temp }}/"
+        fi
