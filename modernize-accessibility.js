@@ -14,11 +14,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2e
 }
 `;
 
-const pageLoadCSS = `
-@keyframes pageLoadFade{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-body{animation:pageLoadFade 0.6s ease-out;}
-@media (prefers-reduced-motion: reduce){body{animation:none;}}
-`;
+const pageLoadCSS = ``; // removed page-load fade to prevent FOUC / flash
 
 const modernLinkCSS = `
 a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative;}
