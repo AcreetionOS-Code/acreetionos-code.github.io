@@ -19,24 +19,38 @@ echo "Work dir: $WORK"
 
 # ── 1. Install tools ──
 echo "[1/8] Installing build tools..."
-sudo apt-get update -qq
-sudo apt-get install -y -qq xorriso isolinux squashfs-tools unsquashfs wget git > /dev/null 2>&1
+sudo apt-get update -qq || true
+sudo apt-get install -y -qq xorriso isolinux squashfs-tools unsquashfs wget git || true
 
 # ── 2. Download base ISO ──
 echo "[2/8] Downloading base AcreetionOS ISO..."
-wget -q --show-progress -O "$WORK/base.iso" "$ISO_URL"
+if ! wget -q --show-progress -O "$WORK/base.iso" "$ISO_URL"; then
+  echo "ERROR: Failed to download base ISO from $ISO_URL"
+  echo "Trying fallback download location..."
+  wget -q --show-progress -O "$WORK/base.iso" "https://gitlab.acreetionos.org/api/v4/projects/acreetionos-code%2Facreetionos/packages/generic/acreetionos/1.0/AcreetionOS-1.0-x86_64.iso" || \
+  wget -q --show-progress -O "$WORK/base.iso" "https://github.com/AcreetionOS-Code/acreetionos/releases/download/1.0/AcreetionOS-1.0-x86_64.iso" || \
+  { echo "ERROR: All download attempts failed"; exit 1; }
+fi
 
 # ── 3. Extract ISO ──
 echo "[3/8] Extracting ISO..."
 mkdir -p "$ISO_DIR"
-xorriso -osirrox on -indev "$WORK/base.iso" -extract / "$ISO_DIR" 2>/dev/null
-chmod -R +w "$ISO_DIR"
+if xorriso -osirrox on -indev "$WORK/base.iso" -extract / "$ISO_DIR" 2>/dev/null; then
+  chmod -R +w "$ISO_DIR"
+else
+  echo "ERROR: Failed to extract ISO with xorriso"
+  exit 1
+fi
 
 # ── 4. Extract squashfs ──
 echo "[4/8] Extracting root filesystem..."
 mkdir -p "$SQUASH_DIR"
 if [ -f "$ISO_DIR/arch/x86_64/airootfs.sfs" ]; then
-  unsquashfs -d "$SQUASH_DIR" "$ISO_DIR/arch/x86_64/airootfs.sfs" 2>/dev/null
+  if unsquashfs -d "$SQUASH_DIR" "$ISO_DIR/arch/x86_64/airootfs.sfs" 2>/dev/null; then
+    echo "  Squashfs extracted successfully"
+  else
+    echo "  WARNING: Failed to extract airootfs.sfs, continuing without squashfs customization"
+  fi
 else
   echo "  WARNING: airootfs.sfs not found, skipping squashfs customization"
 fi
@@ -149,7 +163,7 @@ fi
 echo "[8/8] Building TrumpOS ISO..."
 VOLUME_ID="TRUMPOS"
 
-xorriso -as mkisofs \
+if xorriso -as mkisofs \
   -iso-level 3 \
   -full-iso9660-filenames \
   -volid "$VOLUME_ID" \
@@ -163,7 +177,12 @@ xorriso -as mkisofs \
   -eltorito-alt-boot -e "EFI/archiso/efiboot.img" \
   -no-emul-boot -isohybrid-gpt-basdat \
   -output "$OUTPUT" \
-  "$ISO_DIR" 2>/dev/null
+  "$ISO_DIR" 2>/dev/null; then
+  echo "  ISO built successfully"
+else
+  echo "ERROR: Failed to build ISO"
+  exit 1
+fi
 
 echo ""
 echo "=== Done ==="
