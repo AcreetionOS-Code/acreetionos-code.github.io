@@ -118,7 +118,7 @@ echo "  ✓ TrumpOS branding applied"
 echo "[4/5] Building final ISO with mkarchiso..."
 # Create the mkarchiso config file on‑the‑fly
 CONFIG_DIR="$WORK/archiso-config"
-mkdir -p "$config_dir"
+mkdir -p "$CONFIG_DIR"
 cat > "$WORK/mkarchiso.conf" <<'EOF'
 # ----------------------------------------------
 # mkarchiso configuration – identical to the one used by AcreetionOS
