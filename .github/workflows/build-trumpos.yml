@@ -12,13 +12,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Setup Arch build environment
+      - name: Initialize pacman and install build tools
         run: |
-          pacman -Syu --noconfirm
-          pacman -S --noconfirm mkarchiso squashfs-tools xorriso git wget p7zip
+          # Initialize keys first
+          pacman-key --init
+          pacman-key --populate archlinux
+          
+          # Sync and install packages
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm --needed \
+            base-devel \
+            archiso \
+            squashfs-tools \
+            xorriso \
+            git \
+            wget \
+            p7zip
+      
+      - name: Verify mkarchiso is available
+        run: |
+          which mkarchiso || (echo "ERROR: mkarchiso not found" && exit 1)
+          mkarchiso --help || true
       
       - name: Build TrumpOS ISO
-        run: bash TrumpOS/build-arch.sh
+        run: bash TrumpOS/build.sh
       
       - name: Upload to GitLab Package Registry
         env:
