@@ -19,26 +19,77 @@ echo "Work dir: $WORK"
 
 # ── 1. Install tools ──
 echo "[1/8] Installing build tools..."
-sudo apt-get update -qq || true
-sudo apt-get install -y -qq xorriso isolinux squashfs-tools unsquashfs wget git || true
+
+# Check if packages are already available, skip if they are
+check_and_install() {
+    local pkg=$1
+    if ! command -v "$pkg" >/dev/null 2>&1; then
+        echo "  Installing $pkg..."
+        sudo apt-get install -y -qq "$pkg" 2>/dev/null || {
+            echo "  WARNING: Failed to install $pkg, continuing without it"
+        }
+    else
+        echo "  ✓ $pkg already available"
+    fi
+}
+
+check_and_install xorriso
+check_and_install isolinux
+check_and_install squashfs-tools
+check_and_install unsquashfs
+check_and_install wget
+check_and_install git
+check_and_install p7zip-full
 
 # ── 2. Download base ISO ──
 echo "[2/8] Downloading base AcreetionOS ISO..."
-if ! wget -q --show-progress -O "$WORK/base.iso" "$ISO_URL"; then
-  echo "ERROR: Failed to download base ISO from $ISO_URL"
-  echo "Trying fallback download location..."
-  wget -q --show-progress -O "$WORK/base.iso" "https://gitlab.acreetionos.org/api/v4/projects/acreetionos-code%2Facreetionos/packages/generic/acreetionos/1.0/AcreetionOS-1.0-x86_64.iso" || \
-  wget -q --show-progress -O "$WORK/base.iso" "https://github.com/AcreetionOS-Code/acreetionos/releases/download/1.0/AcreetionOS-1.0-x86_64.iso" || \
-  { echo "ERROR: All download attempts failed"; exit 1; }
+for url in \
+  "$ISO_URL" \
+  "https://gitlab.acreetionos.org/api/v4/projects/acreetionos-code%2Facreetionos/packages/generic/acreetionos/1.0/AcreetionOS-1.0-x86_64.iso" \
+  "https://github.com/AcreetionOS-Code/acreetionos/releases/download/1.0/AcreetionOS-1.0-x86_64.iso" \
+  "https://acreetionos.org/downloads/AcreetionOS-1.0-x86_64.iso"; do
+  echo "  Trying: $url"
+  if wget -q --show-progress -O "$WORK/base.iso" "$url"; then
+    echo "  ✓ Downloaded successfully"
+    break
+  else
+    echo "  ✗ Failed"
+    rm -f "$WORK/base.iso"
+  fi
+done
+
+if [ ! -f "$WORK/base.iso" ]; then
+  echo "ERROR: All download attempts failed"
+  exit 1
 fi
 
 # ── 3. Extract ISO ──
 echo "[3/8] Extracting ISO..."
 mkdir -p "$ISO_DIR"
-if xorriso -osirrox on -indev "$WORK/base.iso" -extract / "$ISO_DIR" 2>/dev/null; then
-  chmod -R +w "$ISO_DIR"
+
+# Try xorriso first, fallback to 7z
+if command -v xorriso >/dev/null 2>&1; then
+  echo "  Trying xorriso extraction..."
+  if xorriso -osirrox on -indev "$WORK/base.iso" -extract / "$ISO_DIR" 2>/dev/null; then
+    echo "  ✓ ISO extracted successfully with xorriso"
+    chmod -R +w "$ISO_DIR"
+  else
+    echo "  ✗ xorriso extraction failed, trying 7z..."
+    if command -v 7z >/dev/null 2>&1; then
+      if 7z x "$WORK/base.iso" -o"$ISO_DIR" -y >/dev/null 2>&1; then
+        echo "  ✓ ISO extracted successfully with 7z"
+        chmod -R +w "$ISO_DIR"
+      else
+        echo "  ✗ 7z extraction failed too"
+        exit 1
+      fi
+    else
+      echo "  ERROR: Both xorriso and 7z extraction failed"
+      exit 1
+    fi
+  fi
 else
-  echo "ERROR: Failed to extract ISO with xorriso"
+  echo "  ERROR: xorriso not available and no fallback extraction method ready"
   exit 1
 fi
 
@@ -46,13 +97,16 @@ fi
 echo "[4/8] Extracting root filesystem..."
 mkdir -p "$SQUASH_DIR"
 if [ -f "$ISO_DIR/arch/x86_64/airootfs.sfs" ]; then
+  echo "  Extracting airootfs.sfs..."
   if unsquashfs -d "$SQUASH_DIR" "$ISO_DIR/arch/x86_64/airootfs.sfs" 2>/dev/null; then
-    echo "  Squashfs extracted successfully"
+    echo "  ✓ Squashfs extracted successfully"
   else
     echo "  WARNING: Failed to extract airootfs.sfs, continuing without squashfs customization"
+    # Continue with the build process even if squashfs extraction fails
   fi
 else
   echo "  WARNING: airootfs.sfs not found, skipping squashfs customization"
+  # Continue with the build process even if squashfs not found
 fi
 
 # ── 5. Apply TrumpOS branding (boot configs) ──
@@ -84,7 +138,10 @@ done
 # ── 6. Inject TrumpOS Calamares config ──
 echo "[6/8] Injecting TrumpOS Calamares configuration..."
 
+# Only proceed if we have a working squashfs directory
 if [ -d "$SQUASH_DIR/etc/calamares" ]; then
+  echo "  ✓ Calamares directory found"
+  
   # Remove AcreetionOS branding
   if [ -d "$SQUASH_DIR/etc/calamares/branding/AcreetionOS" ]; then
     echo "  Removing AcreetionOS branding..."
@@ -97,73 +154,77 @@ if [ -d "$SQUASH_DIR/etc/calamares" ]; then
     mkdir -p "$SQUASH_DIR/etc/calamares/branding/TrumpOS"
     cp -r "$SCRIPT_DIR/calamares/branding/TrumpOS/"* "$SQUASH_DIR/etc/calamares/branding/TrumpOS/"
   else
-    echo "  WARNING: Local TrumpOS branding not found at $SCRIPT_DIR/calamares/branding/TrumpOS"
-    echo "  Attempting to clone from GitLab..."
-    CALAMARES_REPO="$WORK/calamares-config"
-    git clone https://gitlab.acreetionos.org/acreetionos-code/trumpos-calamares.git "$CALAMARES_REPO" 2>/dev/null || \
-    git clone https://gitlab.acreetionos.org/natalie/calamares-config.git "$CALAMARES_REPO" 2>/dev/null || true
-    if [ -d "$CALAMARES_REPO/etc/calamares/branding/AcreetionOS" ]; then
-      echo "  Cloning AcreetionOS Calamares as base for TrumpOS..."
-      mkdir -p "$SQUASH_DIR/etc/calamares/branding/TrumpOS"
-      cp -r "$CALAMARES_REPO/etc/calamares/branding/AcreetionOS/"* "$SQUASH_DIR/etc/calamares/branding/TrumpOS/"
-      # Rename branding.desc references
-      sed -i 's/componentName:.*/componentName:  TrumpOS/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/productName:.*/productName:         TrumpOS/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/shortProductName:.*/shortProductName:    TrumpOS/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/versionedName:.*/versionedName:       TrumpOS 1.0/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/shortVersionedName:.*/shortVersionedName:  TrumpOS 1.0/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/bootloaderEntryName:.*/bootloaderEntryName: TrumpOS/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/SidebarBackground:.*/SidebarBackground:    "#002147"/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/SidebarText:.*/SidebarText:          "#D4AF37"/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i 's/SidebarBackgroundCurrent:.*/SidebarBackgroundCurrent: "#D4AF37"/' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-      sed -i '/SidebarBackgroundCurrent/a\   SidebarTextCurrent:   "#002147"' "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc"
-    fi
+    echo "  WARNING: Local TrumpOS branding not found, creating basic TrumpOS branding..."
+    mkdir -p "$SQUASH_DIR/etc/calamares/branding/TrumpOS"
+    # Create a basic branding.desc file
+    cat > "$SQUASH_DIR/etc/calamares/branding/TrumpOS/branding.desc" << 'EOF'
+componentName:     TrumpOS
+productName:        TrumpOS
+shortProductName:   TrumpOS
+versionedName:      TrumpOS 1.0
+shortVersionedName: TrumpOS 1.0
+bootloaderEntryName: TrumpOS
+SidebarBackground:   "#002147"
+SidebarText:         "#D4AF37"
+SidebarBackgroundCurrent: "#D4AF37"
+SidebarTextCurrent:  "#002147"
+EOF
   fi
 
   # Replace settings.conf to use TrumpOS branding
   if [ -f "$SCRIPT_DIR/calamares/modules/settings.conf" ]; then
     echo "  Installing TrumpOS Calamares settings.conf..."
     cp "$SCRIPT_DIR/calamares/modules/settings.conf" "$SQUASH_DIR/etc/calamares/settings.conf"
+  else
+    echo "  WARNING: settings.conf not found, using default"
   fi
 
-  # Update os-release
+  # Update system files
   if [ -f "$SQUASH_DIR/etc/os-release" ]; then
     sed -i 's/NAME=.*/NAME="TrumpOS"/' "$SQUASH_DIR/etc/os-release"
     sed -i 's/ID=.*/ID=trumpos/' "$SQUASH_DIR/etc/os-release"
     sed -i 's/PRETTY_NAME=.*/PRETTY_NAME="TrumpOS 1.0 (Make Linux Great Again)"/' "$SQUASH_DIR/etc/os-release"
   fi
-  # Update lsb-release
+  
   if [ -f "$SQUASH_DIR/etc/lsb-release" ]; then
     sed -i 's/DISTRIB_DESCRIPTION=.*/DISTRIB_DESCRIPTION="TrumpOS 1.0"/' "$SQUASH_DIR/etc/lsb-release"
   fi
 
-  # Update hostname
   if [ -f "$SQUASH_DIR/etc/hostname" ]; then
     echo "trumpos" > "$SQUASH_DIR/etc/hostname"
   fi
 
-  # Update hosts file
   if [ -f "$SQUASH_DIR/etc/hosts" ]; then
     sed -i 's/acreetionos/trumpos/g' "$SQUASH_DIR/etc/hosts" 2>/dev/null || true
   fi
 
-  echo "  TrumpOS Calamares configuration injected successfully."
+  echo "  ✓ TrumpOS Calamares configuration injected successfully"
 else
   echo "  WARNING: /etc/calamares not found in squashfs, skipping Calamares injection"
+  # Continue with the build process even without Calamares customization
 fi
 
 # ── 7. Repackage squashfs ──
 echo "[7/8] Repackaging filesystem..."
 if [ -d "$SQUASH_DIR" ] && [ -f "$ISO_DIR/arch/x86_64/airootfs.sfs" ]; then
-  mksquashfs "$SQUASH_DIR" "$ISO_DIR/arch/x86_64/airootfs.sfs" -comp xz -noappend > /dev/null 2>&1 || echo "  (squashfs repack skipped — no write perms)"
-  md5sum "$ISO_DIR/arch/x86_64/airootfs.sfs" > "$ISO_DIR/arch/x86_64/airootfs.md5" 2>/dev/null || true
+  echo "  Repackaging airootfs.sfs..."
+  if mksquashfs "$SQUASH_DIR" "$ISO_DIR/arch/x86_64/airootfs.sfs" -comp xz -noappend >/dev/null 2>&1; then
+    echo "  ✓ Squashfs repackaged successfully"
+    md5sum "$ISO_DIR/arch/x86_64/airootfs.sfs" > "$ISO_DIR/arch/x86_64/airootfs.md5" 2>/dev/null || true
+  else
+    echo "  WARNING: Failed to repackage squashfs, using original"
+  fi
+else
+  echo "  WARNING: Skipping squashfs repackage (missing files)"
 fi
 
 # ── 8. Build ISO ──
 echo "[8/8] Building TrumpOS ISO..."
 VOLUME_ID="TRUMPOS"
 
-if xorriso -as mkisofs \
+echo "  Building ISO with xorriso..."
+BUILD_FAILED=0
+if ! xorriso -as mkisofs \
   -iso-level 3 \
   -full-iso9660-filenames \
   -volid "$VOLUME_ID" \
@@ -178,9 +239,14 @@ if xorriso -as mkisofs \
   -no-emul-boot -isohybrid-gpt-basdat \
   -output "$OUTPUT" \
   "$ISO_DIR" 2>/dev/null; then
-  echo "  ISO built successfully"
+  echo "  WARNING: xorriso ISO creation failed ($?)"
+  BUILD_FAILED=1
+fi
+
+if [ $BUILD_FAILED -eq 0 ]; then
+  echo "  ✓ ISO built successfully"
 else
-  echo "ERROR: Failed to build ISO"
+  echo "  ERROR: Failed to build ISO"
   exit 1
 fi
 
