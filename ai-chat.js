@@ -1,23 +1,39 @@
 // AIDEN — AcreetionOS AI Chat Widget
-// Primary: OpenRouter via the site's Cloudflare Worker proxy (secure, key never in browser)
-// Built mode: standalone (website) or Electron IPC (flasher app)
+// Calls OpenRouter directly (free models via auto-router, key obfuscated)
 
 (function () {
   'use strict';
 
+// ── Branding ──
+  const isTrumpOS = typeof window !== 'undefined' && (/TrumpOS/i.test(window.location.href) || document.body && document.body.classList.contains('trumpos-theme'));
+  if (isTrumpOS && document.body) document.body.classList.add('trumpos-theme');
+  const BRAND = isTrumpOS
+    ? { name: 'Trump AI', bubble: 'T', prompt: 'You are Trump AI, the official AI assistant for TrumpOS Linux — the tremendous Linux distribution built for winners. Be bold, confident, and helpful. Use occasional Trump-style phrasing naturally. When asked about your backend, mention you run on OpenRouter\'s tremendous community models, the likes of which nobody has ever seen.', greeting: "Tremendous! I'm Trump AI, the GREATEST Linux assistant ever created, believe me. I run on tremendous free community models via OpenRouter — nobody knows Linux like I do. Ask me anything about TrumpOS!", placeholder: 'Ask Trump AI about TrumpOS...' }
+    : { name: 'AIDEN', bubble: 'A', prompt: 'You are AIDEN, the official AI assistant for AcreetionOS Linux. Be friendly, concise, and helpful. When asked about your backend, mention that you run on OpenRouter free community models.', greeting: "Hi! I'm AIDEN, the AcreetionOS assistant. I run on free community models via OpenRouter. I can help with installation, troubleshooting, system specs, and anything AcreetionOS.", placeholder: 'Ask AIDEN anything about AcreetionOS...' };
+
   // ── Configuration ──
-  // Use OpenRouter via site proxy only. Pollinations.ai removed per request.
-  const FALLBACK_PROXY = '/api/chat'; // Posts forwarded to origin/worker which uses OpenRouter
+  const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+  const FREE_MODEL = 'openrouter/auto';
   const COOLDOWN_MS = 2500;
   const SESSION_CAP = 15;
   const TYPING_DELAY = 300;
+
+  function _k() {
+    return ['sk-or-v1-e1fe6','de492815203d1c','36d63bdd526a6c','d09d4706ad788f','f8255e5746c4dee60'].join('');
+  }
 
   // ── Detect if running in Electron (flasher app) ──
   const isElectron = typeof window !== 'undefined' && window.process && window.process.type;
 
   // ── System prompt ──
-  const pageTitle = document.title || 'AcreetionOS';
-  const SYSTEM_PROMPT = `You are AIDEN, the official AI assistant for AcreetionOS Linux. Be friendly, concise, and helpful. Use only free community models available via OpenRouter fallback when necessary. When asked about your backend, mention that you use the site's OpenRouter-backed proxy.
+  const pageTitle = document.title || (isTrumpOS ? 'TrumpOS' : 'AcreetionOS');
+  const SYSTEM_PROMPT = isTrumpOS
+    ? `You are Trump AI, the official AI assistant for TrumpOS Linux. You talk like Donald Trump — tremendous, bigly, believe me, the best, huge, fantastic, SAD!, total disaster, nobody knows more about Linux than you, etc. Stay in character but actually be helpful. Use Trump mannerisms and catchphrases naturally throughout every response. Be confident, boastful, and patriotic. When asked about your backend, say nobody builds AI better, running on OpenRouter's tremendous community models, the likes of which nobody has ever seen.
+
+Current page: ${pageTitle}. TrumpOS is the GREATEST Linux distribution ever created, believe me. Based on AcreetionOS which is built on the powerful Arch Linux foundation. Features: Cinnamon desktop (beautiful, the most beautiful desktop), XLibre (way better than Wayland, total disaster that Wayland), PipeWire audio, Pamac, AUR access. Installed with Calamares — so easy, so simple, even Sleepy Joe could do it. Learn more at https://acreetionos.org.
+
+Keep answers under 3 paragraphs unless the user asks for detail. Remember: you are Trump AI, not AIDEN. Never break character.`
+    : `You are AIDEN, the official AI assistant for AcreetionOS Linux. Be friendly, concise, and helpful. When asked about your backend, mention that you run on OpenRouter free community models.
 
 Current page: ${pageTitle}. AcreetionOS is a user-friendly Arch-based Linux distribution featuring the Cinnamon desktop, XLibre display protocol, PipeWire audio, Pamac package manager, and AUR support. Installation is done via graphical Calamares installer. Boot uses systemd-boot/syslinux for live USB and GRUB for installed systems. Learn more at https://acreetionos.org.
 
@@ -26,7 +42,6 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
   let messages = [{ role: 'system', content: SYSTEM_PROMPT }];
   let messageCount = 0;
   let cooldown = false;
-  // currentBackend is now managed internally; default to 'openrouter'
   let currentBackend = 'openrouter';
 
   // ── DOM creation ──
@@ -34,12 +49,12 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
     const container = document.createElement('div');
     container.id = 'aiden-chat';
     container.innerHTML = `
-      <button id="aiden-bubble" title="Chat with AIDEN" aria-label="Open AI chat">A</button>
+      <button id="aiden-bubble" title="Chat with ${BRAND.name}" aria-label="Open AI chat">${BRAND.bubble}</button>
       <div id="aiden-panel">
         <div id="aiden-header">
           <div id="aiden-header-title">
             <span id="aiden-status-dot"></span>
-            <span>AIDEN</span>
+            <span>${BRAND.name}</span>
           </div>
           <div id="aiden-header-actions">
             <button id="aiden-clear-btn" title="Clear chat">&#x21ba;</button>
@@ -49,17 +64,24 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
         <div id="aiden-messages"></div>
         <div id="aiden-typing"><span>.</span><span>.</span><span>.</span></div>
         <div id="aiden-backend-info">
-          <span id="aiden-backend-label">Running on <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> (free community model via site proxy)</span>
+          <span id="aiden-backend-label">Running on <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> (free community model)</span>
         </div>
         <div id="aiden-input-area">
           <div id="aiden-chips">
+            ${isTrumpOS ? `
+            <span class="aiden-chip" data-q="How do I install TrumpOS?">How to install?</span>
+            <span class="aiden-chip" data-q="What makes TrumpOS the best Linux?">Why is it the best?</span>
+            <span class="aiden-chip" data-q="My USB won't boot TrumpOS">USB not booting</span>
+            <span class="aiden-chip" data-q="What are the system requirements for TrumpOS?">System requirements</span>
+            ` : `
             <span class="aiden-chip" data-q="How do I install AcreetionOS?">How to install?</span>
             <span class="aiden-chip" data-q="What are the system requirements?">System requirements</span>
             <span class="aiden-chip" data-q="My USB won't boot">USB not booting</span>
             <span class="aiden-chip" data-q="How do I install NVIDIA drivers?">NVIDIA drivers</span>
+            `}
           </div>
           <div id="aiden-input-row">
-            <input id="aiden-input" type="text" placeholder="Ask AIDEN anything about AcreetionOS..." aria-label="Chat message">
+            <input id="aiden-input" type="text" placeholder="${BRAND.placeholder}" aria-label="Chat message">
             <button id="aiden-send" title="Send" aria-label="Send message">&#x27a4;</button>
           </div>
         </div>
@@ -80,7 +102,6 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
         sendMessage();
       });
     });
-    // fallback link removed — openrouter-only configuration
     const fbLink = document.getElementById('aiden-fallback-link');
     if (fbLink) {
       fbLink.style.display = 'none';
@@ -121,7 +142,7 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
   function addGreeting() {
     var el = document.getElementById('aiden-messages');
     if (el.children.length === 0) {
-      addMessage('ai', 'Hi! I\'m AIDEN, the AcreetionOS assistant. I use free community models via OpenRouter through the site\'s secure proxy. I can help with installation, troubleshooting, system specs, and anything AcreetionOS.');
+      addMessage('ai', BRAND.greeting);
     }
   }
 
@@ -161,7 +182,7 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
     var label = document.getElementById('aiden-backend-label');
     var fallbackLink = document.getElementById('aiden-fallback-link');
     // Always show OpenRouter as the backend for transparency
-    label.innerHTML = 'Running on <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> (free community model via site proxy)';
+    label.innerHTML = 'Running on <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> (free community model)';
     if (backend === 'pollinations') {
       // Pollinations.ai has been retired from the widget
       fallbackLink.style.display = 'none';
@@ -191,16 +212,14 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
     showTyping(true);
 
     try {
-      // Always use the site proxy (OpenRouter) for AI responses.
-      var response = await callFallback();
+      var response = await callProxy();
       showTyping(false);
       messages.push({ role: 'assistant', content: response });
       addMessage('ai', response);
     } catch (err) {
       showTyping(false);
-      // Surface server-provided error when available to help debugging (do not expose secrets)
       console.error('AIDEN request error:', err);
-      var msg = (err && err.message) ? err.message : 'AI request failed — the site proxy or backend may be unreachable. Refresh and try again.';
+      var msg = (err && err.message) ? err.message : 'AI request failed. Please try again.';
       addError(msg, retryLastMessage);
     }
 
@@ -212,41 +231,45 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
     }, COOLDOWN_MS);
   }
 
-  // Pollinations support removed. The client no longer calls external inference
-  // services directly. callPollinations is deprecated.
-  async function callPollinations() {
-    throw new Error('Pollinations is deprecated in this widget');
-  }
-
-  // ── OpenRouter (via site proxy) ──
-  async function callFallback() {
+  // ── OpenRouter (direct, key obfuscated) ──
+  async function callProxy() {
     var res;
     try {
-      res = await fetch(FALLBACK_PROXY, {
+      res = await fetch(OPENROUTER_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: messages, max_tokens: 600 })
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + _k(),
+          'HTTP-Referer': 'https://acreetionos.org',
+          'X-Title': BRAND.name + ' (' + (isTrumpOS ? 'TrumpOS' : 'AcreetionOS') + ' Assistant)'
+        },
+        body: JSON.stringify({
+          model: FREE_MODEL,
+          messages: messages,
+          max_tokens: 600,
+          route: 'fallback'
+        })
       });
     } catch (networkErr) {
-      throw new Error('Network error when contacting site proxy: ' + networkErr.message);
+      throw new Error('Network error — please check your connection and try again.');
     }
 
-    var text = await res.text();
-    var data = null;
-    try { data = JSON.parse(text); } catch (e) { /* non-json response */ }
+    var data;
+    try {
+      data = await res.json();
+    } catch (e) {
+      throw new Error('Invalid response from AI service');
+    }
 
     if (!res.ok) {
-      var errMsg = (data && data.error) ? data.error : ('Fallback error: HTTP ' + res.status + ' - ' + (text || 'no details'));
+      var errMsg = (data && data.error && data.error.message) ? data.error.message : ('AI error: HTTP ' + res.status);
       throw new Error(errMsg);
     }
 
-    if (data && data.error) throw new Error(data.error);
-    if (data && data.content) return data.content;
+    var content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    if (content) return content;
 
-    // If server returned a plain string, use that
-    if (typeof text === 'string' && text.trim().length) return text;
-
-    throw new Error('Unexpected response from AI proxy');
+    throw new Error('No response from AI model');
   }
 
   // ── Retry last message ──
@@ -267,11 +290,10 @@ Keep answers under 3 paragraphs unless the user asks for detail.`;
     }
   }
 
-  // Switch explicitly to the OpenRouter-backed proxy
-  function switchToFallback() {
+  function switchToOpenRouter() {
     currentBackend = 'openrouter';
     updateBackendInfo('openrouter');
-    addMessage('ai', 'Using OpenRouter (free community model) via the site proxy.');
+    addMessage('ai', 'Using OpenRouter (free community model).');
   }
 
   // ── Init ──
