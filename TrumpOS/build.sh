@@ -165,7 +165,7 @@ EOF
 
 # Launch mkarchiso (need to run inside Arch container)
 echo "  Running mkarchiso to generate final ISO..."
-if ! mkarchiso -c "$WORK/mkarchiso.conf" -w "$WORK" -D "$ISO_DIR" -O "$ISO_NAME"; then
+if ! mkarchiso -c "$WORK/mkarchiso.conf" -w "$WORK" -D "$ISO_DIR" -o "$ISO_NAME"; then
   echo "ERROR: mkarchiso failed"
   exit 1
 fi
