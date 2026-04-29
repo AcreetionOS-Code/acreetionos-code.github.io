@@ -10,7 +10,9 @@
     { href: 'https://bsky.acreetionos.org',          icon: 'bi-cloud-sun',    label: 'Bluesky',      title: 'Join on Bluesky' },
     { href: 'https://www.facebook.com/groups/574717645277790', icon: 'bi-facebook', label: 'Facebook', title: 'Join our Facebook Group' },
     { href: 'https://github.com/AcreetionOS-Code',   icon: 'bi-github',       label: 'GitHub',       title: 'View on GitHub' },
-    { href: 'https://gitlab.acreetionos.org',        icon: 'bi-gitlab',       label: 'GitLab',       title: 'Self-hosted GitLab' }
+    { href: 'https://gitlab.acreetionos.org',        icon: 'bi-gitlab',       label: 'GitLab',       title: 'Self-hosted GitLab' },
+    { href: 'https://xmpp.acreetionos.org',          icon: 'bi-chat-text',    label: 'XMPP',         title: 'Connect on XMPP' },
+    { href: 'https://matrix.acreetionos.org',        icon: 'bi-boxes',        label: 'Matrix',       title: 'Join our Matrix Space' }
   ];
 
   function createSocialBar() {
