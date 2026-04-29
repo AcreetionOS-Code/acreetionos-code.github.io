@@ -716,6 +716,10 @@ body {
     color: black;
 }
 
+.main-nav a.btn-storm {
+    color: white;
+}
+
 /* ensure contact.js transitions work */
 body.fade-out {
     animation: fadeOut 0.45s ease-in-out forwards;
