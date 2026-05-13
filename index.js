@@ -72,7 +72,6 @@ async function handleNews(env) {
 
   try {
     const [gh, gl, rss] = await Promise.all([
-      // GitHub: fetch repos, then parallel per-repo requests
       (async () => {
         try {
           const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=5&sort=pushed');
@@ -87,13 +86,13 @@ async function handleNews(env) {
               if (commitsRes.ok) {
                 const commits = await commitsRes.json();
                 for (const c of commits) {
-                  items.push({ type: 'commit', repo: repo.name, message: (c.commit.message || '').split('\n')[0], author: c.commit.author?.name || 'Unknown', date: c.commit.author?.date, url: c.html_url });
+                  items.push({ type: 'commit', repo: repo.name, message: (c.commit.message || '').split('\n')[0], author: c.commit.author?.name || 'Unknown', date: c.commit.author?.date, url: c.html_url, source: 'GitHub' });
                 }
               }
               if (releasesRes.ok) {
                 const releases = await releasesRes.json();
                 for (const r of releases) {
-                  items.push({ type: 'release', repo: repo.name, name: r.tag_name, desc: (r.body || '').split('\n')[0], date: r.published_at || r.created_at, url: r.html_url });
+                  items.push({ type: 'release', repo: repo.name, name: r.tag_name, desc: (r.body || '').split('\n')[0], date: r.published_at || r.created_at, url: r.html_url, source: 'GitHub' });
                 }
               }
               return items;
@@ -103,7 +102,6 @@ async function handleNews(env) {
           return nested.flat();
         } catch (e) { return []; }
       })(),
-      // GitLab: fetch projects, then parallel per-project requests
       (async () => {
         try {
           const projectsRes = await fetch(GL_URL + '/api/v4/projects?per_page=5&order_by=last_activity_at');
@@ -116,7 +114,7 @@ async function handleNews(env) {
                 if (commitsRes.ok) {
                   const commits = await commitsRes.json();
                   for (const c of commits) {
-                    items.push({ type: 'commit', repo: proj.path_with_namespace || proj.name, message: c.title || c.message || '', author: c.author_name || 'Unknown', date: c.created_at, url: c.web_url || (GL_URL + '/' + proj.path_with_namespace + '/-/commit/' + c.id) });
+                    items.push({ type: 'commit', repo: proj.path_with_namespace || proj.name, message: c.title || c.message || '', author: c.author_name || 'Unknown', date: c.created_at, url: c.web_url || (GL_URL + '/' + proj.path_with_namespace + '/-/commit/' + c.id), source: 'GitLab' });
                   }
                 }
                 return items;
@@ -126,9 +124,7 @@ async function handleNews(env) {
           return nested.flat();
         } catch (e) { return []; }
       })(),
-      // RSS: parallel feed fetches
       (async () => {
-        const results = [];
         const feedFetches = RSS_FEEDS.map(feedUrl =>
           fetch(feedUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AcreetionOS-News-Bot)' } })
             .then(async (res) => {
@@ -140,7 +136,7 @@ async function handleNews(env) {
                 const link = (item.match(/<link>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/link>/) || [,''])[1].trim();
                 const desc = (item.match(/<description>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/description>/) || [,''])[1].trim().replace(/<[^>]+>/g, '').slice(0, 200);
                 const pubDate = (item.match(/<pubDate>([^<]*)<\/pubDate>/) || [,''])[1];
-                if (title && link) return { type: 'news', repo: 'Google News', message: title, desc, date: pubDate, url: link };
+                if (title && link) return { type: 'news', message: title, desc, date: pubDate, url: link, source: 'Google News' };
                 return null;
               }).filter(Boolean);
             }).catch(() => [])
@@ -150,65 +146,30 @@ async function handleNews(env) {
       })()
     ]);
 
-    const allData = [...gh, ...gl, ...rss].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-    const directArticles = rss.slice(0, 6).map(item => ({
-      title: item.message, desc: item.desc || 'AcreetionOS mentioned in recent news.',
-      tag: 'Community', tagClass: 'tag-community', url: item.url, source: 'Google News', date: item.date
+    const directArticles = gh.filter(a => a.type === 'release').slice(0, 3).concat(gl.slice(0, 2)).concat(rss.slice(0, 4)).slice(0, 6).map(item => ({
+      type: 'direct',
+      title: item.type === 'release' ? item.name + ' released' : item.message || 'AcreetionOS update',
+      desc: item.desc || item.message || 'Recent activity from ' + item.source,
+      tag: item.type === 'release' ? 'Release' : 'Community',
+      tagClass: item.type === 'release' ? 'tag-release' : 'tag-community',
+      url: item.url || 'https://acreetionos.org',
+      source: item.source || 'acreetionos.org',
+      date: item.date
     }));
 
-    // AI generation — only if we have data, use low tokens for speed
-    const apiKey = env.OPENROUTER_API_KEY;
-    let aiArticles = [];
-    if (apiKey && allData.length > 0) {
-      try {
-        const activityText = allData.map(d => {
-          if (d.type === 'release') return '[RELEASE] ' + d.repo + ' - ' + (d.name || '') + ': ' + (d.desc || '');
-          if (d.type === 'news') return '[NEWS] ' + (d.message || '');
-          return '[COMMIT] ' + d.repo + ' - ' + (d.message || '') + ' (by ' + d.author + ')';
-        }).join('\n');
-        const res = await fetch(OPENROUTER_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey,
-            'HTTP-Referer': 'https://acreetionos.org', 'X-Title': 'AcreetionOS News Generator'
-          },
-          body: JSON.stringify({
-            model: FREE_MODEL,
-            messages: [
-              { role: 'system', content: 'You are a news writer for AcreetionOS Linux. Given activity data, output 2-3 concise news articles as JSON array. Each: {title(max 50 chars), summary(1 sentence), tag(Release/Development/Community/Infrastructure), url}. JSON only. No markdown.' },
-              { role: 'user', content: 'AcreetionOS activity:\n' + activityText }
-            ],
-            max_tokens: 384
-          })
-        });
-        if (res.ok) {
-          const data = await res.json();
-          let content = (data.choices?.[0]?.message?.content || '').replace(/```json\s*/gi, '').replace(/```\s*$/g, '').trim();
-          const parsed = JSON.parse(content);
-          if (Array.isArray(parsed)) {
-            aiArticles = parsed.map(a => ({
-              title: a.title || 'Untitled', desc: a.summary || a.desc || '',
-              tag: a.tag || 'Development',
-              tagClass: 'tag-' + ((a.tag || 'dev').toLowerCase().includes('release') ? 'release' : (a.tag || 'dev').toLowerCase().includes('community') ? 'community' : (a.tag || 'dev').toLowerCase().includes('infra') ? 'infra' : 'commit'),
-              url: a.url || 'https://acreetionos.org', source: 'AI Generated', date: new Date().toISOString()
-            }));
-          }
-        }
-      } catch (e) {}
-    }
-
-    const allArticles = [...aiArticles, ...directArticles].slice(0, 12);
+    const activityData = [...gh, ...gl, ...rss].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
     return new Response(JSON.stringify({
-      articles: allArticles.length > 0 ? allArticles : [
-        { title: 'No Recent News', desc: 'Check back soon for the latest AcreetionOS news.', tag: 'Community', tagClass: 'tag-community', url: 'https://acreetionos.org', source: 'acreetionos.org', date: new Date().toISOString() }
-      ],
-      meta: { totalActivities: allData.length, aiGenerated: aiArticles.length, rssFound: rss.length }
+      articles: directArticles,
+      activity: activityData.slice(0, 20).map(a => ({
+        type: a.type, repo: a.repo || '', message: a.message || a.name || '', author: a.author || '', date: a.date, url: a.url || '', source: a.source || ''
+      })),
+      meta: { directFound: directArticles.length, activityCount: activityData.length }
     }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=600', ...corsHeaders({ headers: { get: () => '' } }) }
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   } catch (e) {
-    return new Response(JSON.stringify({ error: 'News generation failed', articles: [] }), {
+    return new Response(JSON.stringify({ error: 'News fetch failed', articles: [], activity: [] }), {
       status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
