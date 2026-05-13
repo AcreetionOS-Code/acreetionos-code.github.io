@@ -13,7 +13,7 @@
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
 // Use only explicitly free community models. Keep the values in one place.
-const FREE_MODEL = 'meta-llama/llama-3.2-3b-instruct:free';
+const FREE_MODEL = 'openrouter/auto';
 const WHISPER_MODEL = 'openai/whisper-1';
 const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
@@ -70,155 +70,148 @@ async function handleNews(env) {
     'https://news.google.com/rss/search?q=%22AcreetionOS%22&hl=en-US&gl=US&ceid=US:en'
   ];
 
-  async function fetchGitHub() {
-    const results = [];
-    try {
-      const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=10&sort=pushed');
-      if (!reposRes.ok) return results;
-      const repos = await reposRes.json();
-      for (const repo of repos.slice(0, 5)) {
+  try {
+    const [gh, gl, rss] = await Promise.all([
+      // GitHub: fetch repos, then parallel per-repo requests
+      (async () => {
         try {
-          const [commitsRes, releasesRes] = await Promise.all([
-            fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/commits?per_page=3'),
-            fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/releases?per_page=2')
-          ]);
-          if (commitsRes.ok) {
-            const commits = await commitsRes.json();
-            for (const c of commits) {
-              results.push({ type: 'commit', repo: repo.name, message: (c.commit.message || '').split('\n')[0], author: c.commit.author?.name || 'Unknown', date: c.commit.author?.date, url: c.html_url });
-            }
-          }
-          if (releasesRes.ok) {
-            const releases = await releasesRes.json();
-            for (const r of releases) {
-              results.push({ type: 'release', repo: repo.name, name: r.tag_name, desc: (r.body || '').split('\n')[0], date: r.published_at || r.created_at, url: r.html_url });
-            }
-          }
-        } catch (e) {}
-      }
-    } catch (e) {}
-    return results;
-  }
-
-  async function fetchGitLab() {
-    const results = [];
-    try {
-      const projectsRes = await fetch(GL_URL + '/api/v4/projects?per_page=10&order_by=last_activity_at');
-      if (!projectsRes.ok) return results;
-      const projects = await projectsRes.json();
-      for (const proj of projects.slice(0, 5)) {
+          const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=5&sort=pushed');
+          if (!reposRes.ok) return [];
+          const repos = await reposRes.json();
+          const repoFetches = repos.slice(0, 3).map(repo =>
+            Promise.all([
+              fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/commits?per_page=2'),
+              fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/releases?per_page=1')
+            ]).then(async ([commitsRes, releasesRes]) => {
+              const items = [];
+              if (commitsRes.ok) {
+                const commits = await commitsRes.json();
+                for (const c of commits) {
+                  items.push({ type: 'commit', repo: repo.name, message: (c.commit.message || '').split('\n')[0], author: c.commit.author?.name || 'Unknown', date: c.commit.author?.date, url: c.html_url });
+                }
+              }
+              if (releasesRes.ok) {
+                const releases = await releasesRes.json();
+                for (const r of releases) {
+                  items.push({ type: 'release', repo: repo.name, name: r.tag_name, desc: (r.body || '').split('\n')[0], date: r.published_at || r.created_at, url: r.html_url });
+                }
+              }
+              return items;
+            }).catch(() => [])
+          );
+          const nested = await Promise.all(repoFetches);
+          return nested.flat();
+        } catch (e) { return []; }
+      })(),
+      // GitLab: fetch projects, then parallel per-project requests
+      (async () => {
         try {
-          const commitsRes = await fetch(GL_URL + '/api/v4/projects/' + proj.id + '/repository/commits?per_page=3');
-          if (commitsRes.ok) {
-            const commits = await commitsRes.json();
-            for (const c of commits) {
-              results.push({ type: 'commit', repo: proj.path_with_namespace || proj.name, message: c.title || c.message || '', author: c.author_name || 'Unknown', date: c.created_at, url: c.web_url || (GL_URL + '/' + proj.path_with_namespace + '/-/commit/' + c.id) });
-            }
-          }
-        } catch (e) {}
-      }
-    } catch (e) {}
-    return results;
-  }
+          const projectsRes = await fetch(GL_URL + '/api/v4/projects?per_page=5&order_by=last_activity_at');
+          if (!projectsRes.ok) return [];
+          const projects = await projectsRes.json();
+          const projFetches = projects.slice(0, 3).map(proj =>
+            fetch(GL_URL + '/api/v4/projects/' + proj.id + '/repository/commits?per_page=2')
+              .then(async (commitsRes) => {
+                const items = [];
+                if (commitsRes.ok) {
+                  const commits = await commitsRes.json();
+                  for (const c of commits) {
+                    items.push({ type: 'commit', repo: proj.path_with_namespace || proj.name, message: c.title || c.message || '', author: c.author_name || 'Unknown', date: c.created_at, url: c.web_url || (GL_URL + '/' + proj.path_with_namespace + '/-/commit/' + c.id) });
+                  }
+                }
+                return items;
+              }).catch(() => [])
+          );
+          const nested = await Promise.all(projFetches);
+          return nested.flat();
+        } catch (e) { return []; }
+      })(),
+      // RSS: parallel feed fetches
+      (async () => {
+        const results = [];
+        const feedFetches = RSS_FEEDS.map(feedUrl =>
+          fetch(feedUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AcreetionOS-News-Bot)' } })
+            .then(async (res) => {
+              if (!res.ok) return [];
+              const xml = await res.text();
+              const items = xml.match(/<item>[\s\S]*?<\/item>/gi) || [];
+              return items.slice(0, 4).map(item => {
+                const title = (item.match(/<title>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/title>/) || [,''])[1].trim();
+                const link = (item.match(/<link>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/link>/) || [,''])[1].trim();
+                const desc = (item.match(/<description>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/description>/) || [,''])[1].trim().replace(/<[^>]+>/g, '').slice(0, 200);
+                const pubDate = (item.match(/<pubDate>([^<]*)<\/pubDate>/) || [,''])[1];
+                if (title && link) return { type: 'news', repo: 'Google News', message: title, desc, date: pubDate, url: link };
+                return null;
+              }).filter(Boolean);
+            }).catch(() => [])
+        );
+        const nested = await Promise.all(feedFetches);
+        return nested.flat();
+      })()
+    ]);
 
-  async function fetchRSS() {
-    const results = [];
-    for (const feedUrl of RSS_FEEDS) {
+    const allData = [...gh, ...gl, ...rss].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+    const directArticles = rss.slice(0, 6).map(item => ({
+      title: item.message, desc: item.desc || 'AcreetionOS mentioned in recent news.',
+      tag: 'Community', tagClass: 'tag-community', url: item.url, source: 'Google News', date: item.date
+    }));
+
+    // AI generation — only if we have data, use low tokens for speed
+    const apiKey = env.OPENROUTER_API_KEY;
+    let aiArticles = [];
+    if (apiKey && allData.length > 0) {
       try {
-        const res = await fetch(feedUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AcreetionOS-News-Bot)' } });
-        if (!res.ok) continue;
-        const xml = await res.text();
-        // Simple RSS item extraction
-        const items = xml.match(/<item>[\s\S]*?<\/item>/gi) || [];
-        for (const item of items.slice(0, 5)) {
-          const title = (item.match(/<title>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/title>/) || [,''])[1].trim();
-          const link = (item.match(/<link>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/link>/) || [,''])[1].trim();
-          const desc = (item.match(/<description>(?:<!\[CDATA\[)?([^\]]*)(?:\]\]>)?<\/description>/) || [,''])[1].trim().replace(/<[^>]+>/g, '').slice(0, 200);
-          const pubDate = (item.match(/<pubDate>([^<]*)<\/pubDate>/) || [,''])[1];
-          if (title && link) {
-            results.push({ type: 'news', repo: 'Google News', message: title, author: 'Web', desc: desc, date: pubDate, url: link });
+        const activityText = allData.map(d => {
+          if (d.type === 'release') return '[RELEASE] ' + d.repo + ' - ' + (d.name || '') + ': ' + (d.desc || '');
+          if (d.type === 'news') return '[NEWS] ' + (d.message || '');
+          return '[COMMIT] ' + d.repo + ' - ' + (d.message || '') + ' (by ' + d.author + ')';
+        }).join('\n');
+        const res = await fetch(OPENROUTER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey,
+            'HTTP-Referer': 'https://acreetionos.org', 'X-Title': 'AcreetionOS News Generator'
+          },
+          body: JSON.stringify({
+            model: FREE_MODEL,
+            messages: [
+              { role: 'system', content: 'You are a news writer for AcreetionOS Linux. Given activity data, output 2-3 concise news articles as JSON array. Each: {title(max 50 chars), summary(1 sentence), tag(Release/Development/Community/Infrastructure), url}. JSON only. No markdown.' },
+              { role: 'user', content: 'AcreetionOS activity:\n' + activityText }
+            ],
+            max_tokens: 384
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          let content = (data.choices?.[0]?.message?.content || '').replace(/```json\s*/gi, '').replace(/```\s*$/g, '').trim();
+          const parsed = JSON.parse(content);
+          if (Array.isArray(parsed)) {
+            aiArticles = parsed.map(a => ({
+              title: a.title || 'Untitled', desc: a.summary || a.desc || '',
+              tag: a.tag || 'Development',
+              tagClass: 'tag-' + ((a.tag || 'dev').toLowerCase().includes('release') ? 'release' : (a.tag || 'dev').toLowerCase().includes('community') ? 'community' : (a.tag || 'dev').toLowerCase().includes('infra') ? 'infra' : 'commit'),
+              url: a.url || 'https://acreetionos.org', source: 'AI Generated', date: new Date().toISOString()
+            }));
           }
         }
       } catch (e) {}
     }
-    return results;
+
+    const allArticles = [...aiArticles, ...directArticles].slice(0, 12);
+
+    return new Response(JSON.stringify({
+      articles: allArticles.length > 0 ? allArticles : [
+        { title: 'No Recent News', desc: 'Check back soon for the latest AcreetionOS news.', tag: 'Community', tagClass: 'tag-community', url: 'https://acreetionos.org', source: 'acreetionos.org', date: new Date().toISOString() }
+      ],
+      meta: { totalActivities: allData.length, aiGenerated: aiArticles.length, rssFound: rss.length }
+    }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=600', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: 'News generation failed', articles: [] }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
   }
-
-  const [gh, gl, rss] = await Promise.all([fetchGitHub(), fetchGitLab(), fetchRSS()]);
-  const allData = [...gh, ...gl, ...rss].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-
-  // If there's RSS news, include those as direct articles
-  const directArticles = rss.slice(0, 6).map(item => ({
-    title: item.message,
-    desc: item.desc || 'AcreetionOS mentioned in recent news.',
-    tag: 'Community',
-    tagClass: 'tag-community',
-    url: item.url,
-    source: 'Google News',
-    date: item.date
-  }));
-
-  // Also generate AI articles from combined data
-  const apiKey = env.OPENROUTER_API_KEY;
-  let aiArticles = [];
-
-  if (apiKey && allData.length > 0) {
-    try {
-      const activityText = allData.map(d => {
-        if (d.type === 'release') return '[RELEASE] ' + d.repo + ' - ' + (d.name || '') + ': ' + (d.desc || '');
-        if (d.type === 'news') return '[NEWS] ' + (d.message || '') + ' - ' + (d.desc || '');
-        return '[COMMIT] ' + d.repo + ' - ' + (d.message || '') + ' (by ' + d.author + ')';
-      }).join('\n');
-
-      const res = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey,
-          'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': 'AcreetionOS News Generator'
-        },
-        body: JSON.stringify({
-          model: 'meta-llama/llama-3.2-3b-instruct:free',
-          messages: [
-            { role: 'system', content: 'You generate news articles about AcreetionOS Linux distribution. Given raw activity data, write 2-4 concise news articles. Each article has: title (max 60 chars), summary (1-2 sentences), tag (Release/Development/Community/Infrastructure), url (most relevant URL). Respond with ONLY a valid JSON array. No markdown.' },
-            { role: 'user', content: 'Recent AcreetionOS activity:\n' + activityText }
-          ],
-          max_tokens: 1024
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        let content = data.choices?.[0]?.message?.content || '';
-        content = content.replace(/```json\s*/gi, '').replace(/```\s*$/g, '').trim();
-        const parsed = JSON.parse(content);
-        if (Array.isArray(parsed)) {
-          aiArticles = parsed.map(a => ({
-            title: a.title || 'Untitled',
-            desc: a.summary || a.desc || '',
-            tag: a.tag || 'Development',
-            tagClass: 'tag-' + ((a.tag || 'dev').toLowerCase().includes('release') ? 'release' : (a.tag || 'dev').toLowerCase().includes('community') ? 'community' : (a.tag || 'dev').toLowerCase().includes('infra') ? 'infra' : 'commit'),
-            url: a.url || 'https://acreetionos.org',
-            source: 'AI Generated',
-            date: new Date().toISOString()
-          }));
-        }
-      }
-    } catch (e) {}
-  }
-
-  // Combine: AI articles first, then direct RSS articles, limit to 12
-  const allArticles = [...aiArticles, ...directArticles].slice(0, 12);
-
-  return new Response(JSON.stringify({
-    articles: allArticles.length > 0 ? allArticles : [
-      { title: 'No Recent News', desc: 'Check back soon for the latest AcreetionOS news and updates.', tag: 'Community', tagClass: 'tag-community', url: 'https://acreetionos.org', source: 'acreetionos.org', date: new Date().toISOString() }
-    ],
-    meta: { totalActivities: allData.length, aiGenerated: aiArticles.length, rssFound: rss.length }
-  }), {
-    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
-  });
 }
 
 export default {
