@@ -17,5 +17,5 @@ jobs:
         env:
           AI_TEST_API_KEY: ${{ secrets.AI_TEST_API_KEY }}
           AI_TEST_ENDPOINT: 'https://openrouter.ai/api/v1/chat/completions'
-          AI_TEST_MODEL: 'meta-llama/llama-3.2-3b-instruct:free'
+          AI_TEST_MODEL: 'inclusionai/ring-2.6-1t:free'
         run: python3 tests/ai-review.py
