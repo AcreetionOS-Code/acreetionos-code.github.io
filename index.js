@@ -1,15 +1,19 @@
-// Cloudflare Worker — AIDEN AI proxy + Page View Counter
+// Cloudflare Worker — AIDEN AI proxy + Page View Counter + Audio Transcription
 // Holds the API key securely on the server, never exposed to the browser
 // Maintainers: Natalie Spiva (spivanatalie64), Darren Clift (cobra3282000)
 // Website: https://acreetionos.org — contact via the project channels for AIDEN
 // The worker proxies the site to OpenRouter server-side. Pollinations.ai support removed.
-// This worker provides /api/chat (server-side OpenRouter) and /api/counter (visitor counter).
-// GET /api/counter — returns current active user count
-// POST /api/counter — increments and returns new count
+// This worker provides:
+//   POST /api/chat    — server-side OpenRouter chat (free model)
+//   POST /api/transcribe — audio transcription via OpenRouter Whisper (free)
+//   GET  /api/counter — returns current active user count
+//   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-// Use only explicitly free community models. Keep the value in one place.
+const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
+// Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'meta-llama/llama-3.2-3b-instruct:free';
+const WHISPER_MODEL = 'openai/whisper-1';
 const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -26,7 +30,7 @@ function corsHeaders(request) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Content-Encoding',
     'Access-Control-Max-Age': '86400'
   };
 }
@@ -83,14 +87,79 @@ export default {
       });
     }
 
+    // Audio transcription via OpenRouter Whisper (free)
+    // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
+    if (request.method === 'POST' && url.pathname === '/api/transcribe') {
+      try {
+        const body = await request.json();
+        if (!body.audio) {
+          return new Response(JSON.stringify({ error: 'audio data required' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'Transcription not configured' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+
+        // Decode base64 audio to a buffer
+        const audioBytes = Uint8Array.from(atob(body.audio), c => c.charCodeAt(0));
+
+        const whisperRes = await fetch(WHISPER_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AIDEN Whisper (AcreetionOS Voice Input)'
+          },
+          body: JSON.stringify({
+            model: WHISPER_MODEL,
+            // Whisper API expects a file upload; OpenRouter's compatible endpoint accepts base64
+            audio: body.audio,
+            // hint: body.mimeType || 'audio/webm;codecs=opus'
+          })
+        });
+
+        const whisperData = await whisperRes.json();
+
+        if (!whisperRes.ok) {
+          return new Response(JSON.stringify({
+            error: whisperData.error?.message || 'Transcription failed',
+            status: whisperRes.status
+          }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+
+        return new Response(JSON.stringify({
+          text: whisperData.text || '',
+          model: WHISPER_MODEL
+        }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'Transcription error: ' + err.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
     // Load persisted count on first request
     if (visitorCount === 0) {
       ctx.waitUntil(loadCount());
     }
 
-    // Only handle /api/chat
+    // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
-      return new Response('AIDEN Proxy — POST /api/chat with {messages: [...]}', {
+      return new Response('AIDEN Proxy — POST /api/chat with {messages: [...]} | POST /api/transcribe with {audio: base64}', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', ...corsHeaders(request) }
       });
