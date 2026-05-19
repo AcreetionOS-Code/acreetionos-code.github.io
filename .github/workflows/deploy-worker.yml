@@ -30,29 +30,16 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Wrangler
-        run: |
-          npm ci --silent || true
-          npm install -g wrangler@2.14.0
+        run: npm install -g wrangler@latest
 
-      - name: Authenticate with Cloudflare (token)
+      - name: Deploy Worker
         env:
-          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          echo "Authenticating wrangler..."
-          # Use token auth in non-interactive mode
-          printf "%s" "$CF_API_TOKEN" > /tmp/cf_token
-          wrangler login --api-token $(cat /tmp/cf_token) || true
-
-      - name: Publish Worker
-        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
-          # Populate account_id in wrangler.toml at runtime to avoid committing it
-          tmpfile=$(mktemp)
-          jq --null-input --compact-output '{"account_id": env.CLOUDFLARE_ACCOUNT_ID}' > $tmpfile
-          # Use wrangler publish with inline env secret for the worker
-          wrangler publish --env production --no-delegate-account || wrangler publish --release
+          echo "$OPENROUTER_API_KEY" | wrangler secret put OPENROUTER_API_KEY || true
+          wrangler deploy
 
       - name: Confirm
         run: echo "Worker published (if no errors above)."

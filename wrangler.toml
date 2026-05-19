@@ -1,10 +1,7 @@
 name = "acreetionos-aiden-proxy"
 main = "index.js"
 compatibility_date = "2026-04-26"
-type = "javascript"
-# account_id is supplied at publish time via the GitHub Actions job using the
-# CLOUDFLARE_ACCOUNT_ID secret. This keeps account identifiers out of the repo.
-account_id = "${CLOUDFLARE_ACCOUNT_ID}"
+# account_id is supplied via CLOUDFLARE_ACCOUNT_ID env var at deploy time
 
 [vars]
-OPENROUTER_API_KEY = "${OPENROUTER_API_KEY}"
+# OPENROUTER_API_KEY is supplied as a secret via wrangler deploy --secret
