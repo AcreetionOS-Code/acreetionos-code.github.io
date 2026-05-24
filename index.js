@@ -274,11 +274,47 @@ export default {
       ctx.waitUntil(loadCount());
     }
 
+    // AI news article generation
+    if (request.method === 'POST' && url.pathname === '/api/news/ai') {
+      try {
+        const body = await request.json();
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
+            status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const openRouterRes = await fetch(OPENROUTER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AcreetionOS News AI'
+          },
+          body: JSON.stringify({
+            model: FREE_MODEL,
+            messages: body.messages || [],
+            max_tokens: body.max_tokens || 512
+          })
+        });
+        const data = await openRouterRes.json();
+        return new Response(JSON.stringify(data), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'AI generation failed: ' + err.message }), {
+          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
-      return new Response('AIDEN Proxy — POST /api/chat with {messages: [...]} | POST /api/transcribe with {audio: base64}', {
+      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://openrouter.ai https://api.github.com https://gitlab.acreetionos.org https://news.google.com https://api.allorigins.win; base-uri 'self'; form-action 'self' https://www.qwant.com";
+      return new Response('AIDEN Proxy — POST /api/chat with {messages: [...]} | POST /api/transcribe with {audio: base64} | POST /api/news/ai with {messages: [...]}', {
         status: 200,
-        headers: { 'Content-Type': 'text/plain', ...corsHeaders(request) }
+        headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }
       });
     }
 

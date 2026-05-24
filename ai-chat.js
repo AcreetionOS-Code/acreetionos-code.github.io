@@ -1,6 +1,7 @@
 // AIDEN — AcreetionOS Voice AI Assistant
 // Google Live-style conversational AI with speech I/O (cross-browser)
-// Calls OpenRouter directly (free models via auto-router, key obfuscated)
+// Proxies all AI calls through the server-side Worker (/api/chat, /api/transcribe)
+// API key is held server-side in Cloudflare Worker environment variables
 
 (function () {
   'use strict';
@@ -28,16 +29,10 @@
       };
 
 // ── Configuration ──
-  const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-  const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
-  const FREE_MODEL = 'openrouter/auto';
+  const API_BASE = '/api';
   const COOLDOWN_MS = 2500;
   const SESSION_CAP = 15;
   const STREAM_DELAY = 15;
-
-  function _k() {
-    return ['REDACTED','REDACTED','REDACTED','REDACTED','REDACTED'].join('');
-  }
 
   const isElectron = typeof window !== 'undefined' && window.process && window.process.type;
 
@@ -408,18 +403,14 @@
       // Read blob as base64
       var base64 = await blobToBase64(blob);
 
-      var res = await fetch(WHISPER_URL, {
+      var res = await fetch(API_BASE + '/transcribe', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + _k(),
-          'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': 'AIDEN Whisper (AcreetionOS Voice)'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'openai/whisper-1',
           audio: base64,
-          // response_format: 'verbose_json'
+          mimeType: mediaRecorder ? mediaRecorder.mimeType || 'audio/webm' : 'audio/webm'
         })
       });
 
@@ -818,23 +809,18 @@
     sendTextMessage(text);
   }
 
-// ── OpenRouter proxy ──
+// ── Worker proxy ──
   async function callProxy() {
     var res;
     try {
-      res = await fetch(OPENROUTER_URL, {
+      res = await fetch(API_BASE + '/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + _k(),
-          'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': BRAND.name + ' (AcreetionOS Voice AI)'
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: FREE_MODEL,
           messages: messages,
-          max_tokens: 600,
-          route: 'fallback'
+          max_tokens: 600
         })
       });
     } catch (networkErr) {
@@ -853,7 +839,7 @@
       throw new Error(errMsg);
     }
 
-    var content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+    var content = data.content || (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
     if (content) return content;
 
     throw new Error('No response from AI model');
