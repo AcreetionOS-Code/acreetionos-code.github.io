@@ -181,6 +181,13 @@
     if (btn) btn.classList.toggle('aiden-speaking', on);
   }
 
+  function setListening(state) {
+    isListening = state;
+    var micBtn = document.getElementById('aiden-mic-btn');
+    if (micBtn) micBtn.setAttribute('aria-label', state ? 'Stop listening' : 'Voice input');
+    syncAccessibilityUI();
+  }
+
   function showCaptions(text) {
     if (!captionsEnabled) return;
     var captionEl = document.getElementById('aiden-captions');
