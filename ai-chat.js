@@ -842,7 +842,8 @@
     }
 
     if (!res.ok) {
-      var errMsg = (data && data.error && data.error.message) ? data.error.message : ('AI error: HTTP ' + res.status);
+      var errMsg = (data && data.error && data.error.message) ? data.error.message : (data && data.error ? data.error : 'AI error: HTTP ' + res.status);
+      if (data && data.detail) errMsg += ' (' + data.detail + ')';
       throw new Error(errMsg);
     }
 

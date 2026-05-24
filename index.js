@@ -299,6 +299,17 @@ export default {
           })
         });
         const data = await openRouterRes.json();
+        if (!openRouterRes.ok) {
+          const errDetail = JSON.stringify(data).slice(0, 500);
+          return new Response(JSON.stringify({
+            error: data.error?.message || data.error || 'AI generation failed',
+            detail: errDetail,
+            status: openRouterRes.status
+          }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
         return new Response(JSON.stringify(data), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
@@ -358,8 +369,10 @@ export default {
       const data = await openRouterRes.json();
 
       if (!openRouterRes.ok) {
+        const errDetail = JSON.stringify(data).slice(0, 500);
         return new Response(JSON.stringify({
-          error: data.error?.message || 'OpenRouter request failed',
+          error: data.error?.message || data.error || 'OpenRouter request failed',
+          detail: errDetail,
           status: openRouterRes.status
         }), {
           status: 502,
