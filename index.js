@@ -13,7 +13,7 @@
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
 // Use only explicitly free community models. Keep the values in one place.
-const FREE_MODEL = 'google/gemini-2.0-flash-exp:free';
+const FREE_MODEL = 'meta-llama/llama-3.2-3b-instruct:free';
 const WHISPER_MODEL = 'openai/whisper-1';
 const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
