@@ -1,4 +1,4 @@
-name = "acreetionos-aiden-proxy"
+name = "trumpos-mask"
 main = "index.js"
 compatibility_date = "2026-04-26"
 # account_id is supplied via CLOUDFLARE_ACCOUNT_ID env var at deploy time
