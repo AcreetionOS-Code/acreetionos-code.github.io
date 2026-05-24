@@ -380,8 +380,20 @@ export default {
         });
       }
 
+      const content = data.choices?.[0]?.message?.content;
+      if (!content) {
+        const errDetail = JSON.stringify(data).slice(0, 500);
+        return new Response(JSON.stringify({
+          error: 'AI model returned empty response',
+          detail: errDetail,
+          model: data.model || FREE_MODEL
+        }), {
+          status: 502,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
       return new Response(JSON.stringify({
-        content: data.choices?.[0]?.message?.content || '',
+        content: content,
         model: data.model || FREE_MODEL,
         backend: 'openrouter'
       }), {
