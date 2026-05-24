@@ -3,9 +3,7 @@ main = "index.js"
 compatibility_date = "2026-04-26"
 # account_id is supplied via CLOUDFLARE_ACCOUNT_ID env var at deploy time
 
-routes = [
-  { pattern = "acreetionos.org/api/*" }
-]
+routes = ["acreetionos.org/api/*"]
 
 [vars]
 # OPENROUTER_API_KEY is supplied as a secret via wrangler deploy --secret
