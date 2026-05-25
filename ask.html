@@ -63,7 +63,7 @@
 <header class="page-header"><div class="hc"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="36" height="36" />Acreetion<span>OS</span></a><nav class="main-nav"><a href="index.html">Home</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a></nav></div></header>
 <div class="pw">
 <div id="chat-mode">
-<div id="chat-header"><div class="chat-brand"><div class="chat-avatar">A</div><div><div class="chat-name">AIDEN</div><div class="chat-sub">AcreetionOS Onboard Assistant</div></div></div></div>
+<div id="chat-header"><div class="chat-brand"><div class="chat-avatar">A</div><div><div class="chat-name">AIDEN</div><div class="chat-sub">AcreetionOS Onboard Assistant</div></div></div><button id="tts-btn" title="Toggle voice" style="background:transparent;border:1px solid var(--gbd);color:var(--g);padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:1rem;transition:all 0.2s">🔊</button></div>
 <div id="messages"><div class="msg ai"><div class="sender">AIDEN</div>Hey! I'm AIDEN, your onboard AcreetionOS assistant. Ask me anything about the project — installation, features, requirements, or team. I work completely offline! ✨</div></div>
 <div class="suggestions" id="suggestions">
 <button class="suggestion-chip">What is AcreetionOS?</button>
@@ -134,6 +134,17 @@ function showTyping(on){
   }else if(el){el.remove()}
   messages.scrollTop=messages.scrollHeight
 }
+let ttsEnabled=true
+function speakText(t){
+  if(!ttsEnabled||!window.speechSynthesis)return
+  window.speechSynthesis.cancel()
+  const u=new SpeechSynthesisUtterance(t)
+  u.rate=1.05;u.pitch=1;u.volume=1
+  const voices=window.speechSynthesis.getVoices()
+  const preferred=voices.find(v=>v.lang.startsWith('en')&&v.name.includes('Google'))||voices.find(v=>v.lang.startsWith('en'))
+  if(preferred)u.voice=preferred
+  window.speechSynthesis.speak(u)
+}
 function send(text){
   if(!text.trim())return
   addMsg('user',text)
@@ -144,6 +155,7 @@ function send(text){
     showTyping(false)
     const reply=match(text)
     addMsg('ai',reply)
+    speakText(reply)
     suggestions.style.display='flex'
   },400+Math.random()*400)
 }
@@ -153,6 +165,14 @@ input.addEventListener('keydown',e=>{if(e.key==='Enter')send(input.value)})
 document.querySelectorAll('.suggestion-chip').forEach(btn=>{
   btn.addEventListener('click',()=>send(btn.textContent))
 })
+// TTS toggle
+document.getElementById('tts-btn').addEventListener('click',()=>{
+  ttsEnabled=!ttsEnabled
+  document.getElementById('tts-btn').textContent=ttsEnabled?'🔊':'🔇'
+  if(!ttsEnabled)window.speechSynthesis&&window.speechSynthesis.cancel()
+})
+// Pre-load voices
+if(window.speechSynthesis)window.speechSynthesis.getVoices()
 </script>
 </body>
 </html>
