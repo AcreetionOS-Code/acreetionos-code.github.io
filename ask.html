@@ -624,9 +624,13 @@
     return new Promise(resolve => {
       stopBrowserSpeech();
       const voices = speechSynthesis.getVoices();
-      const voice = voices.find(v =>
-        v.lang.startsWith('en-US') && v.name.toLowerCase().includes('google')
-      ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
+      const voice = voices.find(v => {
+        const n = v.name.toLowerCase();
+        return v.lang.startsWith('en') && (n.includes('neural') || n.includes('natural'));
+      }) || voices.find(v => {
+        const n = v.name.toLowerCase();
+        return v.lang.startsWith('en') && (n.includes('samantha') || n.includes('microsoft') || n.includes('uk english') || n.includes('david') || n.includes('zira'));
+      }) || voices.find(v => v.lang.startsWith('en-US') && v.name.toLowerCase().includes('google')) || voices.find(v => v.lang.startsWith('en')) || voices[0];
       const utt = new SpeechSynthesisUtterance(text);
       utt.voice = voice;
       utt.rate = 1.0;
@@ -1018,7 +1022,9 @@
     });
 
     window.addEventListener('resize', () => { if (liveActive) { resizeCanvas(); initParticles(); } });
-    speechSynthesis.getVoices(); // Warm up
+    // Warm up voice loading
+    speechSynthesis.getVoices();
+    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
