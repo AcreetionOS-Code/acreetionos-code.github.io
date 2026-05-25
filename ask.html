@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Ask AIDEN - AcreetionOS AI Assistant</title>
+    <meta name="description" content="Ask AIDEN anything about AcreetionOS. Get instant answers about installation, features, privacy, and more from our AI assistant." />
+    <meta name="keywords" content="AcreetionOS AI, Linux AI assistant, AcreetionOS help, AIDEN, ask about AcreetionOS" />
+    <link rel="canonical" href="https://acreetionos.org/ask.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://acreetionos.org/ask.html" />
+    <meta property="og:title" content="Ask AIDEN - AcreetionOS AI Assistant" />
+    <meta property="og:description" content="Ask anything about AcreetionOS and get instant AI-powered answers." />
+    <meta property="og:image" content="https://acreetionos.org/logo.webp" />
+    <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+    <link rel="stylesheet" href="contact.css" />
+    <link rel="stylesheet" href="ai-chat.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <style>
+        .ask-hero {
+            text-align: center;
+            padding: 3rem 1.5rem 2rem;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+        .ask-hero h1 {
+            font-family: var(--font-mono, monospace);
+            font-size: 2.2rem;
+            color: var(--acreetion-green, #2ecc71);
+            margin-bottom: 0.75rem;
+        }
+        .ask-hero p {
+            color: var(--acreetion-text, #b2b2b2);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .suggested-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            max-width: 860px;
+            margin: 0 auto 2rem;
+            padding: 0 1.5rem;
+        }
+        .suggested-questions button {
+            background: var(--acreetion-panel-bg, #1a1a1a);
+            border: 1px solid var(--acreetion-box-border, #333);
+            border-radius: 20px;
+            color: var(--acreetion-text, #b2b2b2);
+            padding: 0.4rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .suggested-questions button:hover {
+            border-color: var(--acreetion-green, #2ecc71);
+            color: var(--acreetion-green, #2ecc71);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="ask-hero">
+            <h1>Ask AIDEN</h1>
+            <p>Your AI guide to everything AcreetionOS.</p>
+            <p>Ask about installation, features, hardware compatibility, philosophy — anything.</p>
+        </div>
+
+        <div class="suggested-questions" id="suggestions">
+            <button>What is AcreetionOS?</button>
+            <button>How do I install it?</button>
+            <button>What makes it different from Manjaro?</button>
+            <button>What is XLibre?</button>
+            <button>Is it good for beginners?</button>
+            <button>What are the system requirements?</button>
+            <button>How do I install AUR packages?</button>
+            <button>What is repository sovereignty?</button>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('#suggestions button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const event = new CustomEvent('aiden-prompt', { detail: btn.textContent });
+                window.dispatchEvent(event);
+                document.getElementById('suggestions').style.display = 'none';
+            });
+        });
+    </script>
+    <script src="ai-chat.js"></script>
+</body>
+</html>
