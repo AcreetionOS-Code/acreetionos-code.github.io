@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <title>Newsletter - AcreetionOS</title>
+    <meta name="description" content="Daily AcreetionOS newsletter. Linux tips, development updates, community highlights, and more." />
+    <meta name="keywords" content="AcreetionOS newsletter, Linux news, Arch Linux updates, open source newsletter" />
+    <link rel="canonical" href="https://acreetionos.org/newsletter.html" />
+    <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+    <link rel="stylesheet" href="contact.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Fira+Code&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <style>
+        .newsletter-entry {
+            background: var(--acreetion-panel-bg, #1a1a1a);
+            border: 1px solid var(--acreetion-box-border, #333);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .newsletter-entry h2 {
+            color: var(--acreetion-green, #2ecc71);
+            font-size: 1.3rem;
+            margin-bottom: 0.4rem;
+        }
+        .newsletter-date {
+            color: var(--acreetion-text, #b2b2b2);
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .newsletter-body {
+            color: var(--acreetion-text, #b2b2b2);
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--acreetion-text, #b2b2b2);
+        }
+        .error {
+            text-align: center;
+            padding: 3rem;
+            color: #e74c3c;
+        }
+        h1 {
+            font-family: var(--font-mono, monospace);
+            color: var(--acreetion-text-bright, #e5e5e5);
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: var(--acreetion-text, #b2b2b2);
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <main style="max-width: 860px; margin: 2rem auto; padding: 0 1.5rem;">
+        <h1>Newsletter</h1>
+        <p class="subtitle">Daily updates from the AcreetionOS team — AI-generated, always fresh.</p>
+        <div id="newsletters">
+            <div class="loading">Loading newsletters...</div>
+        </div>
+    </main>
+
+    <script>
+        const REPO = "acreetionos-code/acreetionos-code.github.io";
+
+        async function loadNewsletters() {
+            const container = document.getElementById("newsletters");
+
+            try {
+                const res = await fetch(
+                    `https://api.github.com/repos/${REPO}/contents/newsletters`
+                );
+
+                if (!res.ok) {
+                    container.innerHTML = '<p class="error">No newsletters yet — check back soon.</p>';
+                    return;
+                }
+
+                const files = await res.json();
+                const jsonFiles = files
+                    .filter(f => f.name.endsWith(".json"))
+                    .sort((a, b) => b.name.localeCompare(a.name));
+
+                if (jsonFiles.length === 0) {
+                    container.innerHTML = '<p class="error">No newsletters yet — check back soon.</p>';
+                    return;
+                }
+
+                container.innerHTML = "";
+
+                for (const file of jsonFiles) {
+                    const dataRes = await fetch(file.download_url);
+                    const data = await dataRes.json();
+
+                    const entry = document.createElement("div");
+                    entry.className = "newsletter-entry";
+                    entry.innerHTML = `
+                        <h2>${escapeHtml(data.subject)}</h2>
+                        <div class="newsletter-date">${escapeHtml(data.date_display)}</div>
+                        <div class="newsletter-body">${escapeHtml(data.body)}</div>
+                    `;
+                    container.appendChild(entry);
+                }
+            } catch (err) {
+                container.innerHTML = `<p class="error">Failed to load newsletters.</p>`;
+            }
+        }
+
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        loadNewsletters();
+    </script>
+</body>
+</html>
