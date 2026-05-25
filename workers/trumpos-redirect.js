@@ -4,8 +4,9 @@ addEventListener('fetch', event => {
 
 async function handle(request) {
   const url = new URL(request.url)
+  const target = 'https://spivanatalie64.github.io/TrumpOS/'
   if (url.pathname.startsWith('/TrumpOS')) {
-    return Response.redirect('https://spivanatalie64.github.io/TrumpOS/', 301)
+    return Response.redirect(target, 301)
   }
-  return Response.redirect('https://acreetionos.org', 302)
+  return Response.redirect(target, 301)
 }
