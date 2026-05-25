@@ -91,6 +91,7 @@
 <li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"clear"</strong> — clears the text field.</li>
 <li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"send"</strong> — sends the message to AIDEN.</li>
 <li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"stop"</strong> — stops listening.</li>
+<li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">🤖 AI Mode</strong> — AIDEN uses OpenRouter AI if you set an API key. Without one, the offline knowledge base is used.</li>
 <li style="padding:0.4rem 0"><strong style="color:var(--fg)">🔊 TTS</strong> — AIDEN reads answers aloud. Toggle on/off.</li>
 </ul>
 </div>
@@ -152,6 +153,7 @@ function showTyping(on){
   messages.scrollTop=messages.scrollHeight
 }
 let ttsEnabled=true
+let aiKey=localStorage.getItem('aiden_key')||''
 function speakText(t){
   if(!ttsEnabled||!window.speechSynthesis)return
   window.speechSynthesis.cancel()
@@ -162,19 +164,39 @@ function speakText(t){
   if(preferred)u.voice=preferred
   window.speechSynthesis.speak(u)
 }
-function send(text){
+async function callAI(text){
+  if(!aiKey){
+    const k=prompt('Enter your OpenRouter API key for AI answers (get free at https://openrouter.ai/keys)\n\nLeave blank to use offline knowledge base:')
+    if(k){aiKey=k;localStorage.setItem('aiden_key',k)}
+    else return null
+  }
+  const history=[{role:'system',content:'You are AIDEN, the helpful AcreetionOS assistant. Answer concisely and accurately about AcreetionOS, ArttulOS, TrumpOS, Arch Linux, and Linux in general.'},{role:'user',content:text}]
+  try{
+    const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiKey},
+      body:JSON.stringify({model:'meta-llama/llama-3.2-3b-instruct:free',messages:history,max_tokens:500})
+    })
+    const data=await res.json()
+    if(!res.ok)throw new Error(data.error?.message||'API error')
+    return data.choices?.[0]?.message?.content||''
+  }catch(e){
+    console.error('AI failed:',e)
+    return null
+  }
+}
+async function send(text){
   if(!text.trim())return
   addMsg('user',text)
   input.value=''
   suggestions.style.display='none'
   showTyping(true)
-  setTimeout(()=>{
-    showTyping(false)
-    const reply=match(text)
-    addMsg('ai',reply)
-    speakText(reply)
-    suggestions.style.display='flex'
-  },400+Math.random()*400)
+  let reply=await callAI(text)
+  if(!reply)reply=match(text)
+  showTyping(false)
+  addMsg('ai',reply)
+  speakText(reply)
+  suggestions.style.display='flex'
 }
 
 sendBtn.addEventListener('click',()=>send(input.value))
