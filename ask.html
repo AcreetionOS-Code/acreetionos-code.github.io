@@ -438,7 +438,7 @@
 (function () {
   'use strict';
 
-  const API_BASE = '/api';
+  const API_BASE = 'https://openrouter.ai/api/v1';
   const SYSTEM_PROMPT = 'You are AIDEN, the AcreetionOS Intelligent Dialogue & Engagement Network — a natural voice AI framework. When asked about yourself, explain that AIDEN is the AI framework and each voice (Nova, Echo, Ember, Atlas, Iris) is a character on top of AIDEN. You sound natural and human — like a helpful friend who knows a lot about Linux. Be warm, conversational, and genuine. Use casual but clear language. Keep responses concise — 2-3 sentences max unless asked for detail. Never use bullet points or numbered lists unless explicitly asked. Just talk naturally. AcreetionOS is a user-friendly Arch-based Linux distribution with Cinnamon desktop, XLibre display protocol, PipeWire audio, and AUR support. Installed via Calamares graphical installer.';
 
   // ── Voice presets (characters on top of AIDEN) ──
@@ -654,28 +654,39 @@
   }
 
   // ── Chat API (non-streaming) ──
-  async function callChat(msgs) {
-    const res = await fetch(API_BASE + '/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: msgs, max_tokens: 600 }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || 'AI error');
-    return data.content || data?.choices?.[0]?.message?.content || '';
+  function getApiKey() {
+    const stored = localStorage.getItem('openrouter_key');
+    if (stored) return stored;
+    const fallback = prompt('Enter your OpenRouter API key to use the assistant (get one free at https://openrouter.ai/keys):');
+    if (fallback) localStorage.setItem('openrouter_key', fallback);
+    return fallback;
   }
 
-  // ── Chat API (streaming, fires onChunk for each text delta) ──
-  async function callChatStream(msgs, onChunk) {
-    const res = await fetch(API_BASE + '/chat', {
+  async function callChat(msgs) {
+    const key = getApiKey();
+    if (!key) throw new Error('No API key');
+    const res = await fetch(API_BASE + '/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: msgs, max_tokens: 600, stream: true }),
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: 'meta-llama/llama-3.2-3b-instruct:free', messages: msgs, max_tokens: 600 }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.error?.message || data?.error || 'AI error');
+    return data?.choices?.[0]?.message?.content || '';
+  }
+
+  async function callChatStream(msgs, onChunk) {
+    const key = getApiKey();
+    if (!key) throw new Error('No API key');
+    const res = await fetch(API_BASE + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({ model: 'meta-llama/llama-3.2-3b-instruct:free', messages: msgs, max_tokens: 600, stream: true }),
       signal: streamAbortController?.signal,
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      throw new Error(data?.error?.message || 'AI error');
+      throw new Error(data?.error?.message || data?.error || 'AI error');
     }
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
@@ -702,20 +713,18 @@
   }
 
   async function transcribeAudio(blob, mimeType) {
-    const base64 = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result.split(',')[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-    const res = await fetch(API_BASE + '/transcribe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ audio: base64, mimeType }),
-    });
-    const data = await res.json();
-    if (!res.ok) { console.error('Transcription error:', data); throw new Error(data?.error?.message || data?.detail || 'Transcription failed'); }
-    return data.text?.trim() || '';
+    try {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SR) throw new Error('use_browser_speech');
+    } catch (e) {
+      if (e.message === 'use_browser_speech') throw new Error('Browser speech not supported');
+    }
+    throw new Error('Speech-to-text unavailable. Use the text chat instead.');
+  }
+
+  async function tts(text) {
+    if (!window.speechSynthesis) throw new Error('Browser TTS not available');
+    return new Blob(); // not used — the code already falls back to SpeechSynthesis
   }
 
   // ── TTS (AI voice first for reliability across devices, browser SpeechSynth  // ── TTS (AI voice via OpenRouter primary, browser SpeechSynthesis fallback) ──
