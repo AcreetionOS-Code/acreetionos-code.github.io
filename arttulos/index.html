@@ -70,7 +70,7 @@ footer a{color:var(--g);text-decoration:none}
 </style>
 </head><body>
 
-<div class="bar"><span>◆</span> ARTTULOS — LITERALLY JUST ACREETIONOS BUT IMMUTABLE <span>◆</span></div>
+<div class="bar"><span>◆</span> ARTTULOS — FOR PEOPLE WHO BREAK THINGS BUT STILL NEED TO GET STUFF DONE <span>◆</span></div>
 
 <header>
 <div class="hc">
@@ -86,29 +86,41 @@ footer a{color:var(--g);text-decoration:none}
 <div class="page">
 
 <div class="hero">
-<div class="tag">Same AcreetionOS · Read-Only Root · Atomic Updates</div>
+<div class="tag">For Students · For Tinkerers · For People Who Just Need It To Work</div>
 <h1><span>ArttulOS</span></h1>
-<p>It's <strong>AcreetionOS</strong> — the same Arch Linux base, same Cinnamon desktop, same Pamac, same AUR access — but with the root filesystem locked read-only. You install applications in containers. System updates are atomic image swaps. You literally cannot break the base system. It's AcreetionOS, you just can't touch the OS.</p>
+<p>You know what happens: you try to install <em>one</em> package, next thing you know you're three hours deep in dependency hell and your essay is due tomorrow. ArttulOS fixes that. It's <strong>AcreetionOS</strong> — same Arch base, same Cinnamon desktop, same everything — but with the root locked read-only. You literally cannot break it. Your schoolwork works. Your job works. Your bad ideas don't destroy your OS.</p>
 <div class="btns">
-<a href="https://github.com/spivanatalie64/arttulos" class="btn btn-p">Source Code</a>
-<a href="https://discord.acreetionos.org" class="btn btn-s">Join Discord</a>
+<a href="https://discord.acreetionos.org" class="btn btn-p">Join Discord</a>
+<a href="https://github.com/spivanatalie64/arttulos" class="btn btn-s">Source Code</a>
 </div>
 </div>
 
 <div class="feature-box" style="border-left:3px solid var(--g)">
-<h2>🤔 What does "immutable" actually mean?</h2>
-<p>It means the operating system files — <code>/usr</code>, <code>/bin</code>, <code>/lib</code>, <code>/etc</code> (mostly) — are mounted <strong>read-only</strong>. You cannot accidentally <code>rm -rf /usr</code>. You cannot install a broken package that corrupts your system. You cannot accumulate years of config cruft that slows everything down.</p>
-<p>When you want to install something: it goes in a <strong>container</strong>. Your apps, their dependencies, their configs — all isolated. When you want to update: the system downloads a <strong>new atomic image</strong> and swaps it in. If the update fails, it rolls back automatically. You are not a sysadmin anymore — you're just a user.</p>
-<p style="margin-top:1rem;color:var(--fg)"><strong>Same Arch repos. Same AUR. Same Cinnamon desktop. Same AcreetionOS. Just locked down so you can't break it.</strong></p>
+<h2>🤔 So what actually IS immutable?</h2>
+<p>It means <code>/usr</code> is read-only. You can't <code>sudo rm -rf /usr</code> (yes, we've all been there). You can't install a broken AUR package that takes down your desktop. You can't accumulate five years of orphaned configs that make your system crawl. The OS is locked. Period.</p>
+<p>When you need an app: run it in a <strong>container</strong>. Your Python experiments stay in their box. Your weird npm packages stay in their box. Your "let me try this random binary from GitHub" stays in its box. When the system updates: it downloads a <strong>whole new image</strong> and swaps to it. If it fails, it rolls back. You don't fix your OS — your OS fixes itself.</p>
+<p style="margin-top:1rem;color:var(--fg)"><strong>Same AcreetionOS you know. Same Arch under the hood. Same AUR. Same Cinnamon. Just locked down so your curiosity doesn't cost you your homework.</strong></p>
 </div>
 
 <div class="cards">
-<div class="card"><h3>🔒 Read-Only Root</h3><p><code>/usr</code> is r/o. Nothing modifies the system without an explicit atomic update. You literally cannot break your install — no matter how hard you try.</p></div>
-<div class="card"><h3>📦 Container Apps</h3><p>Podman/Docker for everything. Your browser in a container. Your IDE in a container. Your games in a container. The host stays pristine.</p></div>
-<div class="card"><h3>♻️ Atomic Updates</h3><p>Whole-image A/B swaps. Either the update fully succeeds and you reboot into it, or it rolls back instantly. No partial upgrades, no dependency hell.</p></div>
-<div class="card"><h3>🎮 Same Desktop</h3><p>Cinnamon 6.4, just like AcreetionOS. Same theming, same layout, same workflows. You won't even notice you're on an immutable system — until you try to break something and can't.</p></div>
-<div class="card"><h3>📦 AUR Works</h3><p>Packages from the AUR? Build them in a container. They install to your user namespace, not the system. Your system stays clean.</p></div>
-<div class="card"><h3>🔄 Declarative</h3><p>System config as code. Rebuild identical systems from the same config anywhere. Your OS becomes reproducible infrastructure.</p></div>
+<div class="card"><h3>🔒 Can't Break It</h3><p><code>/usr</code> is read-only. <code>rm -rf /</code> does nothing. You literally cannot destroy your install. Try it. We dare you.</p></div>
+<div class="card"><h3>📦 Apps in Boxes</h3><p>Every app runs in its own container. Python, Node, random GitHub binaries — they all stay isolated. Your system stays clean.</p></div>
+<div class="card"><h3>♻️ Self-Healing</h3><p>Updates are whole-image swaps. If an update breaks, the system rolls back automatically. You never deal with a broken update.</p></div>
+<div class="card"><h3>🎒 Perfect for School</h3><p>Writing a paper? Coding a project? Taking a test? Your OS won't crash, won't break, won't distract you. It just works.</p></div>
+<div class="card"><h3>🏢 Works for Work</h3><p>Stable desktop for your day job. Same AcreetionOS Cinnamon workflow. Nothing breaks on Patch Tuesday. Nothing breaks ever.</p></div>
+<div class="card"><h3>🛠️ Mess Around Safely</h3><p>Want to try that crazy kernel module? Go ahead. It goes in a container. Your system is protected from your experiments.</p></div>
+</div>
+
+<div class="feature-box">
+<h2>📋 What stays the same</h2>
+<ul>
+<li><strong>OS Base</strong><span>Arch Linux (rolling) — same as AcreetionOS</span></li>
+<li><strong>Desktop</strong><span>Cinnamon 6.4 — same layout, same workflow</span></li>
+<li><strong>Package manager</strong><span>Pamac + AUR access — same as always</span></li>
+<li><strong>Terminal</strong><span>Full bash/zsh — you still have control, just not over /usr</span></li>
+<li><strong>Drivers</strong><span>NVIDIA, AMD, Intel — all work out of the box</span></li>
+<li><strong>Everything else</strong><span>The same AcreetionOS you already know and love</span></li>
+</ul>
 </div>
 
 <div class="feature-box">
