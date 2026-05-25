@@ -714,7 +714,7 @@
       body: JSON.stringify({ audio: base64, mimeType }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error('Transcription failed');
+    if (!res.ok) { console.error('Transcription error:', data); throw new Error(data?.error?.message || data?.detail || 'Transcription failed'); }
     return data.text?.trim() || '';
   }
 
@@ -805,8 +805,59 @@
     currentUtterance = null;
   }
 
-  // ── Recording ──
-  async function startRecording() {
+  // ── Speech Recognition (browser-native, no API key needed) ──
+  let speechRecognition = null;
+  let recognitionFinalTranscript = '';
+
+  function startSpeechRecognition() {
+    try {
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) { fallbackStartRecording(); return; }
+      speechRecognition = new SR();
+      speechRecognition.lang = 'en-US';
+      speechRecognition.interimResults = false;
+      speechRecognition.continuous = false;
+      speechRecognition.maxAlternatives = 1;
+      recognitionFinalTranscript = '';
+
+      speechRecognition.onresult = (event) => {
+        recognitionFinalTranscript = event.results[0][0].transcript;
+      };
+
+      speechRecognition.onend = () => {
+        const transcript = recognitionFinalTranscript;
+        speechRecognition = null;
+        recognitionFinalTranscript = '';
+        if (transcript && liveActive) {
+          processTranscript(transcript);
+        } else if (liveActive) {
+          startLiveLoop();
+        }
+      };
+
+      speechRecognition.onerror = (event) => {
+        speechRecognition = null;
+        if (event.error === 'no-speech' || event.error === 'aborted') {
+          if (liveActive) startLiveLoop();
+          return;
+        }
+        console.error('Speech recognition error:', event.error);
+        fallbackStartRecording();
+      };
+
+      speechRecognition.start();
+    } catch (e) {
+      fallbackStartRecording();
+    }
+  }
+
+  function stopSpeechRecognition() {
+    try { if (speechRecognition) { speechRecognition.abort(); speechRecognition = null; } } catch (e) {}
+  }
+
+  function fallbackStartRecording() {
+    if (liveActive) startRecording();
+  }
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     recordingStream = stream;
     audioChunks = [];

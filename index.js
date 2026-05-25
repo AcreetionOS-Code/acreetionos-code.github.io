@@ -15,7 +15,7 @@ const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
 const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
-const WHISPER_MODEL = 'openai/whisper-large-v3';
+const WHISPER_MODEL = 'openai/whisper-1';
 const TTS_MODEL = 'cartesia-ai/cartesia-tts';const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -269,6 +269,7 @@ export default {
         if (!whisperRes.ok) {
           return new Response(JSON.stringify({
             error: whisperData.error?.message || 'Transcription failed',
+            detail: JSON.stringify(whisperData).slice(0, 300),
             status: whisperRes.status
           }), {
             status: 502,
