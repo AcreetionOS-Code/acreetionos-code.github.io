@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com; media-src 'self' blob:; base-uri 'self';" />
   <title>Ask AIDEN - AcreetionOS AI Assistant</title>
   <meta name="description" content="Ask AIDEN anything about AcreetionOS. Real-time AI conversation about installation, features, privacy, and more." />
   <meta name="keywords" content="AcreetionOS AI, Linux AI assistant, AIDEN, ask about AcreetionOS" />
@@ -309,6 +310,13 @@
   </style>
 </head>
 <body>
+
+<!-- ── Mic permission warning ── -->
+<div id="perm-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:2000;background:#2c1a00;border-bottom:2px solid #f39c12;padding:0.6rem 1.5rem;align-items:center;gap:0.75rem;font-size:0.85rem;color:#f39c12">
+  <span>⚠️</span>
+  <span>Microphone access is blocked. To use voice features, allow microphone access in your browser's site settings and reload.</span>
+  <button onclick="this.parentElement.style.display='none'" style="margin-left:auto;background:transparent;border:1px solid #f39c12;color:#f39c12;border-radius:8px;padding:0.2rem 0.6rem;cursor:pointer">Dismiss</button>
+</div>
 
 <!-- ── Chat Mode ── -->
 <div id="chat-mode">
@@ -894,11 +902,37 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
   }
 
+  // ── Unlock TTS and mic on first gesture (required by Chrome) ──
+  let ttsUnlocked = false;
+  function unlockTTS() {
+    if (ttsUnlocked) return;
+    ttsUnlocked = true;
+    const utt = new SpeechSynthesisUtterance('');
+    utt.volume = 0;
+    speechSynthesis.speak(utt);
+  }
+
+  function checkMicPermission() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      document.getElementById('perm-banner').style.display = 'flex';
+      return;
+    }
+    navigator.permissions && navigator.permissions.query({ name: 'microphone' }).then(r => {
+      if (r.state === 'denied') document.getElementById('perm-banner').style.display = 'flex';
+    }).catch(() => {});
+  }
+
   // ── Boot ──
   function init() {
+    checkMicPermission();
+
+    // Unlock TTS on any interaction
+    document.addEventListener('click', unlockTTS, { once: true });
+    document.addEventListener('keydown', unlockTTS, { once: true });
+
     // Greeting
     const bubble = addChatMsg('ai', '');
-    streamText("Hey! I'm AIDEN, your AcreetionOS assistant. Ask me anything — or tap Go Live for a real conversation.", bubble);
+    streamText("Hey! I'm AIDEN, your AcreetionOS assistant. Ask me anything — or tap Go Live for a real voice conversation.", bubble);
 
     // Chat input
     document.getElementById('send-btn').addEventListener('click', () => {
@@ -915,7 +949,7 @@
     });
 
     // Live mode
-    document.getElementById('live-btn').addEventListener('click', openLive);
+    document.getElementById('live-btn').addEventListener('click', () => { unlockTTS(); openLive(); });
     document.getElementById('end-live-btn').addEventListener('click', closeLive);
 
     // Orb tap to start/stop listening
