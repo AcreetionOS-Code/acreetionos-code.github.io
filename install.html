@@ -38,7 +38,7 @@
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="background-grid"></div>
-    <header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="TrumpOS/index.html" class="btn btn-storm" style="background-color: #ffcc00; color: #222; font-weight:900; text-transform:uppercase;">TrumpOS (MLGA)</a><a href="index.html#manual-downloads">Downloads</a><a href="donate.html">Donate</a><a href="wiki.html">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" class="btn btn-storm">Git Tracker</a><a href="https://gitlab.acreetionos.org" class="btn btn-storm">GitLab</a><a href="mastodon.html" class="btn btn-storm">Mastodon</a><a href="bsky.html" data-modal-target="#bsky-modal" class="btn btn-storm"><i class="bi bi-globe"></i> Bluesky</a><a href="https://xmpp.acreetionos.org" class="btn btn-storm">XMPP</a><a href="https://matrix.acreetionos.org" class="btn btn-storm">Matrix</a></nav></div></header>
+    <header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="TrumpOS/index.html" class="btn btn-storm" style="background-color: #ffcc00; color: #222; font-weight:900; text-transform:uppercase;">TrumpOS (MLGA)</a><a href="index.html#manual-downloads">Downloads</a><a href="donate.html">Donate</a><a href="wiki.html">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" class="btn btn-storm">Git Tracker</a><a href="https://gitlab.acreetionos.org" class="btn btn-storm">GitLab</a></nav></div></header>
 
     <div id="main-content" class="page-wrapper">
         <div class="main-column">
@@ -207,7 +207,7 @@ yay -S google-chrome spotify</code></pre>
                         <li><a href="https://discord.gg/AJ6uuvtDXY" target="_blank"><span class="resource-title">Discord Community</span></a></li>
                         <li><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank"><span class="resource-title">Root Community</span></a></li>
                         <li><a href="https://build.acreetionos.org" target="_blank"><span class="resource-title">ISO Builder</span></a></li>
-                        <li><a href="https://nextcloud.acreetionos.org" target="_blank"><span class="resource-title">Nextcloud</span></a></li>
+                        
                         <li><a href="https://social.acreetionos.org" target="_blank"><span class="resource-title">Mastodon</span></a></li>
                     </ul>
                 </div>
@@ -255,7 +255,7 @@ yay -S google-chrome spotify</code></pre>
 <link rel="stylesheet" href="ai-chat.css">
 <script src="ai-chat.js"></script>
 <script src="social-icons.js"></script><script src="user-counter.js"></script>
-</div><div id="bsky-modal" class="modal-overlay"><div class="modal-box" style="text-align: center;"><button class="modal-close-btn" title="Close">&times;</button><h2>Heading to Bluesky</h2><p style="margin-top: 1rem;">You are being redirected to Bluesky's primary page to log in. Our official instance is located at <strong>bsky.acreetionos.org</strong>.</p><div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;"><a href="https://bsky.app/" class="btn btn-storm" style="background: var(--acreetion-green); color: #111;">Continue to Primary Page Login</a><a href="https://bsky.acreetionos.org/register.html" class="btn btn-storm" style="background: transparent; color: var(--acreetion-green); border: 1px solid var(--acreetion-green);">Register on Our Instance</a></div></div>
+</div><div id="bsky-modal" class="modal-overlay"><div class="modal-box" style="text-align: center;"><button class="modal-close-btn" title="Close">&times;</button><h2>Heading to Bluesky</h2><p style="margin-top: 1rem;">You are being redirected to Bluesky's primary page to log in. Our official instance is located at <strong>bsky.acreetionos.org</strong>.</p><div style="margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem;"></div></div>
 <script>document.addEventListener('DOMContentLoaded',()=>{const t=document.querySelectorAll('[data-modal-target]'),m=document.querySelectorAll('.modal-overlay'),o=e=>{e.classList.add('visible'),document.body.style.overflow='hidden'},c=e=>{e.classList.remove('visible'),document.body.style.overflow=''};t.forEach(e=>e.addEventListener('click',e=>{e.preventDefault();const a=document.querySelector(e.target.dataset.modalTarget);a&&o(a)})),m.forEach(e=>{e.addEventListener('click',t=>{t.target===e&&c(e)});const t=e.querySelector('.modal-close-btn');t&&t.addEventListener('click',()=>c(e))})});</script>
 </body>
 
