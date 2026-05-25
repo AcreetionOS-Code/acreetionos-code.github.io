@@ -184,6 +184,11 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
+    // TrumpOS redirect — moved to own repo
+    if (url.pathname.startsWith('/TrumpOS')) {
+      return Response.redirect('https://spivanatalie64.github.io/TrumpOS/', 301);
+    }
+
     // Page view counter — GET returns count, POST increments
     if (url.pathname === '/api/news') {
       return handleNews(env);
