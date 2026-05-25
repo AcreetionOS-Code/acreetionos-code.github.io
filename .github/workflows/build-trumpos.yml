@@ -1,5 +1,8 @@
 name: Build TrumpOS ISO
 on:
+  push:
+    branches: [main]
+    paths: [TrumpOS/**]
   schedule:
     - cron: '0 4 * * 6'  # Saturday 04:00 UTC
   workflow_dispatch:
