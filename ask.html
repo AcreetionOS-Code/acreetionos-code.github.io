@@ -841,7 +841,6 @@
       liveMessages.push({ role: 'user', content: transcript });
 
       setLiveState('speaking');
-      await startInterruptMonitor();
       speakChain = Promise.resolve();
       streamAbortController = new AbortController();
 
@@ -871,7 +870,6 @@
 
       liveMessages.push({ role: 'assistant', content: fullReply });
       addLiveMsg('ai', fullReply);
-      stopInterruptMonitor();
     } catch (e) {
       console.error(e);
     }
@@ -1171,7 +1169,7 @@
         stopAndProcess();
       } else if (liveState === 'speaking') {
         stopSpeaking();
-        stopInterruptMonitor();
+        if (streamAbortController) { streamAbortController.abort(); streamAbortController = null; }
         startLiveLoop();
       }
     });
