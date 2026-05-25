@@ -63,7 +63,7 @@
 <header class="page-header"><div class="hc"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="36" height="36" />Acreetion<span>OS</span></a><nav class="main-nav"><a href="index.html">Home</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a></nav></div></header>
 <div class="pw">
 <div id="chat-mode">
-<div id="chat-header"><div class="chat-brand"><div class="chat-avatar">A</div><div><div class="chat-name">AIDEN</div><div class="chat-sub">AcreetionOS Onboard Assistant</div></div></div><button id="tts-btn" title="Toggle voice" style="background:transparent;border:1px solid var(--gbd);color:var(--g);padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:1rem;transition:all 0.2s">🔊</button></div>
+<div id="chat-header"><div class="chat-brand"><div class="chat-avatar">A</div><div><div class="chat-name">AIDEN</div><div class="chat-sub">AcreetionOS Onboard Assistant</div></div></div><div style="display:flex;gap:0.4rem"><button id="info-btn" title="How this works" style="background:transparent;border:1px solid var(--gbd);color:var(--fg2);padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:0.9rem;transition:all 0.2s">ⓘ</button><button id="tts-btn" title="Toggle voice" style="background:transparent;border:1px solid var(--gbd);color:var(--g);padding:0.4rem 0.6rem;border-radius:6px;cursor:pointer;font-size:1rem;transition:all 0.2s">🔊</button></div></div>
 <div id="messages"><div class="msg ai"><div class="sender">AIDEN</div>Hey! I'm AIDEN, your onboard AcreetionOS assistant. Ask me anything about the project — installation, features, requirements, or team. I work completely offline! ✨</div></div>
 <div class="suggestions" id="suggestions">
 <button class="suggestion-chip">What is AcreetionOS?</button>
@@ -74,11 +74,28 @@
 <button class="suggestion-chip">Is it free?</button>
 </div>
 <div id="input-row">
-<input id="chat-input" type="text" placeholder="Ask AIDEN anything..." autocomplete="off" />
+<input id="chat-input" type="text" placeholder="Type or tap 🎤 and speak..." autocomplete="off" />
+<button id="mic-btn" title="Voice input" style="background:transparent;border:1px solid var(--gbd);color:var(--fg2);border-radius:8px;padding:0 0.8rem;cursor:pointer;font-size:1rem;transition:all 0.2s">🎤</button>
 <button id="send-btn">➤</button>
 </div>
 </div>
 </div>
+
+<div id="info-popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:1rem">
+<div style="background:var(--gb2);border:1px solid var(--gbd);border-radius:12px;max-width:500px;padding:2rem;position:relative">
+<button id="info-close" style="position:absolute;top:0.5rem;right:0.8rem;background:none;border:none;color:var(--fg2);font-size:1.5rem;cursor:pointer">×</button>
+<h2 style="font-family:var(--fm);color:var(--g);margin-bottom:1rem;font-size:1.1rem">🎤 Voice Commands</h2>
+<ul style="list-style:none;padding:0;color:var(--fg2);font-size:0.85rem">
+<li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">Tap 🎤</strong> — starts listening. Speak your question.</li>
+<li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"delete"</strong> — removes the last word you said.</li>
+<li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"clear"</strong> — clears the text field.</li>
+<li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"send"</strong> — sends the message to AIDEN.</li>
+<li style="padding:0.4rem 0;border-bottom:1px solid var(--gbd)"><strong style="color:var(--fg)">"stop"</strong> — stops listening.</li>
+<li style="padding:0.4rem 0"><strong style="color:var(--fg)">🔊 TTS</strong> — AIDEN reads answers aloud. Toggle on/off.</li>
+</ul>
+</div>
+</div>
+
 <footer><p>AcreetionOS — <a href="index.html">Home</a> · <a href="https://discord.acreetionos.org">Discord</a></p></footer>
 <script>
 const KB = [
@@ -171,6 +188,58 @@ document.getElementById('tts-btn').addEventListener('click',()=>{
   document.getElementById('tts-btn').textContent=ttsEnabled?'🔊':'🔇'
   if(!ttsEnabled)window.speechSynthesis&&window.speechSynthesis.cancel()
 })
+
+// Info popup
+const infoPopup=document.getElementById('info-popup')
+document.getElementById('info-btn').addEventListener('click',()=>infoPopup.style.display='flex')
+document.getElementById('info-close').addEventListener('click',()=>infoPopup.style.display='none')
+infoPopup.addEventListener('click',e=>{if(e.target===infoPopup)infoPopup.style.display='none'})
+
+// Voice dictation
+let sr=null
+let listening=false
+const micBtn=document.getElementById('mic-btn')
+function startListening(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition
+  if(!SR){alert('Speech recognition not supported in this browser. Try Chrome.');return}
+  sr=new SR()
+  sr.lang='en-US'
+  sr.interimResults=true
+  sr.continuous=true
+  sr.onresult=e=>{
+    let interim='',final=''
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      if(e.results[i].isFinal)final+=e.results[i][0].transcript
+      else interim+=e.results[i][0].transcript
+    }
+    const words=(final||interim).toLowerCase().trim()
+    if(words.endsWith('delete')){
+      const parts=input.value.trim().split(/\s+/)
+      parts.pop()
+      input.value=parts.join(' ')
+      input.selectionStart=input.selectionEnd=input.value.length
+      return
+    }
+    if(words.endsWith('clear')){input.value='';return}
+    if(words.endsWith('send')){input.value=input.value.trim();send(input.value);return}
+    if(words.endsWith('stop')){stopListening();return}
+    if(final){
+      input.value+=final
+      if(!input.value.startsWith(' '))input.value=input.value.trimStart()
+      input.selectionStart=input.selectionEnd=input.value.length
+    }
+  }
+  sr.onerror=()=>{stopListening()}
+  sr.onend=()=>{if(listening&&sr)try{sr.start()}catch(e){}}
+  try{sr.start();listening=true;micBtn.textContent='🎙️';micBtn.style.borderColor='var(--g)';micBtn.style.color='var(--g)'}catch(e){}
+}
+function stopListening(){
+  listening=false
+  if(sr){try{sr.stop()}catch(e){};sr=null}
+  micBtn.textContent='🎤';micBtn.style.borderColor='var(--gbd)';micBtn.style.color='var(--fg2)'
+}
+micBtn.addEventListener('click',()=>{listening?stopListening():startListening()})
+
 // Pre-load voices
 if(window.speechSynthesis)window.speechSynthesis.getVoices()
 </script>
