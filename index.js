@@ -11,11 +11,10 @@
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
+const HF_WHISPER_URL = 'https://api-inference.huggingface.co/models/openai/whisper-base';
 const HF_TTS_URL = 'https://api-inference.huggingface.co/models/espnet/kan-bayashi_ljspeech_vits';
 // Use only explicitly free community models. Keep the values in one place.
-const FREE_MODEL = 'openrouter/auto';
-const WHISPER_MODEL = 'openai/whisper-1';const ALLOWED_ORIGINS = [
+const FREE_MODEL = 'openrouter/auto';const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
@@ -205,8 +204,7 @@ export default {
       });
     }
 
-    // Audio transcription via OpenRouter Whisper (free)
-    // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
+    // Audio transcription via Hugging Face Whisper (free, no API key needed)
     if (request.method === 'POST' && url.pathname === '/api/transcribe') {
       try {
         const body = await request.json();
@@ -217,39 +215,19 @@ export default {
           });
         }
 
-        const apiKey = env.OPENROUTER_API_KEY;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'Transcription not configured' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        // Derive format from MIME type
+        // Decode base64 to raw audio bytes
+        const audioBytes = Uint8Array.from(atob(body.audio), c => c.charCodeAt(0));
         const mime = body.mimeType || 'audio/webm';
-        const fmt = mime.includes('ogg') ? 'ogg' : mime.includes('mp4') ? 'mp4' : 'webm';
 
-        const whisperRes = await fetch(WHISPER_URL, {
+        const whisperRes = await fetch(HF_WHISPER_URL, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AIDEN Whisper (AcreetionOS Voice Input)'
-          },
-          body: JSON.stringify({
-            model: WHISPER_MODEL,
-            input_audio: {
-              data: body.audio,
-              format: fmt
-            }
-          })
+          headers: { 'Content-Type': mime },
+          body: audioBytes
         });
 
-        // OpenRouter may return 200 with empty body on format issues; check for that too
         const whisperText = await whisperRes.text();
-        if (!whisperText || whisperText.trim().length === 0) {
-          return new Response(JSON.stringify({ error: 'Empty transcription response' }), {
+        if (!whisperRes.ok || !whisperText) {
+          return new Response(JSON.stringify({ error: 'Transcription failed', detail: whisperText?.slice(0, 200) || '' }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
@@ -259,26 +237,14 @@ export default {
         try {
           whisperData = JSON.parse(whisperText);
         } catch (e) {
-          return new Response(JSON.stringify({ error: 'Invalid transcription response', raw: whisperText.slice(0, 200) }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        if (!whisperRes.ok) {
-          return new Response(JSON.stringify({
-            error: whisperData.error?.message || 'Transcription failed',
-            detail: JSON.stringify(whisperData).slice(0, 300),
-            status: whisperRes.status
-          }), {
+          return new Response(JSON.stringify({ error: 'Invalid response', raw: whisperText.slice(0, 200) }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
 
         return new Response(JSON.stringify({
-          text: whisperData.text || '',
-          model: WHISPER_MODEL
+          text: whisperData.text || ''
         }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
