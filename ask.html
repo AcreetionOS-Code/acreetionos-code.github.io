@@ -341,6 +341,28 @@
       font-family: 'Fira Code', monospace;
     }
 
+    /* ── Audio output selector ── */
+    #audio-output-selector {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      font-family: 'Fira Code', monospace;
+    }
+    #audio-output-selector select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.15rem 0.3rem;
+      font-size: 0.7rem;
+      font-family: 'Fira Code', monospace;
+      max-width: 140px;
+      cursor: pointer;
+    }
+
     /* ── Orb tap ripple ── */
     .tap-ripple {
       position: absolute;
@@ -413,6 +435,10 @@
     <button class="voice-dot" data-voice="3" title="Atlas — deep and confident" style="--dot-color:#9b59b6"></button>
     <button class="voice-dot" data-voice="4" title="Iris — bright and cheerful" style="--dot-color:#e74c3c"></button>
   </div>
+  <div id="audio-output-selector">
+    <span id="audio-device-label">Audio: </span>
+    <select id="audio-device-select"></select>
+  </div>
   <div id="interrupt-hint">Speak to interrupt</div>
 
   <div id="live-transcript"></div>
@@ -457,6 +483,7 @@
   let currentSpeakResolve = null;
   let speakChain = Promise.resolve();
   let streamAbortController = null;
+  let audioOutputDevices = [];
   let audioLevel = 0;
   let targetAudioLevel = 0;
 
@@ -993,12 +1020,33 @@
     // Auto-request mic and enumerate audio devices (triggers permission prompts)
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => {});
-      navigator.mediaDevices.enumerateDevices().then(devices => {
-        const audioOuts = devices.filter(d => d.kind === 'audiooutput' && d.deviceId);
-        if (liveAudioEl && audioOuts.length > 0 && liveAudioEl.setSinkId) {
-          liveAudioEl.setSinkId(audioOuts[0].deviceId).catch(() => {});
-        }
-      }).catch(() => {});
+      const setupAudioOutput = () => {
+        navigator.mediaDevices.enumerateDevices().then(devices => {
+          audioOutputDevices = devices.filter(d => d.kind === 'audiooutput');
+          const sel = document.getElementById('audio-device-select');
+          if (sel) {
+            const currentId = liveAudioEl?.sinkId || '';
+            sel.innerHTML = audioOutputDevices.map(d =>
+              `<option value="${d.deviceId}" ${d.deviceId === currentId ? 'selected' : ''}>${d.label || d.deviceId.slice(0, 8)}</option>`
+            ).join('');
+          }
+          // Try to select a non-default audio output (headphones)
+          if (liveAudioEl && liveAudioEl.setSinkId) {
+            const preferred = audioOutputDevices.find(d => d.deviceId !== 'default' && d.deviceId);
+            if (preferred && preferred.deviceId !== liveAudioEl.sinkId) {
+              liveAudioEl.setSinkId(preferred.deviceId).catch(() => {});
+            }
+          }
+        }).catch(() => {});
+      };
+      // Request speaker-selection permission if API exists
+      if (navigator.permissions && navigator.permissions.request) {
+        navigator.permissions.request({ name: 'speaker-selection' }).then(() => {
+          setupAudioOutput();
+        }).catch(() => setupAudioOutput());
+      } else {
+        setupAudioOutput();
+      }
     }
     playTestTone();
     setVoice(currentVoice);
@@ -1209,6 +1257,11 @@
     document.getElementById('end-live-btn').addEventListener('click', closeLive);
     document.querySelectorAll('.voice-dot').forEach(dot => {
       dot.addEventListener('click', () => setVoice(parseInt(dot.dataset.voice)));
+    });
+    document.getElementById('audio-device-select').addEventListener('change', e => {
+      if (liveAudioEl && liveAudioEl.setSinkId) {
+        liveAudioEl.setSinkId(e.target.value).catch(() => {});
+      }
     });
 
     // Orb tap to start/stop listening
