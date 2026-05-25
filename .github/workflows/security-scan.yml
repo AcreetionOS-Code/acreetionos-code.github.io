@@ -1,0 +1,60 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: '0 6 * * *'   # daily at 6am UTC
+  workflow_dispatch:
+
+jobs:
+  secret-scan:
+    name: Secret Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan for secrets
+        run: |
+          set -e
+          FOUND=false
+          if git grep -n --break --heading -I -E \
+            "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|CLOUDFLARE_API_TOKEN|OPENROUTER_API_KEY|BEGIN RSA PRIVATE KEY|BEGIN PRIVATE KEY|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|xox[baprs]-[0-9a-zA-Z-]{10,})" \
+            -- . || true; then
+            echo "::error::Potential secrets found! Review above."
+            FOUND=true
+          fi
+          if [ "$FOUND" = "true" ]; then exit 1; fi
+          echo "✓ No secrets detected"
+
+  cve-scan:
+    name: CVE Dependency Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for package manifests
+        run: |
+          if [ -f package.json ]; then
+            echo "Node project detected — running npm audit"
+            npm audit --audit-level=moderate 2>&1 || true
+          fi
+          if [ -f requirements.txt ]; then
+            echo "Python project detected"
+            pip-audit --desc on . 2>/dev/null || pip3 install pip-audit && pip-audit --desc on . 2>/dev/null || echo "pip-audit not available"
+          fi
+      - name: Check for known vulnerable CDN libraries
+        run: |
+          VULN_LIBS=(
+            "jquery:<3.5.0"
+            "lodash:<4.17.21"
+            "bootstrap:<4.6.0"
+          )
+          for entry in "${VULN_LIBS[@]}"; do
+            LIB="${entry%%:*}"
+            VER="${entry#*:}"
+            FILES=$(grep -r "$LIB" --include="*.html" --include="*.js" . 2>/dev/null || true)
+            if [ -n "$FILES" ]; then
+              echo "⚠ Found: $LIB in files:"
+              echo "$FILES" | head -5
+            fi
+          done
+          echo "✓ CDN library check complete"
