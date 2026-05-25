@@ -1,0 +1,76 @@
+name: AI Vulnerability Fixer
+
+on:
+  workflow_run:
+    workflows: ["Security Scan"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  analyze-and-fix:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' || github.event_name == 'workflow_dispatch' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get latest security scan output
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            RUN_ID="${{ github.event.workflow_run.id }}"
+            gh run view "$RUN_ID" --log > /tmp/scan-output.txt 2>&1 || true
+          else
+            echo "Manual trigger — running fresh scan..."
+            git grep -n --break --heading -I -E \
+              "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN PRIVATE KEY|ghp_[A-Za-z0-9]{36})" \
+              -- . > /tmp/scan-output.txt 2>&1 || true
+          fi
+          echo "Scan output captured"
+
+      - name: AI generates fixes
+        env:
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          ISSUES=$(cat /tmp/scan-output.txt 2>/dev/null | head -100)
+          if [ -z "$ISSUES" ]; then
+            echo "No issues found — nothing to fix."
+            exit 0
+          fi
+          echo "Issues detected. Asking AI for fixes..."
+          PROMPT="The following security issues were found in a GitHub repository. For each issue, provide the exact file path, the line to change, and the corrected code. Output in a format ready for git patch.
+
+Issues:
+$ISSUES
+
+For each issue, output:
+FILE: <path>
+LINE: <line>
+REPLACE: <current text>
+WITH: <replacement text>"
+          curl -s "https://openrouter.ai/api/v1/chat/completions" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENROUTER_KEY" \
+            -d '{
+              "model": "meta-llama/llama-3.2-3b-instruct:free",
+              "messages": [{"role": "system", "content": "You are a security engineer. Output precise file patches."}, {"role": "user", "content": '"$PROMPT"'}],
+              "max_tokens": 1000
+            }' | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+content = data.get('choices', [{}])[0].get('message', {}).get('content', 'No response')
+print(content)
+" > /tmp/ai-fixes.txt
+          cat /tmp/ai-fixes.txt
+
+      - name: Apply fixes if AI provided patches
+        run: |
+          if [ ! -f /tmp/ai-fixes.txt ] || [ ! -s /tmp/ai-fixes.txt ]; then
+            echo "No AI fixes generated"
+            exit 0
+          fi
+          echo "AI Fix Report:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/ai-fixes.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
