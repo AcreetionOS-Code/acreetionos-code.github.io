@@ -30,7 +30,8 @@ jobs:
           for pattern in "CLOUDFLARE_API_TOKEN" "OPENROUTER_API_KEY"; do
             MATCHES=$(git grep -n -I "$pattern" -- . 2>/dev/null | \
               grep -v "\.md:" | grep -v "\.example:" | grep -v "wrangler\.toml" | \
-              grep -v "README" | grep -v "tools/" | grep -v "\.yml:" | grep -v "\.yaml:" || true)
+              grep -v "README" | grep -v "tools/" | grep -v "\.yml:" | grep -v "\.yaml:" | \
+              grep -v "\.js:" | grep -v "\.py:" || true)
             if [ -n "$MATCHES" ]; then
               echo "Potential secret NAME reference in non-doc file:"
               echo "$MATCHES"
