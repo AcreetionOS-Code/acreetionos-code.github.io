@@ -66,8 +66,9 @@ async function handleNews(env) {
   const GH_ORG = 'AcreetionOS-Code';
   const GL_URL = 'https://gitlab.acreetionos.org';
   const RSS_FEEDS = [
-    'https://news.google.com/rss/search?q=AcreetionOS+Linux&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=%22AcreetionOS%22&hl=en-US&gl=US&ceid=US:en'
+    'https://news.google.com/rss/search?q=%22AcreetionOS%22&hl=en-US&gl=US&ceid=US:en',
+    'https://news.google.com/rss/search?q=AcreetionOS+Arch+Linux&hl=en-US&gl=US&ceid=US:en',
+    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en'
   ];
 
   try {
