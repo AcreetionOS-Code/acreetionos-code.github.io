@@ -1,1 +1,0 @@
-window.OPENROUTER_KEY = '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';
