@@ -703,55 +703,44 @@
 
   // ── TTS (AI voice first for reliability across devices, browser SpeechSynthesis fallback) ──
   function speak(text) {
-    return speakAI(text).catch(() => speakBrowser(text));
-  }
-
-  async function speakAI(text) {
-    const voiceMap = { nova: 'nova', echo: 'echo', ember: 'alloy', atlas: 'onyx', iris: 'shimmer' };
-    const voiceName = voiceMap[VOICE_PRESETS[currentVoice].name.toLowerCase()] || 'nova';
-    try {
-      const res = await fetch(API_BASE + '/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: text, voice: voiceName })
-      });
-      if (!res.ok) throw new Error('TTS API failed');
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      if (liveAudioEl) {
-        liveAudioEl.src = url;
-        currentAudioSource = liveAudioEl;
-        await new Promise((resolve, reject) => {
-          currentSpeakResolve = resolve;
-          liveAudioEl.onended = () => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); };
-          liveAudioEl.onerror = () => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); };
-          liveAudioEl.play().catch(() => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); });
-        });
-      } else {
-        URL.revokeObjectURL(url);
-      }
-    } catch (e) {
-      throw e;
-    }
+    return speakBrowser(text);
   }
 
   function speakBrowser(text) {
     return new Promise(resolve => {
       stopBrowserSpeech();
+      // Chrome workaround: cancel first, then speak after a microtask
+      speechSynthesis.cancel();
+      // Ensure voices are loaded
       const voices = speechSynthesis.getVoices();
-      const preset = VOICE_PRESETS[currentVoice];
-      let voice = voices.find(v => preset.match(v));
-      if (!voice) voice = voices.find(v => preset.match(v));
-      if (!voice) voice = voices.find(v => v.lang.startsWith('en')) || voices[0];
-      const utt = new SpeechSynthesisUtterance(text);
-      utt.voice = voice;
-      utt.rate = 1.0;
-      utt.pitch = 1.0;
-      utt.lang = 'en-US';
-      utt.onend = () => { currentUtterance = null; resolve(); };
-      utt.onerror = () => { currentUtterance = null; resolve(); };
-      currentUtterance = utt;
-      speechSynthesis.speak(utt);
+      if (voices.length === 0) {
+        speechSynthesis.onvoiceschanged = () => { speechSynthesis.onvoiceschanged = null; doSpeak(voices => voices); };
+        speechSynthesis.getVoices();
+        // Fallback: try anyway after a tick
+        setTimeout(() => doSpeak(() => speechSynthesis.getVoices()), 100);
+      } else {
+        doSpeak(() => voices);
+      }
+      function doSpeak(getVoices) {
+        const v = getVoices();
+        const preset = VOICE_PRESETS[currentVoice];
+        let voice = v.find(vv => preset.match(vv));
+        if (!voice) voice = v.find(vv => preset.match(vv));
+        if (!voice) voice = v.find(vv => vv.lang.startsWith('en')) || v[0];
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.voice = voice || null;
+        utt.rate = 1.0;
+        utt.pitch = 1.0;
+        utt.lang = 'en-US';
+        let resolved = false;
+        const finish = () => { if (!resolved) { resolved = true; currentUtterance = null; resolve(); } };
+        utt.onend = finish;
+        utt.onerror = finish;
+        currentUtterance = utt;
+        speechSynthesis.speak(utt);
+        // Chrome often swallows onend — force resolve
+        setTimeout(finish, Math.min(15000, Math.max(2000, text.length * 100)));
+      }
     });
   }
 
@@ -918,7 +907,7 @@
     let sum = 0;
     for (let i = 0; i < data.length; i++) { const v = (data[i] - 128) / 128; sum += v * v; }
     const rms = Math.sqrt(sum / data.length);
-    if (rms > 0.06) {
+    if (rms > 0.12) {
       stopSpeaking();
       if (streamAbortController) { streamAbortController.abort(); streamAbortController = null; }
       stopInterruptMonitor();
@@ -961,20 +950,12 @@
     });
   }
 
-  // ── Audio element (created on user gesture for Chrome autoplay) ──
-  let liveAudioEl = null;
-
   // ── Open/Close Live ──
   function openLive() {
     liveActive = true;
     liveMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
     document.getElementById('live-transcript').innerHTML = '';
     document.getElementById('live-mode').classList.add('active');
-    // Create audio element during user gesture so Chrome allows playback
-    if (!liveAudioEl) {
-      liveAudioEl = new Audio();
-      liveAudioEl.volume = 1;
-    }
     setVoice(currentVoice);
     resizeCanvas();
     initParticles();
