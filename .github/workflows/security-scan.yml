@@ -17,12 +17,28 @@ jobs:
         run: |
           set -e
           FOUND=false
+
+          # Scan for actual secret VALUES (API keys, tokens) — across all files
           if git grep -n --break --heading -I -E \
-            "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|CLOUDFLARE_API_TOKEN|OPENROUTER_API_KEY|BEGIN RSA PRIVATE KEY|BEGIN PRIVATE KEY|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|xox[baprs]-[0-9a-zA-Z-]{10,})" \
-            -- . || true; then
-            echo "::error::Potential secrets found! Review above."
+            "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|gho_[A-Za-z0-9]{36}|xox[baprs]-[0-9a-zA-Z-]{10,}|BEGIN RSA PRIVATE KEY|BEGIN PRIVATE KEY)" \
+            -- . 2>/dev/null || true; then
+            echo "::error::Potential secret VALUES found! Review above."
             FOUND=true
           fi
+
+          # Scan for SECRET NAMES only in files where they'd be actual values (not docs/configs)
+          for pattern in "CLOUDFLARE_API_TOKEN" "OPENROUTER_API_KEY"; do
+            MATCHES=$(git grep -n -I "$pattern" -- . 2>/dev/null | \
+              grep -v "\.md:" | grep -v "\.example:" | grep -v "wrangler\.toml" | \
+              grep -v "README" | grep -v "tools/" | grep -v "\.yml:" | grep -v "\.yaml:" || true)
+            if [ -n "$MATCHES" ]; then
+              echo "Potential secret NAME reference in non-doc file:"
+              echo "$MATCHES"
+              echo "::error::Secret name '$pattern' found outside documentation"
+              FOUND=true
+            fi
+          done
+
           if [ "$FOUND" = "true" ]; then exit 1; fi
           echo "✓ No secrets detected"
 
