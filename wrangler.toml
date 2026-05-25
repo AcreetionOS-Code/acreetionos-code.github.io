@@ -1,9 +1,9 @@
-name = "acreetionos-aiden-proxy"
+name = "trumpos-mask"
 main = "index.js"
 compatibility_date = "2026-04-26"
-# account_id is supplied via CLOUDFLARE_ACCOUNT_ID env var at deploy time
 
-routes = ["acreetionos.org/api/*"]
+# Routes managed via Cloudflare dashboard — remove from wrangler to avoid CI conflicts
+# routes = []
 
 [vars]
 # OPENROUTER_API_KEY is supplied as a secret via wrangler deploy --secret
