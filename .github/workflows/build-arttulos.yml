@@ -1,0 +1,70 @@
+name: Build ArttulOS ISO
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 0'  # weekly at 6am Sunday
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: spivanatalie64/arttulos
+          path: arttulos
+
+      - name: Build Docker image
+        run: |
+          cd arttulos
+          docker build -t arttulos-builder .
+
+      - name: Build ISO
+        run: |
+          cd arttulos
+          mkdir -p output
+          docker run --privileged -v $PWD/output:/output arttulos-builder \
+            bash -c "
+              cd /build && \
+              bash build_iso.sh && \
+              cp /build/arttulos-*.iso /output/
+            "
+
+      - name: Upload ISO to Cloudflare R2
+        env:
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          ISO=$(ls arttulos/output/*.iso 2>/dev/null | head -1)
+          if [ -z "$ISO" ]; then echo "No ISO found"; exit 1; fi
+          BUCKET="arttulos-iso"
+          FILENAME=$(basename "$ISO")
+          # Create bucket if needed
+          curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"name\":\"$BUCKET\"}" || true
+          # Upload via presigned URL
+          UPLOAD_URL=$(curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/$BUCKET/objects/${FILENAME}/upload" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{}' | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('uploadURL',''))")
+          if [ -n "$UPLOAD_URL" ]; then
+            curl -s -X PUT "$UPLOAD_URL" --data-binary @"$ISO"
+            echo "✓ Uploaded: $FILENAME"
+          else
+            echo "Upload failed, checking existing objects..."
+            curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/$BUCKET/objects" \
+              -H "Authorization: Bearer $CF_TOKEN" | python3 -c "import sys,json; print(json.load(sys.stdin))"
+          fi
+
+      - name: Update website with download link
+        env:
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          ISO=$(ls arttulos/output/*.iso 2>/dev/null | head -1)
+          if [ -z "$ISO" ]; then echo "No ISO"; exit 1; fi
+          FILENAME=$(basename "$ISO")
+          echo "ISO_URL=https://${CF_ACCOUNT}.r2.cloudflarestorage.com/arttulos-iso/${FILENAME}" >> $GITHUB_ENV
