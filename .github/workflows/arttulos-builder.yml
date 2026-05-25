@@ -27,31 +27,25 @@ jobs:
           repository: spivanatalie64/arttulos
           path: patches
 
-      - name: Install archiso
-        run: sudo pacman -Syu --noconfirm archiso || (echo "Not Arch, trying apt" && sudo apt-get update -qq && sudo apt-get install -y -qq mkarchiso archiso 2>/dev/null || echo "Will use Docker")
-
-      - name: Apply immutable patches to airootfs
+      - name: Build ISO in Arch Linux container
         run: |
-          cp patches/configs/immutable-patch.sh src/
-          if [ -d src/airootfs ]; then
-            cp patches/configs/immutable-patch.sh src/airootfs/root/
-            echo "Patches copied to airootfs"
-          fi
-          cd src
-          echo "AcreetionOS + immutable patches ready"
-
-      - name: Build ISO
-        run: |
-          cd src
-          if [ -f build.sh ]; then
-            chmod +x *.sh
-            bash build.sh 2>&1 | tee /tmp/build.log || echo "Build failed in script"
-          elif [ -f Makefile ]; then
-            make 2>&1 | tee /tmp/build.log || echo "Build failed in make"
-          fi
           mkdir -p /tmp/iso
-          find .. -name "*.iso" -exec cp {} /tmp/iso/ \; 2>/dev/null || true
-          find / -name "*.iso" -maxdepth 4 -exec cp {} /tmp/iso/ \; 2>/dev/null || true
+          docker run --privileged --rm \
+            -v $PWD/src:/workspace \
+            -v $PWD/patches:/patches \
+            -v /tmp/iso:/output \
+            archlinux:latest \
+            bash -c "
+              pacman -Syu --noconfirm archiso git && \
+              cp /patches/configs/immutable-patch.sh /workspace/ && \
+              if [ -d /workspace/airootfs ]; then cp /patches/configs/immutable-patch.sh /workspace/airootfs/root/; fi && \
+              cd /workspace && \
+              chmod +x *.sh && \
+              bash build.sh 2>&1 && \
+              find .. -name '*.iso' -exec cp {} /output/ \; 2>/dev/null; \
+              find / -name '*.iso' -maxdepth 5 -exec cp {} /output/ \; 2>/dev/null || true; \
+              ls -la /output/
+            " || echo "Docker build completed with issues"
           ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
 
       - name: Upload ISO to R2
