@@ -709,18 +709,9 @@
   function speakBrowser(text) {
     return new Promise(resolve => {
       stopBrowserSpeech();
-      // Chrome workaround: cancel first, then speak after a microtask
       speechSynthesis.cancel();
-      // Ensure voices are loaded
-      const voices = speechSynthesis.getVoices();
-      if (voices.length === 0) {
-        speechSynthesis.onvoiceschanged = () => { speechSynthesis.onvoiceschanged = null; doSpeak(voices => voices); };
-        speechSynthesis.getVoices();
-        // Fallback: try anyway after a tick
-        setTimeout(() => doSpeak(() => speechSynthesis.getVoices()), 100);
-      } else {
-        doSpeak(() => voices);
-      }
+      let resolved = false;
+      const finish = () => { if (!resolved) { resolved = true; currentUtterance = null; resolve(); } };
       function doSpeak(getVoices) {
         const v = getVoices();
         const preset = VOICE_PRESETS[currentVoice];
@@ -732,15 +723,32 @@
         utt.rate = 1.0;
         utt.pitch = 1.0;
         utt.lang = 'en-US';
-        let resolved = false;
-        const finish = () => { if (!resolved) { resolved = true; currentUtterance = null; resolve(); } };
         utt.onend = finish;
         utt.onerror = finish;
         currentUtterance = utt;
         speechSynthesis.speak(utt);
-        // Chrome often swallows onend — force resolve
-        setTimeout(finish, Math.min(15000, Math.max(2000, text.length * 100)));
+        // Chrome Linux workaround: pause/resume forces audio output
+        setTimeout(() => {
+          try { speechSynthesis.pause(); speechSynthesis.resume(); } catch (e) {}
+          // Also force-start any pending utterance
+          if (speechSynthesis.speaking === false && currentUtterance === utt) {
+            speechSynthesis.speak(utt);
+          }
+        }, 50);
+        // Force resolve - Chrome often swallows onend
+        setTimeout(finish, Math.min(15000, Math.max(3000, text.length * 100)));
       }
+      // Wait a tick after cancel before speaking (Chrome requirement)
+      setTimeout(() => {
+        const voices = speechSynthesis.getVoices();
+        if (voices.length === 0) {
+          speechSynthesis.onvoiceschanged = () => { speechSynthesis.onvoiceschanged = null; doSpeak(() => speechSynthesis.getVoices()); };
+          speechSynthesis.getVoices();
+          setTimeout(() => doSpeak(() => speechSynthesis.getVoices()), 200);
+        } else {
+          doSpeak(() => voices);
+        }
+      }, 10);
     });
   }
 
