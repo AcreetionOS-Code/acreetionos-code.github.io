@@ -521,7 +521,7 @@
         <div id="aiden-backend-info">
           <span id="aiden-backend-label">Running on <a href="https://openrouter.ai" target="_blank" rel="noopener">OpenRouter</a> (free community model)</span>
         </div>
-        <div id="aiden-input-area">
+          <div id="aiden-input-area">
           <div id="aiden-chips">
             ${isTrumpOS ? `
             <span class="aiden-chip" data-q="How do I install TrumpOS?">How to install?</span>
@@ -541,8 +541,13 @@
             <button id="aiden-send" title="Send" aria-label="Send message">&#x27a4;</button>
           </div>
           ${micSupported ? '<div id="aiden-voice-hint" class="aiden-voice-hint">Tap the mic or hold to speak</div>' : '<div id="aiden-voice-hint" class="aiden-voice-hint" style="opacity:0.6">Your browser doesn\'t support mic — type to chat</div>'}
-        </div>
-      </div>`;
+          <div id="aiden-live-row">
+            <a href="ask.html" id="aiden-live-btn">
+              <span class="aiden-live-dot"></span>
+              Go LIVE
+            </a>
+          </div>
+        </div>`;
     document.body.appendChild(container);
 
     // ── Event bindings ──

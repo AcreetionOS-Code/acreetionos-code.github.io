@@ -49,19 +49,23 @@ self.addEventListener('activate', (event) => {
   scheduleAidenCheck();
 });
 
-// Fetch event - serve from cache, proxy /api/chat to OpenRouter
+// Fetch event - serve from cache, forward API requests directly
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // AIDEN fallback proxy: intercept POST /api/chat and forward to the
-  // origin /api/chat endpoint. The origin/Cloudflare Worker holds the
-  // OpenRouter API key — the SW only forwards the request.
-  if (event.request.method === 'POST' && url.pathname === '/api/chat') {
+  // Forward all POST API requests directly without caching
+  if (event.request.method === 'POST' && url.pathname.startsWith('/api/')) {
     event.respondWith(fetch(event.request.clone()));
     return;
   }
 
-  // Normal caching for everything else
+  // Only cache GET requests
+  if (event.request.method !== 'GET') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Normal caching for GET requests
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {

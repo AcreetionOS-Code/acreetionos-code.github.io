@@ -610,6 +610,50 @@ body.trumpos-theme #aiden-captions {
   color: #f0d060;
 }
 
+/* ── Go Live button ── */
+#aiden-live-row {
+  text-align: center;
+  padding: 0.4rem 0.75rem 0.1rem;
+  flex-shrink: 0;
+}
+#aiden-live-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--acreetion-green, #2ecc71);
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 0.25rem 0.9rem;
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.2s, transform 0.1s;
+}
+#aiden-live-btn:hover {
+  filter: brightness(1.1);
+  transform: scale(1.04);
+}
+.aiden-live-dot {
+  width: 6px;
+  height: 6px;
+  background: #000;
+  border-radius: 50%;
+  animation: aidenLivePulse 1.2s ease-in-out infinite;
+}
+@keyframes aidenLivePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+body.trumpos-theme #aiden-live-btn {
+  background: #D4AF37;
+  color: #002147;
+}
+body.trumpos-theme .aiden-live-dot {
+  background: #002147;
+}
+
 /* ── Panel width adjustment for extra buttons ── */
 @media (max-width: 480px) {
   #aiden-panel {

@@ -225,25 +225,45 @@ export default {
           });
         }
 
-        // Decode base64 audio to a buffer
-        const audioBytes = Uint8Array.from(atob(body.audio), c => c.charCodeAt(0));
+        // Derive format from MIME type
+        const mime = body.mimeType || 'audio/webm';
+        const fmt = mime.includes('ogg') ? 'ogg' : mime.includes('mp4') ? 'mp4' : 'webm';
 
         const whisperRes = await fetch(WHISPER_URL, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
             'HTTP-Referer': 'https://acreetionos.org',
             'X-Title': 'AIDEN Whisper (AcreetionOS Voice Input)'
           },
           body: JSON.stringify({
             model: WHISPER_MODEL,
-            // Whisper API expects a file upload; OpenRouter's compatible endpoint accepts base64
-            audio: body.audio,
-            // hint: body.mimeType || 'audio/webm;codecs=opus'
+            input_audio: {
+              data: body.audio,
+              format: fmt
+            }
           })
         });
 
-        const whisperData = await whisperRes.json();
+        // OpenRouter may return 200 with empty body on format issues; check for that too
+        const whisperText = await whisperRes.text();
+        if (!whisperText || whisperText.trim().length === 0) {
+          return new Response(JSON.stringify({ error: 'Empty transcription response' }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+
+        let whisperData;
+        try {
+          whisperData = JSON.parse(whisperText);
+        } catch (e) {
+          return new Response(JSON.stringify({ error: 'Invalid transcription response', raw: whisperText.slice(0, 200) }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
 
         if (!whisperRes.ok) {
           return new Response(JSON.stringify({
