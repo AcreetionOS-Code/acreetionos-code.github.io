@@ -890,14 +890,22 @@
 
 // ── Worker proxy ──
   async function callProxy() {
+    var key = localStorage.getItem('aiden_key') || localStorage.getItem('openrouter_key') || '';
+    if (!key) {
+      key = prompt('Enter your OpenRouter API key (get free at https://openrouter.ai/keys)');
+      if (key) localStorage.setItem('aiden_key', key);
+      else throw new Error('No API key provided');
+    }
     var res;
     try {
-      res = await fetch(API_BASE + '/chat', {
+      res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + key
         },
         body: JSON.stringify({
+          model: 'meta-llama/llama-3.2-3b-instruct:free',
           messages: messages,
           max_tokens: 600
         })
@@ -919,7 +927,7 @@
       throw new Error(errMsg);
     }
 
-    var content = data.content || (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content);
+    var content = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
     if (content) return content;
 
     throw new Error('No response from AI model');
