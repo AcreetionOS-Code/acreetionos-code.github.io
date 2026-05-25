@@ -592,9 +592,9 @@
     return data.text?.trim() || '';
   }
 
-  // ── TTS (AI voice via OpenRouter, fallback to browser) ──
+  // ── TTS (browser SpeechSynthesis first for speed, AI voice fallback) ──
   function speak(text) {
-    return speakAI(text).catch(() => speakBrowser(text));
+    return speakBrowser(text).catch(() => speakAI(text));
   }
 
   async function speakAI(text) {
