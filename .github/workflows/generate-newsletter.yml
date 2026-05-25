@@ -1,0 +1,30 @@
+name: Generate Newsletter
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate newsletter
+        run: python3 scripts/generate-newsletter.py
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new newsletter to commit."
+          else
+            git commit -m "newsletter: add $(date +%Y-%m-%d)"
+            git push
+          fi

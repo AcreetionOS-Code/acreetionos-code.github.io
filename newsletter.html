@@ -67,52 +67,45 @@
     </main>
 
     <script>
-        const REPO = "acreetionos-code/acreetionos-code.github.io";
-
         async function loadNewsletters() {
             const container = document.getElementById("newsletters");
 
             try {
-                const res = await fetch(
-                    `https://api.github.com/repos/${REPO}/contents/newsletters`
-                );
+                const listRes = await fetch("newsletters/list.json");
 
-                if (!res.ok) {
+                if (!listRes.ok) {
                     container.innerHTML = '<p class="error">No newsletters yet — check back soon.</p>';
                     return;
                 }
 
-                const files = await res.json();
-                const jsonFiles = files
-                    .filter(f => f.name.endsWith(".json"))
-                    .sort((a, b) => b.name.localeCompare(a.name));
+                const entries = await listRes.json();
 
-                if (jsonFiles.length === 0) {
+                if (entries.length === 0) {
                     container.innerHTML = '<p class="error">No newsletters yet — check back soon.</p>';
                     return;
                 }
 
                 container.innerHTML = "";
 
-                for (const file of jsonFiles) {
-                    const dataRes = await fetch(file.download_url);
+                for (const entry of entries) {
+                    const dataRes = await fetch("newsletters/" + entry.filename);
                     const data = await dataRes.json();
 
-                    const entry = document.createElement("div");
-                    entry.className = "newsletter-entry";
-                    entry.innerHTML = `
-                        <h2>${escapeHtml(data.subject)}</h2>
-                        <div class="newsletter-date">${escapeHtml(data.date_display)}</div>
-                        <div class="newsletter-body">${escapeHtml(data.body)}</div>
+                    const div = document.createElement("div");
+                    div.className = "newsletter-entry";
+                    div.innerHTML = `
+                        <h2>${esc(data.subject)}</h2>
+                        <div class="newsletter-date">${esc(data.date_display)}</div>
+                        <div class="newsletter-body">${esc(data.body)}</div>
                     `;
-                    container.appendChild(entry);
+                    container.appendChild(div);
                 }
             } catch (err) {
-                container.innerHTML = `<p class="error">Failed to load newsletters.</p>`;
+                container.innerHTML = '<p class="error">Failed to load newsletters.</p>';
             }
         }
 
-        function escapeHtml(str) {
+        function esc(str) {
             return str
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
