@@ -26,7 +26,7 @@ PAGES = [
     'index.html', 'install.html', 'faq.html', 'contact.html',
     'compare.html', 'requirements.html', 'developers.html', 'wiki.html',
     'blog.html', 'contributing.html', 'governance.html', 'ermin.html',
-    'selfhelp.html', '404.html', 'TrumpOS/index.html'
+    'selfhelp.html', '404.html'
 ]
 
 SYSTEM_PROMPT = """You are a QA tester reviewing HTML pages for the AcreetionOS Linux website.
