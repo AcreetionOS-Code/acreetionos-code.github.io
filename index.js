@@ -12,9 +12,11 @@
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
+const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
 const WHISPER_MODEL = 'openai/whisper-1';
+const TTS_MODEL = 'openai/gpt-4o-mini-tts-2025-12-15';
 const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -337,6 +339,59 @@ export default {
       } catch (err) {
         return new Response(JSON.stringify({ error: 'AI generation failed: ' + err.message }), {
           status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
+    // Text-to-Speech via OpenRouter
+    if (request.method === 'POST' && url.pathname === '/api/tts') {
+      try {
+        const body = await request.json();
+        if (!body.input) {
+          return new Response(JSON.stringify({ error: 'input text required' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'TTS not configured' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const ttsRes = await fetch(TTS_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
+          },
+          body: JSON.stringify({
+            model: TTS_MODEL,
+            input: body.input,
+            voice: body.voice || 'nova',
+            response_format: 'mp3'
+          })
+        });
+        if (!ttsRes.ok) {
+          const errText = await ttsRes.text();
+          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 300) }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        return new Response(ttsRes.body, {
+          headers: {
+            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/mpeg',
+            ...corsHeaders(request)
+          }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'TTS error: ' + err.message }), {
+          status: 500,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
     }

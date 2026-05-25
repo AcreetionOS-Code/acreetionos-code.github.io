@@ -393,6 +393,8 @@
   let interruptContext = null;
   let interruptStream = null;
   let currentUtterance = null;
+  let currentAudio = null;
+  let currentSpeakResolve = null;
   let audioLevel = 0;
   let targetAudioLevel = 0;
 
@@ -590,15 +592,41 @@
     return data.text?.trim() || '';
   }
 
-  // ── TTS ──
+  // ── TTS (AI voice via OpenRouter, fallback to browser) ──
   function speak(text) {
+    return speakAI(text).catch(() => speakBrowser(text));
+  }
+
+  async function speakAI(text) {
+    try {
+      const res = await fetch(API_BASE + '/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: text, voice: 'nova' })
+      });
+      if (!res.ok) throw new Error('TTS API failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      currentAudio = audio;
+      await new Promise(resolve => {
+        currentSpeakResolve = resolve;
+        audio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); };
+        audio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); };
+        audio.play().catch(() => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); });
+      });
+    } catch (e) {
+      // Fall through to browser TTS
+    }
+  }
+
+  function speakBrowser(text) {
     return new Promise(resolve => {
-      stopSpeaking();
+      stopBrowserSpeech();
       const voices = speechSynthesis.getVoices();
       const voice = voices.find(v =>
         v.lang.startsWith('en-US') && v.name.toLowerCase().includes('google')
       ) || voices.find(v => v.lang.startsWith('en')) || voices[0];
-
       const utt = new SpeechSynthesisUtterance(text);
       utt.voice = voice;
       utt.rate = 1.0;
@@ -612,6 +640,19 @@
   }
 
   function stopSpeaking() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    if (currentSpeakResolve) {
+      const r = currentSpeakResolve;
+      currentSpeakResolve = null;
+      r();
+    }
+    stopBrowserSpeech();
+  }
+
+  function stopBrowserSpeech() {
     if (speechSynthesis.speaking) speechSynthesis.cancel();
     currentUtterance = null;
   }
