@@ -990,6 +990,16 @@
       liveAudioEl = new Audio();
       liveAudioEl.volume = 1;
     }
+    // Auto-request mic and enumerate audio devices (triggers permission prompts)
+    if (navigator.mediaDevices) {
+      navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => {});
+      navigator.mediaDevices.enumerateDevices().then(devices => {
+        const audioOuts = devices.filter(d => d.kind === 'audiooutput' && d.deviceId);
+        if (liveAudioEl && audioOuts.length > 0 && liveAudioEl.setSinkId) {
+          liveAudioEl.setSinkId(audioOuts[0].deviceId).catch(() => {});
+        }
+      }).catch(() => {});
+    }
     playTestTone();
     setVoice(currentVoice);
     resizeCanvas();
