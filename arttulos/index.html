@@ -138,12 +138,24 @@ footer a{color:var(--g);text-decoration:none}
 
 <div class="feature-box" id="download">
 <h2>⬇️ Download ArttulOS</h2>
-<p>ArttulOS is built weekly via GitHub Actions. Download the latest ISO below:</p>
+<p>ArttulOS is built every 3 days via GitHub Actions. Both Cinnamon and XLibre editions are available:</p>
 <div class="btns" style="margin:1rem 0;justify-content:flex-start">
-<a href="https://github.com/spivanatalie64/arttulos/actions/workflows/build.yml" class="btn btn-p" target="_blank">Latest Build</a>
+<a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/build-arttulos.yml" class="btn btn-p" target="_blank">Latest Builds</a>
 <a href="https://discord.acreetionos.org" class="btn btn-s">Get Help</a>
 </div>
-<p style="font-size:0.8rem;color:var(--fg3)">ISOs are stored on Cloudflare R2 — free to download, no account needed.</p>
+<p style="font-size:0.8rem;color:var(--fg3)">ISOs stored on Cloudflare R2 — free downloads. Old builds are purged after 3 weeks.</p>
+</div>
+
+<div class="feature-box">
+<h2>🔄 Recovery System</h2>
+<p>ArttulOS includes a built-in recovery partition and boot health monitoring:</p>
+<ul>
+<li><strong>Recovery mode</strong> — boot entry in systemd-boot to reinstall the immutable base</li>
+<li><strong>Boot health check</strong> — if the system fails to boot 3 times, recovery mode is offered automatically</li>
+<li><strong><code>arttulos-recover</code></strong> — CLI tool that pulls a fresh base image from Cloudflare R2 and reinstalls the core OS while preserving <code>/home</code></li>
+<li><strong><code>arttulos-update</code></strong> — atomic A/B update mechanism for applying system updates</li>
+</ul>
+<p>Your data in <code>/home</code> and application containers is preserved during recovery. Only the immutable base system is replaced.</p>
 </div>
 
 <div class="feature-box">
