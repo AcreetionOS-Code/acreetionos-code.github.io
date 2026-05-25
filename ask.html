@@ -707,7 +707,8 @@
   }
 
   async function speakAI(text) {
-    const voiceName = VOICE_PRESETS[currentVoice].name.toLowerCase();
+    const voiceMap = { nova: 'nova', echo: 'echo', ember: 'alloy', atlas: 'onyx', iris: 'shimmer' };
+    const voiceName = voiceMap[VOICE_PRESETS[currentVoice].name.toLowerCase()] || 'nova';
     try {
       const res = await fetch(API_BASE + '/tts', {
         method: 'POST',
@@ -721,9 +722,16 @@
       currentAudio = audio;
       await new Promise(resolve => {
         currentSpeakResolve = resolve;
-        audio.onended = () => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); };
-        audio.onerror = () => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); };
-        audio.play().catch(() => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); });
+        const done = () => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); };
+        audio.onended = done;
+        audio.onerror = done;
+        audio.play().catch(() => {
+          if (audioCtx && audioCtx.state === 'suspended') {
+            audioCtx.resume().then(() => audio.play().catch(done));
+          } else {
+            done();
+          }
+        });
       });
     } catch (e) {
       throw e;
@@ -1099,19 +1107,28 @@
 
   // ── Unlock audio on first gesture (required by Chrome) ──
   let audioUnlocked = false;
+  let audioCtx = null;
   function unlockAudio() {
     if (audioUnlocked) return;
     audioUnlocked = true;
+    // Unlock AudioContext
     try {
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const buf = ctx.createBuffer(1, 1, 22050);
-      const src = ctx.createBufferSource();
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = audioCtx.createBuffer(1, 1, 22050);
+      const src = audioCtx.createBufferSource();
       src.buffer = buf;
-      src.connect(ctx.destination);
+      src.connect(audioCtx.destination);
       src.start();
-      ctx.close();
     } catch (e) {}
+    // Prime HTMLAudioElement playback
     try {
+      const silent = new Audio();
+      silent.volume = 0.01;
+      silent.play().then(() => silent.pause()).catch(() => {});
+    } catch (e) {}
+    // Unlock SpeechSynthesis
+    try {
+      speechSynthesis.getVoices();
       const utt = new SpeechSynthesisUtterance('');
       speechSynthesis.speak(utt);
     } catch (e) {}
