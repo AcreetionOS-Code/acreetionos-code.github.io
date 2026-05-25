@@ -858,6 +858,8 @@
   function fallbackStartRecording() {
     if (liveActive) startRecording();
   }
+
+  async function startRecording() {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     recordingStream = stream;
     audioChunks = [];
@@ -914,6 +916,48 @@
     speakChain = speakChain.then(() => speak(text));
   }
 
+  async function processTranscript(transcript) {
+    addLiveMsg('user', transcript);
+    liveMessages.push({ role: 'user', content: transcript });
+
+    setLiveState('speaking');
+    speakChain = Promise.resolve();
+    streamAbortController = new AbortController();
+
+    let fullReply = '';
+    let sentenceBuf = '';
+
+    try {
+      fullReply = await callChatStream(liveMessages, (chunk, full) => {
+        sentenceBuf += chunk;
+        const words = full.split(/\s+/);
+        if (words.length >= 3 && !words[0]) {
+          speak(full);
+          words[0] = true;
+        }
+        const parts = sentenceBuf.split(/(?<=[.!?])\s+/);
+        while (parts.length > 1) {
+          queueSpeak(parts.shift().trim());
+        }
+        sentenceBuf = parts[0] || '';
+      });
+    } catch (e) {
+      console.error('Stream error, falling back to non-streaming:', e);
+      const reply = await callChat(liveMessages);
+      fullReply = reply;
+      await speak(reply);
+    }
+
+    if (sentenceBuf.trim().length > 3) {
+      await speakChain.then(() => speak(sentenceBuf.trim()));
+    }
+
+    liveMessages.push({ role: 'assistant', content: fullReply });
+    addLiveMsg('ai', fullReply);
+
+    if (liveActive) startLiveLoop();
+  }
+
   async function stopAndProcess() {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       await new Promise(resolve => {
@@ -933,45 +977,7 @@
     try {
       const transcript = await transcribeAudio(blob, blob.type);
       if (!transcript) { startLiveLoop(); return; }
-
-      addLiveMsg('user', transcript);
-      liveMessages.push({ role: 'user', content: transcript });
-
-      setLiveState('speaking');
-      speakChain = Promise.resolve();
-      streamAbortController = new AbortController();
-
-      let fullReply = '';
-      let sentenceBuf = '';
-
-      try {
-        fullReply = await callChatStream(liveMessages, (chunk, full) => {
-          sentenceBuf += chunk;
-          const words = full.split(/\s+/);
-          if (words.length >= 3 && !words[0]) {
-            // Speak first few words immediately for near-instant response
-            speak(full);
-            words[0] = true;
-          }
-          const parts = sentenceBuf.split(/(?<=[.!?])\s+/);
-          while (parts.length > 1) {
-            queueSpeak(parts.shift().trim());
-          }
-          sentenceBuf = parts[0] || '';
-        });
-      } catch (e) {
-        console.error('Stream error, falling back to non-streaming:', e);
-        const reply = await callChat(liveMessages);
-        fullReply = reply;
-        await speak(reply);
-      }
-
-      if (sentenceBuf.trim().length > 3) {
-        await speakChain.then(() => speak(sentenceBuf.trim()));
-      }
-
-      liveMessages.push({ role: 'assistant', content: fullReply });
-      addLiveMsg('ai', fullReply);
+      await processTranscript(transcript);
     } catch (e) {
       console.error(e);
     }
@@ -1027,8 +1033,7 @@
   async function startLiveLoop() {
     if (!liveActive) return;
     setLiveState('listening');
-    try { await startRecording(); }
-    catch (e) { setLiveState('idle'); }
+    startSpeechRecognition();
   }
 
   // ── Live Transcript ──
@@ -1102,6 +1107,7 @@
 
   function closeLive() {
     liveActive = false;
+    stopSpeechRecognition();
     if (streamAbortController) { streamAbortController.abort(); streamAbortController = null; }
     stopSpeaking();
     stopInterruptMonitor();

@@ -12,11 +12,10 @@
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
-const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
+const HF_TTS_URL = 'https://api-inference.huggingface.co/models/espnet/kan-bayashi_ljspeech_vits';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
-const WHISPER_MODEL = 'openai/whisper-1';
-const TTS_MODEL = 'cartesia-ai/cartesia-tts';const ALLOWED_ORIGINS = [
+const WHISPER_MODEL = 'openai/whisper-1';const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
@@ -343,7 +342,7 @@ export default {
       }
     }
 
-    // Text-to-Speech via OpenRouter (Cartesia TTS — natural human voice)
+    // Text-to-Speech via Hugging Face (free neural TTS, no API key needed)
     if (request.method === 'POST' && url.pathname === '/api/tts') {
       try {
         const body = await request.json();
@@ -353,38 +352,22 @@ export default {
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        const apiKey = env.OPENROUTER_API_KEY;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'TTS not configured' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const ttsRes = await fetch(TTS_URL, {
+        const text = body.input.slice(0, 200);
+        const ttsRes = await fetch(HF_TTS_URL, {
           method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
-          },
-          body: JSON.stringify({
-            model: TTS_MODEL,
-            input: body.input,
-            voice: body.voice || 'nova',
-            response_format: 'mp3'
-          })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inputs: text })
         });
         if (!ttsRes.ok) {
-          const errText = await ttsRes.text();
-          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 300) }), {
+          const errText = await ttsRes.text().catch(() => '');
+          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 200) }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
         return new Response(ttsRes.body, {
           headers: {
-            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/mpeg',
+            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/flac',
             ...corsHeaders(request)
           }
         });
