@@ -9,7 +9,7 @@ import os, sys, re, json, urllib.request, pathlib
 # ── Config ──
 ENDPOINT = os.environ.get('AI_TEST_ENDPOINT', 'https://openrouter.ai/api/v1/chat/completions')
 MODEL = os.environ.get('AI_TEST_MODEL', 'meta-llama/llama-3.2-3b-instruct:free')
-API_KEY = os.environ.get('AI_TEST_API_KEY', '')
+API_KEY = os.environ.get('AI_TEST_API_KEY', '') or os.environ.get('OPENROUTER_API_KEY', '')
 
 # Try reading from .env
 if not API_KEY:
