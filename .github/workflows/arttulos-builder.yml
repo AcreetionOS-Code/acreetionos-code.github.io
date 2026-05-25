@@ -1,0 +1,54 @@
+name: Build ArttulOS ISO
+on:
+  schedule:
+    - cron: '0 6 */3 * *'
+  workflow_dispatch:
+jobs:
+  build:
+    strategy:
+      matrix:
+        edition:
+          - name: Cinnamon
+            repo: AcreetionOS-Code/acreetionos
+            output: arttulos-cinnamon.iso
+          - name: XLibre
+            repo: AcreetionOS-Code/AcreetionOS-Cinnamon-XLibre
+            output: arttulos-xlibre.iso
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ matrix.edition.repo }}
+          path: src
+          submodules: recursive
+      - uses: actions/checkout@v4
+        with:
+          repository: spivanatalie64/arttulos
+          path: patches
+      - run: |
+          cp patches/configs/immutable-patch.sh src/
+          cd src && bash configs/immutable-patch.sh 2>/dev/null || true
+      - run: |
+          cd src
+          [ -f build_iso.sh ] && bash build_iso.sh || [ -f Makefile ] && make iso
+          mkdir -p /tmp/iso && find . -name "*.iso" -exec cp {} /tmp/iso/${{ matrix.edition.output }} \;
+      - name: Upload to R2
+        env:
+          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          F="arttulos-${{ matrix.edition.name }}-$(date +%Y%m%d).iso"
+          [ ! -f "/tmp/iso/${{ matrix.edition.output }}" ] && exit 0
+          cp "/tmp/iso/${{ matrix.edition.output }}" "/tmp/$F"
+          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets" -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" -d '{"name":"arttulos-iso"}' || true
+          U=$(curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/arttulos-iso/objects/${F}/upload" -H "Authorization: Bearer $CF_TOKEN" -d '{}' | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('uploadURL',''))")
+          [ -n "$U" ] && curl -s -X PUT "$U" --data-binary @"/tmp/$F" && echo "✓ $F"
+  cleanup:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          CUTOFF=$(date -d "21 days ago" +%s)
+          for obj in $(curl -s "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/r2/buckets/arttulos-iso/objects" -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" | python3 -c "import sys,json;[print(o['key']) for o in json.load(sys.stdin).get('result',{}).get('objects',[])]" 2>/dev/null); do
+            D=$(echo "$obj" | grep -oP '\d{8}') && [ -n "$D" ] && [ $(date -d "$D" +%s 2>/dev/null) -lt $CUTOFF ] 2>/dev/null && curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/${{ secrets.CLOUDFLARE_ACCOUNT_ID }}/r2/buckets/arttulos-iso/objects/$obj" -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" && echo "Deleted $obj"
+          done
