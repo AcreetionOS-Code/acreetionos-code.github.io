@@ -1,0 +1,10 @@
+componentName:     TrumpOS
+productName:        TrumpOS
+shortProductName:   TrumpOS
+versionedName:      TrumpOS 1.0
+shortVersionedName: TrumpOS 1.0
+bootloaderEntryName: TrumpOS
+SidebarBackground:   "#002147"
+SidebarText:         "#D4AF37"
+SidebarBackgroundCurrent: "#D4AF37"
+SidebarTextCurrent:  "#002147"
