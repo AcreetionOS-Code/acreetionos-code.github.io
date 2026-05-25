@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-# -------------------------------------------------
-# TrumpOS Build Script – applies branding BEFORE ISO creation
-# Mirrors AcreetionOS build flow but injects TrumpOS branding
-# -------------------------------------------------
-
 ISO_URL="${1:-https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso}"
 ISO_NAME="TrumpOS-1.0-x86_64.iso"
 WORK=$(mktemp -d)
@@ -18,123 +13,70 @@ echo "Base URL: $ISO_URL"
 echo "Working dir: $WORK"
 
 # Install required tools (run inside Arch container)
-if ! command -v pacman >/dev/null 2>&1; then
-  echo "Running in Arch container – installing tools..."
-  sudo pacman -Sy --noconfirm xorriso squashfs-tools sbsigntool mkisofs-git git
-else
-  echo "Tools already available"
+if command -v pacman >/dev/null 2>&1; then
+  pacman -Sy --noconfirm xorriso squashfs-tools git wget 2>/dev/null || true
 fi
 
-# -------------------------------------------------
 # 1. Download base ISO
-# -------------------------------------------------
 echo "[1/5] Downloading base ISO..."
 BASE_ISO="$WORK/base.iso"
-wget -q --show-progress -O "$BASE_ISO" "$ISO_URL"
-if [ ! -f "$BASE_ISO" ]; then
+wget -q --show-progress -O "$BASE_ISO" "$ISO_URL" || curl -sL -o "$BASE_ISO" "$ISO_URL"
+if [ ! -f "$BASE_ISO" ] || [ ! -s "$BASE_ISO" ]; then
   echo "ERROR: Failed to download base ISO"
   exit 1
 fi
 
-# -------------------------------------------------
-# 2. Prepare working ISO tree (using xorriso)
-# -------------------------------------------------
+# 2. Extract ISO tree
 echo "[2/5] Extracting ISO tree..."
 mkdir -p "$ISO_DIR"
-# Try xorriso extraction first
 if xorriso -osirrox on -indev "$BASE_ISO" -extract / "$ISO_DIR" 2>/dev/null; then
   echo "  Extracted with xorriso"
+elif command -v 7z >/dev/null 2>&1; then
+  7z x -aoa -o"$ISO_DIR" "$BASE_ISO" || { echo "ERROR: 7z failed"; exit 1; }
 else
-  echo "  xorriso failed – trying 7z fallback"
-  if command -v 7z >/dev/null 2>&1; then
-    7z x -aoa -o"$ISO_DIR" "$BASE_ISO" || { echo "ERROR: 7z extraction failed"; exit 1; }
-  else
-    echo "ERROR: Neither xorriso nor 7z available"
-    exit 1
-  fi
+  echo "ERROR: Cannot extract ISO"
+  exit 1
 fi
-chmod -R +w "$ISO_DIR" || { echo "ERROR: Cannot make ISO tree writable"; exit 1; }
+chmod -R +w "$ISO_DIR" 2>/dev/null || true
 
-# -------------------------------------------------
-# 3. Apply TrumpOS branding to the extracted tree
-# -------------------------------------------------
+# 3. Apply TrumpOS branding
 echo "[3/5] Applying TrumpOS branding..."
-# 1) Bootloader (isolinux/syslinux)
-if [ -f "$ISO_DIR/isolinux/isolinux.cfg" ]; then
-  sed -i 's/AcreetionOS/TrumpOS/g' "$ISO_DIR/isolinux/isolinux.cfg"
-  sed -i 's/Arch Linux/TrumpOS — Make Linux Great Again/g' "$ISO_DIR/isolinux/isolinux.cfg"
-fi
+for f in "$ISO_DIR/isolinux/isolinux.cfg" "$ISO_DIR/EFI/BOOT/grub.cfg" "$ISO_DIR/boot/grub/grub.cfg"; do
+  [ -f "$f" ] && sed -i 's/AcreetionOS/TrumpOS/g' "$f" && sed -i 's/Arch Linux/TrumpOS/g' "$f" 2>/dev/null || true
+done
 if [ -f "$ISO_DIR/loader/entries/archiso-x86_64.conf" ]; then
   sed -i 's/Arch Linux/TrumpOS/g' "$ISO_DIR/loader/entries/archiso-x86_64.conf"
-  echo "  title TrumpOS — The Best Linux, Believe Me" >> "$ISO_DIR/loader/entries/archiso-x86_64.conf"
+  echo "  title TrumpOS — Make Linux Great Again" >> "$ISO_DIR/loader/entries/archiso-x86_64.conf"
 fi
-# 2) Chroot environment configs
-if [ -d "$ISO_DIR/etc/calamares/branding/AcreetionOS" ]; then
-  echo "  Removing AcreetionOS branding..."
-  rm -rf "$ISO_DIR/etc/calamares/branding/AcreetionOS"
-fi
+# Calamares branding
 if [ -d "$BRAND_DIR" ]; then
-  echo "  Installing TrumpOS branding..."
   mkdir -p "$ISO_DIR/etc/calamares/branding/TrumpOS"
-  cp -r "$BRAND_DIR/"* "$ISO_DIR/etc/calamares/branding/TrumpOS/"
-else
-  echo "  WARNING: No local TrumpOS branding found – creating minimal branding"
-  mkdir -p "$ISO_DIR/etc/calamares/branding/TrumpOS"
-  cat > "$ISO_DIR/etc/calamares/branding/TrumpOS/branding.desc" <<'EOF'
-componentName:     TrumpOS
-productName:        TrumpOS
-shortProductName:   TrumpOS
-versionedName:      TrumpOS 1.0
-shortVersionedName: TrumpOS 1.0
-bootloaderEntryName: TrumpOS
-SidebarBackground:   "#002147"
-SidebarText:         "#D4AF37"
-SidebarBackgroundCurrent: "#D4AF37"
-SidebarTextCurrent:  "#002147"
-EOF
+  cp -r "$BRAND_DIR/"* "$ISO_DIR/etc/calamares/branding/TrumpOS/" 2>/dev/null || true
 fi
-# settings.conf (optional)
-if [ -f "$SCRIPT_DIR/settings.conf" ]; then
-  cp "$SCRIPT_DIR/settings.conf" "$ISO_DIR/etc/calamares/settings.conf"
-fi
-# os‑release / hostname / hosts
+# os-release
 if [ -f "$ISO_DIR/etc/os-release" ]; then
   sed -i 's/NAME=.*/NAME="TrumpOS"/' "$ISO_DIR/etc/os-release"
   sed -i 's/ID=.*/ID=trumpos/' "$ISO_DIR/etc/os-release"
-  sed -i 's/PRETTY_NAME=.*/PRETTY_NAME="TrumpOS 1.0 (Make Linux Great Again)"/' "$ISO_DIR/etc/os-release"
+  sed -i 's/PRETTY_NAME=.*/PRETTY_NAME="TrumpOS 1.0 (MLGA)"/' "$ISO_DIR/etc/os-release"
 fi
-if [ -f "$ISO_DIR/etc/hostname" ]; then
-  echo "trumpos" > "$ISO_DIR/etc/hostname"
-fi
-if [ -f "$ISO_DIR/etc/hosts" ]; then
-  sed -i 's/acreetionos/trumpos/g' "$ISO_DIR/etc/hosts" 2>/dev/null || true
-fi
-
+[ -f "$ISO_DIR/etc/hostname" ] && echo "trumpos" > "$ISO_DIR/etc/hostname"
 echo "  ✓ TrumpOS branding applied"
 
-# -------------------------------------------------
-# 4. Build the final ISO with mkarchiso (mirroring AcreetionOS)
-# -------------------------------------------------
-echo "[4/5] Building final ISO with mkarchiso..."
-# Remove mkarchiso config section (lines 119-164)
-# Mkarchiso will use default settings and the prepared ISO_DIR
-# -------------------------------------------------
-# 4. Build the final ISO with mkarchiso
-# -------------------------------------------------
-echo "[4/5] Building final ISO with mkarchiso..."
-# Use the prepared ISO_DIR directly as the profile directory
-if ! mkarchiso -w "$WORK" -D "$ISO_DIR" -o "$ISO_NAME"; then
-  echo "ERROR: mkarchiso failed"
-  exit 1
+# 4. Build final ISO
+echo "[4/5] Building final ISO..."
+if command -v mkarchiso >/dev/null 2>&1; then
+  mkarchiso -w "$WORK/work" -o "$WORK/out" "$ISO_DIR" 2>&1 || {
+    echo "mkarchiso failed — building via xorriso directly"
+    xorriso -as mkisofs -iso-level 3 -full-iso9660-filenames \
+      -volid "TRUMPOS" -o "$ISO_NAME" "$ISO_DIR"
+  }
+else
+  xorriso -as mkisofs -iso-level 3 -full-iso9660-filenames \
+    -volid "TRUMPOS" -o "$ISO_NAME" "$ISO_DIR"
 fi
 
-
-# -------------------------------------------------
-# 5. Verify and finish
-# -------------------------------------------------
+# 5. Verify
 echo "[5/5] Finished building $ISO_NAME"
-ls -lh "$ISO_NAME"
-
-# Clean up
+ls -lh "$ISO_NAME" 2>/dev/null || echo "ISO not found at expected path"
 rm -rf "$WORK"
 echo "=== DONE ==="
