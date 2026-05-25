@@ -16,7 +16,7 @@ const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
 const WHISPER_MODEL = 'openai/whisper-1';
-const TTS_MODEL = 'openai/gpt-4o-mini-tts-2025-12-15';
+const TTS_MODEL = 'cartesia-ai/cartesia-tts';
 const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -369,7 +369,7 @@ export default {
             'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
           },
           body: JSON.stringify({
-            model: TTS_MODEL,
+            model: body.model || TTS_MODEL,
             input: body.input,
             voice: body.voice || 'nova',
             response_format: 'mp3'
@@ -427,6 +427,8 @@ export default {
       // Only allow explicitly whitelisted free models to be used
       const model = FREE_MODEL;
 
+      const isStream = body.stream === true;
+
       const openRouterRes = await fetch(OPENROUTER_URL, {
         method: 'POST',
         headers: {
@@ -438,9 +440,21 @@ export default {
         body: JSON.stringify({
           model: model,
           messages: body.messages,
-          max_tokens: body.max_tokens || 800
+          max_tokens: body.max_tokens || 800,
+          stream: isStream
         })
       });
+
+      if (isStream) {
+        // Forward SSE stream directly to client
+        const headers = {
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive',
+          ...corsHeaders(request)
+        };
+        return new Response(openRouterRes.body, { headers });
+      }
 
       const data = await openRouterRes.json();
 

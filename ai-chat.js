@@ -22,7 +22,7 @@
     : {
         name: 'AIDEN',
         bubble: 'A',
-        prompt: 'You are AIDEN, a friendly and knowledgeable AI assistant for AcreetionOS Linux. You sound natural and human — like a helpful friend who happens to know a lot about Linux. Be warm, conversational, and genuine. Use casual but clear language. Avoid sounding robotic or overly formal. Keep responses concise and helpful. When asked about yourself, say you\'re AIDEN and run on OpenRouter free community models.\n\nCurrent page: {{PAGE}}. AcreetionOS is a user-friendly Arch-based Linux distribution featuring the Cinnamon desktop, XLibre display protocol, PipeWire audio, Pamac package manager, and AUR support. Installation is done via graphical Calamares installer. Boot uses systemd-boot/syslinux for live USB and GRUB for installed systems. Learn more at https://acreetionos.org.\n\nKeep answers under 3 paragraphs unless the user asks for detail. Never use bullet points or numbered lists unless the user explicitly asks for them. Just talk naturally.',
+        prompt: 'You are AIDEN, the AcreetionOS Intelligent Dialogue & Engagement Network — a natural voice AI framework. When asked about yourself, explain that AIDEN is the AI framework and each voice (Nova, Echo, Ember, Atlas, Iris) is a character on top of AIDEN. You sound natural and human — like a helpful friend who happens to know a lot about Linux. Be warm, conversational, and genuine. Use casual but clear language. Avoid sounding robotic or overly formal. Keep responses concise and helpful.\n\nCurrent page: {{PAGE}}. AcreetionOS is a user-friendly Arch-based Linux distribution featuring the Cinnamon desktop, XLibre display protocol, PipeWire audio, Pamac package manager, and AUR support. Installation is done via graphical Calamares installer. Boot uses systemd-boot/syslinux for live USB and GRUB for installed systems. Learn more at https://acreetionos.org.\n\nKeep answers under 3 paragraphs unless the user asks for detail. Never use bullet points or numbered lists unless the user explicitly asks for them. Just talk naturally.',
         greeting: "Hey there! I'm AIDEN, your AcreetionOS assistant. I run on free community models via OpenRouter. I can help with installation, troubleshooting, system stuff, or really anything AcreetionOS-related. What's up?",
         placeholder: 'Type or tap the mic to ask AIDEN...',
         wakeWord: 'hey aiden'
@@ -55,9 +55,12 @@
   var captionsEnabled = localStorage.getItem('aiden-captions') === 'true';
   var zoomLevel = parseFloat(localStorage.getItem('aiden-zoom')) || 1;
   var currentUtterance = null;
+  var currentAudio = null;
+  var currentSpeakResolve = null;
   var selectedVoice = null;
   var speechSupported = typeof window !== 'undefined' && 'speechSynthesis' in window;
   var micSupported = typeof window !== 'undefined' && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+  var ttsApiSupported = typeof fetch !== 'undefined';
 
   function getVoicePreference() {
     return localStorage.getItem('aiden-voice') || null;
@@ -122,52 +125,117 @@
   }
 
   function speakText(text) {
-    if (!ttsEnabled || !speechSupported) return;
+    if (!ttsEnabled) return;
     stopSpeech();
-    loadVoices().then(function (voices) {
-      if (voices.length === 0) return;
-      selectedVoice = pickVoice(voices);
-      var utterance = new SpeechSynthesisUtterance(text);
-      utterance.voice = selectedVoice;
-      if (isTrumpOS) {
-        utterance.rate = 0.88;
-        utterance.pitch = 0.6;
-        utterance.volume = 1.0;
-      } else {
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.05;
-      }
-      utterance.lang = 'en-US';
-      utterance.onstart = function () {
-        showCaptions(text);
-        addSpeaking(true);
-      };
-      utterance.onend = function () {
-        hideCaptions();
-        addSpeaking(false);
-        currentUtterance = null;
-      };
-      utterance.onerror = function () {
-        hideCaptions();
-        addSpeaking(false);
-        currentUtterance = null;
-      };
-      utterance.onboundary = function (e) {
-        if (captionsEnabled && e.charIndex >= 0 && text) {
-          var captionEl = document.getElementById('aiden-captions');
-          if (captionEl) {
-            var shown = text.substring(0, e.charIndex) + '|' + text.substring(e.charIndex);
-            captionEl.textContent = shown;
-          }
+    addSpeaking(true);
+    showCaptions(text);
+    speakAI(text).catch(function () {
+      speakBrowser(text);
+    });
+  }
+
+  function speakAI(text) {
+    if (!ttsApiSupported) return Promise.reject();
+    return fetch(API_BASE + '/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: text, voice: 'nova' })
+    }).then(function (res) {
+      if (!res.ok) throw new Error('TTS API failed');
+      return res.blob();
+    }).then(function (blob) {
+      var url = URL.createObjectURL(blob);
+      var audio = new Audio(url);
+      currentAudio = audio;
+      return new Promise(function (resolve) {
+        currentSpeakResolve = resolve;
+        audio.onended = function () {
+          URL.revokeObjectURL(url);
+          currentAudio = null;
+          currentSpeakResolve = null;
+          hideCaptions();
+          addSpeaking(false);
+          resolve();
+        };
+        audio.onerror = function () {
+          URL.revokeObjectURL(url);
+          currentAudio = null;
+          currentSpeakResolve = null;
+          hideCaptions();
+          addSpeaking(false);
+          resolve();
+        };
+        audio.play().catch(function () {
+          URL.revokeObjectURL(url);
+          currentAudio = null;
+          currentSpeakResolve = null;
+          hideCaptions();
+          addSpeaking(false);
+          resolve();
+        });
+      });
+    });
+  }
+
+  function speakBrowser(text) {
+    if (!speechSupported) return Promise.resolve();
+    return new Promise(function (resolve) {
+      loadVoices().then(function (voices) {
+        if (voices.length === 0) { resolve(); return; }
+        selectedVoice = pickVoice(voices);
+        var utterance = new SpeechSynthesisUtterance(text);
+        utterance.voice = selectedVoice;
+        if (isTrumpOS) {
+          utterance.rate = 0.88;
+          utterance.pitch = 0.6;
+          utterance.volume = 1.0;
+        } else {
+          utterance.rate = 1.0;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
         }
-      };
-      currentUtterance = utterance;
-      speechSynthesis.speak(utterance);
+        utterance.lang = 'en-US';
+        utterance.onstart = function () {
+          showCaptions(text);
+          addSpeaking(true);
+        };
+        utterance.onend = function () {
+          hideCaptions();
+          addSpeaking(false);
+          currentUtterance = null;
+          resolve();
+        };
+        utterance.onerror = function () {
+          hideCaptions();
+          addSpeaking(false);
+          currentUtterance = null;
+          resolve();
+        };
+        utterance.onboundary = function (e) {
+          if (captionsEnabled && e.charIndex >= 0 && text) {
+            var captionEl = document.getElementById('aiden-captions');
+            if (captionEl) {
+              var shown = text.substring(0, e.charIndex) + '|' + text.substring(e.charIndex);
+              captionEl.textContent = shown;
+            }
+          }
+        };
+        currentUtterance = utterance;
+        speechSynthesis.speak(utterance);
+      });
     });
   }
 
   function stopSpeech() {
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+    if (currentSpeakResolve) {
+      var r = currentSpeakResolve;
+      currentSpeakResolve = null;
+      r();
+    }
     if (currentUtterance) {
       speechSynthesis.cancel();
       currentUtterance = null;
@@ -720,12 +788,11 @@
     scrollToBottom();
 
     if (role === 'ai' && !instant) {
-      streamResponse(text, div).then(function () {
-        if (speechSupported) speakText(text);
-      });
+      speakText(text);
+      streamResponse(text, div);
     } else {
       div.innerHTML = text.replace(/\n/g, '<br>').replace(/`([^`]+)`/g, '<code>$1</code>');
-      if (role === 'ai' && speechSupported) speakText(text);
+      if (role === 'ai') speakText(text);
     }
 
     var msgEls = el.querySelectorAll('.aiden-msg');

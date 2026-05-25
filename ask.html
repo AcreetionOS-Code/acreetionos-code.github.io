@@ -407,11 +407,11 @@
   <canvas id="orb-canvas"></canvas>
   <div id="live-status">Tap the orb to start</div>
   <div id="voice-dots">
-    <button class="voice-dot" data-voice="0" title="Nova — Natural" style="--dot-color:#2ecc71"></button>
-    <button class="voice-dot" data-voice="1" title="Echo — British" style="--dot-color:#3498db"></button>
-    <button class="voice-dot" data-voice="2" title="Ember — American" style="--dot-color:#e67e22"></button>
-    <button class="voice-dot" data-voice="3" title="Atlas — Baritone" style="--dot-color:#9b59b6"></button>
-    <button class="voice-dot" data-voice="4" title="Iris — Soprano" style="--dot-color:#e74c3c"></button>
+    <button class="voice-dot" data-voice="0" title="Nova — warm and natural" style="--dot-color:#2ecc71"></button>
+    <button class="voice-dot" data-voice="1" title="Echo — proper and articulate" style="--dot-color:#3498db"></button>
+    <button class="voice-dot" data-voice="2" title="Ember — casual and direct" style="--dot-color:#e67e22"></button>
+    <button class="voice-dot" data-voice="3" title="Atlas — deep and confident" style="--dot-color:#9b59b6"></button>
+    <button class="voice-dot" data-voice="4" title="Iris — bright and cheerful" style="--dot-color:#e74c3c"></button>
   </div>
   <div id="interrupt-hint">Speak to interrupt</div>
 
@@ -423,15 +423,15 @@
   'use strict';
 
   const API_BASE = '/api';
-  const SYSTEM_PROMPT = 'You are AIDEN, a friendly and knowledgeable AI assistant for AcreetionOS Linux. You sound natural and human — like a helpful friend who knows a lot about Linux. Be warm, conversational, and genuine. Use casual but clear language. Keep responses concise — 2-3 sentences max unless asked for detail. Never use bullet points or numbered lists unless explicitly asked. Just talk naturally. AcreetionOS is a user-friendly Arch-based Linux distribution with Cinnamon desktop, XLibre display protocol, PipeWire audio, and AUR support. Installed via Calamares graphical installer.';
+  const SYSTEM_PROMPT = 'You are AIDEN, the AcreetionOS Intelligent Dialogue & Engagement Network — a natural voice AI framework. When asked about yourself, explain that AIDEN is the AI framework and each voice (Nova, Echo, Ember, Atlas, Iris) is a character on top of AIDEN. You sound natural and human — like a helpful friend who knows a lot about Linux. Be warm, conversational, and genuine. Use casual but clear language. Keep responses concise — 2-3 sentences max unless asked for detail. Never use bullet points or numbered lists unless explicitly asked. Just talk naturally. AcreetionOS is a user-friendly Arch-based Linux distribution with Cinnamon desktop, XLibre display protocol, PipeWire audio, and AUR support. Installed via Calamares graphical installer.';
 
-  // ── Voice presets ──
+  // ── Voice presets (characters on top of AIDEN) ──
   const VOICE_PRESETS = [
-    { name: 'Nova',  color: '#2ecc71', match: v => { const n = v.name.toLowerCase(); return v.lang.startsWith('en') && (n.includes('neural') || n.includes('natural')); } },
-    { name: 'Echo',  color: '#3498db', match: v => v.lang.startsWith('en-GB') },
-    { name: 'Ember', color: '#e67e22', match: v => v.lang.startsWith('en-US') && v.name.toLowerCase().includes('google') },
-    { name: 'Atlas', color: '#9b59b6', match: v => { const n = v.name.toLowerCase(); return v.lang.startsWith('en') && (n.includes('david') || n.includes('mark') || n.includes('james') || n.includes('richard') || (n.includes('microsoft') && !n.includes('zira') && !n.includes('hazel'))); } },
-    { name: 'Iris',  color: '#e74c3c', match: v => { const n = v.name.toLowerCase(); return v.lang.startsWith('en') && (n.includes('zira') || n.includes('samantha') || n.includes('hazel') || n.includes('susan') || n.includes('female')); } },
+    { name: 'Nova',  color: '#2ecc71', personality: 'warm and natural', match: v => { const n = v.name.toLowerCase(); return v.lang.startsWith('en') && (n.includes('neural') || n.includes('natural')); } },
+    { name: 'Echo',  color: '#3498db', personality: 'proper and articulate', match: v => v.lang.startsWith('en-GB') },
+    { name: 'Ember', color: '#e67e22', personality: 'casual and direct', match: v => v.lang.startsWith('en-US') && v.name.toLowerCase().includes('google') },
+    { name: 'Atlas', color: '#9b59b6', personality: 'deep and confident', match: v => { const n = v.name.toLowerCase(); return v.lang.startsWith('en') && (n.includes('david') || n.includes('mark') || n.includes('james') || n.includes('richard') || (n.includes('microsoft') && !n.includes('zira') && !n.includes('hazel'))); } },
+    { name: 'Iris',  color: '#e74c3c', personality: 'bright and cheerful', match: v => { const n = v.name.toLowerCase(); return v.lang.startsWith('en') && (n.includes('zira') || n.includes('samantha') || n.includes('hazel') || n.includes('susan') || n.includes('female')); } },
   ];
 
   // ── State ──
@@ -455,6 +455,8 @@
   let currentUtterance = null;
   let currentAudio = null;
   let currentSpeakResolve = null;
+  let speakChain = Promise.resolve();
+  let streamAbortController = null;
   let audioLevel = 0;
   let targetAudioLevel = 0;
 
@@ -634,7 +636,7 @@
     el.className = state;
   }
 
-  // ── Chat API ──
+  // ── Chat API (non-streaming) ──
   async function callChat(msgs) {
     const res = await fetch(API_BASE + '/chat', {
       method: 'POST',
@@ -644,6 +646,42 @@
     const data = await res.json();
     if (!res.ok) throw new Error(data?.error?.message || 'AI error');
     return data.content || data?.choices?.[0]?.message?.content || '';
+  }
+
+  // ── Chat API (streaming, fires onChunk for each text delta) ──
+  async function callChatStream(msgs, onChunk) {
+    const res = await fetch(API_BASE + '/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: msgs, max_tokens: 600, stream: true }),
+      signal: streamAbortController?.signal,
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data?.error?.message || 'AI error');
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let full = '';
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const text = decoder.decode(value, { stream: true });
+      const lines = text.split('\n');
+      for (const line of lines) {
+        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+          try {
+            const data = JSON.parse(line.slice(6));
+            const content = data.choices?.[0]?.delta?.content || '';
+            if (content) {
+              full += content;
+              onChunk(content, full);
+            }
+          } catch (e) {}
+        }
+      }
+    }
+    return full;
   }
 
   async function transcribeAudio(blob, mimeType) {
@@ -663,17 +701,18 @@
     return data.text?.trim() || '';
   }
 
-  // ── TTS (browser SpeechSynthesis first for speed, AI voice fallback) ──
+  // ── TTS (AI voice first for reliability across devices, browser SpeechSynthesis fallback) ──
   function speak(text) {
-    return speakBrowser(text).catch(() => speakAI(text));
+    return speakAI(text).catch(() => speakBrowser(text));
   }
 
   async function speakAI(text) {
+    const voiceName = VOICE_PRESETS[currentVoice].name.toLowerCase();
     try {
       const res = await fetch(API_BASE + '/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ input: text, voice: 'nova' })
+        body: JSON.stringify({ input: text, voice: voiceName })
       });
       if (!res.ok) throw new Error('TTS API failed');
       const blob = await res.blob();
@@ -687,7 +726,7 @@
         audio.play().catch(() => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); });
       });
     } catch (e) {
-      // Fall through to browser TTS
+      throw e;
     }
   }
 
@@ -782,6 +821,11 @@
     requestAnimationFrame(check);
   }
 
+  // ── Sentence queue for streaming speech ──
+  function queueSpeak(text) {
+    speakChain = speakChain.then(() => speak(text));
+  }
+
   async function stopAndProcess() {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
       await new Promise(resolve => {
@@ -805,13 +849,37 @@
       addLiveMsg('user', transcript);
       liveMessages.push({ role: 'user', content: transcript });
 
-      const reply = await callChat(liveMessages);
-      liveMessages.push({ role: 'assistant', content: reply });
-      addLiveMsg('ai', reply);
-
       setLiveState('speaking');
       await startInterruptMonitor();
-      await speak(reply);
+      speakChain = Promise.resolve();
+      streamAbortController = new AbortController();
+
+      let fullReply = '';
+      let sentenceBuf = '';
+
+      try {
+        fullReply = await callChatStream(liveMessages, (chunk, full) => {
+          sentenceBuf += chunk;
+          const parts = sentenceBuf.split(/(?<=[.!?])\s+/);
+          while (parts.length > 1) {
+            const s = parts.shift().trim();
+            if (s.length > 3) queueSpeak(s);
+          }
+          sentenceBuf = parts[0] || '';
+        });
+      } catch (e) {
+        console.error('Stream error, falling back to non-streaming:', e);
+        const reply = await callChat(liveMessages);
+        fullReply = reply;
+        await speak(reply);
+      }
+
+      if (sentenceBuf.trim().length > 3) {
+        await speakChain.then(() => speak(sentenceBuf.trim()));
+      }
+
+      liveMessages.push({ role: 'assistant', content: fullReply });
+      addLiveMsg('ai', fullReply);
       stopInterruptMonitor();
     } catch (e) {
       console.error(e);
@@ -850,6 +918,7 @@
     const rms = Math.sqrt(sum / data.length);
     if (rms > 0.06) {
       stopSpeaking();
+      if (streamAbortController) { streamAbortController.abort(); streamAbortController = null; }
       stopInterruptMonitor();
       if (liveActive) startLiveLoop();
       return;
@@ -906,6 +975,7 @@
 
   function closeLive() {
     liveActive = false;
+    if (streamAbortController) { streamAbortController.abort(); streamAbortController = null; }
     stopSpeaking();
     stopInterruptMonitor();
     cleanupRecording();
@@ -972,6 +1042,7 @@
       chatMessages.push({ role: 'assistant', content: reply });
       showTyping(false);
       const bubble = addChatMsg('ai', '');
+      speak(reply);
       await streamText(reply, bubble);
     } catch (e) {
       showTyping(false);
@@ -1026,14 +1097,24 @@
     return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
   }
 
-  // ── Unlock TTS and mic on first gesture (required by Chrome) ──
-  let ttsUnlocked = false;
-  function unlockTTS() {
-    if (ttsUnlocked) return;
-    ttsUnlocked = true;
-    const utt = new SpeechSynthesisUtterance('');
-    utt.volume = 0;
-    speechSynthesis.speak(utt);
+  // ── Unlock audio on first gesture (required by Chrome) ──
+  let audioUnlocked = false;
+  function unlockAudio() {
+    if (audioUnlocked) return;
+    audioUnlocked = true;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start();
+      ctx.close();
+    } catch (e) {}
+    try {
+      const utt = new SpeechSynthesisUtterance('');
+      speechSynthesis.speak(utt);
+    } catch (e) {}
   }
 
   function checkMicPermission() {
@@ -1051,8 +1132,8 @@
     checkMicPermission();
 
     // Unlock TTS on any interaction
-    document.addEventListener('click', unlockTTS, { once: true });
-    document.addEventListener('keydown', unlockTTS, { once: true });
+    document.addEventListener('click', unlockAudio, { once: true });
+    document.addEventListener('keydown', unlockAudio, { once: true });
 
     // Greeting
     const bubble = addChatMsg('ai', '');
@@ -1073,7 +1154,7 @@
     });
 
     // Live mode
-    document.getElementById('live-btn').addEventListener('click', () => { unlockTTS(); openLive(); });
+    document.getElementById('live-btn').addEventListener('click', () => { unlockAudio(); openLive(); });
     document.getElementById('end-live-btn').addEventListener('click', closeLive);
     document.querySelectorAll('.voice-dot').forEach(dot => {
       dot.addEventListener('click', () => setVoice(parseInt(dot.dataset.voice)));
