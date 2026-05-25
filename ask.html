@@ -154,14 +154,21 @@ function showTyping(on){
 }
 let ttsEnabled=true
 let aiKey=localStorage.getItem('aiden_key')||''
+let ttsVoices=[]
+function loadVoices(){
+  ttsVoices=window.speechSynthesis?.getVoices()||[]
+}
+if(window.speechSynthesis){
+  loadVoices()
+  window.speechSynthesis.onvoiceschanged=loadVoices
+}
 function speakText(t){
   if(!ttsEnabled||!window.speechSynthesis)return
   window.speechSynthesis.cancel()
   const u=new SpeechSynthesisUtterance(t)
-  u.rate=1.05;u.pitch=1;u.volume=1
-  const voices=window.speechSynthesis.getVoices()
-  const preferred=voices.find(v=>v.lang.startsWith('en')&&v.name.includes('Google'))||voices.find(v=>v.lang.startsWith('en'))
-  if(preferred)u.voice=preferred
+  u.rate=1.05;pitch=1;volume=1
+  const pref=ttsVoices.find(v=>v.lang.startsWith('en')&&v.name.includes('Google'))||ttsVoices.find(v=>v.lang.startsWith('en'))||ttsVoices[0]
+  if(pref)u.voice=pref
   window.speechSynthesis.speak(u)
 }
 async function callAI(text){
