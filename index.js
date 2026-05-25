@@ -416,11 +416,15 @@ export default {
           'HTTP-Referer': 'https://acreetionos.org',
           'X-Title': 'AIDEN (AcreetionOS Assistant)'
         },
-        body: JSON.stringify({
+        body: JSON.stringify(isStream ? {
           model: model,
           messages: body.messages,
           max_tokens: body.max_tokens || 800,
-          stream: isStream
+          stream: true
+        } : {
+          model: model,
+          messages: body.messages,
+          max_tokens: body.max_tokens || 800
         })
       });
 
