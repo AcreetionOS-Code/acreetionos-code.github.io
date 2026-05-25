@@ -220,12 +220,14 @@
       position: absolute; top: 0; left: 0; right: 0;
       display: flex; align-items: center; justify-content: space-between;
       padding: 1.2rem 1.5rem;
+      gap: 0.5rem;
     }
     .live-brand-name {
       font-family: 'Fira Code', monospace;
       font-size: 1.1rem; font-weight: 700;
       color: var(--text);
       display: flex; align-items: center; gap: 0.5rem;
+      flex-shrink: 0;
     }
     .live-badge {
       font-size: 0.65rem; font-weight: 700;
@@ -245,8 +247,21 @@
       font-size: 0.85rem;
       cursor: pointer;
       transition: border-color 0.2s, color 0.2s;
+      flex-shrink: 0;
     }
     #end-live-btn:hover { border-color: #e74c3c; color: #e74c3c; }
+    #audio-device-select {
+      background: var(--panel);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.25rem 0.4rem;
+      font-size: 0.7rem;
+      font-family: 'Fira Code', monospace;
+      cursor: pointer;
+      max-width: 120px;
+      flex-shrink: 0;
+    }
 
     #orb-canvas {
       display: block;
@@ -341,28 +356,6 @@
       font-family: 'Fira Code', monospace;
     }
 
-    /* ── Audio output selector ── */
-    #audio-output-selector {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      margin-top: 0.5rem;
-      font-size: 0.7rem;
-      color: var(--text-dim);
-      font-family: 'Fira Code', monospace;
-    }
-    #audio-output-selector select {
-      background: var(--panel);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.15rem 0.3rem;
-      font-size: 0.7rem;
-      font-family: 'Fira Code', monospace;
-      max-width: 140px;
-      cursor: pointer;
-    }
-
     /* ── Orb tap ripple ── */
     .tap-ripple {
       position: absolute;
@@ -424,6 +417,7 @@
       AIDEN <span class="live-badge">LIVE</span>
     </div>
     <button id="end-live-btn">End conversation</button>
+    <select id="audio-device-select" title="Audio output device"></select>
   </div>
 
   <canvas id="orb-canvas"></canvas>
@@ -435,11 +429,7 @@
     <button class="voice-dot" data-voice="3" title="Atlas — deep and confident" style="--dot-color:#9b59b6"></button>
     <button class="voice-dot" data-voice="4" title="Iris — bright and cheerful" style="--dot-color:#e74c3c"></button>
   </div>
-  <div id="audio-output-selector">
-    <span id="audio-device-label">Audio: </span>
-    <select id="audio-device-select"></select>
-  </div>
-  <div id="interrupt-hint">Speak to interrupt</div>
+  <div id="interrupt-hint">Tap the orb or speak to interrupt</div>
 
   <div id="live-transcript"></div>
 </div>
@@ -1017,36 +1007,33 @@
       liveAudioEl = new Audio();
       liveAudioEl.volume = 1;
     }
-    // Auto-request mic and enumerate audio devices (triggers permission prompts)
+    // Auto-request mic and enumerate audio devices
     if (navigator.mediaDevices) {
       navigator.mediaDevices.getUserMedia({ audio: true }).catch(() => {});
       const setupAudioOutput = () => {
         navigator.mediaDevices.enumerateDevices().then(devices => {
           audioOutputDevices = devices.filter(d => d.kind === 'audiooutput');
           const sel = document.getElementById('audio-device-select');
-          if (sel) {
-            const currentId = liveAudioEl?.sinkId || '';
-            sel.innerHTML = audioOutputDevices.map(d =>
-              `<option value="${d.deviceId}" ${d.deviceId === currentId ? 'selected' : ''}>${d.label || d.deviceId.slice(0, 8)}</option>`
-            ).join('');
-          }
-          // Try to select a non-default audio output (headphones)
-          if (liveAudioEl && liveAudioEl.setSinkId) {
+          if (!sel) return;
+          const currentId = liveAudioEl?.sinkId || '';
+          sel.innerHTML = audioOutputDevices.map(d =>
+            `<option value="${d.deviceId}" ${d.deviceId === currentId ? 'selected' : ''}>${d.label || (d.deviceId === 'default' ? 'Default' : d.deviceId.slice(0, 8))}</option>`
+          ).join('');
+          // Prefer non-default audio output (headphones/external speakers)
+          if (liveAudioEl && liveAudioEl.setSinkId && !liveAudioEl.sinkId) {
             const preferred = audioOutputDevices.find(d => d.deviceId !== 'default' && d.deviceId);
-            if (preferred && preferred.deviceId !== liveAudioEl.sinkId) {
-              liveAudioEl.setSinkId(preferred.deviceId).catch(() => {});
+            if (preferred && preferred.deviceId) {
+              liveAudioEl.setSinkId(preferred.deviceId).then(() => {
+                if (sel) sel.value = preferred.deviceId;
+              }).catch(() => {});
             }
           }
         }).catch(() => {});
       };
-      // Request speaker-selection permission if API exists
-      if (navigator.permissions && navigator.permissions.request) {
-        navigator.permissions.request({ name: 'speaker-selection' }).then(() => {
-          setupAudioOutput();
-        }).catch(() => setupAudioOutput());
-      } else {
-        setupAudioOutput();
-      }
+      // Enumerate after a delay to ensure labels are populated
+      setTimeout(setupAudioOutput, 500);
+      // Re-enumerate when devicechange fires
+      navigator.mediaDevices.addEventListener('devicechange', setupAudioOutput);
     }
     playTestTone();
     setVoice(currentVoice);
