@@ -146,16 +146,16 @@ footer a{color:var(--g);text-decoration:none}
 <p style="font-size:0.8rem;color:var(--fg3)">ISOs stored on Cloudflare R2 — free downloads. Old builds are purged after 3 weeks.</p>
 </div>
 
-<div class="feature-box">
-<h2>🔄 Recovery System</h2>
-<p>ArttulOS includes a built-in recovery partition and boot health monitoring:</p>
-<ul>
-<li><strong>Recovery mode</strong> — boot entry in systemd-boot to reinstall the immutable base</li>
-<li><strong>Boot health check</strong> — if the system fails to boot 3 times, recovery mode is offered automatically</li>
-<li><strong><code>arttulos-recover</code></strong> — CLI tool that pulls a fresh base image from Cloudflare R2 and reinstalls the core OS while preserving <code>/home</code></li>
-<li><strong><code>arttulos-update</code></strong> — atomic A/B update mechanism for applying system updates</li>
-</ul>
-<p>Your data in <code>/home</code> and application containers is preserved during recovery. Only the immutable base system is replaced.</p>
+<div class="feature-box" style="border:1px solid var(--g);">
+<h2>🔄 Recovery System — You Can't Permanently Break It</h2>
+<p style="margin-bottom:1.5rem">Even if you somehow manage to corrupt the base system, ArttulOS has your back. The recovery system automatically detects boot failures and offers to restore the immutable base — while keeping all your files and containers intact.</p>
+<div class="cards" style="margin:0">
+<div class="card" style="background:var(--gbg)"><h3>🆘 Recovery Mode</h3><p>A dedicated boot entry in systemd-boot. Select it at startup and the system reinstalls the immutable base from a known-good image. Your <code>/home</code> is untouched.</p></div>
+<div class="card" style="background:var(--gbg)"><h3>❤️‍🩹 Boot Health Check</h3><p>systemd service monitors every boot. If the system fails to start 3 times in a row, recovery mode is offered automatically. No manual intervention needed.</p></div>
+<div class="card" style="background:var(--gbg)"><h3>🛠️ <code>arttulos-recover</code></h3><p>CLI tool that pulls a fresh immutable base image from Cloudflare R2 and reinstalls the core OS — preserving <code>/home</code>, containers, and overlay configs. Run it from the recovery shell.</p></div>
+<div class="card" style="background:var(--gbg)"><h3>📦 <code>arttulos-update</code></h3><p>Atomic A/B update mechanism. The current system is slot A. Updates download to slot B. Reboot into B. If it fails, reboot back to A. No partial upgrades, no broken states.</p></div>
+</div>
+<p style="margin-top:1rem;color:var(--fg2);font-size:0.85rem">Your documents, downloads, application containers, and <code>/home</code> are stored on separate overlays and are never touched during recovery or updates. Only the immutable base (<code>/usr</code>, <code>/bin</code>, <code>/lib</code>) gets replaced.</p>
 </div>
 
 <div class="feature-box">
