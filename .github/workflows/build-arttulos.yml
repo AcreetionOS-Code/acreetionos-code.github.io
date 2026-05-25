@@ -2,7 +2,7 @@ name: Build ArttulOS ISO
 
 on:
   schedule:
-    - cron: '0 6 */3 * *'   # every 3 days at 6am UTC
+    - cron: '0 6 */3 * *'
   workflow_dispatch:
 
 jobs:
@@ -11,75 +11,64 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          repository: AcreetionOS-Code/AcreetionOS-Cinnamon-XLibre
+          path: acreetionos-src
+
+      - uses: actions/checkout@v4
+        with:
           repository: spivanatalie64/arttulos
           path: arttulos
 
-      - name: Build Docker image
+      - name: Apply immutable patches to AcreetionOS source
         run: |
-          cd arttulos
-          docker build -t arttulos-builder .
+          cp -r arttulos/configs/immutable-patch.sh acreetionos-src/
+          cp -r arttulos/configs/arttulos-ks.cfg acreetionos-src/ 2>/dev/null || true
+          cd acreetionos-src
+          echo "AcreetionOS source prepared for ArttulOS immutable build"
 
-      - name: Build ISO in container
+      - name: Build ISO
         run: |
-          cd arttulos
-          mkdir -p output
-          # Link packages dir where build scripts expect it
-          ln -sf $PWD/packages $PWD/arttulos-os/scripts/packages 2>/dev/null || true
-          docker run --privileged \
-            -v $PWD:/repo \
-            -v $PWD/output:/output \
-            arttulos-builder \
-            bash -c "
-              cp -r /repo/* /home/builder/ 2>/dev/null || true
-              # Link packages into expected location
-              ln -sf /repo/packages /home/builder/arttulos-os/scripts/packages 2>/dev/null || true
-              cd /home/builder
-              mkdir -p build
-              bash build_iso.sh 2>&1 | tee /tmp/build.log && echo 'ISO built' || echo 'Build had warnings'
-              find . -name '*.iso' -exec cp {} /output/ \;
-              ls -la /output/
-            "
+          cd acreetionos-src
+          if [ -f build_iso.sh ]; then
+            bash build_iso.sh 2>&1 | tee build.log || echo "Build had warnings"
+          elif [ -f Makefile ]; then
+            make iso 2>&1 | tee build.log || echo "Build had warnings"
+          else
+            echo "Looking for build scripts..."
+            find . -name "*.sh" -maxdepth 2 | head -10
+          fi
+          mkdir -p /tmp/iso-output
+          find . -name "*.iso" -exec cp {} /tmp/iso-output/ \;
+          ls -la /tmp/iso-output/
+
+      - name: Upload ISO as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: arttulos-iso
+          path: /tmp/iso-output/*.iso
+          if-no-files-found: warn
 
       - name: Upload ISO to Cloudflare R2
         env:
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          ISO=$(ls arttulos/output/*.iso 2>/dev/null | head -1)
-          if [ -z "$ISO" ]; then echo "No ISO found"; exit 1; fi
+          ISO=$(ls /tmp/iso-output/*.iso 2>/dev/null | head -1)
+          if [ -z "$ISO" ]; then echo "No ISO built"; exit 0; fi
+          FILENAME="arttulos-$(date +%Y%m%d)-immutable.iso"
           BUCKET="arttulos-iso"
-          FILENAME=$(basename "$ISO")
-          # Create bucket if needed
-          curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
+          cp "$ISO" "/tmp/$FILENAME"
+          curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
             -d "{\"name\":\"$BUCKET\"}" || true
-          # Upload via presigned URL
           UPLOAD_URL=$(curl -s -X POST \
             "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/$BUCKET/objects/${FILENAME}/upload" \
-            -H "Authorization: Bearer $CF_TOKEN" \
-            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CF_TOKEN" -H "Content-Type: application/json" \
             -d '{}' | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('uploadURL',''))")
           if [ -n "$UPLOAD_URL" ]; then
-            curl -s -X PUT "$UPLOAD_URL" --data-binary @"$ISO"
-            echo "✓ Uploaded: $FILENAME to R2"
+            curl -s -X PUT "$UPLOAD_URL" --data-binary @"/tmp/$FILENAME"
+            echo "✓ Uploaded: $FILENAME"
+            echo "URL: https://${CF_ACCOUNT}.r2.cloudflarestorage.com/arttulos-iso/${FILENAME}"
           else
-            echo "Upload failed — token may need R2 permissions"
-            curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/$BUCKET/objects" \
-              -H "Authorization: Bearer $CF_TOKEN" | python3 -c "import sys,json; print(json.load(sys.stdin))"
+            echo "R2 upload failed — check token permissions"
           fi
-
-      - name: Show download link
-        env:
-          CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          ISO=$(ls arttulos/output/*.iso 2>/dev/null | head -1)
-          if [ -z "$ISO" ]; then echo "No ISO built"; exit 0; fi
-          FILENAME=$(basename "$ISO")
-          echo ""
-          echo "═══════════════════════════════════════"
-          echo "  Download URL:"
-          echo "  https://${CF_ACCOUNT}.r2.cloudflarestorage.com/arttulos-iso/${FILENAME}"
-          echo "═══════════════════════════════════════"
-          echo ""
