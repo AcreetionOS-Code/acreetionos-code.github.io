@@ -10,14 +10,15 @@ from urllib.error import URLError
 
 WORKER_URL = os.environ.get("WORKER_URL", "https://acreetionos.org/api")
 NEWSLETTER_DIR = os.environ.get("NEWSLETTER_DIR", "newsletters")
+REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "90"))
 
 
-def fetch_json(url, data=None):
+def fetch_json(url, data=None, timeout=None):
     req = Request(url, data=data, headers={"User-Agent": "AcreetionOS-Newsletter-Bot/1.0"})
     if data:
         req.add_header("Content-Type", "application/json")
     try:
-        with urlopen(req, timeout=30) as resp:
+        with urlopen(req, timeout=timeout or REQUEST_TIMEOUT) as resp:
             return json.loads(resp.read())
     except URLError as e:
         print(f"  HTTP error: {e.status} {e.reason}", file=sys.stderr)
@@ -90,28 +91,34 @@ def main():
     )
 
     content = None
-    try:
-        ai_response = fetch_json(
-            f"{WORKER_URL}/news/ai",
-            data=json.dumps({
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                "max_tokens": 1024,
-            }).encode(),
-        )
-        content = (
-            ai_response
-            .get("choices", [{}])[0]
-            .get("message", {})
-            .get("content", "")
-            .strip()
-        )
-        if not content:
+    for attempt in range(3):
+        try:
+            ai_response = fetch_json(
+                f"{WORKER_URL}/news/ai",
+                data=json.dumps({
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt},
+                    ],
+                    "max_tokens": 1024,
+                }).encode(),
+                timeout=120,
+            )
+            content = (
+                ai_response
+                .get("choices", [{}])[0]
+                .get("message", {})
+                .get("content", "")
+                .strip()
+            )
+            if content:
+                break
             raise ValueError("Empty AI response")
-    except Exception as e:
-        print(f"AI generation failed ({e}), using fallback template.", file=sys.stderr)
+        except Exception as e:
+            print(f"AI generation attempt {attempt + 1} failed ({e})", file=sys.stderr)
+            if attempt < 2:
+                import time
+                time.sleep(5)
 
     if not content:
         content = (
