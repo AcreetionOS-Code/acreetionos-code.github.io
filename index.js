@@ -11,7 +11,7 @@
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const HF_WHISPER_URL = 'https://api-inference.huggingface.co/models/openai/whisper-tiny';
+const HF_WHISPER_URL = 'https://hf.co/api/inference/models/openai/whisper-tiny';
 const HF_TTS_URL = 'https://api-inference.huggingface.co/models/espnet/kan-bayashi_ljspeech_vits';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';const ALLOWED_ORIGINS = [
