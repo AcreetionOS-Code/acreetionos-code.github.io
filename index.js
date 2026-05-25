@@ -12,10 +12,10 @@
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
+const GOOGLE_TTS_URL = 'https://translate.google.com/translate_tts';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
-const WHISPER_MODEL = 'openai/whisper-1';
-const ALLOWED_ORIGINS = [
+const WHISPER_MODEL = 'openai/whisper-large-v3';const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
