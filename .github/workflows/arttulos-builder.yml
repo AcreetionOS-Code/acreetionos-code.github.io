@@ -27,25 +27,34 @@ jobs:
           repository: spivanatalie64/arttulos
           path: patches
 
-      - name: Build ISO in Arch Linux container
+      - name: Prepare build environment
         run: |
-          mkdir -p /tmp/iso
+          cp patches/configs/immutable-patch.sh src/
+          [ -d src/airootfs ] && cp patches/configs/immutable-patch.sh src/airootfs/root/
+          # Fix build.sh — remove sudo (not needed in Docker)
+          sed -i 's/sudo //g' src/build.sh
+          # Fix mkarchiso.sh — proper env var + remove j$nproc
+          echo 'export PACMAN_OPTS="--overwrite \"*\""' > src/mkarchiso.sh
+          echo 'mkarchiso -L ArttulOS -v -o ../ISO . -C ./pacman.conf' >> src/mkarchiso.sh
+          # Fix profiledef.sh — use non-deprecated boot modes
+          sed -i "s/bios.syslinux.mbr/bios.syslinux/" src/profiledef.sh
+          sed -i "s/bios.syslinux.eltorito/bios.syslinux/" src/profiledef.sh
+
+      - name: Build ISO in Docker
+        run: |
           docker run --privileged --rm \
             -v $PWD/src:/workspace \
             -v $PWD/patches:/patches \
-            -v /tmp/iso:/output \
             archlinux:latest \
             bash -c "
-              pacman -Syu --noconfirm archiso git && \
-              cp /patches/configs/immutable-patch.sh /workspace/ && \
-              if [ -d /workspace/airootfs ]; then cp /patches/configs/immutable-patch.sh /workspace/airootfs/root/; fi && \
+              pacman -Syu --noconfirm archiso && \
               cd /workspace && \
               chmod +x *.sh && \
-              bash build.sh 2>&1 && \
-              find .. -name '*.iso' -exec cp {} /output/ \; 2>/dev/null; \
-              find / -name '*.iso' -maxdepth 5 -exec cp {} /output/ \; 2>/dev/null || true; \
-              ls -la /output/
-            " || echo "Docker build completed with issues"
+              bash build.sh 2>&1; \
+              find / -name '*.iso' -maxdepth 5 2>/dev/null;
+            " 2>&1 | tee /tmp/build.log
+          mkdir -p /tmp/iso
+          docker run --rm -v $PWD/src:/workspace -v /tmp/iso:/output archlinux:latest bash -c "find /workspace/.. -name '*.iso' -exec cp {} /output/ \; 2>/dev/null; ls -la /output/" 2>/dev/null || true
           ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
 
       - name: Upload ISO to R2
@@ -54,7 +63,7 @@ jobs:
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           ISO=$(ls /tmp/iso/*.iso 2>/dev/null | head -1)
-          [ -z "$ISO" ] && echo "No ISO" && exit 0
+          [ -z "$ISO" ] && echo "No ISO to upload" && exit 0
           F="arttulos-${{ matrix.edition.name }}-$(date +%Y%m%d).iso"
           cp "$ISO" "/tmp/$F"
           curl -s -X POST "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets" -H "Authorization: Bearer $CF_TOKEN" -d '{"name":"arttulos-iso"}' || true
@@ -66,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - name: Delete ISOs older than 3 weeks from R2
+      - name: Delete ISOs older than 3 weeks
         env:
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
