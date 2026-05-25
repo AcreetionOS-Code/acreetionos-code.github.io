@@ -1,0 +1,121 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ArttulOS — The Immutable Container OS</title>
+<meta name="description" content="ArttulOS is an immutable, containerized operating system built on AcreetionOS technology. Atomic updates, read-only root, and container-native workloads for mission-critical deployments."/>
+<style>
+:root{--g:#2ecc71;--gbg:#080b0a;--bg2:#0e1311;--bg3:#1a221e;--bd:#1e2a24;--fg:#eef2f0;--fg2:#8a9e94;--fg3:#5a6e64;--fm:'JetBrains Mono','Fira Code',monospace;--fs:'Space Grotesk','Inter',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--fs);background:var(--gbg);color:var(--fg);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+.bar{background:var(--bg2);border-bottom:1px solid var(--bd);padding:0.35rem 2rem;text-align:center;font-family:var(--fm);font-size:0.65rem;color:var(--fg3);letter-spacing:0.1em;text-transform:uppercase}
+.bar span{color:var(--g)}
+header{background:rgba(8,11,10,0.85);backdrop-filter:blur(16px);border-bottom:2px solid var(--g);position:sticky;top:0;z-index:100}
+.hc{max-width:1200px;margin:0 auto;padding:0 2rem;display:flex;align-items:center;height:64px;gap:1rem}
+.logo{font-family:var(--fm);font-size:1.3rem;font-weight:700;color:var(--fg);text-decoration:none;display:flex;align-items:center;gap:0.6rem}
+.logo span{color:var(--g)}
+.nav{margin-left:auto;display:flex;gap:0.3rem}
+.nav a{color:var(--fg3);text-decoration:none;font-family:var(--fm);font-size:0.75rem;padding:0.4rem 0.8rem;border-radius:6px;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.05em}
+.nav a:hover{color:var(--fg);background:rgba(46,204,113,0.06);text-decoration:none}
+.page{max-width:1200px;margin:3rem auto;padding:0 2rem;flex:1;width:100%}
+.hero{text-align:center;padding:4rem 0 3rem}
+.hero h1{font-family:var(--fm);font-size:2.8rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.04em}
+.hero h1 span{background:linear-gradient(135deg,var(--g),#3ddc84);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--fg2);font-size:1.05rem;max-width:600px;margin:0 auto;line-height:1.7}
+.tag{display:inline-block;background:rgba(46,204,113,0.1);color:var(--g);padding:0.25rem 0.75rem;border-radius:6px;font-family:var(--fm);font-size:0.7rem;border:1px solid rgba(46,204,113,0.15);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:1rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem;margin:2rem 0}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:1.5rem;transition:all 0.3s}
+.card:hover{border-color:var(--g);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.3)}
+.card h3{font-family:var(--fm);font-size:0.8rem;color:var(--g);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.5rem}
+.card p{color:var(--fg2);font-size:0.9rem;margin:0}
+.feature-box{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:2rem;margin:2rem 0}
+.feature-box h2{font-family:var(--fm);font-size:1.2rem;color:var(--g);margin-bottom:1rem}
+.feature-box p{color:var(--fg2);font-size:0.9rem;margin-bottom:0.5rem}
+.feature-box ul{list-style:none;padding:0}
+.feature-box li{padding:0.5rem 0;border-bottom:1px solid var(--bd);color:var(--fg2);font-size:0.9rem;display:flex;gap:0.75rem;align-items:center}
+.feature-box li:last-child{border:none}
+.feature-box li strong{color:var(--fg);font-family:var(--fm);min-width:140px;font-size:0.8rem}
+code{font-family:var(--fm);background:rgba(46,204,113,0.06);padding:0.2em 0.4em;border-radius:4px;font-size:0.85em;color:var(--g)}
+pre{background:rgba(0,0,0,0.2);border:1px solid var(--bd);border-radius:8px;padding:1rem;overflow-x:auto;margin:1rem 0}
+pre code{background:transparent;padding:0;color:var(--fg2)}
+.btns{display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin:2rem 0}
+.btn{display:inline-block;padding:0.7rem 1.5rem;border-radius:8px;font-family:var(--fm);font-size:0.8rem;font-weight:600;text-decoration:none;transition:all 0.3s;text-transform:uppercase;letter-spacing:0.05em}
+.btn-p{background:var(--g);color:#000}
+.btn-p:hover{background:#3ddc84;color:#000;text-decoration:none}
+.btn-s{background:transparent;border:1px solid var(--bd);color:var(--fg2)}
+.btn-s:hover{border-color:var(--g);color:var(--g);text-decoration:none}
+footer{border-top:1px solid var(--bd);padding:2rem;text-align:center;background:var(--bg2);margin-top:auto}
+footer p{color:var(--fg3);font-size:0.8rem;margin-bottom:0.3rem}
+footer a{color:var(--g);text-decoration:none}
+@media(max-width:768px){.hero h1{font-size:1.8rem}.hc{padding:0 1rem}.page{padding:0 1rem;margin:1.5rem auto}.nav a{font-size:0.65rem;padding:0.3rem 0.5rem}}
+</style>
+</head><body>
+
+<div class="bar"><span>◆</span> ARTTULOS — IMMUTABLE CONTAINER OS <span>◆</span> BUILT ON ACREETIONOS TECHNOLOGY</div>
+
+<header>
+<div class="hc">
+<a href="/arttulos/" class="logo">⌂ Arttul<span>OS</span></a>
+<nav class="nav">
+<a href="/arttulos/">Dashboard</a>
+<a href="https://acreetionos.org">AcreetionOS</a>
+<a href="https://discord.acreetionos.org">Discord</a>
+</nav>
+</div>
+</header>
+
+<div class="page">
+
+<div class="hero">
+<div class="tag">Immutable · Container-Native · Atomic</div>
+<h1><span>ArttulOS</span></h1>
+<p>An immutable, containerized operating system built on AcreetionOS technology. Atomic updates, read-only root filesystem, and container-native workloads — designed for systems that must stay running and must stay secure.</p>
+<div class="btns">
+<a href="https://github.com/spivanatalie64/arttulos" class="btn btn-p">Source Code</a>
+<a href="https://discord.acreetionos.org" class="btn btn-s">Join Discord</a>
+</div>
+</div>
+
+<div class="cards">
+<div class="card"><h3>🔒 Immutable Root</h3><p>The root filesystem is mounted read-only. Nothing changes it without an explicit atomic update. No config drift, no surprise modifications, no "what happened to my system?"</p></div>
+<div class="card"><h3>📦 Container-Native</h3><p>Applications run in isolated containers via Docker/Podman with pre-hardened profiles. The host stays pristine — apps live in their own worlds with their own dependencies.</p></div>
+<div class="card"><h3>♻️ Atomic Updates</h3><p>Updates are applied as whole-image swaps. Either the update succeeds entirely, or it rolls back automatically. No partial upgrades, no dependency hell, no broken systems.</p></div>
+<div class="card"><h3>🛡️ Security by Default</h3><p>SELinux enforcing, read-only /usr, no setuid binaries, no world-writable paths, and automatic CVE scanning via GitHub Actions. The attack surface is minimal by design.</p></div>
+<div class="card"><h3>⚡ AcreetionOS Base</h3><p>Built on the Arch Linux foundation via AcreetionOS — you get the performance of rolling releases with the stability of an immutable layer. Pacman runs in a transient overlay.</p></div>
+<div class="card"><h3>🔄 Declarative Config</h3><p>System configuration is declared as code — network, users, services, firewall rules. Rebuild from the same config anywhere and get identical results. Reproducible infrastructure.</p></div>
+</div>
+
+<div class="feature-box">
+<h2>Specifications</h2>
+<ul>
+<li><strong>Base</strong><span>AcreetionOS / Arch Linux (rolling)</span></li>
+<li><strong>Root filesystem</strong><span>Read-only ext4 with overlayfs for transient writes</span></li>
+<li><strong>Update mechanism</strong><span>A/B atomic image swaps with automatic rollback on failure</span></li>
+<li><strong>Container runtime</strong><span>Podman with rootless mode; Docker via compatibility layer</span></li>
+<li><strong>Init system</strong><span>systemd with custom immutable targets</span></li>
+<li><strong>Security</strong><span>SELinux enforcing, read-only /usr, no setuid by default</span></li>
+<li><strong>Desktop</strong><span>Optional — deploy via container (Cinnamon, GNOME, or none)</span></li>
+<li><strong>State</strong><span>Active development — alpha milestones on GitHub</span></li>
+</ul>
+</div>
+
+<div class="feature-box">
+<h2>Quick Start</h2>
+<p>ArttulOS is in active development. To build from source:</p>
+<pre><code>git clone https://github.com/spivanatalie64/arttulos
+cd arttulos
+# See BUILD_PROCESS.md for build instructions
+cat BUILD_PROCESS.md</code></pre>
+<p>For questions, discussion, and development updates:</p>
+<div class="btns" style="margin:1rem 0 0;justify-content:flex-start">
+<a href="https://discord.acreetionos.org" class="btn btn-p">Join Discord</a>
+<a href="https://github.com/spivanatalie64/arttulos" class="btn btn-s">GitHub</a>
+</div>
+</div>
+
+</div>
+
+<footer>
+<p>ArttulOS — An <a href="https://acreetionos.org">AcreetionOS</a> project. Built with Arch Linux and containers.</p>
+<p><a href="https://acreetionos.org">acreetionos.org</a> · <a href="https://discord.acreetionos.org">Discord</a> · <a href="https://github.com/spivanatalie64/arttulos">GitHub</a></p>
+</footer>
+
+</body></html>
