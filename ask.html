@@ -718,7 +718,7 @@
     return data.text?.trim() || '';
   }
 
-  // ── TTS (AI voice first for reliability across devices, browser SpeechSynthesis fallback) ──
+  // ── TTS (AI voice first for reliability across devices, browser SpeechSynth  // ── TTS (AI voice via OpenRouter primary, browser SpeechSynthesis fallback) ──
   function speak(text) {
     return speakAPI(text).catch(() => speakBrowser(text));
   }
@@ -727,7 +727,7 @@
     const res = await fetch(API_BASE + '/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ input: text })
+      body: JSON.stringify({ input: text, voice: 'nova' })
     });
     if (!res.ok) throw new Error('TTS API failed');
     const blob = await res.blob();
@@ -896,10 +896,15 @@
       try {
         fullReply = await callChatStream(liveMessages, (chunk, full) => {
           sentenceBuf += chunk;
+          const words = full.split(/\s+/);
+          if (words.length >= 3 && !words[0]) {
+            // Speak first few words immediately for near-instant response
+            speak(full);
+            words[0] = true;
+          }
           const parts = sentenceBuf.split(/(?<=[.!?])\s+/);
           while (parts.length > 1) {
-            const s = parts.shift().trim();
-            if (s.length > 3) queueSpeak(s);
+            queueSpeak(parts.shift().trim());
           }
           sentenceBuf = parts[0] || '';
         });

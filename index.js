@@ -12,10 +12,11 @@
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
-const GOOGLE_TTS_URL = 'https://translate.google.com/translate_tts';
+const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
-const WHISPER_MODEL = 'openai/whisper-large-v3';const ALLOWED_ORIGINS = [
+const WHISPER_MODEL = 'openai/whisper-large-v3';
+const TTS_MODEL = 'cartesia-ai/cartesia-tts';const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
@@ -341,7 +342,7 @@ export default {
       }
     }
 
-    // Text-to-Speech via Google Translate (free, no API key required)
+    // Text-to-Speech via OpenRouter (Cartesia TTS — natural human voice)
     if (request.method === 'POST' && url.pathname === '/api/tts') {
       try {
         const body = await request.json();
@@ -351,19 +352,38 @@ export default {
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        // Google Translate TTS supports ~200 chars per request; use first chunk
-        const text = body.input.slice(0, 200);
-        const ttsUrl = GOOGLE_TTS_URL + '?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=en&client=tw-ob';
-        const ttsRes = await fetch(ttsUrl);
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'TTS not configured' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const ttsRes = await fetch(TTS_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
+          },
+          body: JSON.stringify({
+            model: TTS_MODEL,
+            input: body.input,
+            voice: body.voice || 'nova',
+            response_format: 'mp3'
+          })
+        });
         if (!ttsRes.ok) {
-          return new Response(JSON.stringify({ error: 'TTS failed' }), {
+          const errText = await ttsRes.text();
+          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 300) }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
         return new Response(ttsRes.body, {
           headers: {
-            'Content-Type': 'audio/mpeg',
+            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/mpeg',
             ...corsHeaders(request)
           }
         });
