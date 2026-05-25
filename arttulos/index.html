@@ -158,6 +158,7 @@ cd arttulos
 <button class="aw-send" onclick="askAiden()">➤</button>
 </div>
 </div>
+<script src="/aiden-key.js"></script>
 <script>
 const AIDEN_ANSWERS={
   'what is arttulos|what is this|about':"ArttulOS is literally just AcreetionOS but immutable. Same Arch base, same Cinnamon desktop, same AUR — but with a read-only root filesystem and atomic updates. You can't break it. That's the whole thing~ uwu",
@@ -178,23 +179,37 @@ function matchAiden(t){
   }
   return"Sorry, I don't have an answer for that yet~ Try asking about what ArttulOS is, how it differs from AcreetionOS, or what immutable means! uwu 💚"
 }
+async function aiAiden(t){
+  if(!window.OPENROUTER_KEY)return null
+  try{
+    const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.OPENROUTER_KEY},
+      body:JSON.stringify({model:'meta-llama/llama-3.2-3b-instruct:free',messages:[{role:'system',content:'You are AIDEN, a cute helpful assistant for ArttulOS (an immutable container OS based on AcreetionOS). Answer concisely but with a playful uwu tone. Keep responses under 3 sentences.'},{role:'user',content:t}],max_tokens:200})
+    })
+    const d=await res.json()
+    if(!res.ok)throw new Error(d.error?.message)
+    return d.choices?.[0]?.message?.content||null
+  }catch(e){console.error('AI error:',e);return null}
+}
 function toggleAiden(){
   const w=document.getElementById('aiden-widget')
   w.classList.toggle('open')
   if(w.classList.contains('open'))document.getElementById('aw-input').focus()
 }
-function askAiden(){
+async function askAiden(){
   const i=document.getElementById('aw-input')
   const t=i.value.trim()
   if(!t)return
   i.value=''
   const m=document.getElementById('aw-msgs')
   m.innerHTML+='<div class="aw-msg user">'+t+'</div>'
-  const reply=matchAiden(t)
+  let reply=await aiAiden(t)
+  if(!reply)reply=matchAiden(t)
   setTimeout(()=>{
     m.innerHTML+='<div class="aw-msg bot"><div class="aw-sender">AIDEN</div>'+reply+'</div>'
     m.scrollTop=m.scrollHeight
-  },300+Math.random()*400)
+  },100)
 }
 document.getElementById('aw-input').addEventListener('keydown',e=>{if(e.key==='Enter')askAiden()})
 </script>

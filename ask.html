@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="contact.css" />
+<script src="/aiden-key.js"></script>
   <style>
     :root{--g:#2ecc71;--gb:#121212;--gp:#1a1a1a;--gb2:#222;--gbd:#333;--fg:#e5e5e5;--fg2:#b2b2b2;--fm:'Fira Code',monospace;--fs:'Roboto',sans-serif}
     *{margin:0;padding:0;box-sizing:border-box}
@@ -132,6 +133,7 @@ function match(input){
   return best.answer
 }
 
+if(typeof window.OPENROUTER_KEY!=='undefined'&&window.OPENROUTER_KEY)aiKey=window.OPENROUTER_KEY
 const messages=document.getElementById('messages')
 const input=document.getElementById('chat-input')
 const sendBtn=document.getElementById('send-btn')
