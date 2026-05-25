@@ -23,16 +23,20 @@ jobs:
         run: |
           cd arttulos
           mkdir -p output
+          # Link packages dir where build scripts expect it
+          ln -sf $PWD/packages $PWD/arttulos-os/scripts/packages 2>/dev/null || true
           docker run --privileged \
             -v $PWD:/repo \
             -v $PWD/output:/output \
             arttulos-builder \
             bash -c "
               cp -r /repo/* /home/builder/ 2>/dev/null || true
+              # Link packages into expected location
+              ln -sf /repo/packages /home/builder/arttulos-os/scripts/packages 2>/dev/null || true
               cd /home/builder
               mkdir -p build
-              bash build_iso.sh 2>&1 | tee /tmp/build.log || echo 'Build had warnings'
-              find build -name '*.iso' -exec cp {} /output/ \;
+              bash build_iso.sh 2>&1 | tee /tmp/build.log && echo 'ISO built' || echo 'Build had warnings'
+              find . -name '*.iso' -exec cp {} /output/ \;
               ls -la /output/
             "
 
