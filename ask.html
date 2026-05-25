@@ -703,7 +703,28 @@
 
   // ── TTS (AI voice first for reliability across devices, browser SpeechSynthesis fallback) ──
   function speak(text) {
-    return speakBrowser(text);
+    return speakAPI(text).catch(() => speakBrowser(text));
+  }
+
+  async function speakAPI(text) {
+    const res = await fetch(API_BASE + '/tts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input: text })
+    });
+    if (!res.ok) throw new Error('TTS API failed');
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    if (liveAudioEl) {
+      liveAudioEl.src = url;
+      currentAudioSource = liveAudioEl;
+      await new Promise((resolve) => {
+        currentSpeakResolve = resolve;
+        liveAudioEl.onended = () => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); };
+        liveAudioEl.onerror = () => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); };
+        liveAudioEl.play().catch(() => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); });
+      });
+    }
   }
 
   function speakBrowser(text) {
@@ -956,12 +977,19 @@
     });
   }
 
+  // ── Audio element (created on user gesture for Chrome autoplay) ──
+  let liveAudioEl = null;
+
   // ── Open/Close Live ──
   function openLive() {
     liveActive = true;
     liveMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
     document.getElementById('live-transcript').innerHTML = '';
     document.getElementById('live-mode').classList.add('active');
+    if (!liveAudioEl) {
+      liveAudioEl = new Audio();
+      liveAudioEl.volume = 1;
+    }
     playTestTone();
     setVoice(currentVoice);
     resizeCanvas();

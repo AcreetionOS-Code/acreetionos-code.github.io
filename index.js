@@ -12,11 +12,9 @@
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
-const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
 const WHISPER_MODEL = 'openai/whisper-1';
-const TTS_MODEL = 'cartesia-ai/cartesia-tts';
 const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -343,7 +341,7 @@ export default {
       }
     }
 
-    // Text-to-Speech via OpenRouter
+    // Text-to-Speech via Google Translate (free, no API key required)
     if (request.method === 'POST' && url.pathname === '/api/tts') {
       try {
         const body = await request.json();
@@ -353,38 +351,19 @@ export default {
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        const apiKey = env.OPENROUTER_API_KEY;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'TTS not configured' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const ttsRes = await fetch(TTS_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
-          },
-          body: JSON.stringify({
-            model: body.model || TTS_MODEL,
-            input: body.input,
-            voice: body.voice || 'nova',
-            response_format: 'mp3'
-          })
-        });
+        // Google Translate TTS supports ~200 chars per request; use first chunk
+        const text = body.input.slice(0, 200);
+        const ttsUrl = GOOGLE_TTS_URL + '?ie=UTF-8&q=' + encodeURIComponent(text) + '&tl=en&client=tw-ob';
+        const ttsRes = await fetch(ttsUrl);
         if (!ttsRes.ok) {
-          const errText = await ttsRes.text();
-          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 300) }), {
+          return new Response(JSON.stringify({ error: 'TTS failed' }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
         return new Response(ttsRes.body, {
           headers: {
-            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/mpeg',
+            'Content-Type': 'audio/mpeg',
             ...corsHeaders(request)
           }
         });
