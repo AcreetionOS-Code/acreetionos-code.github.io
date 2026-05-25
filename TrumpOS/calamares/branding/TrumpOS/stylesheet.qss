@@ -1,0 +1,120 @@
+/* TrumpOS Calamares Stylesheet — Gold & Navy */
+
+QTreeView {
+    font-size: 14pt;
+    color: #D4AF37;
+    padding: 5px;
+    margin: 2px;
+}
+
+QListView {
+    font-size: 14pt;
+    color: #D4AF37;
+    padding: 5px;
+    margin: 2px;
+}
+
+QComboBox {
+    font-size: 14pt;
+    color: #D4AF37;
+    padding: 5px;
+    margin: 2px;
+}
+
+#packagechooserq {
+    font-size: 14pt;
+}
+
+#textBoxUserName, #textBoxHostName, #textBoxUserPassword, #textBoxRootPassword, #textBoxVerify {
+    font-size: 14pt;
+}
+
+#labelUsername, #labelHostname, #labelUserPassword, #labelUserVerify, #labelRootPassword, #labelRootVerify {
+    font-size: 14pt;
+}
+
+QLineEdit {
+    font-size: 14pt;
+    padding: 5px;
+}
+
+QLabel {
+    font-size: 14pt;
+}
+
+#usersPage QWidget {
+    font-size: 14pt;
+}
+
+#partitionBarView {
+    font-size: 14pt;
+}
+
+#partitionLabels QLabel {
+    font-size: 14pt;
+}
+
+#mountPointComboBox {
+    font-size: 14pt;
+}
+
+#partitionTable {
+    font-size: 14pt;
+}
+
+#deviceComboBox {
+    font-size: 14pt;
+}
+
+#partitionPage QWidget {
+    font-size: 14pt;
+}
+
+#partitionMountPoint {
+    font-size: 14pt;
+}
+
+#fileSystemComboBox {
+    font-size: 14pt;
+}
+
+QCheckBox {
+    spacing: 5px;
+    color: #D4AF37;
+}
+
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #D4AF37;
+    border-radius: 3px;
+    background-color: #002147;
+}
+
+QCheckBox::indicator:unchecked {
+    background-color: #002147;
+}
+
+QCheckBox::indicator:unchecked:hover {
+    background-color: #0a3060;
+    border-color: #e5c44e;
+}
+
+QCheckBox::indicator:checked {
+    background-color: #D4AF37;
+    border-color: #D4AF37;
+}
+
+QCheckBox::indicator:checked:hover {
+    background-color: #e5c44e;
+    border-color: #e5c44e;
+}
+
+QCheckBox::indicator:disabled {
+    border-color: #333;
+    background-color: #111;
+}
+
+QCheckBox::indicator:focus {
+    border-color: #D4AF37;
+}
