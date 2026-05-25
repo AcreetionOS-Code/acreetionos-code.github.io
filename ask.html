@@ -962,6 +962,7 @@
     liveMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
     document.getElementById('live-transcript').innerHTML = '';
     document.getElementById('live-mode').classList.add('active');
+    playTestTone();
     setVoice(currentVoice);
     resizeCanvas();
     initParticles();
@@ -1112,6 +1113,20 @@
       speechSynthesis.getVoices();
       const utt = new SpeechSynthesisUtterance('');
       speechSynthesis.speak(utt);
+    } catch (e) {}
+  }
+
+  function playTestTone() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.15;
+      osc.frequency.value = 440;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.15);
     } catch (e) {}
   }
 
