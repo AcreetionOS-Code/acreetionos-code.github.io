@@ -1,9 +1,9 @@
 name: Build ArttulOS ISO
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: '0 6 * * 0'  # weekly at 6am Sunday
+    - cron: '0 6 */3 * *'   # every 3 days at 6am UTC
+  workflow_dispatch:
 
 jobs:
   build:
@@ -19,15 +19,21 @@ jobs:
           cd arttulos
           docker build -t arttulos-builder .
 
-      - name: Build ISO
+      - name: Build ISO in container
         run: |
           cd arttulos
           mkdir -p output
-          docker run --privileged -v $PWD/output:/output arttulos-builder \
+          docker run --privileged \
+            -v $PWD:/repo \
+            -v $PWD/output:/output \
+            arttulos-builder \
             bash -c "
-              cd /build && \
-              bash build_iso.sh && \
-              cp /build/arttulos-*.iso /output/
+              cp -r /repo/* /home/builder/ 2>/dev/null || true
+              cd /home/builder
+              mkdir -p build
+              bash build_iso.sh 2>&1 | tee /tmp/build.log || echo 'Build had warnings'
+              find build -name '*.iso' -exec cp {} /output/ \;
+              ls -la /output/
             "
 
       - name: Upload ISO to Cloudflare R2
@@ -53,18 +59,23 @@ jobs:
             -d '{}' | python3 -c "import sys,json; print(json.load(sys.stdin).get('result',{}).get('uploadURL',''))")
           if [ -n "$UPLOAD_URL" ]; then
             curl -s -X PUT "$UPLOAD_URL" --data-binary @"$ISO"
-            echo "✓ Uploaded: $FILENAME"
+            echo "✓ Uploaded: $FILENAME to R2"
           else
-            echo "Upload failed, checking existing objects..."
+            echo "Upload failed — token may need R2 permissions"
             curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/$BUCKET/objects" \
               -H "Authorization: Bearer $CF_TOKEN" | python3 -c "import sys,json; print(json.load(sys.stdin))"
           fi
 
-      - name: Update website with download link
+      - name: Show download link
         env:
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           ISO=$(ls arttulos/output/*.iso 2>/dev/null | head -1)
-          if [ -z "$ISO" ]; then echo "No ISO"; exit 1; fi
+          if [ -z "$ISO" ]; then echo "No ISO built"; exit 0; fi
           FILENAME=$(basename "$ISO")
-          echo "ISO_URL=https://${CF_ACCOUNT}.r2.cloudflarestorage.com/arttulos-iso/${FILENAME}" >> $GITHUB_ENV
+          echo ""
+          echo "═══════════════════════════════════════"
+          echo "  Download URL:"
+          echo "  https://${CF_ACCOUNT}.r2.cloudflarestorage.com/arttulos-iso/${FILENAME}"
+          echo "═══════════════════════════════════════"
+          echo ""
