@@ -808,11 +808,13 @@
   // ── Speech Recognition (browser-native, no API key needed) ──
   let speechRecognition = null;
   let recognitionFinalTranscript = '';
+  let srFailCount = 0;
 
   function startSpeechRecognition() {
     try {
       const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) { fallbackStartRecording(); return; }
+      if (!SR) { srFailCount++; setLiveState('idle'); return; }
+      if (srFailCount > 3) { setLiveState('idle'); return; }
       speechRecognition = new SR();
       speechRecognition.lang = 'en-US';
       speechRecognition.interimResults = false;
@@ -829,34 +831,30 @@
         speechRecognition = null;
         recognitionFinalTranscript = '';
         if (transcript && liveActive) {
+          srFailCount = 0;
           processTranscript(transcript);
         } else if (liveActive) {
+          srFailCount++;
           startLiveLoop();
         }
       };
 
       speechRecognition.onerror = (event) => {
         speechRecognition = null;
-        if (event.error === 'no-speech' || event.error === 'aborted') {
-          if (liveActive) startLiveLoop();
-          return;
-        }
+        srFailCount++;
         console.error('Speech recognition error:', event.error);
-        fallbackStartRecording();
+        if (liveActive) startLiveLoop();
       };
 
       speechRecognition.start();
     } catch (e) {
-      fallbackStartRecording();
+      srFailCount++;
+      if (liveActive) startLiveLoop();
     }
   }
 
   function stopSpeechRecognition() {
     try { if (speechRecognition) { speechRecognition.abort(); speechRecognition = null; } } catch (e) {}
-  }
-
-  function fallbackStartRecording() {
-    if (liveActive) startRecording();
   }
 
   async function startRecording() {
