@@ -453,7 +453,7 @@
   let interruptContext = null;
   let interruptStream = null;
   let currentUtterance = null;
-  let currentAudio = null;
+  let currentAudioSource = null;
   let currentSpeakResolve = null;
   let speakChain = Promise.resolve();
   let streamAbortController = null;
@@ -718,21 +718,18 @@
       if (!res.ok) throw new Error('TTS API failed');
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
-      currentAudio = audio;
-      await new Promise(resolve => {
-        currentSpeakResolve = resolve;
-        const done = () => { URL.revokeObjectURL(url); currentAudio = null; currentSpeakResolve = null; resolve(); };
-        audio.onended = done;
-        audio.onerror = done;
-        audio.play().catch(() => {
-          if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => audio.play().catch(done));
-          } else {
-            done();
-          }
+      if (liveAudioEl) {
+        liveAudioEl.src = url;
+        currentAudioSource = liveAudioEl;
+        await new Promise((resolve, reject) => {
+          currentSpeakResolve = resolve;
+          liveAudioEl.onended = () => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); };
+          liveAudioEl.onerror = () => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); };
+          liveAudioEl.play().catch(() => { URL.revokeObjectURL(url); currentAudioSource = null; currentSpeakResolve = null; resolve(); });
         });
-      });
+      } else {
+        URL.revokeObjectURL(url);
+      }
     } catch (e) {
       throw e;
     }
@@ -759,10 +756,7 @@
   }
 
   function stopSpeaking() {
-    if (currentAudio) {
-      currentAudio.pause();
-      currentAudio = null;
-    }
+    if (liveAudioEl) { liveAudioEl.pause(); liveAudioEl.src = ''; }
     if (currentSpeakResolve) {
       const r = currentSpeakResolve;
       currentSpeakResolve = null;
@@ -772,7 +766,7 @@
   }
 
   function stopBrowserSpeech() {
-    if (speechSynthesis.speaking) speechSynthesis.cancel();
+    try { if (speechSynthesis.speaking) speechSynthesis.cancel(); } catch (e) {}
     currentUtterance = null;
   }
 
@@ -967,12 +961,20 @@
     });
   }
 
+  // ── Audio element (created on user gesture for Chrome autoplay) ──
+  let liveAudioEl = null;
+
   // ── Open/Close Live ──
   function openLive() {
     liveActive = true;
     liveMessages = [{ role: 'system', content: SYSTEM_PROMPT }];
     document.getElementById('live-transcript').innerHTML = '';
     document.getElementById('live-mode').classList.add('active');
+    // Create audio element during user gesture so Chrome allows playback
+    if (!liveAudioEl) {
+      liveAudioEl = new Audio();
+      liveAudioEl.volume = 1;
+    }
     setVoice(currentVoice);
     resizeCanvas();
     initParticles();
@@ -1107,26 +1109,18 @@
 
   // ── Unlock audio on first gesture (required by Chrome) ──
   let audioUnlocked = false;
-  let audioCtx = null;
   function unlockAudio() {
     if (audioUnlocked) return;
     audioUnlocked = true;
-    // Unlock AudioContext
     try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const buf = audioCtx.createBuffer(1, 1, 22050);
-      const src = audioCtx.createBufferSource();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
       src.buffer = buf;
-      src.connect(audioCtx.destination);
+      src.connect(ctx.destination);
       src.start();
+      ctx.close();
     } catch (e) {}
-    // Prime HTMLAudioElement playback
-    try {
-      const silent = new Audio();
-      silent.volume = 0.01;
-      silent.play().then(() => silent.pause()).catch(() => {});
-    } catch (e) {}
-    // Unlock SpeechSynthesis
     try {
       speechSynthesis.getVoices();
       const utt = new SpeechSynthesisUtterance('');
