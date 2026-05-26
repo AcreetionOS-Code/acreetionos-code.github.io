@@ -435,15 +435,78 @@ async function handleHostingUnsubscribe(request, env) {
 
 // ─── Malware Scanning ──────────────────────────────────────────
 
-async function scanISOSuspicious(env) {
-  // Scan all active provider ISOs using VirusTotal URL scan
-  // Returns list of flagged providers
-  const vtKey = env.VIRUSTOTAL_API_KEY;
-  if (!vtKey) return { flagged: [], errors: [] };
+const SUSPICIOUS_FILENAME_PATTERNS = /\.(exe|bat|cmd|scr|ps1|vbs|jar|dll|zip|rar|7z)$/i;
+const ISO_MAGIC = new Uint8Array([0x43, 0x44, 0x30, 0x30, 0x31]); // "CD001" at offset 32769
+const SCAN_QUOTA_KEY = 'scan-quota-state';
 
+async function getScanQuota(env) {
+  const data = await getR2(env, 'acreetionos-hosting', SCAN_QUOTA_KEY);
+  return data || { vt_remaining: 500, vt_reset: Date.now() + 86400000, vt_disabled: false };
+}
+
+async function saveScanQuota(env, quota) {
+  await putR2(env, 'acreetionos-hosting', SCAN_QUOTA_KEY, quota);
+}
+
+async function localScanISO(env, data) {
+  // Local fallback scan when VirusTotal quota is exhausted
+  const issues = [];
+  const isoUrl = data.mirror_url;
+
+  try {
+    // 1. HEAD request to verify URL is reachable and looks like an ISO
+    const headRes = await fetch(isoUrl, { method: 'HEAD', signal: AbortSignal.timeout(15000) });
+    if (!headRes.ok) {
+      issues.push('ISO URL returned ' + headRes.status);
+    }
+
+    const contentType = headRes.headers.get('Content-Type') || '';
+    const contentLength = parseInt(headRes.headers.get('Content-Length') || '0');
+
+    if (contentLength > 0 && contentLength < 104857600) {
+      issues.push(`ISO too small (${(contentLength/1048576).toFixed(1)} MB) — likely not a real ISO`);
+    }
+
+    // 2. Check filename for suspicious extensions
+    const pathname = new URL(isoUrl).pathname;
+    if (SUSPICIOUS_FILENAME_PATTERNS.test(pathname)) {
+      issues.push(`Suspicious file extension in URL: ${pathname.match(/\.[^.]+$/)[0]}`);
+    }
+
+    // 3. Check ISO magic bytes in the first chunk
+    const getRes = await fetch(isoUrl, {
+      headers: { 'Range': 'bytes=32769-32773' },
+      signal: AbortSignal.timeout(15000)
+    });
+    if (getRes.ok) {
+      const chunk = await getRes.arrayBuffer();
+      const bytes = new Uint8Array(chunk);
+      const isIso = ISO_MAGIC.every((b, i) => bytes[i] === b);
+      if (!isIso) {
+        issues.push('Missing ISO 9660 magic bytes — file may not be a valid ISO');
+      }
+    }
+
+    // 4. Flag for CI ClamAV deep scan
+    if (issues.length === 0) {
+      return { clean: true, scan_method: 'local_quick' };
+    }
+
+    return { clean: false, scan_method: 'local_quick', issues, auto_deregister: false, needs_clamav: true };
+  } catch (e) {
+    return { clean: false, scan_method: 'local_quick', issues: [`Scan error: ${e.message}`], auto_deregister: false, needs_clamav: true };
+  }
+}
+
+async function scanISOSuspicious(env) {
   const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
   const flagged = [];
   const errors = [];
+  const vtQuarantined = [];
+  const vtDisabled = [];
+
+  let quota = await getScanQuota(env);
+  let useVt = !quota.vt_disabled && env.VIRUSTOTAL_API_KEY;
 
   for (const obj of objects) {
     const data = await getR2(env, 'acreetionos-hosting', obj.key);
@@ -452,47 +515,92 @@ async function scanISOSuspicious(env) {
     const isoUrl = data.mirror_url;
     if (!isoUrl) continue;
 
-    try {
-      // Submit URL to VirusTotal for scanning
-      const submitRes = await fetch('https://www.virustotal.com/api/v3/urls', {
-        method: 'POST',
-        headers: { 'x-apikey': vtKey, 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({ url: isoUrl })
-      });
+    let result;
 
-      if (!submitRes.ok) { errors.push(`${data.org}: VT submit failed ${submitRes.status}`); continue; }
-      const submitData = await submitRes.json();
-      const analysisId = submitData?.data?.id;
-      if (!analysisId) { errors.push(`${data.org}: no analysis ID`); continue; }
-
-      // Wait a moment then fetch results
-      await new Promise(r => setTimeout(r, 5000));
-
-      const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-        headers: { 'x-apikey': vtKey }
-      });
-      if (!resultRes.ok) { errors.push(`${data.org}: VT result fetch failed`); continue; }
-      const resultData = await resultRes.json();
-      const stats = resultData?.data?.attributes?.stats;
-
-      if (stats && (stats.malicious > 0 || stats.suspicious > 0)) {
-        flagged.push({
-          id: data.id, org: data.org, email: data.email,
-          mirror_url: data.mirror_url,
-          malicious: stats.malicious || 0,
-          suspicious: stats.suspicious || 0,
-          total: (stats.harmless || 0) + (stats.malicious || 0) + (stats.suspicious || 0) + (stats.undetected || 0)
+    if (useVt) {
+      try {
+        const submitRes = await fetch('https://www.virustotal.com/api/v3/urls', {
+          method: 'POST',
+          headers: { 'x-apikey': env.VIRUSTOTAL_API_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ url: isoUrl })
         });
-      }
 
-      // Rate limit: 4 requests per minute for free VT
-      await new Promise(r => setTimeout(r, 15000));
-    } catch (e) {
-      errors.push(`${data.org}: ${e.message}`);
+        if (submitRes.status === 429 || submitRes.status === 403) {
+          // Quota exhausted or key invalid — switch to local scan for all remaining
+          quota.vt_disabled = true;
+          quota.vt_disabled_at = Date.now();
+          await saveScanQuota(env, quota);
+          sendDiscordWebhook(env,
+            `**VirusTotal Quota Exhausted** — Switching to local fallback scanning.\nStatus: ${submitRes.status}\nAll remaining providers will be scanned locally and flagged for ClamAV CI verification.`
+          );
+          useVt = false;
+          vtDisabled.push(data.org);
+          result = await localScanISO(env, data);
+        } else if (!submitRes.ok) {
+          errors.push(`${data.org}: VT submit failed ${submitRes.status}`);
+          result = await localScanISO(env, data);
+        } else {
+          const submitData = await submitRes.json();
+          const analysisId = submitData?.data?.id;
+          if (analysisId) {
+            await new Promise(r => setTimeout(r, 5000));
+            const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
+              headers: { 'x-apikey': env.VIRUSTOTAL_API_KEY }
+            });
+            if (resultRes.ok) {
+              const resultData = await resultRes.json();
+              const stats = resultData?.data?.attributes?.stats;
+              if (stats && (stats.malicious > 0 || stats.suspicious > 0)) {
+                result = { clean: false, scan_method: 'virustotal', malicious: stats.malicious, suspicious: stats.suspicious, total: (stats.harmless||0)+(stats.malicious||0)+(stats.suspicious||0)+(stats.undetected||0) };
+              } else {
+                result = { clean: true, scan_method: 'virustotal' };
+              }
+            } else {
+              errors.push(`${data.org}: VT result fetch failed`);
+              result = await localScanISO(env, data);
+            }
+          } else {
+            errors.push(`${data.org}: no VT analysis ID`);
+            result = await localScanISO(env, data);
+          }
+        }
+
+        if (useVt) {
+          quota.vt_remaining = (quota.vt_remaining || 500) - 1;
+          if (quota.vt_remaining <= 0) {
+            quota.vt_disabled = true;
+            quota.vt_disabled_at = Date.now();
+            useVt = false;
+            sendDiscordWebhook(env, '**VirusTotal Daily Quota Reached** — Switching to local scans for remaining providers.');
+          }
+          await saveScanQuota(env, quota);
+          await new Promise(r => setTimeout(r, 16000));
+        }
+      } catch (e) {
+        errors.push(`${data.org}: VT error ${e.message}, falling back to local scan`);
+        result = await localScanISO(env, data);
+      }
+    } else {
+      result = await localScanISO(env, data);
+    }
+
+    if (!result.clean) {
+      const entry = {
+        id: data.id, org: data.org, email: data.email,
+        mirror_url: data.mirror_url,
+        scan_method: result.scan_method,
+        issues: result.issues || [],
+      };
+      if (result.malicious !== undefined) {
+        entry.malicious = result.malicious;
+        entry.suspicious = result.suspicious;
+        entry.total = result.total;
+      }
+      flagged.push(entry);
     }
   }
 
-  return { flagged, errors };
+  return { flagged, errors, vt_disabled: quota.vt_disabled, vt_quarantined: vtDisabled };
 }
 
 async function handleHostingScan(request, env) {
@@ -504,12 +612,30 @@ async function handleHostingScan(request, env) {
   }
   const result = await scanISOSuspicious(env);
 
-  // Auto-deregister flagged providers
+  let needsClamav = false;
+
+  // Auto-deregister flagged providers (VT-confirmed only)
   for (const flagged of result.flagged) {
-    await deleteR2(env, 'acreetionos-hosting', 'provider-' + flagged.id);
+    if (flagged.scan_method === 'virustotal' || (flagged.scan_method === 'local_quick' && flagged.malicious)) {
+      await deleteR2(env, 'acreetionos-hosting', 'provider-' + flagged.id);
+      sendDiscordWebhook(env,
+        `**🚨 MALWARE DETECTED — Provider Auto-Deregistered**\n**Provider:** ${flagged.org}\n**Email:** ${flagged.email}\n**ISO:** ${flagged.mirror_url}\n**Method:** ${flagged.scan_method}\n**Malicious detections:** ${flagged.malicious || 0}\n**Issues:** ${(flagged.issues || []).join(', ')}\n\nProvider has been immediately removed from the website.`
+      );
+    }
+    if (flagged.needs_clamav || flagged.scan_method === 'local_quick') {
+      needsClamav = true;
+    }
+  }
+
+  if (result.vt_disabled) {
     sendDiscordWebhook(env,
-      `**🚨 MALWARE DETECTED — Provider Auto-Deregistered**\n**Provider:** ${flagged.org}\n**Email:** ${flagged.email}\n**ISO:** ${flagged.mirror_url}\n**Malicious detections:** ${flagged.malicious}\n**Suspicious:** ${flagged.suspicious}\n**Total engines:** ${flagged.total}\n\nProvider has been immediately removed from the website.`
+      `**⚠️ VirusTotal Quota Exhausted** — Scanning switched to local fallback.\nFlagged ${result.flagged.filter(f => f.scan_method === 'local_quick').length} providers for ClamAV review.\nOnly VT-confirmed threats were auto-deregistered.`
     );
+  }
+
+  // Trigger CI ClamAV deep scan for locally-flagged providers
+  if (needsClamav) {
+    triggerClamavScan(env);
   }
 
   if (result.flagged.length === 0 && result.errors.length === 0) {
@@ -536,6 +662,18 @@ async function handleHostingCount(env) {
     if (data && data.status === 'active') active++;
   }
   return new Response(JSON.stringify({ count: active, threshold: 5, show_fastest: active >= 5 }), { headers: getCors() });
+}
+
+async function triggerClamavScan(env) {
+  const ghToken = env.GH_TOKEN;
+  if (!ghToken) return;
+  try {
+    await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/scan-provider-isos.yml/dispatches', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-Hosting' },
+      body: JSON.stringify({ ref: 'main' })
+    });
+  } catch (e) { console.error('ClamAV scan trigger failed:', e); }
 }
 
 async function triggerRedeploy(env) {
