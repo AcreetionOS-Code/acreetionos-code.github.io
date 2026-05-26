@@ -207,7 +207,7 @@ export default {
       });
     }
 
-    // R2 ISO listing for ArttulOS downloads
+    // R2 ISO listing for AcreetionOS Immutable downloads
     if (url.pathname === '/api/r2/list') {
       const cfToken = env.CLOUDFLARE_API_TOKEN;
       const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
@@ -217,7 +217,7 @@ export default {
         });
       }
       try {
-        const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/arttulos-iso/objects`, {
+        const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/immutable-iso/objects`, {
           headers: { 'Authorization': `Bearer ${cfToken}` }
         });
         const data = await res.json();
@@ -252,7 +252,7 @@ export default {
         // Resolve "latest" to the most recent matching ISO
         if (filename.includes('latest')) {
           const prefix = filename.replace('-latest.iso', '');
-          const listRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/arttulos-iso/objects`, {
+          const listRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/immutable-iso/objects`, {
             headers: { 'Authorization': `Bearer ${cfToken}` }
           });
           const listData = await listRes.json();
@@ -262,7 +262,7 @@ export default {
           if (match) filename = match.key;
           else return new Response('No ISO builds found', { status: 404 });
         }
-        const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/arttulos-iso/${filename}`;
+        const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/immutable-iso/${filename}`;
         const fileRes = await fetch(downloadUrl);
         if (!fileRes.ok) return new Response('Not found', { status: 404 });
         return new Response(fileRes.body, {

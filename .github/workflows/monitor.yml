@@ -37,7 +37,7 @@ jobs:
       - name: Check subdomains
         if: steps.health.outputs.status == 'healthy'
         run: |
-          for sub in "wiki" "blog" "arttulos" "gitlab"; do
+          for sub in "wiki" "blog" "immutable" "gitlab"; do
             CODE=$(curl -sI -o /dev/null -w "%{http_code}" --max-time 10 "https://$sub.acreetionos.org" 2>/dev/null || echo "000")
             STATUS="✓"
             [ "$CODE" = "200" ] || [ "$CODE" = "301" ] || [ "$CODE" = "302" ] || STATUS="✗"

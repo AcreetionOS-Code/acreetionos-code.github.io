@@ -47,7 +47,7 @@ A specialized tool for monitoring repository sovereignty and development status 
 ### Ermin
 A fork of the Stoat codebase, redesigned to remove bloat, hide origin IPs, and eliminate secret tracking. Built as a free and open-source alternative for community collaboration.
 
-### ArttulOS
+### AcreetionOS Immutable
 A side project focused on absolute stability and a "grey space" computing philosophy where technical choices are pre-integrated for a seamless experience.
 
 ## 4. Installation Guide
