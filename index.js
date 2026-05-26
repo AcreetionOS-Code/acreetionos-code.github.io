@@ -251,6 +251,45 @@ async function sendDiscordWebhook(env, message) {
   } catch (e) { console.error('Discord webhook failed:', e); }
 }
 
+async function assignDiscordRole(env, userId) {
+  if (!userId || !env.DISCORD_BOT_TOKEN) return;
+  try {
+    // Get the guild ID from the webhook URL
+    const whParts = (env.DISCORD_WEBHOOK_URL || '').split('/');
+    const webhookId = whParts[whParts.length - 2];
+    const whRes = await fetch(`https://discord.com/api/v10/webhooks/${webhookId}`, {
+      headers: { 'Authorization': `Bot ${env.DISCORD_BOT_TOKEN}` }
+    });
+    if (!whRes.ok) return;
+    const whData = await whRes.json();
+    const guildId = whData.guild_id;
+    if (!guildId) return;
+
+    // Assign the ISO Hoster role
+    const roleRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}/roles/1412937217797652550`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bot ${env.DISCORD_BOT_TOKEN}` }
+    });
+    if (!roleRes.ok) console.error('Role assignment failed:', await roleRes.text());
+  } catch (e) { console.error('Discord role assignment failed:', e); }
+}
+
+async function sendHostingEmail(env, to, subject, body) {
+  if (!env.EMAIL_FROM || !env.SENDGRID_API_KEY) return;
+  try {
+    await fetch('https://api.sendgrid.com/v3/mail/send', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: env.EMAIL_FROM },
+        subject,
+        content: [{ type: 'text/plain', value: body }]
+      })
+    });
+  } catch (e) { console.error('Email send failed:', e); }
+}
+
 async function handleHostingGetProviders(env) {
   const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
   const providers = [];
@@ -274,14 +313,23 @@ async function handleHostingRegister(request, env) {
       bandwidth: body.bandwidth || '', notes: body.notes || '',
       password: hashPassword(body.password),
       status: 'pending', created: new Date().toISOString(),
-      removal_requested: false
+      removal_requested: false,
+      discord_user_id: body.discord_user_id || '',
+      subscribed: body.subscribe === true
     };
     const ok = await putR2(env, 'acreetionos-hosting', 'provider-' + id, provider);
     if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: getCors() });
 
+    // Mailing list subscription
+    if (body.subscribe && body.email) {
+      await putR2(env, 'acreetionos-hosting', 'subscriber-' + body.email.replace(/[@.]/g, '_'), {
+        email: body.email, org: body.org, subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
+      });
+    }
+
     // Notify Discord
     sendDiscordWebhook(env,
-      `**New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "YOUR_ADMIN_KEY" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
+      `**New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "YOUR_ADMIN_KEY" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
     );
 
     return new Response(JSON.stringify({ success: true, message: 'Registration submitted for review', id }), { headers: getCors() });
@@ -344,6 +392,11 @@ async function handleHostingAdminApprove(request, env) {
     if (body.action === 'approve-removal' || body.action === 'remove') {
       await deleteR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
       sendDiscordWebhook(env, `**Provider Removed (Admin Approved)**\n**Provider:** ${data.org} (${data.email})`);
+      // Notify mailing list about removal
+      if (data.subscribed && data.email) {
+        sendHostingEmail(env, data.email, 'AcreetionOS Hosting - Your Provider Has Been Removed',
+          `Hi ${data.org},\n\nYour hosting provider listing for AcreetionOS has been removed as requested.\n\nThank you for your support.\n- AcreetionOS Team`);
+      }
       triggerRedeploy(env);
       return new Response(JSON.stringify({ success: true, message: 'Provider removed and redeploy triggered' }), { headers: getCors() });
     }
@@ -351,6 +404,17 @@ async function handleHostingAdminApprove(request, env) {
     data.status = 'active';
     await putR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id, data);
     sendDiscordWebhook(env, `**Provider Approved**\n**Provider:** ${data.org} (${data.email}) is now active.`);
+
+    // Assign Discord role
+    if (data.discord_user_id) {
+      assignDiscordRole(env, data.discord_user_id);
+    }
+
+    // Send welcome email to subscribed providers
+    if (data.subscribed && data.email) {
+      sendHostingEmail(env, data.email, 'Welcome to AcreetionOS Hosting Program!',
+        `Hi ${data.org},\n\nYour hosting provider application has been approved!\n\nMirror URL: ${data.mirror_url}\nStatus: Active\n\nYou are now subscribed to hosting updates. We'll notify you of any changes.\n\nTo unsubscribe: https://acreetionos.org/api/hosting/unsubscribe?email=${encodeURIComponent(data.email)}\n\n- AcreetionOS Team`);
+    }
     triggerRedeploy(env);
     return new Response(JSON.stringify({ success: true, message: 'Provider approved and redeploy triggered' }), { headers: getCors() });
   } catch (e) {
@@ -380,6 +444,40 @@ async function handleHostingAdminPending(env) {
   }
   const pending = all.filter(p => p.status === 'pending' || p.removal_requested);
   return new Response(JSON.stringify({ pending, total: all.length }), { headers: getCors() });
+}
+
+async function handleHostingSubscribe(request, env) {
+  try {
+    const body = await request.json();
+    if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: getCors() });
+    const key = 'subscriber-' + body.email.replace(/[@.]/g, '_');
+    const existing = await getR2(env, 'acreetionos-hosting', key);
+    if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: getCors() });
+    await putR2(env, 'acreetionos-hosting', key, {
+      email: body.email, org: body.org || '', subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
+    });
+    return new Response(JSON.stringify({ success: true, message: 'Subscribed to hosting updates' }), { headers: getCors() });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+  }
+}
+
+async function handleHostingUnsubscribe(request, env) {
+  const email = request.url.searchParams?.get?.('email') || '';
+  if (!email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: getCors() });
+  const key = 'subscriber-' + email.replace(/[@.]/g, '_');
+  await deleteR2(env, 'acreetionos-hosting', key);
+  return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: getCors() });
+}
+
+async function handleHostingCount(env) {
+  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  let active = 0;
+  for (const obj of objects) {
+    const data = await getR2(env, 'acreetionos-hosting', obj.key);
+    if (data && data.status === 'active') active++;
+  }
+  return new Response(JSON.stringify({ count: active, threshold: 5, show_fastest: active >= 5 }), { headers: getCors() });
 }
 
 async function triggerRedeploy(env) {
@@ -800,6 +898,15 @@ export default {
     }
     if (url.pathname === '/api/hosting/admin/pending' && request.method === 'GET') {
       return handleHostingAdminPending(env);
+    }
+    if (url.pathname === '/api/hosting/subscribe' && request.method === 'POST') {
+      return handleHostingSubscribe(request, env);
+    }
+    if (url.pathname === '/api/hosting/unsubscribe' && request.method === 'GET') {
+      return handleHostingUnsubscribe(request, env);
+    }
+    if (url.pathname === '/api/hosting/count' && request.method === 'GET') {
+      return handleHostingCount(env);
     }
 
     // Chat endpoint

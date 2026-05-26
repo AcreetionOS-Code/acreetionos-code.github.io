@@ -10,39 +10,76 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fetch providers from R2 and generate providers.json
+      - name: Fetch providers and generate JSON
+        id: fetch
         env:
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          # Fetch provider list from Cloudflare Worker API
           curl -s "https://acreetionos.org/api/hosting/providers" -o /tmp/providers.json
-          echo "Providers fetched:"
-          cat /tmp/providers.json | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'{len(d.get(\"providers\",[]))} providers')"
+          ACTIVE=$(python3 -c "
+import json
+with open('/tmp/providers.json') as f:
+    data = json.load(f)
+providers = [p for p in data.get('providers', []) if p.get('status') == 'active']
+print(json.dumps(providers))
+")
+          echo "$ACTIVE" > providers-data.json
+          echo "count=$(echo "$ACTIVE" | python3 -c "import sys,json; print(len(json.load(sys.stdin)))")" >> $GITHUB_OUTPUT
 
-          # Generate providers-list.html snippet for inclusion
+      - name: Generate providers HTML snippet
+        run: |
           python3 << 'PYEOF'
           import json
-          with open('/tmp/providers.json') as f:
-              data = json.load(f)
-          providers = [p for p in data.get('providers', []) if p.get('status') == 'active']
-          html = '<div class="mirror-list">\n'
-          for p in providers:
-              html += f'<div class="mirror-item">\n'
-              html += f'<strong>{p.get("org","Unknown")}</strong>'
-              if p.get('location'): html += f'<span class="mirror-location">{p["location"]}</span>'
-              html += f'<a href="{p["mirror_url"]}" target="_blank" rel="noopener" class="btn btn-small">ISO Mirror</a>'
-              if p.get('website'): html += f'<a href="{p["website"]}" target="_blank" rel="noopener" class="btn btn-small">Website</a>'
-              html += '</div>\n'
-          html += '</div>'
-          with open('providers-list.html', 'w') as f:
-              f.write(html)
-          print('Generated providers-list.html')
+          with open('providers-data.json') as f:
+              providers = json.load(f)
+          count = len(providers)
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: main
-          force_orphan: false
+          # Generate full providers list HTML for hosting page
+          list_html = '<div class="provider-list">\n'
+          for p in providers:
+              list_html += f'<div class="provider-item">\n'
+              list_html += f'<div class="info">\n'
+              list_html += f'<div class="name">{p.get("org","Unknown")} <span class="tag tag-active">Active</span></div>\n'
+              list_html += f'<div class="url"><a href="{p["mirror_url"]}" target="_blank">{p["mirror_url"]}</a></div>\n'
+              list_html += f'<div class="provider-detail">{p.get("location","")} · {p.get("bandwidth","")}</div>\n'
+              list_html += '</div>\n</div>\n'
+          list_html += '</div>\n'
+          with open('providers-list.html', 'w') as f:
+              f.write(list_html)
+
+          # Generate quick-select JS snippet for download pages
+          if count >= 5:
+              select_html = '<div class="fastest-provider">\n'
+              select_html += '<label for="fastest-mirror">Fastest Provider:</label>\n'
+              select_html += '<select id="fastest-mirror" onchange="window.location.href=this.value">\n'
+              select_html += '<option value="">Select a mirror...</option>\n'
+              for p in providers:
+                  select_html += f'<option value="{p["mirror_url"]}">{p.get("org","Unknown")} — {p.get("location","")}</option>\n'
+              select_html += '</select>\n'
+              select_html += '<a href="/hosting.html" class="btn btn-small">All Hosting Providers</a>\n'
+              select_html += '</div>\n'
+          else:
+              select_html = '<div class="mirror-list">\n'
+              for p in providers:
+                  select_html += f'<div class="mirror-item">'
+                  select_html += f'<strong>{p.get("org","Unknown")}</strong>'
+                  select_html += f'<span class="mirror-location">{p.get("location","")}</span>'
+                  select_html += f'<a href="{p["mirror_url"]}" target="_blank" class="btn btn-small">Download ISO</a>'
+                  select_html += '</div>\n'
+              select_html += '</div>\n'
+              if count > 0:
+                  select_html += '<a href="/hosting.html" class="btn btn-small">View All Providers</a>\n'
+          with open('providers-select.html', 'w') as f:
+              f.write(select_html)
+
+          print(f'Generated provider files: {count} active providers')
+          print(f'Fastest provider mode: {"YES" if count >= 5 else "NO"}')
+
+      - name: Commit generated files
+        run: |
+          git config user.name "AcreetionOS Bot"
+          git config user.email "bot@acreetionos.org"
+          git add providers-data.json providers-list.html providers-select.html -f
+          git diff --cached --quiet || git commit -m "Update hosting providers list [skip ci]"
+          git push origin main
