@@ -220,7 +220,7 @@ async function aiAiden(t){
       body:JSON.stringify({messages:[{role:'system',content:'You are AIDEN, a cute helpful assistant for ArttulOS (an immutable container OS based on AcreetionOS). Answer concisely but with a playful uwu tone. Keep responses under 3 sentences.'},{role:'user',content:t}],max_tokens:200})
     })
     const d=await res.json()
-    if(!res.ok)throw new Error(d.error?.message)
+    if(!res.ok){const e=await res.json();console.error('AIDEN API error:',e);return null}
     return d.content||d.choices?.[0]?.message?.content||null
   }catch(e){console.error('AI error:',e);return null}
 }
