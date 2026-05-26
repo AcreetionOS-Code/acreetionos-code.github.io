@@ -237,9 +237,9 @@ export default {
       }
     }
 
-    // R2 ISO download proxy
+    // R2 ISO download proxy (supports "latest" → resolves to newest matching ISO)
     if (url.pathname.startsWith('/api/r2/get/')) {
-      const filename = url.pathname.replace('/api/r2/get/', '');
+      let filename = url.pathname.replace('/api/r2/get/', '');
       if (!filename || !filename.endsWith('.iso')) {
         return new Response('Not found', { status: 404 });
       }
@@ -249,12 +249,22 @@ export default {
         return new Response('R2 not configured', { status: 503 });
       }
       try {
-        const objRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/arttulos-iso/objects/${filename}`, {
-          headers: { 'Authorization': `Bearer ${cfToken}` }
-        });
-        if (!objRes.ok) return new Response('Not found', { status: 404 });
+        // Resolve "latest" to the most recent matching ISO
+        if (filename.includes('latest')) {
+          const prefix = filename.replace('-latest.iso', '');
+          const listRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/arttulos-iso/objects`, {
+            headers: { 'Authorization': `Bearer ${cfToken}` }
+          });
+          const listData = await listRes.json();
+          const objects = listData?.result?.objects || [];
+          const match = objects.filter(o => o.key.startsWith(prefix) && o.key.endsWith('.iso'))
+            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+          if (match) filename = match.key;
+          else return new Response('No ISO builds found', { status: 404 });
+        }
         const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/arttulos-iso/${filename}`;
         const fileRes = await fetch(downloadUrl);
+        if (!fileRes.ok) return new Response('Not found', { status: 404 });
         return new Response(fileRes.body, {
           headers: {
             'Content-Type': 'application/x-iso9660-image',
