@@ -290,6 +290,103 @@ export default {
       }
     }
 
+    // Build system — trigger GitHub Actions builds and check status
+    if (url.pathname === '/api/build/trigger' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const edition = body.edition;
+        if (!edition) {
+          return new Response(JSON.stringify({ error: 'edition required' }), {
+            status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const ghToken = env.GH_TOKEN;
+        if (!ghToken) {
+          return new Response(JSON.stringify({ error: 'Build trigger not configured' }), {
+            status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const ghRes = await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/build-all.yml/dispatches', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${ghToken}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json',
+            'User-Agent': 'AcreetionOS-Build-Trigger'
+          },
+          body: JSON.stringify({
+            ref: 'main',
+            inputs: { edition }
+          })
+        });
+        if (!ghRes.ok) {
+          const errText = await ghRes.text();
+          return new Response(JSON.stringify({ error: 'GitHub trigger failed', detail: errText.slice(0, 300) }), {
+            status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        return new Response(JSON.stringify({ triggered: true, edition }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'Trigger error: ' + err.message }), {
+          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
+    if (url.pathname === '/api/build/status' && request.method === 'GET') {
+      try {
+        const edition = url.searchParams.get('edition') || '';
+        const cfToken = env.CLOUDFLARE_API_TOKEN;
+        const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+        if (!cfToken || !cfAccount) {
+          return new Response(JSON.stringify({ error: 'R2 not configured', builds: {} }), {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        if (edition) {
+          const statusRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/build-status/objects/${edition}-status.json`, {
+            headers: { 'Authorization': `Bearer ${cfToken}` }
+          });
+          if (!statusRes.ok) {
+            return new Response(JSON.stringify({ edition, status: 'unknown', builds: [] }), {
+              headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+            });
+          }
+          const data = await statusRes.json();
+          return new Response(JSON.stringify(data), {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'no-cache' }
+          });
+        }
+        const listRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/build-status/objects`, {
+          headers: { 'Authorization': `Bearer ${cfToken}` }
+        });
+        const listData = await listRes.json();
+        const objects = listData?.result?.objects || [];
+        const statuses = {};
+        for (const obj of objects) {
+          if (obj.key.endsWith('-status.json')) {
+            const slug = obj.key.replace('-status.json', '');
+            const itemRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/build-status/objects/${obj.key}`, {
+              headers: { 'Authorization': `Bearer ${cfToken}` }
+            });
+            if (itemRes.ok) {
+              const itemData = await itemRes.json();
+              statuses[slug] = itemData;
+            }
+          }
+        }
+        return new Response(JSON.stringify({ builds: statuses }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'no-cache' }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: err.message, builds: {} }), {
+          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
     // Audio transcription via OpenRouter Whisper (free)
     // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
     if (request.method === 'POST' && url.pathname === '/api/transcribe') {
