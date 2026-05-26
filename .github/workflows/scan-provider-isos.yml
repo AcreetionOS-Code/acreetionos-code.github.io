@@ -1,0 +1,168 @@
+name: Scan Provider ISOs for Malware
+on:
+  schedule:
+    - cron: '0 4 * * 1'  # Every Monday at 4AM UTC
+  workflow_dispatch:
+  repository_dispatch:
+    types: [trigger-scan]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ClamAV
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clamav clamav-daemon
+          sudo freshclam --stdout 2>&1 | tail -5 || true
+          sudo systemctl stop clamav-freshclam 2>/dev/null || true
+
+      - name: Fetch provider list and scan ISOs
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # Fetch providers
+          curl -s "https://acreetionos.org/api/hosting/providers" -o /tmp/providers.json
+          python3 << 'PYEOF'
+          import json, subprocess, os, urllib.request, sys, hashlib
+
+          with open('/tmp/providers.json') as f:
+              data = json.load(f)
+
+          providers = [p for p in data.get('providers', []) if p.get('status') == 'active']
+          print(f"Scanning {len(providers)} active providers...")
+
+          results = {"scanned": [], "flagged": [], "clean": [], "errors": []}
+
+          for p in providers:
+              url = p.get('mirror_url', '')
+              org = p.get('org', 'Unknown')
+              if not url:
+                  results["errors"].append({"org": org, "error": "no mirror URL"})
+                  continue
+
+              print(f"\nScanning {org}: {url}")
+              isopath = f"/tmp/iso_check_{p.get('id', 'unknown')}.iso"
+
+              try:
+                  # Download first 1MB for hash check + ClamAV scan
+                  req = urllib.request.Request(url, headers={'Range': 'bytes=0-1048575', 'User-Agent': 'AcreetionOS-Scanner/1.0'})
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      chunk = r.read(1048576)
+
+                  sha256 = hashlib.sha256(chunk).hexdigest()
+                  print(f"  SHA256 (first 1MB): {sha256}")
+
+                  with open(isopath, 'wb') as f:
+                      f.write(chunk)
+
+                  # Scan with ClamAV
+                  result = subprocess.run(
+                      ['clamscan', '--stdout', '--no-summary', isopath],
+                      capture_output=True, text=True, timeout=60
+                  )
+
+                  if result.returncode != 0:
+                      results["flagged"].append({
+                          "org": org, "id": p.get('id'), "email": p.get('email'),
+                          "mirror_url": url, "sha256": sha256,
+                          "clamav_output": result.stdout + result.stderr
+                      })
+                      print(f"  ❌ FLAGGED by ClamAV!")
+                  else:
+                      results["clean"].append({"org": org, "sha256": sha256})
+                      print(f"  ✅ Clean")
+
+              except Exception as e:
+                  results["errors"].append({"org": org, "error": str(e)})
+                  print(f"  ⚠ Error: {e}")
+
+              # Clean up
+              if os.path.exists(isopath):
+                  os.remove(isopath)
+
+          # Write results
+          with open('/tmp/scan-results.json', 'w') as f:
+              json.dump(results, f, indent=2)
+
+          print(f"\n=== Scan Complete ===")
+          print(f"Clean: {len(results['clean'])}")
+          print(f"Flagged: {len(results['flagged'])}")
+          print(f"Errors: {len(results['errors'])}")
+          PYEOF
+
+      - name: Auto-deregister flagged providers
+        if: hashFiles('/tmp/scan-results.json') != ''
+        env:
+          ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          python3 << 'PYEOF'
+          import json, os, subprocess
+
+          with open('/tmp/scan-results.json') as f:
+              results = json.load(f)
+
+          admin_key = os.environ.get('ADMIN_KEY', '')
+          webhook = os.environ.get('DISCORD_WEBHOOK_URL', '')
+
+          if not results.get('flagged'):
+              print("No flagged providers - nothing to deregister")
+              # Still send clean report to Discord
+              if webhook:
+                  clean = len(results.get('clean', []))
+                  errors = len(results.get('errors', []))
+                  msg = f'**Provider ISO Scan Complete** — {clean} clean, {errors} errors. No threats detected.'
+                  subprocess.run(['curl', '-s', '-X', 'POST', webhook,
+                      '-H', 'Content-Type: application/json',
+                      '-d', json.dumps({"content": msg})])
+              exit(0)
+
+          for p in results['flagged']:
+              print(f"\nDeregistering {p['org']}...")
+              if admin_key:
+                  # Call worker API to deregister
+                  api_url = "https://acreetionos.org/api/hosting/admin/approve-removal"
+                  payload = json.dumps({
+                      "provider_id": p['id'],
+                      "admin_key": admin_key,
+                      "action": "remove"
+                  })
+                  result = subprocess.run(
+                      ['curl', '-s', '-X', 'POST', api_url,
+                       '-H', 'Content-Type: application/json',
+                       '-d', payload],
+                      capture_output=True, text=True, timeout=30
+                  )
+                  print(f"  API response: {result.stdout[:200]}")
+
+              # Post detailed alert to Discord
+              if webhook:
+                  msg = (
+                      f'**🚨 MALWARE DETECTED — Auto-Deregistered**\n'
+                      f'**Provider:** {p["org"]}\n'
+                      f'**Email:** {p["email"]}\n'
+                      f'**ISO:** {p["mirror_url"]}\n'
+                      f'**SHA256 (first 1MB):** `{p.get("sha256","")}`\n'
+                      f'**ClamAV Output:** ```{p.get("clamav_output","")[:500]}```\n'
+                      f'Provider has been immediately removed.'
+                  )
+                  subprocess.run(['curl', '-s', '-X', 'POST', webhook,
+                      '-H', 'Content-Type: application/json',
+                      '-d', json.dumps({"content": msg})])
+
+          print(f"\nDeregistered {len(results['flagged'])} flagged providers")
+          PYEOF
+
+      - name: Commit scan results
+        run: |
+          mkdir -p scan-reports
+          cp /tmp/scan-results.json scan-reports/latest.json 2>/dev/null || true
+          git config user.name "AcreetionOS Scanner"
+          git config user.email "scanner@acreetionos.org"
+          git add scan-reports/ -f
+          git diff --cached --quiet || git commit -m "Update malware scan report [skip ci]"
+          git push origin main
