@@ -2,8 +2,6 @@ name = "acreetionos-aiden-proxy"
 main = "index.js"
 compatibility_date = "2026-04-26"
 
-routes = [
-  { pattern = "acreetionos.org/api/*", script = "acreetionos-aiden-proxy" }
-]
+routes = ["acreetionos.org/api/*"]
 
 [vars]
