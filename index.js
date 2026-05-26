@@ -1550,12 +1550,11 @@ export default {
           else return new Response('No ISO builds found', { status: 404 });
         }
         const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/immutable-iso/${filename}`;
-        const fileRes = await fetch(downloadUrl);
-        if (!fileRes.ok) return new Response('Not found', { status: 404 });
-        return new Response(fileRes.body, {
+        // 302 redirect directly to R2 — no proxy overhead, full speed
+        return new Response(null, {
+          status: 302,
           headers: {
-            'Content-Type': 'application/x-iso9660-image',
-            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Location': downloadUrl,
             'Cache-Control': 'public, max-age=86400'
           }
         });
