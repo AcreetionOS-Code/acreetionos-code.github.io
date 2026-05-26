@@ -184,9 +184,9 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
-    // TrumpOS redirect — moved to own repo
-    if (url.pathname.startsWith('/TrumpOS')) {
-      return Response.redirect('https://spivanatalie64.github.io/TrumpOS/', 301);
+    // TrumpOS redirect — any hostname/path to main site
+    if (url.pathname.startsWith('/TrumpOS') || url.pathname.startsWith('/trumpos')) {
+      return Response.redirect('https://acreetionos.org/TrumpOS/', 301);
     }
 
     // Page view counter — GET returns count, POST increments
