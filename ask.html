@@ -109,7 +109,6 @@ const KB = [
   {q:['free','price','cost','donate','paid','how much'], a:'AcreetionOS is completely free and open source. There are no paid editions, no subscriptions, and no telemetry. You can download, use, and share it without restrictions. Donations are welcome but never required.'},
   {q:['arch','based on','arch linux','foundation'], a:'AcreetionOS is built on Arch Linux, the legendary rolling-release distribution. This means you get access to the Arch User Repository (AUR), Pacman package manager, Pamac graphical software center, and rolling updates — all pre-configured with the Cinnamon desktop.'},
   {q:['cinnamon','desktop','environment','de','gui'], a:'AcreetionOS ships with the Cinnamon desktop environment as its flagship interface. Cinnamon offers a traditional taskbar, app menu, and system tray — no extensions needed. It is lightweight, customizable, and familiar to anyone coming from Windows or traditional Linux desktops.'},
-  {q:['trumpos','trump','mlga'], a:'TrumpOS is a special edition spinoff of AcreetionOS, also led by the same team. Check it out at acreetionos.org/TrumpOS/.'},
   {q:['arttulos','immutable','container'], a:'ArttulOS is an immutable, container-native spinoff of AcreetionOS. It features a read-only root filesystem, atomic A/B updates, and containerized workloads via Podman. Check it out at arttulos.acreonetionos.org.'},
   {q:['discord','chat','community','support','help'], a:'Join our community Discord server at discord.acreonetionos.org. It is the best place to ask questions, get support, and hang out with other AcreetionOS users and the development team.'},
   {q:['source','github','code','git','repository','open source'], a:'AcreetionOS is fully open source. Our code is on GitHub at github.com/AcreetionOS-Code and on our self-hosted GitLab at gitlab.acreonetionos.org.'},
@@ -178,7 +177,7 @@ async function callAI(text){
     if(k){aiKey=k;localStorage.setItem('aiden_key',k)}
     else return null
   }
-  const history=[{role:'system',content:'You are AIDEN, the helpful AcreetionOS assistant. Answer concisely and accurately about AcreetionOS, ArttulOS, TrumpOS, Arch Linux, and Linux in general.'},{role:'user',content:text}]
+  const history=[{role:'system',content:'You are AIDEN, the helpful AcreetionOS assistant. Answer concisely and accurately about AcreetionOS, ArttulOS, Arch Linux, and Linux in general.'},{role:'user',content:text}]
   try{
     const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
       method:'POST',

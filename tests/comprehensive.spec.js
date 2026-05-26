@@ -23,7 +23,7 @@ const pages = [
   '/ermin.html',
   '/developers.html',
   '/bsky.html',
-  '/TrumpOS/index.html',
+
   '/404.html'
 ];
 
