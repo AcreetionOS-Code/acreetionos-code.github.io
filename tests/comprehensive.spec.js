@@ -12,7 +12,6 @@ const pages = [
   '/governance.html',
   '/contributing.html',
   '/', // index.html
-  '/mastodon.html',
   '/wiki.html',
   '/selfhelp.html',
   '/migrated.html',
@@ -22,7 +21,6 @@ const pages = [
   '/docs.html',
   '/ermin.html',
   '/developers.html',
-  '/bsky.html',
 
   '/404.html'
 ];

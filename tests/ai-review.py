@@ -27,6 +27,7 @@ PAGES = [
     'compare.html', 'requirements.html', 'developers.html', 'wiki.html',
     'blog.html', 'contributing.html', 'governance.html',
     'hyprland.html', 'unofficial.html', '32bit.html', 'flash.html',
+    'mate.html', 'gnome.html', 'plasma.html', 'xfce.html', 'sway.html', 'i3.html', 'immutable.html',
     'ask.html', 'donate.html', 'newsletter.html',
 ]
 
