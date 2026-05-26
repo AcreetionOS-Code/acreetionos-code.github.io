@@ -27,14 +27,27 @@ const ALLOWED_ORIGINS = [
   'http://127.0.0.1:3000'
 ];
 
+function securityHeaders() {
+  return {
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+    'X-Frame-Options': 'DENY',
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+    'Cross-Origin-Embedder-Policy': 'require-corp',
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://openrouter.ai; base-uri 'self'; form-action 'self' https://www.qwant.com"
+  };
+}
+
 function corsHeaders(request) {
   const origin = request.headers.get('Origin') || '';
   const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowed,
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Content-Encoding',
-    'Access-Control-Max-Age': '86400'
+    'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Content-Encoding, Authorization',
+    'Access-Control-Max-Age': '86400',
+    ...securityHeaders()
   };
 }
 
@@ -495,7 +508,10 @@ export default {
       }
 
       // Only allow explicitly whitelisted free models to be used
-      const model = FREE_MODEL;
+      let model = body.model || FREE_MODEL;
+      if (model !== FREE_MODEL && !model.endsWith(':free')) {
+        model = FREE_MODEL;
+      }
 
       const isStream = body.stream === true;
 

@@ -1,0 +1,14 @@
+Reason,Source,Validation,Pages
+Not found (404),Website,Failed,4374
+Blocked by robots.txt,Website,Not Started,380
+Blocked due to other 4xx issue,Website,Not Started,307
+Redirect error,Website,Not Started,99
+Server error (5xx),Website,Not Started,85
+Duplicate without user-selected canonical,Website,Not Started,63
+Excluded by ‘noindex’ tag,Website,Not Started,24
+Page with redirect,Website,Not Started,1
+Crawled - currently not indexed,Google systems,Not Started,968
+Blocked due to access forbidden (403),Website,Started,2484
+Soft 404,Website,N/A,0
+Alternate page with proper canonical tag,Website,N/A,0
+"Duplicate, Google chose different canonical than user",Google systems,N/A,0
