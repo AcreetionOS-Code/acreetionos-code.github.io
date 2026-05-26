@@ -38,6 +38,8 @@ jobs:
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           echo "$OPENROUTER_API_KEY" | wrangler secret put OPENROUTER_API_KEY || true
+          echo "$CLOUDFLARE_API_TOKEN" | wrangler secret put CLOUDFLARE_API_TOKEN || true
+          echo "$CLOUDFLARE_ACCOUNT_ID" | wrangler secret put CLOUDFLARE_ACCOUNT_ID || true
           wrangler deploy
 
       - name: Confirm

@@ -207,6 +207,66 @@ export default {
       });
     }
 
+    // R2 ISO listing for ArttulOS downloads
+    if (url.pathname === '/api/r2/list') {
+      const cfToken = env.CLOUDFLARE_API_TOKEN;
+      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+      if (!cfToken || !cfAccount) {
+        return new Response(JSON.stringify({ error: 'R2 not configured', isos: [] }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+      try {
+        const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/arttulos-iso/objects`, {
+          headers: { 'Authorization': `Bearer ${cfToken}` }
+        });
+        const data = await res.json();
+        const objects = data?.result?.objects || [];
+        const isos = objects.filter(o => o.key.endsWith('.iso')).sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 10).map(o => ({
+          name: o.key,
+          size: o.size,
+          date: o.created_at
+        }));
+        return new Response(JSON.stringify({ isos }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'public, max-age=3600' }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, isos: [] }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
+    // R2 ISO download proxy
+    if (url.pathname.startsWith('/api/r2/get/')) {
+      const filename = url.pathname.replace('/api/r2/get/', '');
+      if (!filename || !filename.endsWith('.iso')) {
+        return new Response('Not found', { status: 404 });
+      }
+      const cfToken = env.CLOUDFLARE_API_TOKEN;
+      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+      if (!cfToken || !cfAccount) {
+        return new Response('R2 not configured', { status: 503 });
+      }
+      try {
+        const objRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/arttulos-iso/objects/${filename}`, {
+          headers: { 'Authorization': `Bearer ${cfToken}` }
+        });
+        if (!objRes.ok) return new Response('Not found', { status: 404 });
+        const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/arttulos-iso/${filename}`;
+        const fileRes = await fetch(downloadUrl);
+        return new Response(fileRes.body, {
+          headers: {
+            'Content-Type': 'application/x-iso9660-image',
+            'Content-Disposition': `attachment; filename="${filename}"`,
+            'Cache-Control': 'public, max-age=86400'
+          }
+        });
+      } catch (e) {
+        return new Response('Download error', { status: 500 });
+      }
+    }
+
     // Audio transcription via OpenRouter Whisper (free)
     // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
     if (request.method === 'POST' && url.pathname === '/api/transcribe') {
