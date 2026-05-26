@@ -95,6 +95,26 @@ footer a{color:var(--g);text-decoration:none}
 </div>
 </div>
 
+<div class="feature-box" id="downloads" style="border-left:3px solid var(--g)">
+<h2>⬇ Download ArttulOS</h2>
+<p style="margin-bottom:1rem;color:var(--fg2);font-size:0.9rem">Pre-built ISO images are built automatically every 3 days. Choose your edition:</p>
+<div id="iso-list" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem">
+  <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:1.25rem;text-align:center">
+    <div style="font-family:var(--fm);font-size:0.7rem;color:var(--g);margin-bottom:0.5rem">CINNAMON EDITION</div>
+    <div style="font-size:0.85rem;color:var(--fg2);margin-bottom:1rem">The classic Cinnamon desktop — familiar, polished, immutable.</div>
+    <a href="/api/r2/get/arttulos-cinnamon-latest.iso" class="btn btn-p" style="font-size:0.7rem" id="dl-cinnamon">Download Cinnamon</a>
+    <div id="info-cinnamon" style="font-size:0.65rem;color:var(--fg3);margin-top:0.5rem"></div>
+  </div>
+  <div style="background:var(--bg3);border:1px solid var(--bd);border-radius:10px;padding:1.25rem;text-align:center">
+    <div style="font-family:var(--fm);font-size:0.7rem;color:var(--g);margin-bottom:0.5rem">XLIBRE EDITION</div>
+    <div style="font-size:0.85rem;color:var(--fg2);margin-bottom:1rem">Wayland-native with XLibre display protocol — modern and fast.</div>
+    <a href="/api/r2/get/arttulos-xlibre-latest.iso" class="btn btn-p" style="font-size:0.7rem" id="dl-xlibre">Download XLibre</a>
+    <div id="info-xlibre" style="font-size:0.65rem;color:var(--fg3);margin-top:0.5rem"></div>
+  </div>
+</div>
+<p style="margin-top:1rem;font-size:0.75rem;color:var(--fg3)">ISOs are built from the latest AcreetionOS base with immutability patches applied. Builds are available for approximately 3 weeks.</p>
+</div>
+
 <div class="feature-box" style="border-left:3px solid var(--g)">
 <h2>🤔 So what actually IS immutable?</h2>
 <p>It means <code>/usr</code> is read-only. You can't <code>sudo rm -rf /usr</code> (yes, we've all been there). You can't install a broken AUR package that takes down your desktop. You can't accumulate five years of orphaned configs that make your system crawl. The OS is locked. Period.</p>
@@ -244,5 +264,20 @@ async function askAiden(){
   },100)
 }
 document.getElementById('aw-input').addEventListener('keydown',e=>{if(e.key==='Enter')askAiden()})
+// Fetch latest ISOs for download page
+fetch('/api/r2/list').then(r=>r.json()).then(d=>{
+  const isos=d.isos||[]
+  for(const iso of isos){
+    const edition=iso.name.includes('cinnamon')?'cinnamon':'xlibre'
+    const el=document.getElementById('dl-'+edition)
+    const info=document.getElementById('info-'+edition)
+    if(el)el.href='/api/r2/get/'+iso.name
+    if(info){
+      const d=new Date(iso.date)
+      const s=iso.size>1e9?(iso.size/1e9).toFixed(1)+'GB':(iso.size/1e6).toFixed(0)+'MB'
+      info.textContent=d.toLocaleDateString()+' · '+s
+    }
+  }
+}).catch(()=>{})
 </script>
 </body></html>
