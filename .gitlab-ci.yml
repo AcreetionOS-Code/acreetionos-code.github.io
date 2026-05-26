@@ -1,0 +1,21 @@
+image: archlinux:latest
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+stages:
+  - build
+
+build_iso:
+  stage: build
+  before_script:
+    - pacman -Syu --noconfirm archiso squashfs-tools git
+  script:
+    - mkdir -p /tmp/out
+    - # Note: mkarchiso needs a profile. We assume the current dir or a specified path.
+    - mkarchiso -v -w /tmp/work -o /tmp/out .
+  artifacts:
+    paths:
+      - /tmp/out/*.iso
+  only:
+    - main
