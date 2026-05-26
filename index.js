@@ -251,43 +251,11 @@ async function sendDiscordWebhook(env, message) {
   } catch (e) { console.error('Discord webhook failed:', e); }
 }
 
-async function assignDiscordRole(env, userId) {
-  if (!userId || !env.DISCORD_BOT_TOKEN) return;
-  try {
-    // Get the guild ID from the webhook URL
-    const whParts = (env.DISCORD_WEBHOOK_URL || '').split('/');
-    const webhookId = whParts[whParts.length - 2];
-    const whRes = await fetch(`https://discord.com/api/v10/webhooks/${webhookId}`, {
-      headers: { 'Authorization': `Bot ${env.DISCORD_BOT_TOKEN}` }
-    });
-    if (!whRes.ok) return;
-    const whData = await whRes.json();
-    const guildId = whData.guild_id;
-    if (!guildId) return;
-
-    // Assign the ISO Hoster role
-    const roleRes = await fetch(`https://discord.com/api/v10/guilds/${guildId}/members/${userId}/roles/1412937217797652550`, {
-      method: 'PUT',
-      headers: { 'Authorization': `Bot ${env.DISCORD_BOT_TOKEN}` }
-    });
-    if (!roleRes.ok) console.error('Role assignment failed:', await roleRes.text());
-  } catch (e) { console.error('Discord role assignment failed:', e); }
-}
-
 async function sendHostingEmail(env, to, subject, body) {
-  if (!env.EMAIL_FROM || !env.SENDGRID_API_KEY) return;
-  try {
-    await fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${env.SENDGRID_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: to }] }],
-        from: { email: env.EMAIL_FROM },
-        subject,
-        content: [{ type: 'text/plain', value: body }]
-      })
-    });
-  } catch (e) { console.error('Email send failed:', e); }
+  // Store email job in R2 for Cloudflare Email Worker to pick up
+  const job = { to, subject, body, from: env.EMAIL_FROM || 'developers@acreetionos.org', created: new Date().toISOString() };
+  const key = 'email-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  await putR2(env, 'acreetionos-hosting', key, job);
 }
 
 async function handleHostingGetProviders(env) {
@@ -404,11 +372,6 @@ async function handleHostingAdminApprove(request, env) {
     data.status = 'active';
     await putR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id, data);
     sendDiscordWebhook(env, `**Provider Approved**\n**Provider:** ${data.org} (${data.email}) is now active.`);
-
-    // Assign Discord role
-    if (data.discord_user_id) {
-      assignDiscordRole(env, data.discord_user_id);
-    }
 
     // Send welcome email to subscribed providers
     if (data.subscribed && data.email) {

@@ -6,8 +6,6 @@ routes = ["acreetionos.org/api/*"]
 
 [vars]
 DISCORD_WEBHOOK_URL = ""
-DISCORD_BOT_TOKEN = ""
 ADMIN_KEY = ""
 HOSTING_BUCKET = "acreetionos-hosting"
-SENDGRID_API_KEY = ""
-EMAIL_FROM = ""
+EMAIL_FROM = "developers@acreetionos.org"
