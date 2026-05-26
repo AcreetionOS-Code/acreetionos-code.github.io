@@ -1281,6 +1281,58 @@ function generateFixScript(cve, pkg, arch) {
   ].join('\n');
 }
 
+// ─── Smart Mirror Selection ──────────────────────────────────
+
+const MIRRORS = {
+  cinnamon: [
+    { url: 'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso', name: 'Direct Server', priority: 1 },
+    { url: 'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-latest.iso', name: 'Cloudflare R2', priority: 2 },
+    { url: 'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso', name: 'OSUOSL Mirror', priority: 3 },
+    { url: 'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso', name: 'Internet Archive', priority: 4 },
+    { url: 'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download', name: 'SourceForge', priority: 5 },
+  ],
+  xl: [
+    { url: 'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso', name: 'Direct Server', priority: 1 },
+    { url: 'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS_XL-latest.iso', name: 'Cloudflare R2', priority: 2 },
+    { url: 'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso', name: 'OSUOSL Mirror', priority: 3 },
+    { url: 'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso', name: 'Internet Archive', priority: 4 },
+    { url: 'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS_XL-1.0-x86_64.iso/download', name: 'SourceForge', priority: 5 },
+  ],
+};
+
+async function handleBestMirror(request, env) {
+  const edition = (new URL(request.url).searchParams.get('edition') || 'cinnamon').toLowerCase();
+  const mirrors = MIRRORS[edition] || MIRRORS.cinnamon;
+
+  // Test each mirror's latency in parallel
+  const results = await Promise.all(mirrors.map(async (mirror) => {
+    const start = Date.now();
+    try {
+      const res = await fetch(mirror.url, {
+        method: 'HEAD',
+        signal: AbortSignal.timeout(5000)
+      });
+      const latency = Date.now() - start;
+      return { ...mirror, latency, status: res.status, online: res.ok };
+    } catch (e) {
+      return { ...mirror, latency: 9999, status: 0, online: false };
+    }
+  }));
+
+  const online = results.filter(r => r.online).sort((a, b) => a.latency - b.latency);
+  const best = online[0] || results[0];
+
+  return new Response(JSON.stringify({
+    edition,
+    best: best,
+    all: results,
+    online_count: online.length,
+    total: results.length,
+  }), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', ...corsHeaders({ headers: { get: () => '' } }) }
+  });
+}
+
 async function handleCVEFeed(env) {
   try {
     // Fetch from Arch Linux Atom feed (official advisory source)
@@ -1834,6 +1886,11 @@ export default {
     }
     if (url.pathname === '/api/hosting/reactivate' && request.method === 'POST') {
       return handleHostingReactivate(request, env);
+    }
+
+    // ─── Smart Mirror Selection ────────────────────────────────
+    if (url.pathname === '/api/mirror/best' && request.method === 'GET') {
+      return handleBestMirror(request, env);
     }
 
     // ─── CVE Security Endpoints ──────────────────────────────────
