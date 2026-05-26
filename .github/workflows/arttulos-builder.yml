@@ -58,7 +58,7 @@ jobs:
               find / -name '*.iso' -maxdepth 5 2>/dev/null;
             " 2>&1 | tee /tmp/build.log
           mkdir -p /tmp/iso
-          docker run --rm -v $PWD/src:/workspace -v /tmp/iso:/output archlinux:latest bash -c "find /workspace/.. -name '*.iso' -exec cp {} /output/ \; 2>/dev/null; ls -la /output/" 2>/dev/null || true
+          docker run --rm -v $PWD/src:/workspace -v /tmp/iso:/output archlinux:latest bash -c "find /workspace -name '*.iso' -exec cp -v {} /output/ \; 2>/dev/null; find / -maxdepth 3 -name '*.iso' -exec cp -v {} /output/ \; 2>/dev/null; ls -la /output/" 2>/dev/null || true
           ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
 
       - name: Upload ISO to R2
