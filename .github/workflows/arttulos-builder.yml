@@ -24,7 +24,7 @@ jobs:
         with:
           repository: ${{ matrix.edition.repo }}
           path: src
-          submodules: recursive
+          submodules: false
 
       - uses: actions/checkout@v4
         with:
