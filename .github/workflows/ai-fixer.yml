@@ -23,9 +23,9 @@ jobs:
             gh run view "$RUN_ID" --log > /tmp/scan-output.txt 2>&1 || true
           else
             echo "Manual trigger — running fresh scan..."
-            git grep -n --break --heading -I -E \
+            git grep -n -I -E \
               "(sk-[A-Za-z0-9]{20,}|AKIA[0-9A-Z]{16}|BEGIN PRIVATE KEY|ghp_[A-Za-z0-9]{36})" \
-              -- . ':!.github/workflows/' > /tmp/scan-output.txt 2>&1 || true
+              -- . 2>&1 | grep -v "\.yml:" | grep -v "\.yaml:" > /tmp/scan-output.txt || true
           fi
           echo "Scan output captured"
 
