@@ -147,7 +147,7 @@ async function handleNews(env) {
       })()
     ]);
 
-    const directArticles = gh.filter(a => a.type === 'release').slice(0, 3).concat(gl.slice(0, 2)).concat(rss.slice(0, 4)).slice(0, 6).map(item => ({
+    const directArticles = gh.filter(a => a.type === 'release').slice(0, 3).concat(gl.slice(0, 2)).concat(rss.slice(0, 8)).slice(0, 8).map(item => ({
       type: 'direct',
       title: item.type === 'release' ? item.name + ' released' : item.message || 'AcreetionOS update',
       desc: item.desc || item.message || 'Recent activity from ' + item.source,
