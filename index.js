@@ -11,10 +11,13 @@
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const HF_WHISPER_URL = 'https://hf.co/api/inference/models/openai/whisper-tiny';
-const HF_TTS_URL = 'https://api-inference.huggingface.co/models/espnet/kan-bayashi_ljspeech_vits';
+const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
+const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
-const FREE_MODEL = 'meta-llama/llama-3.2-3b-instruct:free';const ALLOWED_ORIGINS = [
+const FREE_MODEL = 'openrouter/auto';
+const WHISPER_MODEL = 'openai/whisper-large-v3';
+const TTS_MODEL = 'cartesia-ai/cartesia-tts';
+const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
@@ -67,8 +70,7 @@ async function handleNews(env) {
   const RSS_FEEDS = [
     'https://news.google.com/rss/search?q=%22AcreetionOS%22&hl=en-US&gl=US&ceid=US:en',
     'https://news.google.com/rss/search?q=AcreetionOS+Arch+Linux&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en',
-    'https://archlinux.org/feeds/news/'
+    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en'
   ];
 
   try {
@@ -147,7 +149,7 @@ async function handleNews(env) {
       })()
     ]);
 
-    const directArticles = gh.filter(a => a.type === 'release').slice(0, 3).concat(gl.slice(0, 2)).concat(rss.slice(0, 8)).slice(0, 8).map(item => ({
+    const directArticles = gh.filter(a => a.type === 'release').slice(0, 3).concat(gl.slice(0, 2)).concat(rss.slice(0, 4)).slice(0, 6).map(item => ({
       type: 'direct',
       title: item.type === 'release' ? item.name + ' released' : item.message || 'AcreetionOS update',
       desc: item.desc || item.message || 'Recent activity from ' + item.source,
@@ -205,7 +207,8 @@ export default {
       });
     }
 
-    // Audio transcription via Hugging Face Whisper (free, no API key needed)
+    // Audio transcription via OpenRouter Whisper (free)
+    // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
     if (request.method === 'POST' && url.pathname === '/api/transcribe') {
       try {
         const body = await request.json();
@@ -216,19 +219,39 @@ export default {
           });
         }
 
-        // Decode base64 to raw audio bytes and send as binary
-        const audioBytes = Uint8Array.from(atob(body.audio), c => c.charCodeAt(0));
-        const mime = body.mimeType || 'audio/webm';
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'Transcription not configured' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
 
-        const whisperRes = await fetch(HF_WHISPER_URL, {
+        // Derive format from MIME type
+        const mime = body.mimeType || 'audio/webm';
+        const fmt = mime.includes('ogg') ? 'ogg' : mime.includes('mp4') ? 'mp4' : 'webm';
+
+        const whisperRes = await fetch(WHISPER_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'audio/webm' },
-          body: audioBytes
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AIDEN Whisper (AcreetionOS Voice Input)'
+          },
+          body: JSON.stringify({
+            model: WHISPER_MODEL,
+            input_audio: {
+              data: body.audio,
+              format: fmt
+            }
+          })
         });
 
+        // OpenRouter may return 200 with empty body on format issues; check for that too
         const whisperText = await whisperRes.text();
-        if (!whisperRes.ok || !whisperText) {
-          return new Response(JSON.stringify({ error: 'Transcription failed', detail: whisperText?.slice(0, 200) || '' }), {
+        if (!whisperText || whisperText.trim().length === 0) {
+          return new Response(JSON.stringify({ error: 'Empty transcription response' }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
@@ -238,14 +261,25 @@ export default {
         try {
           whisperData = JSON.parse(whisperText);
         } catch (e) {
-          return new Response(JSON.stringify({ error: 'Invalid response', raw: whisperText.slice(0, 200) }), {
+          return new Response(JSON.stringify({ error: 'Invalid transcription response', raw: whisperText.slice(0, 200) }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+
+        if (!whisperRes.ok) {
+          return new Response(JSON.stringify({
+            error: whisperData.error?.message || 'Transcription failed',
+            status: whisperRes.status
+          }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
 
         return new Response(JSON.stringify({
-          text: whisperData.text || ''
+          text: whisperData.text || '',
+          model: WHISPER_MODEL
         }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
@@ -309,71 +343,7 @@ export default {
       }
     }
 
-    // Fix script generator — generates PKGBUILD + GTK GUI script for a given news item
-    if (request.method === 'POST' && url.pathname === '/api/fix-script') {
-      try {
-        const body = await request.json();
-        const apiKey = env.OPENROUTER_API_KEY;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const prompt = `You are a PKGBUILD generator for AcreetionOS (Arch Linux based). 
-Given this news item, generate a complete fix script:
-1. A PKGBUILD that compiles the relevant package from source
-2. A GTK3 GUI script (Python with PyGObject) that:
-   - Shows a progress window with a text log
-   - Runs "makepkg -si" in a terminal
-   - Displays build output in real-time
-   - Shows "Build complete" with option to install
-3. A wrapper shell script that launches the GUI
-
-News title: ${body.title || 'Unknown'}
-News description: ${body.desc || 'No description'}
-News source: ${body.source || 'Unknown'}
-AcreetionOS relevance: ${body.relevance || 'Unknown'}
-
-Output ONLY the shell script content. The script should:
-- Create a temp directory
-- Check for deps (python, python-gobject, gtk3, base-devel, git)
-- Write the PKGBUILD to a file
-- Write the Python GUI script to a file
-- Launch the GUI
-Return valid bash script only, no markdown fences.`;
-
-        const openRouterRes = await fetch(OPENROUTER_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AcreetionOS Fix Script'
-          },
-          body: JSON.stringify({
-            model: 'meta-llama/llama-3.2-3b-instruct:free',
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 2048
-          })
-        });
-        const data = await openRouterRes.json();
-        if (!openRouterRes.ok) {
-          return new Response(JSON.stringify({ error: data.error?.message || 'Script generation failed' }), {
-            status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const scriptContent = data.choices?.[0]?.message?.content || '';
-        return new Response(JSON.stringify({ script: scriptContent }), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: 'Script generation failed: ' + err.message }), {
-          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      }
-    }
-
-    // Text-to-Speech via Hugging Face (free neural TTS, no API key needed)
+    // Text-to-Speech via OpenRouter (Cartesia TTS — natural human voice)
     if (request.method === 'POST' && url.pathname === '/api/tts') {
       try {
         const body = await request.json();
@@ -383,22 +353,38 @@ Return valid bash script only, no markdown fences.`;
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        const text = body.input.slice(0, 200);
-        const ttsRes = await fetch(HF_TTS_URL, {
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'TTS not configured' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const ttsRes = await fetch(TTS_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inputs: text })
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
+          },
+          body: JSON.stringify({
+            model: TTS_MODEL,
+            input: body.input,
+            voice: body.voice || 'nova',
+            response_format: 'mp3'
+          })
         });
         if (!ttsRes.ok) {
-          const errText = await ttsRes.text().catch(() => '');
-          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 200) }), {
+          const errText = await ttsRes.text();
+          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 300) }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
         return new Response(ttsRes.body, {
           headers: {
-            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/flac',
+            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/mpeg',
             ...corsHeaders(request)
           }
         });
