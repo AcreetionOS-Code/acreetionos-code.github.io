@@ -191,6 +191,177 @@ async function handleNews(env) {
   }
 }
 
+// ─── Hosting Provider Vetting ─────────────────────────────────
+
+const THREAT_ACTORS = new Set([
+  'lazarus', 'kimsuks', 'apt38', 'hiddencobra', 'bluenoroff',
+  'fancybear', 'apt28', 'sofacy', 'pawnstorm', 'sednit',
+  'cozybear', 'apt29', 'midnightblizzard', 'nobelium',
+  'wizardspider', 'trickbot', 'fin7', 'carbanak',
+  'darkhotel', 'apt32', 'oceanlotus', 'mustangpanda',
+  'taowu', 'panda', 'apt1', 'commentcrew',
+  'shuckworm', 'armageddon', 'gamaredon', 'actinium',
+  'belarusian', 'ghostwriter', 'unc1151', 'stardust',
+  'sandworm', 'apt44', 'blackenergy', 'telebots',
+  'scatteredspider', 'scatteredsPIDEr', '0ktapus', 'octopus',
+  'apt41', 'winnti', 'blacktech', 'bronzesunset',
+  'bluenorthern', 'redquiet', 'blessed', 'muddywater',
+  'tortoiseshell', 'imperialkitten', 'raqqah', 'thedarkoverlord',
+  'darkoverlord', 'thedarkoverlord', 'thedarkoverlord',
+  'conti', 'revil', 'ransomware', 'lockbit', 'blackcat',
+  'alphv', 'clop', 'cryak', 'darkside', 'blackmatter',
+  'blypts', 'grief', 'nokoyawa', 'vicesociety', 'ransomhouse',
+  'vigorous', 'rigorous', 'hades', 'hellokitty',
+  'lapsus', 'lapus', 'lgroth', 'teamtnt', 'webshell',
+  'chinanet', 'barium', 'mgbot', 'mirai', 'botnet',
+  'c2server', 'payloadbin', 'ddos', 'stresser', 'booter',
+  'nulled', 'cracked', 'hackforums', 'raidforums',
+  'breachforums', 'exploit', 'exploit.in', 'xss.is',
+  'dread', 'hackerwanted', 'mostwanted', 'cybercriminal',
+  'carding', 'carder', 'dumps', 'fullz', 'ssndob',
+  'hijack', 'phish', 'phishing', 'malware', 'ransomware',
+  'bankingtrojan', 'infostealer', 'inifil', 'formbook',
+  'agenttesla', 'nanocore', 'remcos', 'darkcomet',
+]);
+
+const SANCTIONED_COUNTRIES = ['iran', 'north korea', 'syria', 'cuba', 'russia', 'belarus', 'crimea'];
+
+async function checkEmailBreaches(env, email) {
+  // Have I Been Pwned k-anonymity API (no key needed)
+  try {
+    const crypto = globalThis.crypto || {};
+    const encoder = new TextEncoder();
+    const data = encoder.encode(email);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+    const prefix = hashHex.slice(0, 5);
+    const suffix = hashHex.slice(5);
+    const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, { signal: AbortSignal.timeout(10000) });
+    if (res.ok) {
+      const text = await res.text();
+      const match = text.split('\n').find(line => line.startsWith(suffix));
+      if (match) {
+        const count = parseInt(match.split(':')[1] || '0');
+        if (count > 3) return { breached: true, breach_count: count, url: `https://haveibeenpwned.com/account/${encodeURIComponent(email)}` };
+      }
+    }
+  } catch (e) { console.error('HIBP check failed:', e); }
+  return { breached: false };
+}
+
+async function vetProvider(env, body) {
+  const { org, email, website, mirror_url, location, notes } = body;
+  const flags = [];
+  let score = 0;
+
+  const orgLower = (org || '').toLowerCase();
+  const emailLower = (email || '').toLowerCase();
+  const notesLower = (notes || '').toLowerCase();
+  const locationLower = (location || '').toLowerCase();
+
+  // 1. Check org name against known threat actors
+  for (const actor of THREAT_ACTORS) {
+    if (orgLower.includes(actor)) {
+      flags.push(`Organization name matches known threat actor keyword: "${actor}"`);
+      score += 50;
+    }
+    if (notesLower.includes(actor) || emailLower.includes(actor)) {
+      flags.push(`Communication references threat actor: "${actor}"`);
+      score += 40;
+    }
+  }
+
+  // 2. Check email for breach history
+  const breachCheck = await checkEmailBreaches(env, email);
+  if (breachCheck.breached) {
+    flags.push(`Email appears in ${breachCheck.breach_count} known data breaches (${breachCheck.url})`);
+    score += breachCheck.breach_count > 20 ? 30 : 15;
+  }
+
+  // 3. Check domain against threat intel blocklist
+  let domain = '';
+  try {
+    domain = new URL(mirror_url || website || '').hostname.replace(/^www\./, '').toLowerCase();
+  } catch (e) {}
+  if (domain && env.CLOUDFLARE_API_TOKEN && env.CLOUDFLARE_ACCOUNT_ID) {
+    const blockedDomains = [];
+    try {
+      const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`, {
+        headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` }
+      });
+      if (res.ok) {
+        const text = await res.text();
+        blockedDomains.push(...text.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean));
+      }
+    } catch (e) {}
+    for (const b of blockedDomains) {
+      if (domain === b || domain.endsWith('.' + b)) {
+        flags.push(`Domain "${domain}" appears in threat intelligence blocklist (matched: ${b})`);
+        score += 45;
+        break;
+      }
+    }
+  }
+
+  // 4. Check location against sanctioned countries
+  for (const country of SANCTIONED_COUNTRIES) {
+    if (locationLower.includes(country)) {
+      flags.push(`Location "${location}" is a sanctioned/embargoed country`);
+      score += 40;
+    }
+  }
+
+  // 5. Check notes for suspicious patterns
+  const suspiciousPatterns = [
+    { pattern: /(credit.?card|cc.?num|ssn|social.?security|dumps|fullz)/i, weight: 40, msg: 'Financial fraud indicators in notes' },
+    { pattern: /(hack|crack|c2|rat|remote.?access.?trojan|keylogger|spyware)/i, weight: 35, msg: 'Hacking tools referenced in notes' },
+    { pattern: /(terrorist|extremist|jihad|isil|isis|taliban)/i, weight: 50, msg: 'Extremist references in notes' },
+    { pattern: /(proxy|vpn|relay|tor|onion|i2p)/i, weight: 5, msg: 'Anonymization tools referenced' },
+    { pattern: /(money.?launder|wash|sanction.?evade|tax.?haven)/i, weight: 45, msg: 'Financial crime indicators in notes' },
+  ];
+  for (const sp of suspiciousPatterns) {
+    if (sp.pattern.test(notesLower) || sp.pattern.test(orgLower)) {
+      flags.push(sp.msg);
+      score += sp.weight;
+    }
+  }
+
+  // 6. Check if email domain is a disposable/temporary email provider
+  const disposableDomains = [
+    'mailinator.com', 'guerrillamail.com', 'tempmail.com', '10minutemail.com',
+    'throwaway.email', 'yopmail.com', 'mail.tm', 'tempmail.net', 'temp-mail.org',
+    'dispostable.com', 'getnada.com', 'sharklasers.com', 'burnermail.io',
+    'spamgourmet.com', 'mailmetrash.com', 'trashmail.com', 'fakeinbox.com',
+    'mailexpire.com', 'emailondeck.com', 'temp-mail.io', 'temp-inbox.com',
+  ];
+  const emailDomain = emailLower.split('@')[1];
+  if (disposableDomains.includes(emailDomain)) {
+    flags.push(`Disposable email provider: ${emailDomain}`);
+    score += 25;
+  }
+
+  // 7. Check if mirror URL matches known malicious URL patterns
+  try {
+    const mirrorPath = new URL(mirror_url).pathname.toLowerCase();
+    if (/\.(exe|bat|cmd|scr|ps1|vbs|jar|dll)$/i.test(mirrorPath)) {
+      flags.push(`Mirror URL points to executable, not ISO`);
+      score += 30;
+    }
+  } catch (e) {}
+
+  const verdict = score >= 40 ? 'rejected' : score >= 15 ? 'flagged' : 'pending';
+
+  return {
+    verdict,
+    score,
+    flags,
+    auto_rejected: score >= 40,
+    needs_manual_review: score >= 15 && score < 40,
+    clean: score < 15,
+  };
+}
+
 // ─── ISO Hosting Provider Management ───────────────────────────────
 
 async function getR2(env, bucket, key) {
@@ -274,16 +445,32 @@ async function handleHostingRegister(request, env) {
     if (!body.org || !body.email || !body.password || !body.mirror_url || !body.location) {
       return new Response(JSON.stringify({ error: 'org, email, password, mirror_url, and location are required' }), { status: 400, headers: getCors() });
     }
+
+    // Run background vetting checks
+    const vetResult = await vetProvider(env, body);
+
+    if (vetResult.auto_rejected) {
+      sendDiscordWebhook(env,
+        `**🚫 Registration Auto-Rejected (Vetting Failed)**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Risk Score:** ${vetResult.score}\n**Flags:**\n${vetResult.flags.map(f => '- ' + f).join('\n')}\n\nRegistration was automatically rejected by security vetting.`
+      );
+      return new Response(JSON.stringify({
+        success: false, error: 'Registration rejected by automated security vetting. Contact developers@acreetionos.org if you believe this is an error.',
+        vetting: { score: vetResult.score, flags: vetResult.flags }
+      }), { status: 403, headers: getCors() });
+    }
+
     const id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
     const provider = {
       id, org: body.org, email: body.email, website: body.website || '',
       mirror_url: body.mirror_url, location: body.location,
       bandwidth: body.bandwidth || '', notes: body.notes || '',
       password: hashPassword(body.password),
-      status: 'pending', created: new Date().toISOString(),
+      status: vetResult.needs_manual_review ? 'flagged' : 'pending',
+      created: new Date().toISOString(),
       removal_requested: false,
       discord_user_id: body.discord_user_id || '',
-      subscribed: body.subscribe === true
+      subscribed: body.subscribe === true,
+      vetting: { score: vetResult.score, flags: vetResult.flags }
     };
     const ok = await putR2(env, 'acreetionos-hosting', 'provider-' + id, provider);
     if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: getCors() });
@@ -295,12 +482,27 @@ async function handleHostingRegister(request, env) {
       });
     }
 
+    const statusEmoji = vetResult.needs_manual_review ? '⚠️' : '✅';
+    const statusLabel = vetResult.needs_manual_review ? 'Flagged — Manual Review Required' : 'Pending Approval';
+
     // Notify Discord
     sendDiscordWebhook(env,
-      `**New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "YOUR_ADMIN_KEY" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
+      `${statusEmoji} **New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**Vetting Score:** ${vetResult.score}\n**Status:** ${statusLabel}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "YOUR_ADMIN_KEY" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
     );
 
-    return new Response(JSON.stringify({ success: true, message: 'Registration submitted for review', id }), { headers: getCors() });
+    if (vetResult.flags.length > 0) {
+      sendDiscordWebhook(env,
+        `**Vetting Details for ${body.org}**\n${vetResult.flags.map(f => '- ' + f).join('\n')}`
+      );
+    }
+
+    const msg = vetResult.auto_rejected
+      ? 'Registration rejected by security vetting'
+      : vetResult.needs_manual_review
+        ? 'Registration submitted — flagged for manual review due to security indicators'
+        : 'Registration submitted for review';
+
+    return new Response(JSON.stringify({ success: true, message: msg, id, vetting: { score: vetResult.score, flagged: vetResult.needs_manual_review } }), { headers: getCors() });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
   }
