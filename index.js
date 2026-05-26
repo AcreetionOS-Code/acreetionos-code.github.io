@@ -250,6 +250,51 @@ async function checkEmailBreaches(env, email) {
   return { breached: false };
 }
 
+async function validateOrgDomain(env, email, org, isPersonal) {
+  // Skip validation if personal checkbox was checked
+  if (isPersonal) return { valid: true, note: 'personal' };
+
+  const domain = email.split('@')[1];
+  if (!domain) return { valid: false, reason: 'Invalid email domain' };
+
+  // Known open source project hosting platforms
+  const ossPlatforms = ['github.io', 'gitlab.io', 'bitbucket.io', 'sourceforge.io', 'gitlab.com', 'github.com'];
+  const isOSS = ossPlatforms.some(p => domain.endsWith('.' + p) || domain === p);
+  if (isOSS) return { valid: true, note: 'open_source_platform' };
+
+  try {
+    // Check if domain has a resolvable website (proves it's a real organization)
+    const headRes = await fetch(`https://${domain}`, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(8000)
+    }).catch(() => null);
+
+    // Also check www subdomain
+    const wwwRes = !headRes?.ok ? await fetch(`https://www.${domain}`, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(8000)
+    }).catch(() => null) : headRes;
+
+    if (wwwRes?.ok || headRes?.ok) {
+      return { valid: true, note: 'verified_domain' };
+    }
+
+    // Try HTTP as fallback
+    const httpRes = !headRes && !wwwRes ? await fetch(`http://${domain}`, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(5000)
+    }).catch(() => null) : null;
+
+    if (httpRes?.ok) {
+      return { valid: true, note: 'verified_domain_http' };
+    }
+
+    return { valid: false, reason: `Domain "${domain}" has no reachable website. Organization email must belong to an open source project or business with an active website, or check "personal use".` };
+  } catch (e) {
+    return { valid: false, reason: `Could not verify domain "${domain}": ${e.message}` };
+  }
+}
+
 async function vetProvider(env, body) {
   const { org, email, website, mirror_url, location, notes } = body;
   const flags = [];
@@ -444,6 +489,12 @@ async function handleHostingRegister(request, env) {
     const body = await request.json();
     if (!body.org || !body.email || !body.password || !body.mirror_url || !body.location) {
       return new Response(JSON.stringify({ error: 'org, email, password, mirror_url, and location are required' }), { status: 400, headers: getCors() });
+    }
+
+    // Validate organization domain (skip if personal checkbox checked)
+    const orgCheck = await validateOrgDomain(env, body.email, body.org, body.personal_email === true);
+    if (!orgCheck.valid) {
+      return new Response(JSON.stringify({ success: false, error: orgCheck.reason }), { status: 400, headers: getCors() });
     }
 
     // Run background vetting checks
@@ -757,7 +808,7 @@ async function scanISOSuspicious(env) {
 
   for (const obj of objects) {
     const data = await getR2(env, 'acreetionos-hosting', obj.key);
-    if (!data || data.status !== 'active') continue;
+    if (!data || (data.status !== 'active' && data.status !== 'reactivating')) continue;
 
     const isoUrl = data.mirror_url;
     if (!isoUrl) continue;
@@ -834,6 +885,27 @@ async function scanISOSuspicious(env) {
     // Update last_seen for clean scans or local scans that passed
     if (result.clean || result.scan_method === 'local_quick') {
       data.last_seen = new Date().toISOString();
+
+      // Auto-reactivation logic — if status is 'reactivating', track uptime
+      if (data.status === 'reactivating') {
+        if (!data.reactivation_online_since) {
+          data.reactivation_online_since = new Date().toISOString();
+        }
+        const onlineSince = new Date(data.reactivation_online_since).getTime();
+        const hoursOnline = (Date.now() - onlineSince) / (1000 * 60 * 60);
+
+        if (hoursOnline >= 24) {
+          data.status = 'active';
+          data.reactivation_requested = false;
+          data.reactivation_online_since = undefined;
+          data.reactivation_requested_at = undefined;
+          sendDiscordWebhook(env,
+            `**✅ Provider Auto-Reactivated**\n**Provider:** ${data.org}\n**Email:** ${data.email}\n**ISO:** ${data.mirror_url}\n**Online for:** ${hoursOnline.toFixed(1)} hours\n\nProvider has been reactivated after 24+ hours of uptime.`
+          );
+          triggerRedeploy(env);
+        }
+      }
+
       await putR2(env, 'acreetionos-hosting', obj.key, data);
     }
 
@@ -979,6 +1051,61 @@ async function triggerClamavScan(env) {
       body: JSON.stringify({ ref: 'main' })
     });
   } catch (e) { console.error('ClamAV scan trigger failed:', e); }
+}
+
+async function handleHostingReactivate(request, env) {
+  // POST /api/hosting/reactivate — Request reactivation after expiry
+  // Body: { email, password, agreement: true }
+  try {
+    const body = await request.json();
+    if (!body.email || !body.password) {
+      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: getCors() });
+    }
+    if (!body.agreement) {
+      return new Response(JSON.stringify({ error: 'You must accept the hosting agreement to reactivate' }), { status: 400, headers: getCors() });
+    }
+
+    // Check if provider exists (including deleted/expired — we can't find deleted ones)
+    // Scan all providers for matching email
+    const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+    let found = null;
+    let providerKey = '';
+    for (const obj of objects) {
+      const data = await getR2(env, 'acreetionos-hosting', obj.key);
+      if (data && data.email === body.email && data.password === hashPassword(body.password)) {
+        found = data; providerKey = obj.key; break;
+      }
+    }
+
+    if (!found) {
+      // Check if they were deleted — store a reactivation request
+      return new Response(JSON.stringify({
+        success: true, message: 'If your account exists, we will verify your mirror and reactivate it within 24 hours if it remains online.',
+        verification_pending: true
+      }), { headers: getCors() });
+    }
+
+    // Mark as pending reactivation with timestamp
+    found.reactivation_requested = true;
+    found.reactivation_requested_at = new Date().toISOString();
+    found.reactivation_agreement_accepted = true;
+    found.status = 'reactivating';
+    await putR2(env, 'acreetionos-hosting', providerKey, found);
+
+    sendDiscordWebhook(env,
+      `**🔄 Reactivation Requested**\n**Provider:** ${found.org} (${found.email})\n**ISO:** ${found.mirror_url}\n**Agreement accepted:** Yes\n\nMirror will be verified every 6 hours. If online for 24+ consecutive hours, it will be automatically reactivated.`
+    );
+
+    triggerRedeploy(env);
+
+    return new Response(JSON.stringify({
+      success: true,
+      message: 'Reactivation requested. Your mirror will be checked every 6 hours. If it stays online for 24 hours, you will be automatically reactivated.',
+      verification_pending: true
+    }), { headers: getCors() });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+  }
 }
 
 async function triggerRedeploy(env) {
@@ -1411,6 +1538,9 @@ export default {
     }
     if (url.pathname === '/api/hosting/scan' && request.method === 'POST') {
       return handleHostingScan(request, env);
+    }
+    if (url.pathname === '/api/hosting/reactivate' && request.method === 'POST') {
+      return handleHostingReactivate(request, env);
     }
 
     // Chat endpoint
