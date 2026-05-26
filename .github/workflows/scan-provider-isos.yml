@@ -1,7 +1,7 @@
 name: Scan Provider ISOs for Malware
 on:
   schedule:
-    - cron: '0 4 * * 1'  # Every Monday at 4AM UTC
+    - cron: '0 */6 * * *'  # Every 6 hours
   workflow_dispatch:
   repository_dispatch:
     types: [trigger-scan]
