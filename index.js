@@ -414,8 +414,8 @@ async function getR2(env, bucket, key) {
   const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
   const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
   if (!res.ok) return null;
-  const data = await res.json();
-  return data?.result;
+  // R2 GET returns the raw object body directly (not wrapped in { result: ... })
+  return await res.json();
 }
 
 async function putR2(env, bucket, key, body) {
