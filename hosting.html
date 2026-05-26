@@ -38,15 +38,21 @@
 <label for="password">Set a Password *</label>
 <input type="password" id="password" required minlength="6" placeholder="For managing your listing">
 </div>
-<div>
+          <div>
 <label for="mirror-url">ISO Mirror URL *</label>
 <input type="url" id="mirror-url" required placeholder="https://mirror.example.com/acreetionos/">
 <label for="location">Server Location *</label>
 <input type="text" id="location" required placeholder="e.g. New York, USA">
 <label for="bandwidth">Available Bandwidth</label>
 <input type="text" id="bandwidth" placeholder="e.g. 10 Gbps">
+<label for="discord-user-id">Discord User ID <span style="color:#888;font-size:0.8rem">(for ISO Hoster role)</span></label>
+<input type="text" id="discord-user-id" placeholder="Right-click your name in Discord → Copy ID">
 <label for="notes">Additional Notes</label>
 <textarea id="notes" placeholder="Any extra info about your mirror..."></textarea>
+<label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.5rem;cursor:pointer">
+<input type="checkbox" id="subscribe" checked style="width:auto;margin:0">
+<span style="color:var(--text-bright)">Subscribe to hosting provider updates via email</span>
+</label>
 </div>
 </div>
 <button type="submit" class="btn btn-primary" id="register-btn">Submit Registration</button>
@@ -153,6 +159,8 @@ async function registerProvider(e) {
     location: document.getElementById('location').value,
     bandwidth: document.getElementById('bandwidth').value,
     notes: document.getElementById('notes').value,
+    discord_user_id: document.getElementById('discord-user-id').value,
+    subscribe: document.getElementById('subscribe').checked,
   };
   try {
     const res = await fetch('/api/hosting/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
