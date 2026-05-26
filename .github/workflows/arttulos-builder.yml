@@ -37,9 +37,9 @@ jobs:
           [ -d src/airootfs ] && cp patches/configs/immutable-patch.sh src/airootfs/root/
           # Fix build.sh — remove sudo (not needed in Docker)
           sed -i 's/sudo //g' src/build.sh
-          # Fix mkarchiso.sh — proper env var + remove j$nproc
+          # Fix mkarchiso.sh — output to mounted volume so ISO persists
           echo 'export PACMAN_OPTS="--overwrite \"*\""' > src/mkarchiso.sh
-          echo 'mkarchiso -L ArttulOS -v -o ../ISO . -C ./pacman.conf' >> src/mkarchiso.sh
+          echo 'mkarchiso -L ArttulOS -v -o /workspace/out . -C ./pacman.conf' >> src/mkarchiso.sh
           # Fix profiledef.sh — use non-deprecated boot modes
           sed -i "s/bios.syslinux.mbr/bios.syslinux/" src/profiledef.sh
           sed -i "s/bios.syslinux.eltorito/bios.syslinux/" src/profiledef.sh
@@ -57,8 +57,11 @@ jobs:
               bash build.sh 2>&1; \
               find / -name '*.iso' -maxdepth 5 2>/dev/null;
             " 2>&1 | tee /tmp/build.log
-          mkdir -p /tmp/iso
-          docker run --rm -v $PWD/src:/workspace -v /tmp/iso:/output archlinux:latest bash -c "find /workspace -name '*.iso' -exec cp -v {} /output/ \; 2>/dev/null; find / -maxdepth 3 -name '*.iso' -exec cp -v {} /output/ \; 2>/dev/null; ls -la /output/" 2>/dev/null || true
+          mkdir -p /tmp/iso /tmp/src
+          cp -r $PWD/src /tmp/src 2>/dev/null || true
+          # After build, copy ISO from the mounted volume
+          cp $PWD/src/out/*.iso /tmp/iso/ 2>/dev/null
+          ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
           ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
 
       - name: Upload ISO to R2
