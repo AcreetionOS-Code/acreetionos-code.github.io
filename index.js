@@ -433,6 +433,101 @@ async function handleHostingUnsubscribe(request, env) {
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: getCors() });
 }
 
+// ─── Malware Scanning ──────────────────────────────────────────
+
+async function scanISOSuspicious(env) {
+  // Scan all active provider ISOs using VirusTotal URL scan
+  // Returns list of flagged providers
+  const vtKey = env.VIRUSTOTAL_API_KEY;
+  if (!vtKey) return { flagged: [], errors: [] };
+
+  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  const flagged = [];
+  const errors = [];
+
+  for (const obj of objects) {
+    const data = await getR2(env, 'acreetionos-hosting', obj.key);
+    if (!data || data.status !== 'active') continue;
+
+    const isoUrl = data.mirror_url;
+    if (!isoUrl) continue;
+
+    try {
+      // Submit URL to VirusTotal for scanning
+      const submitRes = await fetch('https://www.virustotal.com/api/v3/urls', {
+        method: 'POST',
+        headers: { 'x-apikey': vtKey, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ url: isoUrl })
+      });
+
+      if (!submitRes.ok) { errors.push(`${data.org}: VT submit failed ${submitRes.status}`); continue; }
+      const submitData = await submitRes.json();
+      const analysisId = submitData?.data?.id;
+      if (!analysisId) { errors.push(`${data.org}: no analysis ID`); continue; }
+
+      // Wait a moment then fetch results
+      await new Promise(r => setTimeout(r, 5000));
+
+      const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
+        headers: { 'x-apikey': vtKey }
+      });
+      if (!resultRes.ok) { errors.push(`${data.org}: VT result fetch failed`); continue; }
+      const resultData = await resultRes.json();
+      const stats = resultData?.data?.attributes?.stats;
+
+      if (stats && (stats.malicious > 0 || stats.suspicious > 0)) {
+        flagged.push({
+          id: data.id, org: data.org, email: data.email,
+          mirror_url: data.mirror_url,
+          malicious: stats.malicious || 0,
+          suspicious: stats.suspicious || 0,
+          total: (stats.harmless || 0) + (stats.malicious || 0) + (stats.suspicious || 0) + (stats.undetected || 0)
+        });
+      }
+
+      // Rate limit: 4 requests per minute for free VT
+      await new Promise(r => setTimeout(r, 15000));
+    } catch (e) {
+      errors.push(`${data.org}: ${e.message}`);
+    }
+  }
+
+  return { flagged, errors };
+}
+
+async function handleHostingScan(request, env) {
+  // POST /api/hosting/scan — triggers full scan of all provider ISOs
+  // Requires admin_key
+  const body = await request.json().catch(() => ({}));
+  if (body.admin_key !== env.ADMIN_KEY) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: getCors() });
+  }
+  const result = await scanISOSuspicious(env);
+
+  // Auto-deregister flagged providers
+  for (const flagged of result.flagged) {
+    await deleteR2(env, 'acreetionos-hosting', 'provider-' + flagged.id);
+    sendDiscordWebhook(env,
+      `**🚨 MALWARE DETECTED — Provider Auto-Deregistered**\n**Provider:** ${flagged.org}\n**Email:** ${flagged.email}\n**ISO:** ${flagged.mirror_url}\n**Malicious detections:** ${flagged.malicious}\n**Suspicious:** ${flagged.suspicious}\n**Total engines:** ${flagged.total}\n\nProvider has been immediately removed from the website.`
+    );
+  }
+
+  if (result.flagged.length === 0 && result.errors.length === 0) {
+    sendDiscordWebhook(env, '**ISO Malware Scan Complete** — No threats detected across all providers.');
+  }
+
+  if (result.errors.length > 0) {
+    sendDiscordWebhook(env, `**ISO Scan Errors**\n${result.errors.join('\n')}`);
+  }
+
+  // Trigger redeploy if providers were removed
+  if (result.flagged.length > 0) {
+    triggerRedeploy(env);
+  }
+
+  return new Response(JSON.stringify(result), { headers: getCors() });
+}
+
 async function handleHostingCount(env) {
   const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
   let active = 0;
@@ -870,6 +965,9 @@ export default {
     }
     if (url.pathname === '/api/hosting/count' && request.method === 'GET') {
       return handleHostingCount(env);
+    }
+    if (url.pathname === '/api/hosting/scan' && request.method === 'POST') {
+      return handleHostingScan(request, env);
     }
 
     // Chat endpoint
