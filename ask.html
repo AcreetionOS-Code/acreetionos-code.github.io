@@ -153,7 +153,6 @@ function showTyping(on){
   messages.scrollTop=messages.scrollHeight
 }
 let ttsEnabled=true
-let aiKey=localStorage.getItem('aiden_key')||''
 let ttsVoices=[]
 function loadVoices(){
   ttsVoices=window.speechSynthesis?.getVoices()||[]
@@ -172,17 +171,14 @@ function speakText(t){
   window.speechSynthesis.speak(u)
 }
 async function callAI(text){
-  if(!aiKey){
-    const k=prompt('Enter your OpenRouter API key for AI answers (get free at https://openrouter.ai/keys)\n\nLeave blank to use offline knowledge base:')
-    if(k){aiKey=k;localStorage.setItem('aiden_key',k)}
-    else return null
-  }
-  const history=[{role:'system',content:'You are AIDEN, the helpful AcreetionOS assistant. Answer concisely and accurately about AcreetionOS, ArttulOS, Arch Linux, and Linux in general.'},{role:'user',content:text}]
   try{
-    const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+    const res=await fetch('/api/chat',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+aiKey},
-      body:JSON.stringify({model:'meta-llama/llama-3.2-3b-instruct:free',messages:history,max_tokens:500})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        messages:[{role:'system',content:'You are AIDEN, the helpful AcreetionOS assistant. Answer concisely and accurately about AcreetionOS, ArttulOS, Arch Linux, and Linux in general.'},{role:'user',content:text}],
+        max_tokens:500,model:'meta-llama/llama-3.2-3b-instruct:free'
+      })
     })
     const data=await res.json()
     if(!res.ok)throw new Error(data.error?.message||'API error')
