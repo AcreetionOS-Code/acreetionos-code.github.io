@@ -1110,29 +1110,123 @@ async function handleHostingReactivate(request, env) {
 
 // ─── CVE Security Monitoring ──────────────────────────────────
 
-function parseArchCVEXML(xml) {
+const NVD_BASE = 'https://services.nvd.nist.gov/rest/json/cves/2.0';
+const OSV_BASE = 'https://api.osv.dev/v1';
+
+function parseArchAtom(xml) {
   const items = [];
-  const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+  const entryRegex = /<entry>([\s\S]*?)<\/entry>/gi;
   let match;
-  while ((match = itemRegex.exec(xml)) !== null) {
-    const item = match[1];
-    const title = (item.match(/<title>(?:<!\[CDATA\[)?([^\]]*(?:\]\]>)?[^<]*)/) || [,''])[1].replace(']]>', '').trim();
-    const link = (item.match(/<link>([^<]*)<\/link>/) || [,''])[1].trim();
-    const desc = (item.match(/<description>(?:<!\[CDATA\[)?([^\]]*(?:\]\]>)?[^<]*)/) || [,''])[1].replace(']]>', '').trim();
-    const date = (item.match(/<pubDate>([^<]*)<\/pubDate>/) || [,''])[1].trim();
-    const cveMatch = title.match(/(CVE-\d{4}-\d+)/i);
-    if (cveMatch) {
-      const pkg = (title.match(/^\[([^\]]+)\]/) || [,''])[1];
-      items.push({ cve: cveMatch[1], title, link: link || 'https://security.archlinux.org/', desc, date, package: pkg });
+  while ((match = entryRegex.exec(xml)) !== null) {
+    const entry = match[1];
+    const title = (entry.match(/<title[^>]*>(?:<!\[CDATA\[)?([^\]]*(?:\]\]>)?[^<]*)/) || [,''])[1].replace(']]>', '').trim();
+    const content = (entry.match(/<content[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/content>/) || [,''])[1].trim();
+    const updated = (entry.match(/<updated>([^<]*)<\/updated>/) || [,''])[1].trim();
+    const summary = (entry.match(/<summary[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/summary>/) || [,''])[1].replace(']]>', '').trim();
+
+    const cveMatch = title.match(/(CVE-\d{4}-\d+)/gi);
+    const severityMatch = content.match(/Severity:\s*(\w+)/i);
+    const packageMatch = content.match(/Package\s*:\s*([^\s<]+)/i);
+    const typeMatch = content.match(/Type\s*:\s*([^<]+)/i);
+    const remoteMatch = content.match(/Remote\s*:\s*(\w+)/i);
+    const resolutionMatch = content.match(/Upgrade to\s*([^<]+)/i);
+    const linkMatch = entry.match(/<link[^>]*href="([^"]*)"/);
+    const avgMatch = content.match(/AVG-\d+/);
+
+    if (cveMatch && cveMatch.length > 0) {
+      const pkg = (packageMatch ? packageMatch[1].trim() : (title.match(/^\[([^\]]+)\]/) || [,''])[1]).replace(/&amp;/g, '&');
+      items.push({
+        cves: cveMatch.map(c => c.toUpperCase()),
+        primary_cve: cveMatch[0].toUpperCase(),
+        title: title.replace(/&amp;/g, '&'),
+        link: linkMatch ? linkMatch[1] : 'https://security.archlinux.org/',
+        summary: summary.replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').trim(),
+        content: content.replace(/<br\/?>/g, '\n').replace(/<[^>]+>/g, '').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#34;/g, '"').trim(),
+        date: updated,
+        package: pkg,
+        severity: severityMatch ? severityMatch[1] : 'Unknown',
+        type: typeMatch ? typeMatch[1].trim() : 'unknown',
+        remote: remoteMatch ? remoteMatch[1] === 'Yes' : false,
+        resolution: resolutionMatch ? resolutionMatch[1].trim() : '',
+        avg: avgMatch ? avgMatch[0] : ''
+      });
     }
   }
   return items;
 }
 
+async function fetchCVEDetails(cveId) {
+  // Get CVSS score from NVD
+  try {
+    const res = await fetch(`${NVD_BASE}?cveId=${cveId}`, {
+      headers: { 'User-Agent': 'AcreetionOS-CVE/1.0' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const vuln = data?.vulnerabilities?.[0]?.cve;
+      if (vuln) {
+        const metrics = vuln.metrics;
+        let cvss = null, exploitability = null;
+        if (metrics?.cvssMetricV31?.[0]) {
+          cvss = metrics.cvssMetricV31[0].cvssData;
+        } else if (metrics?.cvssMetricV30?.[0]) {
+          cvss = metrics.cvssMetricV30[0].cvssData;
+        } else if (metrics?.cvssMetricV2?.[0]) {
+          cvss = metrics.cvssMetricV2[0].cvssData;
+        }
+        return {
+          cvss_score: cvss?.baseScore || null,
+          cvss_severity: cvss?.baseSeverity || null,
+          cvss_vector: cvss?.vectorString || null,
+          exploitability: metrics?.cvssMetricV31?.[0]?.exploitabilityScore || null,
+          impact_score: metrics?.cvssMetricV31?.[0]?.impactScore || null,
+          cisa_kev: vuln?.cisaExploitAdd ? true : false,
+          cisa_due: vuln?.cisaActionDue || null,
+          known_ransomware: vuln?.cisaRansomwareUse ? true : false
+        };
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function fetchOSVDetails(cveId) {
+  // Cross-reference with OSV.dev for patch status
+  try {
+    const res = await fetch(`${OSV_BASE}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: cveId }),
+      signal: AbortSignal.timeout(8000)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const vuln = data?.vulns?.[0];
+      if (vuln) {
+        const affected = (vuln.affected || []).map(a => ({
+          package: a.package?.name || '',
+          ecosystem: a.package?.ecosystem || '',
+          ranges: a.ranges || [],
+          versions: a.versions || []
+        }));
+        const patches = vuln.related ? vuln.related.filter(r => r.type === 'FIX' || r.type === 'PACKAGE') : [];
+        return { affected, patches, aliases: vuln.aliases || [], severity: vuln.severity || [] };
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function crossReferenceCVE(cveId) {
+  const [nvd, osv] = await Promise.all([
+    fetchCVEDetails(cveId),
+    fetchOSVDetails(cveId).catch(() => null)
+  ]);
+  return { nvd, osv };
+}
+
 function generateFixScript(cve, pkg, arch) {
-  const packages = pkg ? pkg.split(',').map(p => p.trim()).filter(Boolean) : [];
-  const pkgList = packages.length > 0 ? packages.join(' ') : 'PACKAGE_NAME';
-  return `#!/bin/bash
 # AcreetionOS CVE Fix Script
 # CVE: ${cve}
 # Package: ${pkgList}
@@ -1186,28 +1280,45 @@ echo "For more details: https://security.archlinux.org/${cve}"`;
 
 async function handleCVEFeed(env) {
   try {
-    const res = await fetch('https://security.archlinux.org/feed.xml', {
+    // Fetch from Arch Linux Atom feed (official advisory source)
+    const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
       headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' },
       signal: AbortSignal.timeout(15000)
     });
-    if (!res.ok) {
-      return new Response(JSON.stringify({ error: 'Failed to fetch CVE feed', cves: [], count: 0 }), { headers: getCors() });
-    }
+    if (!res.ok) throw new Error('Atom feed fetch failed: ' + res.status);
     const xml = await res.text();
-    const cves = parseArchCVEXML(xml);
-    const recent = cves.slice(0, 50);
+    let cves = parseArchAtom(xml);
 
-    // Store last 50 CVEs in R2 for the badge to check
-    await putR2(env, 'acreetionos-hosting', 'cve-cache.json', { updated: new Date().toISOString(), cves: recent, count: recent.length });
+    // Cross-reference each CVE with NVD, CISA KEV, and OSV for enrichment
+    const enriched = [];
+    // Limit to 10 cross-references per request for performance
+    const toEnrich = cves.slice(0, 10);
+    const enrichedPromises = toEnrich.map(async (cve) => {
+      const crossRef = await crossReferenceCVE(cve.primary_cve).catch(() => null);
+      return { ...cve, cross_ref: crossRef };
+    });
+    const enrichedResults = await Promise.all(enrichedPromises);
 
-    return new Response(JSON.stringify({ cves: recent, count: recent.length, updated: new Date().toISOString() }), {
+    // For remaining CVEs, just pass through without enrichment
+    const remaining = cves.slice(10);
+    const allCves = [...enrichedResults, ...remaining.map(c => ({ ...c, cross_ref: null }))];
+
+    // Store in R2 cache
+    await putR2(env, 'acreetionos-hosting', 'cve-cache.json', {
+      updated: new Date().toISOString(),
+      cves: allCves,
+      count: allCves.length,
+      source: 'security.archlinux.org/advisory/feed.atom'
+    });
+
+    return new Response(JSON.stringify({ cves: allCves, count: allCves.length, updated: new Date().toISOString(), source: 'security.archlinux.org' }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=1800', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   } catch (e) {
-    // Try to serve from cache
+    // Serve from cache on failure
     const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json');
     if (cached && cached.cves) {
-      return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, cached: true }), {
+      return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, source: 'cached', cached: true }), {
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600', ...corsHeaders({ headers: { get: () => '' } }) }
       });
     }
@@ -1218,19 +1329,36 @@ async function handleCVEFeed(env) {
 async function handleCVEStatus(env) {
   const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json');
   if (cached && cached.cves) {
-    const critical = cached.cves.filter(c => c.title.toLowerCase().includes('critical') || c.title.toLowerCase().includes('high'));
-    return new Response(JSON.stringify({ count: cached.count, critical: critical.length, updated: cached.updated, has_active: cached.count > 0 }), {
+    const critical = cached.cves.filter(c =>
+      c.severity?.toLowerCase() === 'critical' ||
+      c.severity?.toLowerCase() === 'high' ||
+      c.cross_ref?.nvd?.cvss_severity === 'CRITICAL' ||
+      c.cross_ref?.nvd?.cvss_severity === 'HIGH'
+    );
+    const exploitable = cached.cves.filter(c => c.cross_ref?.nvd?.cisa_kev).length;
+    const avgCvss = cached.cves
+      .map(c => c.cross_ref?.nvd?.cvss_score)
+      .filter(Boolean);
+    const meanCvss = avgCvss.length > 0 ? (avgCvss.reduce((a, b) => a + b, 0) / avgCvss.length).toFixed(1) : null;
+    return new Response(JSON.stringify({
+      count: cached.count,
+      critical: critical.length,
+      exploitable,
+      avg_cvss: meanCvss,
+      updated: cached.updated,
+      has_active: cached.count > 0,
+      source: cached.source || 'archlinux'
+    }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=600', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
-  // Fetch fresh if no cache
   return handleCVEFeed(env);
 }
 
 async function handleCVEFix(request, env) {
   try {
     const body = await request.json();
-    if (!body.cve || !body.accepted !== true) {
+    if (!body.cve || body.accepted !== true) {
       return new Response(JSON.stringify({ error: 'CVE ID and acceptance required' }), { status: 400, headers: getCors() });
     }
     const cveId = body.cve.toUpperCase();
@@ -1238,22 +1366,31 @@ async function handleCVEFix(request, env) {
       return new Response(JSON.stringify({ error: 'Invalid CVE ID format' }), { status: 400, headers: getCors() });
     }
 
-    // Look up CVE in cache
     const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json');
     let cveData = null;
     if (cached && cached.cves) {
-      cveData = cached.cves.find(c => c.cve === cveId);
+      cveData = cached.cves.find(c => c.primary_cve === cveId || (c.cves || []).includes(cveId));
     }
 
     const pkg = cveData ? cveData.package : '';
     const arch = 'x86_64';
     const script = generateFixScript(cveId, pkg, arch);
 
+    // Get CVSS if available
+    const cvssInfo = cveData?.cross_ref?.nvd;
+
     return new Response(JSON.stringify({
       cve: cveId,
       package: pkg || 'unknown',
-      description: cveData ? cveData.desc : '',
+      severity: cveData?.severity || 'Unknown',
+      cvss_score: cvssInfo?.cvss_score || null,
+      cvss_severity: cvssInfo?.cvss_severity || null,
+      cisa_known: cvssInfo?.cisa_kev || false,
+      description: cveData?.summary || '',
+      resolution: cveData?.resolution || '',
       script,
+      source: 'Arch Linux Security Advisory',
+      source_url: cveData?.link || `https://security.archlinux.org/${cveId}`,
       disclaimer: 'This script is provided as-is. The AcreetionOS project is not responsible for any damage or data loss. By using this script, you accept full responsibility for your system.'
     }), { headers: getCors() });
   } catch (e) {

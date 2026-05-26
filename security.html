@@ -55,10 +55,23 @@ let allCVEs = [];
 let currentFilter = 'all';
 
 function severity(cve) {
-  const t = (cve.title || '').toLowerCase() + ' ' + (cve.desc || '').toLowerCase();
+  // Use enriched CVSS severity first, then Arch severity, then keyword fallback
+  const cvss = cve.cross_ref?.nvd?.cvss_severity;
+  if (cvss === 'CRITICAL') return 'critical';
+  if (cvss === 'HIGH') return 'high';
+  if (cvss === 'MEDIUM') return 'medium';
+  if (cvss === 'LOW') return 'low';
+
+  const s = (cve.severity || '').toLowerCase();
+  if (s === 'critical') return 'critical';
+  if (s === 'high') return 'high';
+  if (s === 'medium') return 'medium';
+  if (s === 'low') return 'low';
+
+  const t = (cve.title || '').toLowerCase() + ' ' + (cve.summary || '').toLowerCase();
   if (t.includes('critical')) return 'critical';
-  if (t.includes('high') || t.includes('arbitrary code') || t.includes('privilege escalation') || t.includes('remote code')) return 'high';
-  if (t.includes('medium') || t.includes('denial of service') || t.includes('information disclosure')) return 'medium';
+  if (t.includes('arbitrary code') || t.includes('privilege escalation') || t.includes('remote code') || t.includes('high')) return 'high';
+  if (t.includes('denial of service') || t.includes('information disclosure') || t.includes('medium')) return 'medium';
   return 'low';
 }
 
@@ -75,14 +88,19 @@ async function loadCVEs() {
 }
 
 function renderStats(data) {
-  const c = document.getElementById('cve-stats');
+  const cves = data.cves || [];
   const total = data.count || 0;
-  const critical = (data.cves || []).filter(c => severity(c) === 'critical').length;
-  const high = (data.cves || []).filter(c => severity(c) === 'high').length;
+  const critical = cves.filter(c => severity(c) === 'critical').length;
+  const high = cves.filter(c => severity(c) === 'high').length;
+  const exploitable = cves.filter(c => c.cross_ref?.nvd?.cisa_kev).length;
+  const avgCvss = cves.map(c => c.cross_ref?.nvd?.cvss_score).filter(Boolean);
+  const meanCvss = avgCvss.length > 0 ? (avgCvss.reduce((a,b) => a+b, 0) / avgCvss.length).toFixed(1) : '—';
   c.innerHTML = `
     <div class="stat-box critical"><div class="num">${critical}</div><div class="label">Critical</div></div>
     <div class="stat-box high"><div class="num">${high}</div><div class="label">High</div></div>
     <div class="stat-box total"><div class="num">${total}</div><div class="label">Total CVEs</div></div>
+    <div class="stat-box"><div class="num" style="color:${exploitable > 0 ? '#e74c3c' : '#888'};font-size:1.4rem">${exploitable > 0 ? '⚠ ' + exploitable : '0'}</div><div class="label">Known Exploited</div></div>
+    <div class="stat-box"><div class="num" style="color:#888">${meanCvss}</div><div class="label">Avg CVSS</div></div>
     <div class="stat-box"><div class="num" style="color:#888">${data.updated ? new Date(data.updated).toLocaleDateString() : '—'}</div><div class="label">Last Updated</div></div>
   `;
 }
@@ -101,24 +119,36 @@ function renderCVEs() {
   list.innerHTML = matched.map(c => {
     const sev = severity(c);
     const sevLabel = sev.charAt(0).toUpperCase() + sev.slice(1);
+    const cveId = c.primary_cve || (c.cves && c.cves[0]) || '';
+    const cvss = c.cross_ref?.nvd;
+    const cvssBadge = cvss?.cvss_score ? `<span class="severity-badge sev-${sev}" title="CVSS ${cvss.cvss_score} · ${cvss.cvss_severity || ''}">CVSS ${cvss.cvss_score}</span>` : '';
+    const cisaBadge = cvss?.cisa_kev ? `<span class="severity-badge sev-critical" style="margin-left:0.3rem" title="Known to be exploited in the wild">CISA KEV</span>` : '';
+    const extraCves = (c.cves && c.cves.length > 1) ? `+${c.cves.length - 1} more` : '';
+    const allCves = c.cves ? c.cves.join(', ') : cveId;
     return `
     <div class="cve-card ${sev}" onclick="toggleCVE(this)">
       <div class="cve-header">
         <div>
-          <span class="cve-id">${c.cve}</span>
+          <span class="cve-id">${cveId}</span>
+          ${extraCves ? `<span style="font-size:0.7rem;color:#888">${extraCves}</span>` : ''}
           ${c.package ? `<span class="cve-pkg">${esc(c.package)}</span>` : ''}
           <span class="severity-badge sev-${sev}">${sevLabel}</span>
+          ${cvssBadge}${cisaBadge}
         </div>
         <span class="cve-date">${c.date ? new Date(c.date).toLocaleDateString() : ''}</span>
       </div>
       <div class="cve-title">${esc(c.title)}</div>
-      <div class="cve-desc">${esc(c.desc || '').slice(0, 200)}${(c.desc||'').length > 200 ? '...' : ''}</div>
+      <div class="cve-desc">${esc(c.summary || c.content || '').slice(0, 200)}${((c.summary||c.content||'').length > 200) ? '...' : ''}</div>
       <div class="cve-detail">
-        <p style="color:var(--text);font-size:0.85rem;margin-bottom:0.8rem">${esc(c.desc || 'No description available.')}</p>
+        ${c.cross_ref?.nvd?.cvss_vector ? `<p style="font-size:0.7rem;color:#666;font-family:monospace;margin-bottom:0.5rem">Vector: ${esc(c.cross_ref.nvd.cvss_vector)}</p>` : ''}
+        <p style="color:var(--text);font-size:0.85rem;margin-bottom:0.8rem">${esc(c.summary || c.content || 'No description available.')}</p>
+        ${c.cross_ref?.osv?.affected?.length > 0 ? `<p style="font-size:0.75rem;color:#888;margin-bottom:0.5rem">Affected ecosystems: ${c.cross_ref.osv.affected.map(a => esc(a.ecosystem || a.package)).join(', ')}</p>` : ''}
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-          <button class="btn btn-red" onclick="event.stopPropagation();openFixModal('${c.cve}','${esc(c.package||'')}','${esc(c.title)}','${esc(c.desc||'')}')">Generate Fix Script</button>
-          <a href="https://security.archlinux.org/${c.cve}" target="_blank" class="btn btn-outline">View on Arch Security</a>
-          <a href="https://nvd.nist.gov/vuln/detail/${c.cve}" target="_blank" class="btn btn-outline">NVD Details</a>
+          <button class="btn btn-red" onclick="event.stopPropagation();openFixModal('${cveId}','${esc(c.package||'')}','${esc(c.title)}','${esc(c.summary||'')}')">Generate Fix Script</button>
+          <a href="https://security.archlinux.org/${cveId}" target="_blank" class="btn btn-outline">Arch Security</a>
+          <a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" class="btn btn-outline">NVD</a>
+          <a href="https://www.cve.org/CVERecord?id=${cveId}" target="_blank" class="btn btn-outline">CVE.org</a>
+          ${c.cross_ref?.nvd?.cisa_kev ? `<span class="btn btn-outline" style="border-color:#e74c3c;color:#e74c3c">⚠ Known Exploited</span>` : ''}
         </div>
       </div>
     </div>`;
