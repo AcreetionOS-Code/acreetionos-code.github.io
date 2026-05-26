@@ -32,7 +32,11 @@
 <label for="org">Organization Name *</label>
 <input type="text" id="org" required placeholder="e.g. My Hosting Co">
 <label for="email">Contact Email *</label>
-<input type="email" id="email" required placeholder="admin@example.com">
+<input type="email" id="email" required placeholder="admin@yourorg.com">
+<label style="display:flex;align-items:center;gap:0.5rem;margin-top:-0.5rem;margin-bottom:0.5rem;cursor:pointer">
+<input type="checkbox" id="personal-email" style="width:auto;margin:0">
+<span style="color:var(--text);font-size:0.85rem">I don't have an organization email (personal use)</span>
+</label>
 <label for="website">Website</label>
 <input type="url" id="website" placeholder="https://example.com">
 <label for="password">Set a Password *</label>
@@ -150,9 +154,20 @@ async function registerProvider(e) {
   const btn = document.getElementById('register-btn');
   btn.disabled = true;
   btn.textContent = 'Submitting...';
+  // Validate organization email unless personal checkbox is checked
+  const email = document.getElementById('email').value;
+  const isPersonal = document.getElementById('personal-email').checked;
+  const emailDomain = email.split('@')[1];
+  const freeDomains = ['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','protonmail.com','proton.me','mail.com','zoho.com','yandex.com','gmx.com','tutanota.com','fastmail.com','hey.com','inbox.com','rediffmail.com','live.com','msn.com','ymail.com'];
+  if (!isPersonal && emailDomain && freeDomains.includes(emailDomain.toLowerCase())) {
+    flash('Please use an organization email or check "I don\'t have an organization email"', 'error');
+    btn.disabled = false; btn.textContent = 'Submit Registration'; return;
+  }
+
   const body = {
     org: document.getElementById('org').value,
-    email: document.getElementById('email').value,
+    email: email,
+    personal_email: isPersonal,
     website: document.getElementById('website').value,
     password: document.getElementById('password').value,
     mirror_url: document.getElementById('mirror-url').value,

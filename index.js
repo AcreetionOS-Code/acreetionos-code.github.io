@@ -470,7 +470,10 @@ async function handleHostingRegister(request, env) {
       removal_requested: false,
       discord_user_id: body.discord_user_id || '',
       subscribed: body.subscribe === true,
-      vetting: { score: vetResult.score, flags: vetResult.flags }
+      vetting: { score: vetResult.score, flags: vetResult.flags },
+      personal_email: body.personal_email === true,
+      last_seen: new Date().toISOString(),
+      expiry_warning_sent: false
     };
     const ok = await putR2(env, 'acreetionos-hosting', 'provider-' + id, provider);
     if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: getCors() });
@@ -828,6 +831,12 @@ async function scanISOSuspicious(env) {
       result = await localScanISO(env, data);
     }
 
+    // Update last_seen for clean scans or local scans that passed
+    if (result.clean || result.scan_method === 'local_quick') {
+      data.last_seen = new Date().toISOString();
+      await putR2(env, 'acreetionos-hosting', obj.key, data);
+    }
+
     if (!result.clean) {
       const entry = {
         id: data.id, org: data.org, email: data.email,
@@ -845,6 +854,50 @@ async function scanISOSuspicious(env) {
   }
 
   return { flagged, errors, vt_disabled: quota.vt_disabled, vt_quarantined: vtDisabled };
+}
+
+async function checkStaleProviders(env) {
+  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  const expired = [];
+  const now = Date.now();
+  const twoWeeks = 14 * 24 * 60 * 60 * 1000;
+
+  for (const obj of objects) {
+    const data = await getR2(env, 'acreetionos-hosting', obj.key);
+    if (!data || data.status !== 'active') continue;
+
+    const lastSeen = data.last_seen ? new Date(data.last_seen).getTime() : 0;
+    const age = now - lastSeen;
+
+    if (age > twoWeeks) {
+      // Send expiry warning if not already sent (send once at 14 days)
+      if (!data.expiry_warning_sent) {
+        data.expiry_warning_sent = true;
+        await putR2(env, 'acreetionos-hosting', obj.key, data);
+
+        // Store email notification job
+        const emailBody = `Hi ${data.org},\n\nYour AcreetionOS hosting provider listing has been flagged as inactive.\n\nYour ISO mirror (${data.mirror_url}) has not been reachable for 14 days. Per our requirements, providers must maintain an active mirror.\n\nIf you believe this is an error, please contact us at developers@acreetionos.org or re-register at https://acreetionos.org/hosting.html\n\nIf we don't hear from you within 7 days, your listing will be automatically removed.\n\n- AcreetionOS Team`;
+        await sendHostingEmail(env, data.email, 'AcreetionOS Hosting — Inactivity Warning', emailBody);
+
+        sendDiscordWebhook(env,
+          `**⚠️ Provider Inactivity Warning**\n**Provider:** ${data.org}\n**Email:** ${data.email}\n**ISO:** ${data.mirror_url}\n**Last seen:** ${data.last_seen || 'Never'}\n**Grace period:** 7 days before removal\n\nWarning email sent to provider.`
+        );
+      }
+
+      // Remove after 21 days (14 days + 7 day grace)
+      if (age > twoWeeks + (7 * 24 * 60 * 60 * 1000)) {
+        await deleteR2(env, 'acreetionos-hosting', obj.key);
+        const removalBody = `Hi ${data.org},\n\nYour AcreetionOS hosting provider listing has been removed.\n\nReason: Your ISO mirror (${data.mirror_url}) was unreachable for more than 21 days. This violates our hosting requirements.\n\nIf you'd like to re-register, please visit https://acreetionos.org/hosting.html and ensure your mirror is online before submitting.\n\nIf you believe this is an error, contact us at developers@acreetionos.org\n\n- AcreetionOS Team`;
+        await sendHostingEmail(env, data.email, 'AcreetionOS Hosting — Listing Removed (Inactivity)', removalBody);
+        expired.push({ org: data.org, email: data.email, last_seen: data.last_seen, reason: 'inactive_21_days' });
+      }
+    }
+
+    // Also update last_seen if ISO is reachable during scan (handled in scanISOSuspicious)
+    // This is a safety net for providers not scanned recently
+  }
+
+  return expired;
 }
 
 async function handleHostingScan(request, env) {
@@ -890,8 +943,16 @@ async function handleHostingScan(request, env) {
     sendDiscordWebhook(env, `**ISO Scan Errors**\n${result.errors.join('\n')}`);
   }
 
-  // Trigger redeploy if providers were removed
-  if (result.flagged.length > 0) {
+  // Check for stale/expired providers (not seen in 14+ days)
+  const expired = await checkStaleProviders(env);
+  if (expired.length > 0) {
+    sendDiscordWebhook(env,
+      `**⏰ Providers Expired (Inactive 14+ Days)**\n${expired.map(e => `- ${e.org} (${e.email}) — Last seen: ${e.last_seen || 'never'}`).join('\n')}\n\nThey have been removed and notified.`
+    );
+  }
+
+  // Trigger redeploy if providers were removed or expired
+  if (result.flagged.length > 0 || expired.length > 0) {
     triggerRedeploy(env);
   }
 
