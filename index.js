@@ -14,7 +14,7 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const HF_WHISPER_URL = 'https://hf.co/api/inference/models/openai/whisper-tiny';
 const HF_TTS_URL = 'https://api-inference.huggingface.co/models/espnet/kan-bayashi_ljspeech_vits';
 // Use only explicitly free community models. Keep the values in one place.
-const FREE_MODEL = 'openrouter/auto';const ALLOWED_ORIGINS = [
+const FREE_MODEL = 'meta-llama/llama-3.2-3b-instruct:free';const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
