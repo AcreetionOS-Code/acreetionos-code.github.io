@@ -1,10 +1,9 @@
-name = "trumpos-redirect"
+name = "acreetionos-aiden-proxy"
 main = "index.js"
 compatibility_date = "2026-04-26"
 
 routes = [
-  { pattern = "acreetionos.org/TrumpOS/*", script = "trumpos-redirect" },
-  { pattern = "natalie.acreetionos.org/TrumpOS/*", script = "trumpos-redirect" }
+  { pattern = "acreetionos.org/api/*", script = "acreetionos-aiden-proxy" }
 ]
 
 [vars]

@@ -184,11 +184,6 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
-    // TrumpOS redirect — any hostname/path to main site
-    if (url.pathname.startsWith('/TrumpOS') || url.pathname.startsWith('/trumpos')) {
-      return Response.redirect('https://acreetionos.org/TrumpOS/', 301);
-    }
-
     // Page view counter — GET returns count, POST increments
     if (url.pathname === '/api/news') {
       return handleNews(env);
