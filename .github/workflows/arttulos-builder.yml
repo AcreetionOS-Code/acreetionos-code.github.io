@@ -51,7 +51,7 @@ jobs:
             -v $PWD/patches:/patches \
             archlinux:latest \
             bash -c "
-              pacman -Syu --noconfirm archiso && \
+              pacman -Syu --noconfirm archiso grub && \
               cd /workspace && \
               chmod +x *.sh && \
               bash build.sh 2>&1; \
