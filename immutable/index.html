@@ -70,11 +70,11 @@ footer a{color:var(--g);text-decoration:none}
 </style>
 </head><body>
 
-<div class="bar"><span>◆</span> ACREETIONOS IMMUTABLE — LITERALLY JUST ACREETIONOS BUT IMMUTABLE <span>◆</span> FOR PEOPLE WHO BREAK THINGS BUT STILL NEED TO GET STUFF DONE <span>◆</span></div>
+<div class="bar"><span>◆</span> ACREETIONOS IMMUTABLE (FORMERLY ARTTULOS) — LITERALLY JUST ACREETIONOS BUT IMMUTABLE <span>◆</span> FOR PEOPLE WHO BREAK THINGS BUT STILL NEED TO GET STUFF DONE <span>◆</span></div>
 
 <header>
 <div class="hc">
-<a href="/immutable/" class="logo">⌂ Arttul<span>OS</span></a>
+<a href="/immutable/" class="logo">⌂ Immutable<span>OS</span></a>
 <nav class="nav">
 <a href="/immutable/">Dashboard</a>
 <a href="https://acreetionos.org">AcreetionOS</a>
@@ -88,7 +88,7 @@ footer a{color:var(--g);text-decoration:none}
 <div class="hero">
 <div class="tag">For Students · For Tinkerers · For People Who Just Need It To Work</div>
 <h1><span>AcreetionOS Immutable</span></h1>
-<p>You know what happens: you try to install <em>one</em> package, next thing you know you're three hours deep in dependency hell and your essay is due tomorrow. AcreetionOS Immutable fixes that. It's <strong>AcreetionOS</strong> — same Arch base, same Cinnamon desktop, same everything — but with the root locked read-only. You literally cannot break it. Your schoolwork works. Your job works. Your bad ideas don't destroy your OS.</p>
+<p>You know what happens: you try to install <em>one</em> package, next thing you know you're three hours deep in dependency hell and your essay is due tomorrow. AcreetionOS Immutable (formerly ArttulOS) fixes that. It's <strong>AcreetionOS</strong> — same Arch base, same Cinnamon desktop, same everything — but with the root locked read-only. You literally cannot break it. Your schoolwork works. Your job works. Your bad ideas don't destroy your OS.</p>
 <div class="btns">
 <a href="https://discord.acreetionos.org" class="btn btn-p">Join Discord</a>
 <a href="https://github.com/spivanatalie64/immutable" class="btn btn-s">Source Code</a>
@@ -201,7 +201,7 @@ cd immutable
 <div id="aiden-widget">
 <div class="aw-header">
 <div class="aw-avatar">A</div>
-<div><div class="aw-name">AIDEN</div><div class="aw-sub">AcreetionOS Immutable Assistant</div></div>
+<div><div class="aw-name">AIDEN</div><div class="aw-sub">AcreetionOS Immutable Assistant (formerly ArttulOS)</div></div>
 <button class="aw-close" onclick="toggleAiden()">×</button>
 </div>
 <div class="aw-messages" id="aw-msgs">
@@ -214,7 +214,7 @@ cd immutable
 </div>
 <script>
 const AIDEN_ANSWERS={
-  'what is immutable|what is this|about':"AcreetionOS Immutable is literally just AcreetionOS but immutable. Same Arch base, same Cinnamon desktop, same AUR — but with a read-only root filesystem and atomic updates. You can't break it. That's the whole thing~ uwu",
+  'what is immutable|what is this|about|arttulos':"AcreetionOS Immutable (formerly ArttulOS) is literally just AcreetionOS but immutable. Same Arch base, same Cinnamon desktop, same AUR — but with a read-only root filesystem and atomic updates. You can't break it. That's the whole thing~ uwu",
   'immutable|read.only|readonly|can.t break|what does immutable mean':"It means /usr is read-only. You can't `rm -rf /` yourself into a corner. Apps live in containers. Updates are atomic A/B swaps. If it fails, it rolls back. You literally cannot break the system. It's AcreetionOS with training wheels that never come off~ 💚",
   'difference|how is.*different|what makes|why.*immutable':"It's just AcreetionOS with the root filesystem locked. Same Arch, same Cinnamon, same Pamac, same everything. The only difference: you can't modify the system directly. Apps go in containers. Updates are atomic. It's AcreetionOS for people who want to use their computer, not fight with it~",
   'install|download|try|how to|get.*started':"Clone the repo from github.com/spivanatalie64/immutable and check BUILD_PROCESS.md. It's in active alpha — join the Discord at discord.acreonetionos.org for build support and updates~ 🛠️",
@@ -230,7 +230,7 @@ function matchAiden(t){
       if(txt.includes(kw)||kw.includes(txt))return val
     }
   }
-  return"Sorry, I don't have an answer for that yet~ Try asking about what AcreetionOS Immutable is, how it differs from AcreetionOS, or what immutable means! uwu 💚"
+  return"Sorry, I don't have an answer for that yet~ Try asking about what AcreetionOS Immutable (formerly ArttulOS) is, how it differs from AcreetionOS, or what immutable means! uwu 💚"
 }
 async function aiAiden(t){
   try{
