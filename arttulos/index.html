@@ -212,24 +212,16 @@ function matchAiden(t){
   }
   return"Sorry, I don't have an answer for that yet~ Try asking about what ArttulOS is, how it differs from AcreetionOS, or what immutable means! uwu 💚"
 }
-function getAidenKey(){
-  let k=localStorage.getItem('aiden_key')
-  if(!k)k=prompt('Enter OpenRouter API key for AI answers (get free at https://openrouter.ai/keys)\n\nLeave blank for offline mode:')
-  if(k){localStorage.setItem('aiden_key',k);return k}
-  return null
-}
 async function aiAiden(t){
-  const key=getAidenKey()
-  if(!key)return null
   try{
-    const res=await fetch('https://openrouter.ai/api/v1/chat/completions',{
+    const res=await fetch('/api/chat',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
-      body:JSON.stringify({model:'meta-llama/llama-3.2-3b-instruct:free',messages:[{role:'system',content:'You are AIDEN, a cute helpful assistant for ArttulOS (an immutable container OS based on AcreetionOS). Answer concisely but with a playful uwu tone. Keep responses under 3 sentences.'},{role:'user',content:t}],max_tokens:200})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({messages:[{role:'system',content:'You are AIDEN, a cute helpful assistant for ArttulOS (an immutable container OS based on AcreetionOS). Answer concisely but with a playful uwu tone. Keep responses under 3 sentences.'},{role:'user',content:t}],max_tokens:200})
     })
     const d=await res.json()
     if(!res.ok)throw new Error(d.error?.message)
-    return d.choices?.[0]?.message?.content||null
+    return d.content||d.choices?.[0]?.message?.content||null
   }catch(e){console.error('AI error:',e);return null}
 }
 function toggleAiden(){
