@@ -4,7 +4,7 @@ Reads API key from AI_TEST_API_KEY env var or .env file.
 Uses OpenAI-compatible chat completions endpoint.
 """
 
-import os, sys, re, json, urllib.request, pathlib
+import os, sys, re, json, urllib.request, pathlib, time, random
 
 # ── Config ──
 ENDPOINT = os.environ.get('AI_TEST_ENDPOINT', 'https://openrouter.ai/api/v1/chat/completions')
@@ -74,24 +74,32 @@ def review_page(filepath, content):
         }
     )
 
-    try:
-        with urllib.request.urlopen(req, timeout=45) as res:
-            resp_body = res.read().decode()
-            data = json.loads(resp_body)
-            if 'choices' not in data:
-                return {'pass': False, 'issues': [f"API Error: {resp_body[:200]}"], 'score': 0, 'summary': 'API Error'}
-            
-            raw = data['choices'][0]['message']['content']
-            # Extract JSON from response (may have markdown fences)
-            json_match = re.search(r'\{[\s\S]*"pass"[\s\S]*\}', raw)
-            if json_match:
-                return json.loads(json_match.group())
-            return {'pass': True, 'issues': ["AI returned non-JSON response"], 'score': 5, 'summary': raw[:200]}
-    except urllib.error.HTTPError as e:
-        error_msg = e.read().decode() if hasattr(e, 'read') else str(e)
-        return {'pass': False, 'issues': [f"HTTP {e.code}: {error_msg[:200]}"], 'score': 0, 'summary': 'HTTP Error'}
-    except Exception as e:
-        return {'pass': False, 'issues': [str(e)], 'score': 0, 'summary': f'Error: {str(e)[:50]}'}
+    for attempt in range(5): # Up to 5 attempts
+        try:
+            with urllib.request.urlopen(req, timeout=60) as res:
+                resp_body = res.read().decode()
+                data = json.loads(resp_body)
+                if 'choices' not in data:
+                    return {'pass': False, 'issues': [f"API Error: {resp_body[:200]}"], 'score': 0, 'summary': 'API Error'}
+                
+                raw = data['choices'][0]['message']['content']
+                # Extract JSON from response (may have markdown fences)
+                json_match = re.search(r'\{[\s\S]*"pass"[\s\S]*\}', raw)
+                if json_match:
+                    return json.loads(json_match.group())
+                return {'pass': True, 'issues': ["AI returned non-JSON response"], 'score': 5, 'summary': raw[:200]}
+        except urllib.error.HTTPError as e:
+            if e.code == 429: # Too Many Requests
+                wait = (2 ** attempt) * 10 + random.uniform(0, 5)
+                print(f"  (Rate limited, waiting {wait:.1f}s for {filepath}...)")
+                time.sleep(wait)
+                continue
+            error_msg = e.read().decode() if hasattr(e, 'read') else str(e)
+            return {'pass': False, 'issues': [f"HTTP {e.code}: {error_msg[:200]}"], 'score': 0, 'summary': 'HTTP Error'}
+        except Exception as e:
+            return {'pass': False, 'issues': [str(e)], 'score': 0, 'summary': f'Error: {str(e)[:50]}'}
+    
+    return {'pass': False, 'issues': ["Max retries exceeded (Rate Limit)"], 'score': 0, 'summary': 'Rate limited'}
 
 def main():
     if not API_KEY:
@@ -100,12 +108,16 @@ def main():
         sys.exit(1)
 
     results = []
-    for page in PAGES:
+    for i, page in enumerate(PAGES):
         filepath = ROOT / page
         if not filepath.exists():
             results.append({'page': page, 'pass': False, 'issues': ['File not found'], 'score': 0, 'summary': 'Missing'})
             print(f'  ✗ {page} — not found')
             continue
+
+        # Add a delay between pages to be polite to the API
+        if i > 0:
+            time.sleep(3)
 
         content = filepath.read_text(encoding='utf-8', errors='ignore')
         review = review_page(page, content)
