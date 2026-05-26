@@ -67,7 +67,8 @@ async function handleNews(env) {
   const RSS_FEEDS = [
     'https://news.google.com/rss/search?q=%22AcreetionOS%22&hl=en-US&gl=US&ceid=US:en',
     'https://news.google.com/rss/search?q=AcreetionOS+Arch+Linux&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en'
+    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en',
+    'https://archlinux.org/feeds/news/'
   ];
 
   try {
@@ -303,6 +304,70 @@ export default {
         });
       } catch (err) {
         return new Response(JSON.stringify({ error: 'AI generation failed: ' + err.message }), {
+          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
+    // Fix script generator — generates PKGBUILD + GTK GUI script for a given news item
+    if (request.method === 'POST' && url.pathname === '/api/fix-script') {
+      try {
+        const body = await request.json();
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
+            status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const prompt = `You are a PKGBUILD generator for AcreetionOS (Arch Linux based). 
+Given this news item, generate a complete fix script:
+1. A PKGBUILD that compiles the relevant package from source
+2. A GTK3 GUI script (Python with PyGObject) that:
+   - Shows a progress window with a text log
+   - Runs "makepkg -si" in a terminal
+   - Displays build output in real-time
+   - Shows "Build complete" with option to install
+3. A wrapper shell script that launches the GUI
+
+News title: ${body.title || 'Unknown'}
+News description: ${body.desc || 'No description'}
+News source: ${body.source || 'Unknown'}
+AcreetionOS relevance: ${body.relevance || 'Unknown'}
+
+Output ONLY the shell script content. The script should:
+- Create a temp directory
+- Check for deps (python, python-gobject, gtk3, base-devel, git)
+- Write the PKGBUILD to a file
+- Write the Python GUI script to a file
+- Launch the GUI
+Return valid bash script only, no markdown fences.`;
+
+        const openRouterRes = await fetch(OPENROUTER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AcreetionOS Fix Script'
+          },
+          body: JSON.stringify({
+            model: 'meta-llama/llama-3.2-3b-instruct:free',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 2048
+          })
+        });
+        const data = await openRouterRes.json();
+        if (!openRouterRes.ok) {
+          return new Response(JSON.stringify({ error: data.error?.message || 'Script generation failed' }), {
+            status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const scriptContent = data.choices?.[0]?.message?.content || '';
+        return new Response(JSON.stringify({ script: scriptContent }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'Script generation failed: ' + err.message }), {
           status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
