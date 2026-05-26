@@ -26,6 +26,8 @@ PAGES = [
     'index.html', 'install.html', 'faq.html', 'contact.html',
     'compare.html', 'requirements.html', 'developers.html', 'wiki.html',
     'blog.html', 'contributing.html', 'governance.html',
+    'hyprland.html', 'unofficial.html', '32bit.html', 'flash.html',
+    'ask.html', 'donate.html', 'newsletter.html',
 ]
 
 SYSTEM_PROMPT = """You are a QA tester reviewing HTML pages for the AcreetionOS Linux website.
@@ -57,7 +59,7 @@ def review_page(filepath, content):
             {'role': 'system', 'content': SYSTEM_PROMPT},
             {'role': 'user', 'content': f'Review this page ({filepath}):\n\n{snippet}'}
         ],
-        'max_tokens': 300,
+        'max_tokens': 500,
         'temperature': 0.1
     }
 
@@ -73,16 +75,23 @@ def review_page(filepath, content):
     )
 
     try:
-        with urllib.request.urlopen(req, timeout=30) as res:
-            data = json.loads(res.read().decode())
+        with urllib.request.urlopen(req, timeout=45) as res:
+            resp_body = res.read().decode()
+            data = json.loads(resp_body)
+            if 'choices' not in data:
+                return {'pass': False, 'issues': [f"API Error: {resp_body[:200]}"], 'score': 0, 'summary': 'API Error'}
+            
             raw = data['choices'][0]['message']['content']
             # Extract JSON from response (may have markdown fences)
             json_match = re.search(r'\{[\s\S]*"pass"[\s\S]*\}', raw)
             if json_match:
                 return json.loads(json_match.group())
-            return {'pass': True, 'issues': [], 'score': 5, 'summary': raw[:200]}
+            return {'pass': True, 'issues': ["AI returned non-JSON response"], 'score': 5, 'summary': raw[:200]}
+    except urllib.error.HTTPError as e:
+        error_msg = e.read().decode() if hasattr(e, 'read') else str(e)
+        return {'pass': False, 'issues': [f"HTTP {e.code}: {error_msg[:200]}"], 'score': 0, 'summary': 'HTTP Error'}
     except Exception as e:
-        return {'pass': False, 'issues': [str(e)], 'score': 0, 'summary': 'AI review failed'}
+        return {'pass': False, 'issues': [str(e)], 'score': 0, 'summary': f'Error: {str(e)[:50]}'}
 
 def main():
     if not API_KEY:
