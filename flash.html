@@ -332,4 +332,28 @@ function escAttr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'
 window.addEventListener('DOMContentLoaded', loadHostingProviders);
 </script>
 
+<!-- CVE Alert Badge -->
+<div id="cve-alert" style="position:fixed;bottom:20px;right:20px;z-index:9999;display:none;cursor:pointer" onclick="window.location.href='security.html'">
+<div style="background:#e74c3c;color:#fff;width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.2rem;box-shadow:0 4px 12px rgba(231,76,60,0.5);animation:pulse 2s infinite">S</div>
+<div id="cve-badge-count" style="position:absolute;top:-4px;right:-4px;background:#fff;color:#e74c3c;width:20px;height:20px;border-radius:50%;font-size:0.7rem;display:flex;align-items:center;justify-content:center;font-weight:700">0</div>
+</div>
+<style>@keyframes pulse{0%,100%{box-shadow:0 4px 12px rgba(231,76,60,0.5)}50%{box-shadow:0 4px 24px rgba(231,76,60,0.8)}}</style>
+<script>
+async function checkCVEAlert() {
+  try {
+    const res = await fetch('/api/cve/status');
+    const data = await res.json();
+    const badge = document.getElementById('cve-alert');
+    const count = document.getElementById('cve-badge-count');
+    if (data.has_active && data.count > 0) {
+      badge.style.display = 'block';
+      count.textContent = data.count > 99 ? '99+' : data.count;
+    } else {
+      badge.style.display = 'none';
+    }
+  } catch(e) {}
+}
+checkCVEAlert();
+setInterval(checkCVEAlert, 300000);
+</script>
 </body></html>
