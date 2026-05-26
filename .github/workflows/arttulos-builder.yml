@@ -2,6 +2,10 @@ name: Build ArttulOS ISO
 on:
   schedule:
     - cron: '0 6 */3 * *'
+  push:
+    paths:
+      - 'arttulos/**'
+      - '.github/workflows/arttulos-builder.yml'
   workflow_dispatch:
 jobs:
   build:
