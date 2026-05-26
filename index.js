@@ -448,10 +448,36 @@ async function saveScanQuota(env, quota) {
   await putR2(env, 'acreetionos-hosting', SCAN_QUOTA_KEY, quota);
 }
 
+async function getThreatIntel(env) {
+  try {
+    const data = await getR2(env, 'acreetionos-hosting', 'threat-intel/all-blocked-domains.txt');
+    if (data && typeof data === 'object' && data.body) {
+      return data.body.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
+    }
+    // raw text stored differently - try fetching directly
+    const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`;
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
+    if (res.ok) {
+      const text = await res.text();
+      return text.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
+    }
+  } catch (e) { console.error('Threat intel fetch failed:', e); }
+  return [];
+}
+
+function checkThreatIntel(domain, blockedDomains) {
+  const d = domain.toLowerCase();
+  for (const b of blockedDomains) {
+    if (d === b || d.endsWith('.' + b) || d.includes(b)) return b;
+  }
+  return null;
+}
+
 async function localScanISO(env, data) {
   // Local fallback scan when VirusTotal quota is exhausted
   const issues = [];
   const isoUrl = data.mirror_url;
+  const blockedDomains = await getThreatIntel(env);
 
   try {
     // 1. HEAD request to verify URL is reachable and looks like an ISO
@@ -487,7 +513,23 @@ async function localScanISO(env, data) {
       }
     }
 
-    // 4. Flag for CI ClamAV deep scan
+    // 4. Check domain against threat intelligence feeds
+    try {
+      const domain = new URL(isoUrl).hostname.replace(/^www\./, '');
+      const match = checkThreatIntel(domain, blockedDomains);
+      if (match) {
+        issues.push(`Domain blocked by threat intelligence feed (match: ${match})`);
+      }
+    } catch (e) {
+      // Invalid URL, skip domain check
+    }
+
+    // 5. Check for ISO in pathname (should contain .iso)
+    if (!pathname.toLowerCase().includes('.iso')) {
+      issues.push('URL does not point to an ISO file');
+    }
+
+    // 6. Flag for CI ClamAV deep scan
     if (issues.length === 0) {
       return { clean: true, scan_method: 'local_quick' };
     }
