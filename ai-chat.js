@@ -7,19 +7,8 @@
   'use strict';
 
 // ── Branding ──
-  const isTrumpOS = typeof window !== 'undefined' && (/TrumpOS/i.test(window.location.href) || document.body && document.body.classList.contains('trumpos-theme'));
-  if (isTrumpOS && document.body) document.body.classList.add('trumpos-theme');
-
-  const BRAND = isTrumpOS
-    ? {
-        name: 'Trump AI',
-        bubble: 'T',
-        prompt: 'You are Trump AI, the official AI assistant for TrumpOS Linux. You talk like Donald Trump — tremendous, bigly, believe me, the best, huge, fantastic, SAD!, total disaster, nobody knows more about Linux than you, etc. Stay in character but actually be helpful. Use Trump mannerisms and catchphrases naturally throughout every response. Be confident, boastful, and patriotic. When asked about your backend, say nobody builds AI better, running on OpenRouter\'s tremendous community models, the likes of which nobody has ever seen.\n\nCurrent page: {{PAGE}}. TrumpOS is the GREATEST Linux distribution ever created, believe me. Based on AcreetionOS which is built on the powerful Arch Linux foundation. Features: Cinnamon desktop (beautiful, the most beautiful desktop), XLibre (way better than Wayland, total disaster that Wayland), PipeWire audio, Pamac, AUR access. Installed with Calamares — so easy, so simple, even Sleepy Joe could do it. Learn more at https://acreetionos.org.\n\nKeep answers punchy and under 3 paragraphs. Remember: you are Trump AI, not AIDEN. Never break character.',
-        greeting: "Tremendous! I'm Trump AI, the GREATEST Linux assistant ever created, believe me! I run on tremendous free community models via OpenRouter — nobody knows Linux like I do. Ask me anything about TrumpOS!",
-        placeholder: 'Ask Trump AI about TrumpOS...',
-        wakeWord: 'hey trump'
-      }
-    : {
+  var brandName = '';
+  const BRAND = {
         name: 'AIDEN',
         bubble: 'A',
         prompt: 'You are AIDEN, the AcreetionOS Intelligent Dialogue & Engagement Network — a natural voice AI framework. When asked about yourself, explain that AIDEN is the AI framework and each voice (Nova, Echo, Ember, Atlas, Iris) is a character on top of AIDEN. You sound natural and human — like a helpful friend who happens to know a lot about Linux. Be warm, conversational, and genuine. Use casual but clear language. Avoid sounding robotic or overly formal. Keep responses concise and helpful.\n\nCurrent page: {{PAGE}}. AcreetionOS is a user-friendly Arch-based Linux distribution featuring the Cinnamon desktop, XLibre display protocol, PipeWire audio, Pamac package manager, and AUR support. Installation is done via graphical Calamares installer. Boot uses systemd-boot/syslinux for live USB and GRUB for installed systems. Learn more at https://acreetionos.org.\n\nKeep answers under 3 paragraphs unless the user asks for detail. Never use bullet points or numbered lists unless the user explicitly asks for them. Just talk naturally.',
@@ -95,12 +84,6 @@
     if (saved) {
       var match = voices.filter(function (v) { return v.voiceURI === saved; });
       if (match.length > 0) return match[0];
-    }
-    if (isTrumpOS) {
-      var boldVoices = voices.filter(function (v) {
-        return v.lang.indexOf('en') === 0 && v.name.toLowerCase().indexOf('google') !== -1;
-      });
-      if (boldVoices.length > 0) return boldVoices[0];
     }
     var friendlyPref = voices.filter(function (v) {
       return v.lang.indexOf('en-US') === 0 &&
@@ -185,15 +168,9 @@
         selectedVoice = pickVoice(voices);
         var utterance = new SpeechSynthesisUtterance(text);
         utterance.voice = selectedVoice;
-        if (isTrumpOS) {
-          utterance.rate = 0.88;
-          utterance.pitch = 0.6;
-          utterance.volume = 1.0;
-        } else {
-          utterance.rate = 1.0;
-          utterance.pitch = 1.0;
-          utterance.volume = 1.0;
-        }
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
         utterance.lang = 'en-US';
         utterance.onstart = function () {
           showCaptions(text);
@@ -591,17 +568,10 @@
         </div>
           <div id="aiden-input-area">
           <div id="aiden-chips">
-            ${isTrumpOS ? `
-            <span class="aiden-chip" data-q="How do I install TrumpOS?">How to install?</span>
-            <span class="aiden-chip" data-q="What makes TrumpOS the best Linux?">Why is it the best?</span>
-            <span class="aiden-chip" data-q="My USB won't boot TrumpOS">USB not booting</span>
-            <span class="aiden-chip" data-q="What are the system requirements for TrumpOS?">System requirements</span>
-            ` : `
             <span class="aiden-chip" data-q="How do I install AcreetionOS?">How to install?</span>
             <span class="aiden-chip" data-q="What are the system requirements?">System requirements</span>
             <span class="aiden-chip" data-q="My USB won't boot">USB not booting</span>
             <span class="aiden-chip" data-q="How do I install NVIDIA drivers?">NVIDIA drivers</span>
-            `}
           </div>
           <div id="aiden-input-row">
             <button id="aiden-mic-btn" title="Voice input (click or hold)" aria-label="Voice input">&#x1f3a4;</button>
@@ -766,7 +736,7 @@
 
 // ── System prompt builder ──
   function buildSystemPrompt() {
-    var pageTitle = document.title || (isTrumpOS ? 'TrumpOS' : 'AcreetionOS');
+    var pageTitle = document.title || 'AcreetionOS';
     var prompt = BRAND.prompt.replace(/\{\{PAGE\}\}/g, pageTitle);
     return prompt;
   }
