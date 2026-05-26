@@ -1227,55 +1227,58 @@ async function crossReferenceCVE(cveId) {
 }
 
 function generateFixScript(cve, pkg, arch) {
-# AcreetionOS CVE Fix Script
-# CVE: ${cve}
-# Package: ${pkgList}
-# Generated: $(date -u +%Y-%m-%dT%H:%M:%SZ)
-# 
-# This script will attempt to fix the vulnerability by updating
-# the affected package(s) to the latest patched version.
-#
-# DISCLAIMER: This script is provided as-is. The AcreetionOS project
-# is not responsible for any damage or data loss. By running this
-# script, you accept full responsibility for your system.
-# Review the script before running it.
-
-set -e
-
-echo "=== AcreetionOS CVE Fix: ${cve} ==="
-echo "Affected package(s): ${pkgList}"
-echo ""
-
-# Verify we're on Arch Linux / AcreetionOS
-if [ ! -f /etc/arch-release ]; then
-  echo "ERROR: This script is for Arch Linux / AcreetionOS only."
-  exit 1
-fi
-
-# Check for root
-if [ "$(id -u)" -ne 0 ]; then
-  echo "ERROR: This script must be run as root (sudo)."
-  exit 1
-fi
-
-echo "[1/3] Updating package databases..."
-pacman -Sy --noconfirm
-
-echo "[2/3] Upgrading affected package(s)..."
-pacman -S --noconfirm ${pkgList}
-
-echo "[3/3] Verification..."
-for pkg in ${pkgList}; do
-  if pacman -Qi "$pkg" &>/dev/null; then
-    ver=$(pacman -Qi "$pkg" | grep '^Version' | awk '{print $3}')
-    echo "  ✓ $pkg updated to $ver"
-  fi
-done
-
-echo ""
-echo "=== Fix applied for ${cve} ==="
-echo "Please reboot if the vulnerability affects the kernel or a system service."
-echo "For more details: https://security.archlinux.org/${cve}"`;
+  var packages = pkg ? pkg.split(',').map(function(p) { return p.trim(); }).filter(Boolean) : [];
+  var pkgList = packages.length > 0 ? packages.join(' ') : 'PACKAGE_NAME';
+  return [
+    '#!/bin/bash',
+    '# AcreetionOS CVE Fix Script',
+    '# CVE: ' + cve,
+    '# Package: ' + pkgList,
+    '# Generated: ' + new Date().toISOString(),
+    '#',
+    '# This script will attempt to fix the vulnerability by updating',
+    '# the affected package(s) to the latest patched version.',
+    '#',
+    '# DISCLAIMER: This script is provided as-is. The AcreetionOS project',
+    '# is not responsible for any damage or data loss. By running this',
+    '# script, you accept full responsibility for your system.',
+    '# Review the script before running it.',
+    '',
+    'set -e',
+    '',
+    'echo "=== AcreetionOS CVE Fix: ' + cve + ' ==="',
+    'echo "Affected package(s): ' + pkgList + '"',
+    'echo ""',
+    '',
+    'if [ ! -f /etc/arch-release ]; then',
+    '  echo "ERROR: This script is for Arch Linux / AcreetionOS only."',
+    '  exit 1',
+    'fi',
+    '',
+    'if [ "$(id -u)" -ne 0 ]; then',
+    '  echo "ERROR: This script must be run as root (sudo)."',
+    '  exit 1',
+    'fi',
+    '',
+    'echo "[1/3] Updating package databases..."',
+    'pacman -Sy --noconfirm',
+    '',
+    'echo "[2/3] Upgrading affected package(s)..."',
+    'pacman -S --noconfirm ' + pkgList,
+    '',
+    'echo "[3/3] Verification..."',
+    'for pkg in ' + pkgList + '; do',
+    '  if pacman -Qi "$pkg" &>/dev/null; then',
+    '    ver=$(pacman -Qi "$pkg" | grep \'^Version\' | awk \'{print $3}\')',
+    '    echo "  OK $pkg updated to $ver"',
+    '  fi',
+    'done',
+    '',
+    'echo ""',
+    'echo "=== Fix applied for ' + cve + ' ==="',
+    'echo "Please reboot if the vulnerability affects the kernel or a system service."',
+    'echo "For more details: https://security.archlinux.org/' + cve + '"',
+  ].join('\n');
 }
 
 async function handleCVEFeed(env) {
