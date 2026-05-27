@@ -1149,12 +1149,32 @@ async function handleISOCheck(request, env) {
     });
   }
 
-  // Try primary URL first
+  // Try primary URL first — download 1MB and verify ISO magic bytes
   async function tryUrl(u) {
     try {
-      const res = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
-      return { reachable: res.ok || res.status === 301 || res.status === 302 || res.status === 206, status: res.status };
-    } catch { return { reachable: false, status: 0 }; }
+      const res = await fetch(u, {
+        headers: { 'Range': 'bytes=0-1048575' },
+        signal: AbortSignal.timeout(15000)
+      });
+      if (!res.ok && res.status !== 206) return { reachable: false, status: res.status };
+      const chunk = await res.arrayBuffer();
+      const bytes = new Uint8Array(chunk);
+      // Check ISO 9660 magic bytes at offset 32769 ("CD001")
+      if (bytes.length >= 32774) {
+        const magic = bytes.slice(32769, 32774);
+        const isIso = magic[0] === 0x43 && magic[1] === 0x44 && magic[2] === 0x30 &&
+                       magic[3] === 0x30 && magic[4] === 0x31;
+        if (!isIso) return { reachable: false, status: res.status, error: 'Not a valid ISO (bad magic bytes)' };
+      }
+      // Also check minimum size (200MB)
+      const contentRange = res.headers.get('Content-Range') || '';
+      const sizeMatch = contentRange.match(/\/(\d+)$/);
+      if (sizeMatch) {
+        const totalSize = parseInt(sizeMatch[1]);
+        if (totalSize < 209715200) return { reachable: false, status: res.status, error: `ISO too small: ${(totalSize/1048576).toFixed(0)}MB` };
+      }
+      return { reachable: true, status: res.status };
+    } catch (e) { return { reachable: false, status: 0, error: e.message }; }
   }
 
   let result = await tryUrl(url);
@@ -2424,7 +2444,7 @@ export default {
     }
   },
 
-  // Cron: runs every 5 min while stabilizing. Change wrangler.toml to "0 */6 * * *" when stable.
+  // Cron: runs every 30 min — verifies all ISOs downloadable, auto-fixes broken
   async scheduled(event, env, ctx) {
     console.log('Running scheduled health check...');
     const req = new Request('https://acreetionos.org/api/health/check');
