@@ -1281,7 +1281,7 @@ async function handleHealthCheck(env) {
     }
   });
 
-  // 3. Check ISO download links from flash.html EDITIONS
+  // 3. Check ISO download links from flash.html EDITIONS + auto-fix
   const isoChecks = (async () => {
     try {
       const flashRes = await fetch('https://acreetionos.org/flash.html', { signal: AbortSignal.timeout(10000) });
@@ -1293,15 +1293,16 @@ async function handleHealthCheck(env) {
         for (const ed of editions) {
           const url = ed.iso_url;
           if (!url) continue;
-          try {
-            const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(8000) });
-            const ok = res.ok || res.status === 301 || res.status === 302 || res.status === 401 || res.status === 403;
-            results.downloads.push({ edition: ed.id, status: res.status, healthy: ok });
-            if (!ok) totalIssues++;
-          } catch (e) {
-            results.downloads.push({ edition: ed.id, status: 0, healthy: false, error: e.message });
-            totalIssues++;
-          }
+          // Use the ISO check handler which has auto-fix logic
+          const fakeReq = new Request(`https://acreetionos.org/api/iso/check?url=${encodeURIComponent(url)}`);
+          const checkRes = await handleISOCheck(fakeReq, env);
+          const checkData = await checkRes.json();
+          results.downloads.push({
+            edition: ed.id, status: checkData.status,
+            healthy: checkData.reachable,
+            found_at: checkData.found_at || null
+          });
+          if (!checkData.reachable) totalIssues++;
         }
       }
     } catch (e) {

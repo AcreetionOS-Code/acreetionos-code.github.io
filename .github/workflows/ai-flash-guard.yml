@@ -1,246 +1,26 @@
-name: AI Flash.html Guardian
+name: AI Flash Guardian
 on:
   schedule:
-    - cron: '0 */2 * * *'  # Every 2 hours
-  push:
-    paths: ['flash.html']
+    - cron: '0 */2 * * *'
   workflow_dispatch:
 
 jobs:
-  validate-and-fix:
+  check-and-fix:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate flash.html structure with AI
-        env:
-          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      - name: Trigger worker health check (auto-fixes ISOs)
         run: |
-          echo "=== AI Validating flash.html ==="
-          cat flash.html > /tmp/flash-current.html
-
-          python3 << 'PYEOF'
-          import json, re, os, subprocess
-
-          with open('/tmp/flash-current.html') as f:
-              html = f.read()
-
-          issues = []
-
-          # 1. Check EDITIONS array parseable
-          editions_match = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
-          if not editions_match:
-              issues.append("EDITIONS array not found")
-          else:
-              try:
-                  js = editions_match.group(1)
-                  js = re.sub(r"'", '"', js)
-                  js = re.sub(r',\s*([\]}])', r'\1', js)
-                  editions = json.loads(js)
-                  print(f"  ✓ EDITIONS: {len(editions)} editions parsed")
-                  
-                  # Check each edition has required fields
-                  for ed in editions:
-                      for field in ['id', 'label', 'desc', 'iso_url']:
-                          if field not in ed:
-                              issues.append(f"  {ed.get('id','?')}: missing '{field}'")
-                          elif not ed[field]:
-                              issues.append(f"  {ed.get('id','?')}: empty '{field}'")
-                      
-                      # Check mirrors have url
-                      for mir in ed.get('mirrors', []):
-                          if 'url' not in mir or not mir['url']:
-                              issues.append(f"  {ed['id']}: mirror missing URL")
-              except json.JSONDecodeError as e:
-                  issues.append(f"EDITIONS JSON parse error: {e}")
-
-          # 2. Check all edition download pages exist
-          for ed in editions if editions_match else []:
-              page = f"{ed.get('id', '')}.html"
-              if os.path.exists(page):
-                  print(f"  ✓ {page} exists")
-              else:
-                  issues.append(f"  Missing page: {page}")
-
-          # 3. Check for common HTML issues
-          if '<!DOCTYPE html>' not in html:
-              issues.append("Missing DOCTYPE")
-          if '</html>' not in html:
-              issues.append("Missing closing html tag")
-          if 'function loadEditions' not in html:
-              issues.append("Missing loadEditions function")
-
-          # 4. Check all ISO URLs are reachable
-          for ed in editions if editions_match else []:
-              url = ed.get('iso_url', '')
-              if url:
-                  try:
-                      r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
-                          '--max-time', '10', '-I', url],
-                          capture_output=True, text=True, timeout=15)
-                      code = r.stdout.strip()
-                      if code not in ['200', '206', '301', '302']:
-                          issues.append(f"  ISO DOWN: {ed['id']}: HTTP {code} — {url[:60]}")
-                  except:
-                      issues.append(f"  ISO FAIL: {ed['id']}: unreachable")
-
-          report = {'issues': issues, 'healthy': len(issues) == 0, 'count': len(issues)}
-          with open('/tmp/flash-report.json', 'w') as f:
-              json.dump(report, f, indent=2)
-
-          if issues:
-              print(f"\n❌ Found {len(issues)} issues:")
-              for i in issues:
-                  print(f"  - {i}")
-          else:
-              print(f"\n✅ flash.html is healthy!")
-          PYEOF
-
-      - name: AI Fix flash.html
-        if: failure()
-        env:
-          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
-        run: |
-          REPORT=$(cat /tmp/flash-report.json)
-          CURRENT=$(cat flash.html | head -c 5000)
-
-          if [ -z "$OPENROUTER_KEY" ]; then
-            echo "No OpenRouter key"
-            exit 0
-          fi
-
-          echo "=== AI Generating Fixes ==="
-
-          python3 << 'PYEOF'
-          import json, re, os, subprocess
-
-          with open('/tmp/flash-report.json') as f:
-              report = json.load(f)
-
-          if report['healthy']:
-              print("No issues to fix")
-              exit(0)
-
-          with open('flash.html') as f:
-              html = f.read()
-
-          api_key = os.environ.get('OPENROUTER_KEY', '')
-          issues_text = "\n".join(report['issues'])
-
-          prompt = f"""The AcreetionOS flash.html file has these issues:
-          {issues_text}
-
-          Here is the current flash.html content (first 5000 chars):
-          {html[:5000]}
-
-          For each issue, provide the exact fix in this format:
-          FILE: flash.html
-          REPLACE: <exact text to replace>
-          WITH: <replacement text>
-          """
-
-          r = subprocess.run(['curl', '-s', 'https://openrouter.ai/api/v1/chat/completions',
-              '-H', 'Content-Type: application/json',
-              '-H', f'Authorization: Bearer {api_key}',
-              '-H', 'HTTP-Referer: https://acreetionos.org',
-              '-d', json.dumps({
-                  'model': 'meta-llama/llama-3.2-3b-instruct:free',
-                  'messages': [
-                      {'role': 'system', 'content': 'You fix HTML/Javascript files. Return precise REPLACE:/WITH: pairs.'},
-                      {'role': 'user', 'content': prompt}
-                  ],
-                  'max_tokens': 2000
-              })], capture_output=True, text=True, timeout=60)
-
-          with open('/tmp/ai-flash-fixes.txt', 'w') as f:
-              f.write(r.stdout)
-
-          # Parse and apply REPLACE/WITH pairs
-          content = r.stdout
-          replacements = re.findall(r'REPLACE:\s*(.+?)\s*WITH:\s*(.+?)(?=REPLACE:|\Z)', content, re.DOTALL)
-          changes = False
-
-          for old_text, new_text in replacements:
-              old_text = old_text.strip()
-              new_text = new_text.strip()
-              if old_text in html:
-                  html = html.replace(old_text, new_text)
-                  print(f"  Applied fix: replaced {len(old_text)} chars")
-                  changes = True
-              else:
-                  print(f"  Could not find: {old_text[:60]}...")
-
-          if changes:
-              with open('flash.html', 'w') as f:
-                  f.write(html)
-              print(f"\n✅ Fixes applied to flash.html")
-              with open('/tmp/flash-fixed', 'w') as f:
-                  f.write('yes')
-          else:
-              print(f"\n⚠ No fixes could be applied automatically")
-          PYEOF
-
-      - name: Create PR via Cloudflare Worker (fix or report)
-        if: failure()
-        run: |
-          python3 << 'PYEOF'
-          import json, os, re, subprocess, urllib.request
-
-          with open('/tmp/flash-report.json') as f:
-              report = json.load(f)
-
-          issues = report.get('issues', [])
-          has_fixes = os.path.exists('/tmp/flash-fixed')
-
-          branch = f"fix/flash-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
-
-          # Build PR body with full issue report
-          pr_body = "🤖 **AI Flash Guardian Report**\n\n"
-          pr_body += f"**Issues found:** {report['count']}\n\n"
-          for i in issues:
-              pr_body += f"- ❌ {i}\n"
-          
-          files = []
-          if has_fixes:
-              with open('flash.html') as f:
-                  html = f.read()
-              em = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
-              if em:
-                  js = re.sub(r"'", '"', em.group(1))
-                  js = re.sub(r',\s*([\]}])', r'\1', js)
-                  editions = json.loads(js)
-                  print(f"✅ Fixed: {len(editions)} editions")
-              files.append({"path": "flash.html", "content": html})
-              pr_body += "\n**Fixes applied:** ✅ flash.html was repaired\n"
-          else:
-              pr_body += "\n**Fixes applied:** ❌ No automatic fix available — requires manual review\n"
-
-          pr_body += "\n---\n_Created automatically by the AI Flash Guardian workflow._"
-
-          payload = json.dumps({
-              "branch": branch,
-              "title": f"Flash Guardian: {report['count']} issue(s) found",
-              "body": pr_body,
-              "files": files
-          }).encode()
-
-          req = urllib.request.Request(
-              "https://acreetionos.org/api/github/create-pr",
-              data=payload,
-              headers={"Content-Type": "application/json"},
-              method="POST"
-          )
-          try:
-              with urllib.request.urlopen(req, timeout=30) as resp:
-                  result = json.loads(resp.read())
-                  if result.get('pr'):
-                      print(f"✅ PR created: {result['pr']['url']}")
-                  else:
-                      print(f"⚠ Worker returned: {result.get('error', 'unknown')}")
-          except urllib.error.HTTPError as e:
-              err = e.read().decode()[:300]
-              print(f"❌ HTTP {e.code}: {err}")
-          except Exception as e:
-              print(f"❌ Error: {e}")
-          PYEOF
+          echo "Calling worker health check..."
+          curl -s "https://acreetionos.org/api/health/check" --max-time 60 | python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+print(f'Issues: {data.get(\"issues\", \"?\")}')
+print(f'Healthy: {data.get(\"healthy\", \"?\")}')
+print(f'Pages: {len(data.get(\"pages\", []))} checked')
+print(f'APIs: {len(data.get(\"apis\", []))} checked')
+print(f'Downloads: {len(data.get(\"downloads\", []))} checked')
+for d in data.get('downloads', []):
+    status = '✅' if d.get('healthy') else '❌'
+    found = f' → {d[\"found_at\"]}' if d.get('found_at') else ''
+    print(f'  {status} {d[\"edition\"]}: {d.get(\"status\",0)}{found}')
+"
