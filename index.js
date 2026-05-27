@@ -1126,7 +1126,7 @@ function parseArchAtom(xml) {
 
     const cveMatch = title.match(/(CVE-\d{4}-\d+)/gi);
     const severityMatch = content.match(/Severity:\s*(\w+)/i);
-    const packageMatch = content.match(/Package\s*:\s*([^\s<]+)/i);
+    const packageMatch = content.match(/Package\s*:\s*([^\s<&]+)/i);
     const typeMatch = content.match(/Type\s*:\s*([^<]+)/i);
     const remoteMatch = content.match(/Remote\s*:\s*(\w+)/i);
     const resolutionMatch = content.match(/Upgrade to\s*([^<]+)/i);
