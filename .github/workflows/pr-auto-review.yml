@@ -68,7 +68,7 @@ jobs:
             echo "Empty diff — auto-approving"
             gh pr review "$PR_NUM" --approve \
               --body "_🤖 AI Review (${AI_MODEL})_\n\n**Verdict:** ✅ APPROVE\n**Reason:** No code changes detected (empty diff)." 2>/dev/null || true
-            gh pr merge "$PR_NUM" --merge --auto 2>&1 || true
+            gh pr merge "$PR_NUM" --merge --auto --delete-branch 2>gh pr merge "$PR_NUM" --merge --auto 2>&11 || true
             exit 0
           fi
 
@@ -162,7 +162,7 @@ PYEOF
             gh pr review "$PR_NUM" --approve --body "$(echo -e "$COMMENT")" 2>/dev/null || true
             echo "✅ PR approved by AI"
             # Auto-merge
-            gh pr merge "$PR_NUM" --merge --auto 2>&1 || true
+            gh pr merge "$PR_NUM" --merge --auto --delete-branch 2>gh pr merge "$PR_NUM" --merge --auto 2>&11 || true
           elif [ "$VERDICT" = "REJECT" ]; then
             gh pr review "$PR_NUM" --request-changes --body "$(echo -e "$COMMENT")" 2>/dev/null || true
             echo "❌ PR rejected by AI"
