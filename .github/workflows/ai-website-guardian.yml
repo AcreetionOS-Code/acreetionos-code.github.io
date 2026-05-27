@@ -157,7 +157,16 @@ jobs:
               r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}', '--max-time', '10', '-I', url],
                 capture_output=True, text=True, timeout=15)
               code = r.stdout.strip()
-              if code not in ['200', '206', '301', '302']:
+              if code in ['200', '206', '301', '302']:
+                continue  # Healthy
+              elif code in ['401', '403']:
+                # Auth-protected — might still be valid (R2 buckets)
+                print(f"  🔒 {ed['id']}: HTTP {code} (may be valid)")
+              elif code in ['404']:
+                issues.append(f"{ed['id']}: HTTP {code} NOT FOUND — {url[:80]}")
+              elif code in ['429']:
+                print(f"  ⏳ {ed['id']}: HTTP {code} rate limited (retry later)")
+              else:
                 issues.append(f"{ed['id']}: HTTP {code} — {url[:80]}")
             except Exception as e:
               issues.append(f"{ed['id']}: {e}")
