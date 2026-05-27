@@ -181,31 +181,48 @@ jobs:
               print(f"\n⚠ No fixes could be applied automatically")
           PYEOF
 
-      - name: Create PR via Cloudflare Worker
-        if: hashFiles('/tmp/flash-fixed') != ''
+      - name: Create PR via Cloudflare Worker (fix or report)
+        if: failure()
         run: |
           python3 << 'PYEOF'
           import json, os, re, subprocess, urllib.request
 
-          with open('flash.html') as f:
-              html = f.read()
+          with open('/tmp/flash-report.json') as f:
+              report = json.load(f)
 
-          # Verify parses
-          em = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
-          if em:
-              js = re.sub(r"'", '"', em.group(1))
-              js = re.sub(r',\s*([\]}])', r'\1', js)
-              editions = json.loads(js)
-              print(f"✅ Validated: {len(editions)} editions")
+          issues = report.get('issues', [])
+          has_fixes = os.path.exists('/tmp/flash-fixed')
 
           branch = f"fix/flash-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
 
-          # Call Cloudflare Worker to create PR
+          # Build PR body with full issue report
+          pr_body = "🤖 **AI Flash Guardian Report**\n\n"
+          pr_body += f"**Issues found:** {report['count']}\n\n"
+          for i in issues:
+              pr_body += f"- ❌ {i}\n"
+          
+          files = []
+          if has_fixes:
+              with open('flash.html') as f:
+                  html = f.read()
+              em = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
+              if em:
+                  js = re.sub(r"'", '"', em.group(1))
+                  js = re.sub(r',\s*([\]}])', r'\1', js)
+                  editions = json.loads(js)
+                  print(f"✅ Fixed: {len(editions)} editions")
+              files.append({"path": "flash.html", "content": html})
+              pr_body += "\n**Fixes applied:** ✅ flash.html was repaired\n"
+          else:
+              pr_body += "\n**Fixes applied:** ❌ No automatic fix available — requires manual review\n"
+
+          pr_body += "\n---\n_Created automatically by the AI Flash Guardian workflow._"
+
           payload = json.dumps({
               "branch": branch,
-              "title": "Auto-fix: flash.html repairs",
-              "body": "🤖 **AI Flash Guardian** found and fixed issues in flash.html.\n\nThis PR was created automatically via the Cloudflare Worker.",
-              "files": [{"path": "flash.html", "content": html}]
+              "title": f"Flash Guardian: {report['count']} issue(s) found",
+              "body": pr_body,
+              "files": files
           }).encode()
 
           req = urllib.request.Request(
@@ -219,13 +236,11 @@ jobs:
                   result = json.loads(resp.read())
                   if result.get('pr'):
                       print(f"✅ PR created: {result['pr']['url']}")
-                      print(f"   Branch: {result['pr']['branch']}")
-                      print(f"   Number: {result['pr']['number']}")
                   else:
-                      print(f"❌ Failed: {result.get('error', 'unknown')}")
+                      print(f"⚠ Worker returned: {result.get('error', 'unknown')}")
           except urllib.error.HTTPError as e:
-              err = e.read().decode()
-              print(f"❌ HTTP {e.code}: {err[:300]}")
+              err = e.read().decode()[:300]
+              print(f"❌ HTTP {e.code}: {err}")
           except Exception as e:
               print(f"❌ Error: {e}")
           PYEOF

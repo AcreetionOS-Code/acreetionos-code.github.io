@@ -212,64 +212,81 @@ jobs:
             print("✅ All SEO checks passed!")
           PYEOF
 
-      - name: Create PR with fixes
+      - name: Create PR with findings via Worker
         if: failure()
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
-          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
         run: |
           python3 << 'PYEOF'
-          import subprocess, os, json, re, glob
-          
-          # Collect all fixes from AI
-          fixes_content = ""
+          import json, os, re, glob, urllib.request
+
+          # Collect all issues from the various task outputs
+          issues = []
+          fixes_applied = []
+
+          # Check for download fixes
           for fixfile in ['/tmp/ai-fixes.txt', '/tmp/download-fixes.txt']:
             if os.path.exists(fixfile):
               with open(fixfile) as f:
-                fixes_content += f.read() + "\n"
-          
-          if not fixes_content.strip():
-            print("No AI fixes available")
-            exit(0)
-          
-          # Apply REPLACE:/WITH: patterns
-          replacements = re.findall(r'REPLACE:\s*(.+?)\s*WITH:\s*(.+?)(?=REPLACE:|\Z)', fixes_content, re.DOTALL)
-          
-          changes = False
-          for old_url, new_url in replacements:
-            old_url = old_url.strip()
-            new_url = new_url.strip()
-            for html_file in glob.glob('*.html'):
-              with open(html_file) as f:
-                data = f.read()
-              if old_url in data:
-                data = data.replace(old_url, new_url)
-                with open(html_file, 'w') as f:
-                  f.write(data)
-                print(f"Fixed {html_file}: {old_url[:50]}...")
-                changes = True
-          
-          if not changes:
-            print("No changes applied")
-            exit(0)
-          
-          BRANCH = f"fix/ai-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
-          
-          subprocess.run(['git', 'config', 'user.name', 'AI Website Guardian'], check=False)
-          subprocess.run(['git', 'config', 'user.email', 'guardian@acreetionos.org'], check=False)
-          subprocess.run(['git', 'checkout', '-b', BRANCH], check=False)
-          subprocess.run(['git', 'add', '-A'], check=False)
-          
-          r = subprocess.run(['git', 'diff', '--cached', '--quiet'], check=False)
-          if r.returncode != 0:
-              subprocess.run(['git', 'commit', '-m', 'Auto-fix: AI website guardian repairs\n\nAutomated fixes from AI guardian workflow.'], check=False)
-              subprocess.run(['git', 'push', 'origin', BRANCH], check=False)
-              pr = subprocess.run(['gh', 'pr', 'create',
-                  '--title', 'Auto-fix: website guardian repairs',
-                  '--body', '🤖 **AI Website Guardian** found and fixed issues.\n\nThis PR was created automatically.',
-                  '--base', 'main', '--head', BRANCH, '--label', 'auto-fix'],
-                  capture_output=True, text=True, check=False)
-              print(f"PR: {pr.stdout.strip()}")
-              subprocess.run(['gh', 'pr', 'merge', '--merge', '--auto'], check=False)
-              print("✅ PR created and auto-merge enabled")
+                content = f.read()
+              replacements = re.findall(r'REPLACE:\s*(.+?)\s*WITH:\s*(.+?)(?=REPLACE:|\Z)', content, re.DOTALL)
+              for old_url, new_url in replacements:
+                old_url = old_url.strip()
+                new_url = new_url.strip()
+                for html_file in glob.glob('*.html'):
+                  with open(html_file) as f:
+                    data = f.read()
+                  if old_url in data:
+                    data = data.replace(old_url, new_url)
+                    with open(html_file, 'w') as f:
+                      f.write(data)
+                    fixes_applied.append(f"{html_file}: {old_url[:60]} → {new_url[:60]}")
+                    issues.append(f"Fixed URL in {html_file}")
+
+          # Collect all changed files
+          files_to_pr = []
+          for html_file in glob.glob('*.html'):
+            with open(html_file) as f:
+              content = f.read()
+            files_to_pr.append({"path": html_file, "content": content})
+
+          if not issues:
+            issues.append("Unknown issue — check workflow logs for details")
+
+          branch = f"fix/ai-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
+
+          pr_body = "🤖 **AI Website Guardian Report**\n\n"
+          pr_body += f"**Issues detected:** {len(issues)}\n\n"
+          for i in issues:
+            pr_body += f"- ❌ {i}\n"
+          if fixes_applied:
+            pr_body += "\n**Fixes applied:**\n"
+            for f in fixes_applied:
+              pr_body += f"- ✅ {f}\n"
+          else:
+            pr_body += "\n**Fixes applied:** ⚠ None — manual review needed\n"
+          pr_body += "\n---\n_Created automatically by the AI Website Guardian workflow._"
+
+          payload = json.dumps({
+            "branch": branch,
+            "title": f"Website Guardian: {len(issues)} issue(s) found",
+            "body": pr_body,
+            "files": files_to_pr
+          }).encode()
+
+          req = urllib.request.Request(
+            "https://acreetionos.org/api/github/create-pr",
+            data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+          )
+          try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+              result = json.loads(resp.read())
+              if result.get('pr'):
+                print(f"✅ PR created: {result['pr']['url']}")
+              else:
+                print(f"⚠ {result.get('error', 'unknown')}")
+          except urllib.error.HTTPError as e:
+            print(f"❌ HTTP {e.code}: {e.read().decode()[:300]}")
+          except Exception as e:
+            print(f"❌ {e}")
           PYEOF
