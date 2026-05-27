@@ -1149,37 +1149,42 @@ async function handleISOCheck(request, env) {
     });
   }
 
-  // Try URL — first with Range + magic byte check, fallback to HEAD
+  // Try URL — HEAD first, fallback to Range+magic, accept 401/403 for R2
   async function tryUrl(u) {
-    // Try 1: HEAD request first (fast)
+    // R2 URLs return 401 — treat as potentially valid
+    const isR2 = u.includes('.r2.dev');
+
+    // HEAD request (fast)
     try {
       const headRes = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(8000) });
-      if (headRes.ok || headRes.status === 206 || headRes.status === 301 || headRes.status === 302) {
+      const ok = headRes.ok || headRes.status === 206 || headRes.status === 301 || headRes.status === 302;
+      if (ok || (isR2 && (headRes.status === 401 || headRes.status === 403))) {
         const cl = parseInt(headRes.headers.get('Content-Length') || '0');
-        if (cl >= 209715200) return { reachable: true, status: headRes.status };
+        if (cl >= 209715200 || isR2) return { reachable: true, status: headRes.status };
+        // If no Content-Length, try Range
       }
     } catch {}
 
-    // Try 2: Range request for magic byte verification
+    // Range request for magic byte verification
     try {
-      const res = await fetch(u, {
-        headers: { 'Range': 'bytes=0-1048575' },
-        signal: AbortSignal.timeout(15000)
-      });
-      if (!res.ok && res.status !== 206) return { reachable: false, status: res.status };
-      const chunk = await res.arrayBuffer();
-      const bytes = new Uint8Array(chunk);
-      if (bytes.length >= 32774) {
-        const magic = bytes.slice(32769, 32774);
-        const isIso = magic[0] === 0x43 && magic[1] === 0x44 && magic[2] === 0x30 &&
-                       magic[3] === 0x30 && magic[4] === 0x31;
-        if (!isIso) return { reachable: false, status: res.status, error: 'Not valid ISO' };
+      const res = await fetch(u, { headers: { 'Range': 'bytes=0-1048575' }, signal: AbortSignal.timeout(15000) });
+      if (res.ok || res.status === 206 || (isR2 && (res.status === 401 || res.status === 403))) {
+        if (isR2 && (res.status === 401 || res.status === 403)) return { reachable: true, status: res.status };
+        const chunk = await res.arrayBuffer();
+        const bytes = new Uint8Array(chunk);
+        if (bytes.length >= 32774) {
+          const magic = bytes.slice(32769, 32774);
+          const isIso = magic[0] === 0x43 && magic[1] === 0x44 && magic[2] === 0x30 &&
+                         magic[3] === 0x30 && magic[4] === 0x31;
+          if (!isIso) return { reachable: false, status: res.status, error: 'Not valid ISO' };
+        }
+        const cr = res.headers.get('Content-Range') || '';
+        const sm = cr.match(/\/(\d+)$/);
+        if (sm) { const ts = parseInt(sm[1]); if (ts < 209715200 && !isR2) return { reachable: false, status: res.status, error: `ISO too small` }; }
+        return { reachable: true, status: res.status };
       }
-      const cr = res.headers.get('Content-Range') || '';
-      const sm = cr.match(/\/(\d+)$/);
-      if (sm) { const ts = parseInt(sm[1]); if (ts < 209715200) return { reachable: false, status: res.status, error: `ISO too small: ${(ts/1048576).toFixed(0)}MB` }; }
-      return { reachable: true, status: res.status };
     } catch (e) { return { reachable: false, status: 0, error: e.message }; }
+    return { reachable: false, status: 0 };
   }
 
   let result = await tryUrl(url);
