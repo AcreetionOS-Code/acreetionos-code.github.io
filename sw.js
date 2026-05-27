@@ -53,6 +53,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
+  // Bypass service worker for Cloudflare edge endpoints (Zaraz, RUM, etc.)
+  if (url.pathname.startsWith('/cdn-cgi/')) {
+    return;
+  }
+
   // Forward all POST API requests directly without caching
   if (event.request.method === 'POST' && url.pathname.startsWith('/api/')) {
     event.respondWith(fetch(event.request.clone()));
