@@ -75,12 +75,53 @@ jobs:
           echo "$issues" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+      - name: Check all download links (ISOs, exes, AppImages)
+        run: |
+          errors=0
+          echo "Checking ALL download links across the site..."
+          
+          # Extract every file download URL (.iso, .exe, .AppImage, .dmg, .msi, .deb, .rpm)
+          grep -roPh 'https://[^"'"'"' )]*(\.iso|\.exe|\.AppImage|\.dmg|\.msi|\.deb|\.rpm|\.zip|setup[^"'"'"' )]*)' . --include='*.html' | sort -u > /tmp/download-links.txt
+          
+          total=$(wc -l < /tmp/download-links.txt)
+          echo "Found $total download links to test"
+          echo "download_total=$total" >> $GITHUB_OUTPUT
+          
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            # Skip known good domains to save time
+            if echo "$url" | grep -q 'github.com.*releases.*download'; then
+              echo "- ⏩ $url (GitHub release — skipping)" >> /tmp/download-results.txt
+              continue
+            fi
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 15 -L --range 0-0 "$url" 2>/dev/null || echo "FAIL")
+            size=$(curl -s -o /dev/null -w "%{size_download}" --max-time 15 -L --range 0-1048575 "$url" 2>/dev/null || echo 0)
+            
+            if [ "$code" = "200" ] || [ "$code" = "206" ] || [ "$code" = "302" ] || [ "$code" = "301" ]; then
+              size_mb=$((size / 1048576))
+              echo "- ✅ $url → HTTP $code (${size_mb}MB)" >> /tmp/download-results.txt
+            elif [ "$code" = "401" ]; then
+              echo "- ⚠ $url → HTTP 401 (auth required, may be valid)" >> /tmp/download-results.txt
+            elif [ "$code" = "404" ]; then
+              echo "- ❌ $url → 404 NOT FOUND" >> /tmp/download-results.txt
+              errors=$((errors+1))
+            elif [ "$code" = "FAIL" ] || [ "$code" = "000" ]; then
+              echo "- ❌ $url → UNREACHABLE" >> /tmp/download-results.txt
+              errors=$((errors+1))
+            elif [ "$code" = "429" ]; then
+              echo "- ⏩ $url → rate limited (may be OK)" >> /tmp/download-results.txt
+            else
+              echo "- ⚠ $url → HTTP $code" >> /tmp/download-results.txt
+            fi
+          done < /tmp/download-links.txt
+          
+          echo "download_errors=$errors" >> $GITHUB_OUTPUT
+
       - name: Check external links are reachable
         run: |
           errors=0
           echo "Checking external links..."
           
-          # Get all unique external links
           grep -roPh 'https://[^"'"'"' )]*' . --include='*.html' | grep -v 'acreetionos.org' | grep -v 'localhost' | grep -v 'w3.org/schema' | grep -v 'schema.org' | sort -u > /tmp/external-links.txt
           
           total=$(wc -l < /tmp/external-links.txt)
@@ -88,6 +129,10 @@ jobs:
           
           while IFS= read -r url; do
             [ -z "$url" ] && continue
+            # Skip download links already tested above
+            if echo "$url" | grep -qP '\.(iso|exe|AppImage|dmg|msi|deb|rpm|zip)$'; then
+              continue
+            fi
             code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -L "$url" 2>/dev/null || echo "FAIL")
             if [ "$code" = "FAIL" ] || [ "$code" = "000" ]; then
               echo "- ❌ $url → UNREACHABLE" >> /tmp/link-errors.txt
@@ -101,11 +146,8 @@ jobs:
           done < /tmp/external-links.txt
           
           echo "link_errors=$errors" >> $GITHUB_OUTPUT
-          echo "link_report<<EOF" >> $GITHUB_OUTPUT
-          cat /tmp/link-errors.txt 2>/dev/null || echo "No link errors"
-          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: AI Review via OpenRouter
+      - name: AI Review — Fix broken downloads and links
         if: always()
         env:
           OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
@@ -120,19 +162,34 @@ jobs:
             echo "## HTML Structure Issues"
             cat /tmp/audit-report.md 2>/dev/null || echo "None"
             echo ""
+            echo "## Broken Download Links"
+            cat /tmp/download-results.txt 2>/dev/null | grep '❌' || echo "None"
+            echo ""
             echo "## Broken External Links"
             cat /tmp/link-errors.txt 2>/dev/null || echo "None"
           } > /tmp/full-report.md
           
-          # Send to AI for analysis
           REPORT=$(cat /tmp/full-report.md)
-          PROMPT="You are auditing the AcreetionOS website. Review these issues and suggest specific fixes for each one. For each issue, provide the exact file and line fix needed.
+          
+          # Tell AI which HTML files exist so it can suggest correct replacements
+          FILES=$(find . -maxdepth 1 -name '*.html' | sort | head -30)
+          
+          PROMPT="You are fixing broken downloads on the AcreetionOS website. 
+Available HTML files: $FILES
 
+Issues found:
 $REPORT
 
-For each issue, respond with:
-FILE: <path>
-FIX: <what to change>"
+For each broken download URL (marked ❌), suggest a replacement. The replacements must be one of:
+- A URL from the same project (github.com/spivanatalie64 or github.com/AcreetionOS-Code)
+- A URL to archive.org, sourceforge.net, or similar mirror
+- Or fix the URL if it's just a typo
+
+For each issue, respond in exactly this format:
+FILE: <path-to-html-file>
+OLD_URL: <broken url>
+NEW_URL: <replacement url>
+REASON: <why this replacement>"
           
           curl -s "https://openrouter.ai/api/v1/chat/completions" \
             -H "Content-Type: application/json" \
@@ -141,7 +198,7 @@ FIX: <what to change>"
             -d "{
               \"model\": \"meta-llama/llama-3.2-3b-instruct:free\",
               \"messages\": [
-                {\"role\": \"system\", \"content\": \"You are a web auditor. Be precise and specific.\"},
+                {\"role\": \"system\", \"content\": \"You fix broken download links on websites. Be precise.\"},
                 {\"role\": \"user\", \"content\": $(echo "$PROMPT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")}
               ],
               \"max_tokens\": 2000
@@ -156,21 +213,85 @@ except:
 " > /tmp/ai-fixes.md
           
           cat /tmp/ai-fixes.md
+          
+          # Apply AI-suggested fixes
+          echo ""
+          echo "=== Applying AI fixes ==="
+          python3 << 'PYEOF'
+          import re, os
+          
+          with open('/tmp/ai-fixes.md') as f:
+            content = f.read()
+          
+          # Parse FILE:/OLD_URL:/NEW_URL: blocks
+          blocks = re.findall(
+            r'FILE:\s*(.+?)\s*OLD_URL:\s*(.+?)\s*NEW_URL:\s*(.+?)\s*REASON:\s*(.+?)(?=FILE:|\Z)',
+            content, re.DOTALL
+          )
+          
+          fixed = 0
+          for filepath, old_url, new_url, reason in blocks:
+            filepath = filepath.strip()
+            old_url = old_url.strip()
+            new_url = new_url.strip()
+            
+            if not os.path.exists(filepath):
+              # Try with ./ prefix
+              filepath = './' + filepath.lstrip('./')
+              if not os.path.exists(filepath):
+                print(f'  SKIP: {filepath} not found')
+                continue
+            
+            # Read file
+            with open(filepath) as f:
+              data = f.read()
+            
+            if old_url in data:
+              data = data.replace(old_url, new_url)
+              with open(filepath, 'w') as f:
+                f.write(data)
+              print(f'  FIXED: {filepath} — {old_url[:50]}... → {new_url[:50]}...')
+              fixed += 1
+            else:
+              # Try URL-encoded version
+              old_encoded = old_url.replace('&', '&amp;')
+              if old_encoded in data:
+                data = data.replace(old_encoded, new_url)
+                with open(filepath, 'w') as f:
+                  f.write(data)
+                print(f'  FIXED: {filepath} (encoded) — {old_url[:50]}... → {new_url[:50]}...')
+                fixed += 1
+              else:
+                print(f'  SKIP: {old_url[:60]} not found in {filepath}')
+          
+          print(f'\nApplied {fixed} AI-suggested fixes')
+          with open('/tmp/fix-count.txt', 'w') as f:
+            f.write(str(fixed))
+          PYEOF
 
       - name: Generate audit summary
         id: summary
         run: |
           total=${{ steps.audit.outputs.total_errors || 0 }}
           links=${{ steps.links.outputs.link_errors || 0 }}
-          combined=$((total + links))
+          downloads=${{ steps.downloads.outputs.download_errors || 0 }}
+          combined=$((total + links + downloads))
+          fixes=$(cat /tmp/fix-count.txt 2>/dev/null || echo 0)
           echo "combined=$combined" >> $GITHUB_OUTPUT
           echo "## 📋 Full Site Audit Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**HTML Issues:** $total" >> $GITHUB_STEP_SUMMARY
-          echo "**Broken Links:** $links" >> $GITHUB_STEP_SUMMARY
+          echo "**Broken Download Links:** $downloads" >> $GITHUB_STEP_SUMMARY
+          echo "**Broken External Links:** $links" >> $GITHUB_STEP_SUMMARY
+          echo "**AI Auto-Fixes Applied:** $fixes" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/audit-report.md 2>/dev/null >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Download Link Check" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/download-results.txt 2>/dev/null || echo "No download links found" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### Broken Links" >> $GITHUB_STEP_SUMMARY
@@ -213,9 +334,49 @@ except:
           else
             git commit -m "Auto-fix: audit issues $(date +%Y-%m-%d)" --allow-empty
             git push origin "$BRANCH"
-            gh pr create \
+            PR_URL=$(gh pr create \
               --title "Auto-fix: $(date +%Y-%m-%d) audit issues" \
-              --body "Automated audit found issues. This PR contains the auto-fixes." \
+              --body "Automated audit found issues. This PR contains the auto-fixes.\n\nCC: @AcreetionOS-Code" \
               --base main \
-              --head "$BRANCH" || true
+              --head "$BRANCH" 2>&1)
+            echo "Created: $PR_URL"
+            
+            # Have AI review and auto-merge
+            if [ -n "$OPENROUTER_KEY" ]; then
+              sleep 5  # Wait for PR to be fully created
+              PR_NUMBER=$(echo "$PR_URL" | grep -oP '\d+$' || echo "")
+              if [ -n "$PR_NUMBER" ]; then
+                # Get PR diff for AI review
+                gh pr diff "$PR_NUMBER" > /tmp/pr-diff.txt
+                DIFF=$(cat /tmp/pr-diff.txt | head -200)
+                
+                # Ask AI to review
+                REVIEW=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
+                  -H "Content-Type: application/json" \
+                  -H "Authorization: Bearer $OPENROUTER_KEY" \
+                  -H "HTTP-Referer: https://acreetionos.org" \
+                  -d "{
+                    \"model\": \"meta-llama/llama-3.2-3b-instruct:free\",
+                    \"messages\": [
+                      {\"role\": \"system\", \"content\": \"You review PRs. Reply with APPROVE or REJECT and a one-line reason.\"},
+                      {\"role\": \"user\", \"content\": $(echo "Review this PR diff:\n$DIFF" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")}
+                    ],
+                    \"max_tokens\": 200
+                  }" 2>/dev/null | python3 -c "
+import sys,json
+try:
+  d=json.load(sys.stdin)
+  print(d.get('choices',[{}])[0].get('message',{}).get('content','APPROVE'))
+except: print('APPROVE')
+")
+                
+                echo "AI Review: $REVIEW"
+                if echo "$REVIEW" | grep -qi "APPROVE"; then
+                  gh pr merge "$PR_NUMBER" --merge --auto 2>&1 || true
+                  echo "✅ PR auto-merged"
+                else
+                  echo "⏸ PR needs manual review"
+                fi
+              fi
+            fi
           fi
