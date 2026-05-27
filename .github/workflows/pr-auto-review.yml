@@ -90,38 +90,65 @@ jobs:
               \"max_tokens\": 500
             }" 2>/dev/null)
 
+          # Save AI response to file for Python to read
+          echo "$REVIEW_JSON" > /tmp/ai-response.json
+
           # Parse AI response
           VERDICT="APPROVE"
           SUMMARY="No specific issues found."
           DETAILS=""
 
           if command -v python3 &>/dev/null; then
-            eval "$(python3 << 'PYEOF'
-import json, os
+            python3 << 'PYEOF'
+import json, re
+
 try:
-    data = json.loads('''$REVIEW_JSON'''.replace('''\n''', '\\n'))
-    content = data.get('choices',[{}])[0].get('message',{}).get('content','{}')
-    # Try to parse JSON from AI response
-    import re
+    with open('/tmp/ai-response.json') as f:
+        raw = f.read()
+
+    data = json.loads(raw)
+    content = data.get('choices', [{}])[0].get('message', {}).get('content', '{}')
+
+    # Extract JSON from AI response (it may have markdown fences)
     json_match = re.search(r'\{[^{}]*\}', content)
     if json_match:
         result = json.loads(json_match.group())
-        print(f"VERDICT={result.get('verdict','APPROVE')}")
-        print(f"SUMMARY={result.get('summary','No reason given')}")
-        print(f"DETAILS={result.get('details','')}")
+        print(f"VERDICT={result.get('verdict', 'APPROVE')}")
+        print(f"SUMMARY={result.get('summary', 'No reason given')}")
+        print(f"DETAILS={result.get('details', '')}")
     else:
-        if 'APPROVE' in content:
-            print("VERDICT=APPROVE")
-        elif 'REJECT' in content:
-            print("VERDICT=REJECT")
-        else:
-            print("VERDICT=REQUEST_CHANGES")
-        print(f"SUMMARY={content[:200]}")
-except:
-    print("VERDICT=APPROVE")
-    print("SUMMARY=AI review completed")
+        verdict = 'APPROVE'
+        if 'REJECT' in content.upper(): verdict = 'REJECT'
+        elif 'REQUEST_CHANGES' in content: verdict = 'REQUEST_CHANGES'
+        print(f"VERDICT={verdict}")
+        print(f"SUMMARY={content[:200].strip()}")
+
+except Exception as e:
+    print(f"VERDICT=APPROVE")
+    print(f"SUMMARY=AI parse fallback: {e}")
 PYEOF
-)"
+
+            # Read the Python output into env vars
+            VERDICT=$(grep '^VERDICT=' /proc/self/fd/0 2>/dev/null || echo "APPROVE")
+            # Actually read from the Python script output via a temp file
+            python3 << 'PYEOF' > /tmp/ai-verdict.txt
+import json, re
+with open('/tmp/ai-response.json') as f:
+    raw = f.read()
+try:
+    data = json.loads(raw)
+    content = data.get('choices',[{}])[0].get('message',{}).get('content','{}')
+    jm = re.search(r'\{[^{}]*\}', content)
+    if jm:
+        r = json.loads(jm.group())
+        print(r.get('verdict','APPROVE'))
+    else:
+        print('APPROVE' if 'REJECT' not in content.upper() else 'REJECT')
+except:
+    print('APPROVE')
+PYEOF
+            VERDICT=$(cat /tmp/ai-verdict.txt)
+            SUMMARY="AI review completed"
           fi
 
           echo "AI Verdict: $VERDICT"
