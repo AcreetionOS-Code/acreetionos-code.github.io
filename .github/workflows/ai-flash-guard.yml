@@ -1,7 +1,7 @@
 name: AI Flash Guardian
 on:
   schedule:
-    - cron: '* * * * *'  # Every 1 min while stabilizing. Change to "0 */2 * * *" once stable.
+    - cron: '*/30 * * * *'  # Every 30 min — verify all ISOs downloadable
   workflow_dispatch:
 
 jobs:

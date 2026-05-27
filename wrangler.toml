@@ -5,8 +5,8 @@ compatibility_date = "2026-04-26"
 routes = ["acreetionos.org/api/*"]
 
 [triggers]
-# Every 1 min while stabilizing. Change to "0 */6 * * *" once stable.
-crons = ["* * * * *"]
+# Check every 30 min: verify all ISOs downloadable, auto-fix broken
+crons = ["*/30 * * * *"]
 
 [vars]
 DISCORD_WEBHOOK_URL = ""
