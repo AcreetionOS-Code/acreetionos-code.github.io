@@ -1,7 +1,7 @@
 name: AI Flash Guardian
 on:
   schedule:
-    - cron: '*/5 * * * *'  # Every 5 min while stabilizing. Change to "0 */2 * * *" once stable.
+    - cron: '* * * * *'  # Every 1 min while stabilizing. Change to "0 */2 * * *" once stable.
   workflow_dispatch:
 
 jobs:
