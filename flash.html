@@ -194,7 +194,13 @@ async function loadEditions() {
   const c = document.getElementById('editions-container');
   c.innerHTML = '<p style="color:var(--acreetion-text);text-align:center;padding:1rem">Checking build status...</p>';
 
-  const checks = await Promise.all(EDITIONS.map(e => checkEditionStatus(e).then(s => ({...e,...s}))));
+  // Check each edition with individual timeout so one slow URL doesn't block all
+  const checkWithTimeout = async (ed) => {
+    const timeout = new Promise(resolve => setTimeout(() => resolve({...ed, built: false, timed_out: true}), 12000));
+    const check = checkEditionStatus(ed).then(s => ({...ed, ...s})).catch(() => ({...ed, built: false}));
+    return Promise.race([check, timeout]);
+  };
+  const checks = await Promise.all(EDITIONS.map(checkWithTimeout));
 
   const official = checks.filter(e => e.official);
   const unofficial = checks.filter(e => !e.official);
