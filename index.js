@@ -1108,6 +1108,151 @@ async function handleHostingReactivate(request, env) {
   }
 }
 
+// ─── GitHub Auto-Fix PR Creator ────────────────────────────
+
+async function handleCreatePR(request, env) {
+  // POST /api/github/create-pr — creates a PR with auto-fixes
+  // Body: { branch, title, body, files: [{ path, content }], base?: "main" }
+  try {
+    const body = await request.json();
+    const ghToken = env.GH_TOKEN;
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GitHub not configured', pr: null }), {
+        status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+
+    const repo = 'AcreetionOS-Code/acreetionos-code.github.io';
+    const base = body.base || 'main';
+    const branch = body.branch || `fix/auto-${Date.now().toString(36)}`;
+    const headers = {
+      'Authorization': `Bearer ${ghToken}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'AcreetionOS-AutoFix/1.0'
+    };
+    const api = (path) => `https://api.github.com/repos/${repo}/${path}`;
+
+    // 1. Get the latest commit SHA on base branch
+    const baseRes = await fetch(api(`git/ref/heads/${base}`), { headers });
+    if (!baseRes.ok) {
+      return new Response(JSON.stringify({ error: 'Failed to get base ref', pr: null }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+    const baseData = await baseRes.json();
+    const baseSha = baseData.object.sha;
+
+    // 2. Create a new tree with the file changes
+    const treeItems = (body.files || []).map(f => ({
+      path: f.path,
+      mode: '100644',
+      type: 'blob',
+      content: f.content
+    }));
+
+    const treeRes = await fetch(api('git/trees'), {
+      method: 'POST', headers,
+      body: JSON.stringify({ base_tree: baseSha, tree: treeItems })
+    });
+    if (!treeRes.ok) {
+      const err = await treeRes.text();
+      return new Response(JSON.stringify({ error: 'Tree creation failed', detail: err.slice(0, 300), pr: null }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+    const treeData = await treeRes.json();
+
+    // 3. Create a commit
+    const commitRes = await fetch(api('git/commits'), {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        message: body.title || 'Auto-fix: AI website guardian repairs',
+        tree: treeData.sha,
+        parents: [baseSha]
+      })
+    });
+    if (!commitRes.ok) {
+      const err = await commitRes.text();
+      return new Response(JSON.stringify({ error: 'Commit failed', detail: err.slice(0, 300), pr: null }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+    const commitData = await commitRes.json();
+
+    // 4. Create the branch
+    const branchRes = await fetch(api(`git/refs`), {
+      method: 'POST', headers,
+      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commitData.sha })
+    });
+    if (!branchRes.ok) {
+      const err = await branchRes.text();
+      return new Response(JSON.stringify({ error: 'Branch creation failed', detail: err.slice(0, 300), pr: null }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+
+    // 5. Create the PR
+    const prRes = await fetch(api('pulls'), {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        title: body.title || 'Auto-fix: AI guardian repairs',
+        body: (body.body || '🤖 **Auto-fix PR**\n\nCreated automatically by the AcreetionOS AI Guardian.') + '\n\n_Generated via Cloudflare Worker_',
+        head: branch,
+        base: base
+      })
+    });
+    if (!prRes.ok) {
+      const err = await prRes.text();
+      return new Response(JSON.stringify({ error: 'PR creation failed', detail: err.slice(0, 300), pr: null }), {
+        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+    const prData = await prRes.json();
+
+    // 6. Enable auto-merge
+    await fetch(api(`pulls/${prData.number}/merge`), {
+      method: 'PUT', headers,
+      body: JSON.stringify({ merge_method: 'merge' })
+    }).catch(() => {});
+
+    return new Response(JSON.stringify({
+      pr: { number: prData.number, url: prData.html_url, branch },
+      success: true
+    }), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message, pr: null }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  }
+}
+
+async function handlePushFix(request, env) {
+  // POST /api/github/push-fix — directly push a file fix to main
+  // Body: { files: [{ path, content }], message }
+  try {
+    const body = await request.json();
+    const ghToken = env.GH_TOKEN;
+    if (!ghToken) {
+      return new Response(JSON.stringify({ error: 'GitHub not configured' }), {
+        status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+
+    // First try to create a PR, fallback to direct push
+    const prResult = await handleCreatePR(request.clone ? request.clone() : request, env).then(r => r.json());
+    return new Response(JSON.stringify(prResult), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  }
+}
+
 // ─── CVE Security Monitoring ──────────────────────────────────
 
 const NVD_BASE = 'https://services.nvd.nist.gov/rest/json/cves/2.0';
@@ -1885,6 +2030,14 @@ export default {
     }
     if (url.pathname === '/api/hosting/reactivate' && request.method === 'POST') {
       return handleHostingReactivate(request, env);
+    }
+
+    // ─── GitHub Auto-Fix PR Creator ───────────────────────────
+    if (url.pathname === '/api/github/create-pr' && request.method === 'POST') {
+      return handleCreatePR(request, env);
+    }
+    if (url.pathname === '/api/github/push-fix' && request.method === 'POST') {
+      return handlePushFix(request, env);
     }
 
     // ─── Smart Mirror Selection ────────────────────────────────
