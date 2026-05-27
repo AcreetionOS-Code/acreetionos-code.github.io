@@ -1,0 +1,218 @@
+name: AI Flash.html Guardian
+on:
+  schedule:
+    - cron: '0 */2 * * *'  # Every 2 hours
+  push:
+    paths: ['flash.html']
+  workflow_dispatch:
+
+jobs:
+  validate-and-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate flash.html structure with AI
+        env:
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          echo "=== AI Validating flash.html ==="
+          cat flash.html > /tmp/flash-current.html
+
+          python3 << 'PYEOF'
+          import json, re, os, subprocess
+
+          with open('/tmp/flash-current.html') as f:
+              html = f.read()
+
+          issues = []
+
+          # 1. Check EDITIONS array parseable
+          editions_match = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
+          if not editions_match:
+              issues.append("EDITIONS array not found")
+          else:
+              try:
+                  js = editions_match.group(1)
+                  js = re.sub(r"'", '"', js)
+                  js = re.sub(r',\s*([\]}])', r'\1', js)
+                  editions = json.loads(js)
+                  print(f"  ✓ EDITIONS: {len(editions)} editions parsed")
+                  
+                  # Check each edition has required fields
+                  for ed in editions:
+                      for field in ['id', 'label', 'desc', 'iso_url']:
+                          if field not in ed:
+                              issues.append(f"  {ed.get('id','?')}: missing '{field}'")
+                          elif not ed[field]:
+                              issues.append(f"  {ed.get('id','?')}: empty '{field}'")
+                      
+                      # Check mirrors have url
+                      for mir in ed.get('mirrors', []):
+                          if 'url' not in mir or not mir['url']:
+                              issues.append(f"  {ed['id']}: mirror missing URL")
+              except json.JSONDecodeError as e:
+                  issues.append(f"EDITIONS JSON parse error: {e}")
+
+          # 2. Check all edition download pages exist
+          for ed in editions if editions_match else []:
+              page = f"{ed.get('id', '')}.html"
+              if os.path.exists(page):
+                  print(f"  ✓ {page} exists")
+              else:
+                  issues.append(f"  Missing page: {page}")
+
+          # 3. Check for common HTML issues
+          if '<!DOCTYPE html>' not in html:
+              issues.append("Missing DOCTYPE")
+          if '</html>' not in html:
+              issues.append("Missing closing html tag")
+          if 'function loadEditions' not in html:
+              issues.append("Missing loadEditions function")
+
+          # 4. Check all ISO URLs are reachable
+          for ed in editions if editions_match else []:
+              url = ed.get('iso_url', '')
+              if url:
+                  try:
+                      r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
+                          '--max-time', '10', '-I', url],
+                          capture_output=True, text=True, timeout=15)
+                      code = r.stdout.strip()
+                      if code not in ['200', '206', '301', '302']:
+                          issues.append(f"  ISO DOWN: {ed['id']}: HTTP {code} — {url[:60]}")
+                  except:
+                      issues.append(f"  ISO FAIL: {ed['id']}: unreachable")
+
+          report = {'issues': issues, 'healthy': len(issues) == 0, 'count': len(issues)}
+          with open('/tmp/flash-report.json', 'w') as f:
+              json.dump(report, f, indent=2)
+
+          if issues:
+              print(f"\n❌ Found {len(issues)} issues:")
+              for i in issues:
+                  print(f"  - {i}")
+          else:
+              print(f"\n✅ flash.html is healthy!")
+          PYEOF
+
+      - name: AI Fix flash.html
+        if: failure()
+        env:
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          REPORT=$(cat /tmp/flash-report.json)
+          CURRENT=$(cat flash.html | head -c 5000)
+
+          if [ -z "$OPENROUTER_KEY" ]; then
+            echo "No OpenRouter key"
+            exit 0
+          fi
+
+          echo "=== AI Generating Fixes ==="
+
+          python3 << 'PYEOF'
+          import json, re, os, subprocess
+
+          with open('/tmp/flash-report.json') as f:
+              report = json.load(f)
+
+          if report['healthy']:
+              print("No issues to fix")
+              exit(0)
+
+          with open('flash.html') as f:
+              html = f.read()
+
+          api_key = os.environ.get('OPENROUTER_KEY', '')
+          issues_text = "\n".join(report['issues'])
+
+          prompt = f"""The AcreetionOS flash.html file has these issues:
+          {issues_text}
+
+          Here is the current flash.html content (first 5000 chars):
+          {html[:5000]}
+
+          For each issue, provide the exact fix in this format:
+          FILE: flash.html
+          REPLACE: <exact text to replace>
+          WITH: <replacement text>
+          """
+
+          r = subprocess.run(['curl', '-s', 'https://openrouter.ai/api/v1/chat/completions',
+              '-H', 'Content-Type: application/json',
+              '-H', f'Authorization: Bearer {api_key}',
+              '-H', 'HTTP-Referer: https://acreetionos.org',
+              '-d', json.dumps({
+                  'model': 'meta-llama/llama-3.2-3b-instruct:free',
+                  'messages': [
+                      {'role': 'system', 'content': 'You fix HTML/Javascript files. Return precise REPLACE:/WITH: pairs.'},
+                      {'role': 'user', 'content': prompt}
+                  ],
+                  'max_tokens': 2000
+              })], capture_output=True, text=True, timeout=60)
+
+          with open('/tmp/ai-flash-fixes.txt', 'w') as f:
+              f.write(r.stdout)
+
+          # Parse and apply REPLACE/WITH pairs
+          content = r.stdout
+          replacements = re.findall(r'REPLACE:\s*(.+?)\s*WITH:\s*(.+?)(?=REPLACE:|\Z)', content, re.DOTALL)
+          changes = False
+
+          for old_text, new_text in replacements:
+              old_text = old_text.strip()
+              new_text = new_text.strip()
+              if old_text in html:
+                  html = html.replace(old_text, new_text)
+                  print(f"  Applied fix: replaced {len(old_text)} chars")
+                  changes = True
+              else:
+                  print(f"  Could not find: {old_text[:60]}...")
+
+          if changes:
+              with open('flash.html', 'w') as f:
+                  f.write(html)
+              print(f"\n✅ Fixes applied to flash.html")
+              with open('/tmp/flash-fixed', 'w') as f:
+                  f.write('yes')
+          else:
+              print(f"\n⚠ No fixes could be applied automatically")
+          PYEOF
+
+      - name: Commit fixes
+        if: hashFiles('/tmp/flash-fixed') != ''
+        run: |
+          python3 << 'PYEOF'
+          import subprocess, os
+
+          # Verify the fixed file still parses
+          with open('flash.html') as f:
+              html = f.read()
+
+          import re
+          em = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
+          if em:
+              import json
+              js = re.sub(r"'", '"', em.group(1))
+              js = re.sub(r',\s*([\]}])', r'\1', js)
+              try:
+                  editions = json.loads(js)
+                  print(f"✅ Fixed flash.html validates: {len(editions)} editions"
+                  )
+              except json.JSONDecodeError as e:
+                  print(f"❌ Fixed file still broken: {e}")
+                  exit(1)
+
+          subprocess.run(['git', 'config', 'user.name', 'AI Flash Guardian'], check=False)
+          subprocess.run(['git', 'config', 'user.email', 'flash@acreetionos.org'], check=False)
+          subprocess.run(['git', 'add', 'flash.html'], check=False)
+          r = subprocess.run(['git', 'diff', '--cached', '--quiet'], check=False)
+          if r.returncode != 0:
+              subprocess.run(['git', 'commit', '-m', 'Auto-fix: AI flash.html guardian repairs'], check=False)
+              subprocess.run(['git', 'push', 'origin', 'HEAD:main'], check=False)
+              print("✅ Fixes committed and pushed")
+          else:
+              print("No changes to commit")
+          PYEOF
