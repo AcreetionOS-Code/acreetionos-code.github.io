@@ -427,7 +427,7 @@ except: print('APPROVE')
                 
                 echo "AI Review: $REVIEW"
                 if echo "$REVIEW" | grep -qi "APPROVE"; then
-                  gh pr merge "$PR_NUMBER" --merge --auto 2>&1 || true
+                  gh pr merge "$PR_NUMBER" --merge --auto --delete-branch 2>gh pr merge "$PR_NUMBER" --merge --auto 2>&11 || true
                   echo "✅ PR auto-merged"
                 else
                   echo "⏸ PR needs manual review"

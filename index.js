@@ -1210,11 +1210,18 @@ async function handleCreatePR(request, env) {
     }
     const prData = await prRes.json();
 
-    // 6. Enable auto-merge
-    await fetch(api(`pulls/${prData.number}/merge`), {
+    // 6. Enable auto-merge with branch deletion
+    const mergeRes = await fetch(api(`pulls/${prData.number}/merge`), {
       method: 'PUT', headers,
       body: JSON.stringify({ merge_method: 'merge' })
     }).catch(() => {});
+
+    // 7. Delete the branch after merge
+    if (mergeRes && mergeRes.ok) {
+      await fetch(api(`git/refs/heads/${branch}`), {
+        method: 'DELETE', headers
+      }).catch(() => {});
+    }
 
     return new Response(JSON.stringify({
       pr: { number: prData.number, url: prData.html_url, branch },
