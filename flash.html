@@ -113,16 +113,199 @@
 </div>
 </div>
 
-<h3 style="color:var(--acreetion-green);margin:1.5rem 0 1rem">Official Editions</h3>
-<div class="edition-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem">
-<div style="background:rgba(46,204,113,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem">
-<h4 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem">Cinnamon Edition</h4>
-<p style="font-size:0.85rem;color:var(--acreetion-text);margin-bottom:0.75rem">The main AcreetionOS desktop.</p>
-<div class="dl-btns" style="display:flex;flex-wrap:wrap;gap:6px">
-<a href="https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso" class="btn btn-cinnamon">ISO</a>
-<a href="https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso" class="btn btn-storm" target="_blank" rel="noopener">IA</a>
-<a href="https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download" class="btn" target="_blank" rel="noopener">SF</a>
+<div id="editions-container"></div>
+
+<!-- Build Terminal Modal -->
+<div id="build-modal" class="modal-overlay">
+<div class="modal-box" style="max-width:800px;position:relative">
+<button class="modal-close-btn" onclick="closeBuildModal()">✕</button>
+<h2 id="build-title" style="color:var(--acreetion-green)">Building...</h2>
+<div id="build-status" style="margin:0.5rem 0;font-size:0.85rem;color:var(--acreetion-text)"></div>
+<pre id="build-terminal" style="background:#0a0a0a;color:#2ecc71;padding:1rem;border-radius:8px;font-family:'Fira Code',monospace;font-size:0.8rem;max-height:400px;overflow-y:auto;white-space:pre-wrap;margin:0.5rem 0">Waiting to start...</pre>
+<div id="build-result" style="display:none;margin-top:0.5rem"></div>
+<a id="build-actions-link" href="#" target="_blank" class="btn btn-storm" style="display:none;margin-top:0.5rem">View on GitHub Actions</a>
 </div>
+</div>
+
+<script>
+const EDITIONS = [
+  {id:'cinnamon', label:'Cinnamon Edition', desc:'The main AcreetionOS desktop.', official:true,
+   iso_url:'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso',
+   mirrors:[{url:'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso',name:'IA'},
+            {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download',name:'SF'}]},
+  {id:'xl', label:'XL (XLibre) Edition', desc:'Experimental XLibre display server.', official:true,
+   iso_url:'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
+   mirrors:[{url:'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso',name:'IA'},
+            {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS_XL-1.0-x86_64.iso/download',name:'SF'}]},
+  {id:'32bit', label:'AcreetionOS32 (32-bit)', desc:'32-bit (i686) for legacy hardware.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS32-latest.iso'},
+  {id:'hyprland', label:'Hyprland Edition', desc:'Wayland compositor with Jakoolit configs.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Hyprland-latest.iso'},
+  {id:'plasma', label:'Plasma Edition', desc:'Modern, powerful KDE Plasma.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Plasma-latest.iso'},
+  {id:'mate', label:'MATE Edition', desc:'Traditional GNOME 2-style desktop.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-MATE-latest.iso'},
+  {id:'gnome', label:'GNOME Edition', desc:'Modern, sleek GNOME desktop.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-GNOME-latest.iso'},
+  {id:'xfce', label:'XFCE Edition', desc:'Lightweight, modular desktop.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-XFCE-latest.iso'},
+  {id:'sway', label:'Sway Edition', desc:'Tiling Wayland compositor.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Sway-latest.iso'},
+  {id:'i3', label:'i3 Edition', desc:'Tiling window manager.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-i3-latest.iso'},
+];
+
+let buildPollTimers = {};
+
+async function checkEditionStatus(ed) {
+  try {
+    const res = await fetch(ed.iso_url, { method:'HEAD', signal:AbortSignal.timeout(8000) });
+    return { built: res.ok || res.status === 302 || res.status === 301, status: res.status };
+  } catch(e) { return { built: false, status: 0 }; }
+}
+
+async function loadEditions() {
+  const c = document.getElementById('editions-container');
+  c.innerHTML = '<p style="color:var(--acreetion-text);text-align:center;padding:1rem">Checking build status...</p>';
+
+  // Check all editions in parallel
+  const checks = await Promise.all(EDITIONS.map(e => checkEditionStatus(e).then(s => ({...e,...s}))));
+
+  const official = checks.filter(e => e.official);
+  const unofficial = checks.filter(e => !e.official);
+
+  let html = '<h3 style="color:var(--acreetion-green);margin:1.5rem 0 1rem">Official Editions</h3>';
+  html += '<div class="edition-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem">';
+  official.forEach(e => { html += renderEdition(e); });
+  html += '</div>';
+
+  html += '<h3 style="color:var(--storm-color);margin:1.5rem 0 1rem">Unofficial Editions</h3>';
+  html += '<div class="edition-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem">';
+  unofficial.forEach(e => { html += renderEdition(e); });
+  html += '</div>';
+
+  c.innerHTML = html;
+}
+
+function renderEdition(e) {
+  const label = e.label;
+  const desc = e.desc;
+  const built = e.built;
+  const edId = e.id;
+
+  let btns = '';
+  if (built) {
+    btns += `<a href="${escAttr(e.iso_url)}" class="btn btn-cinnamon" target="_blank">⬇ Download ISO</a>`;
+    if (e.mirrors) e.mirrors.forEach(m => {
+      btns += `<a href="${escAttr(m.url)}" class="btn btn-storm" target="_blank" rel="noopener">${escAttr(m.name)}</a>`;
+    });
+  } else {
+    btns += `<button class="btn btn-storm" onclick="buildEdition('${edId}','${escAttr(label)}')">🔨 Build</button>`;
+  }
+
+  return `<div style="background:rgba(46,204,113,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem">
+    <h4 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem">${escAttr(label)}</h4>
+    <p style="font-size:0.85rem;color:var(--acreetion-text);margin-bottom:0.75rem">${escAttr(desc)}</p>
+    <div class="dl-btns" style="display:flex;flex-wrap:wrap;gap:6px">${btns}</div>
+  </div>`;
+}
+
+function escAttr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function appendTerminal(text) {
+  const t = document.getElementById('build-terminal');
+  t.textContent += text + '\n';
+  t.scrollTop = t.scrollHeight;
+}
+
+async function buildEdition(editionId, label) {
+  document.getElementById('build-title').textContent = 'Building ' + label + '...';
+  document.getElementById('build-status').textContent = 'Triggering build...';
+  document.getElementById('build-terminal').textContent = '';
+  document.getElementById('build-result').style.display = 'none';
+  document.getElementById('build-actions-link').style.display = 'none';
+  document.getElementById('build-modal').classList.add('visible');
+
+  appendTerminal('[SYSTEM] Triggering build for ' + label + '...');
+
+  try {
+    const res = await fetch('/api/build/trigger', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edition: editionId })
+    });
+    const data = await res.json();
+
+    if (!data.triggered) {
+      appendTerminal('[ERROR] ' + (data.error || 'Build trigger failed'));
+      document.getElementById('build-status').textContent = '❌ Failed';
+      return;
+    }
+
+    appendTerminal('[OK] Build triggered successfully!');
+    appendTerminal('[SYSTEM] Edition: ' + editionId);
+    appendTerminal('[SYSTEM] Build URL: https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions');
+    appendTerminal('');
+    appendTerminal('Watching build progress...');
+
+    // Show link to GitHub Actions
+    document.getElementById('build-actions-link').style.display = 'inline-block';
+    document.getElementById('build-actions-link').href = 'https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions';
+
+    // Poll for status
+    let attempts = 0;
+    const maxAttempts = 120; // 20 minutes
+    const pollInterval = 10000; // 10 seconds
+
+    const pollTimer = setInterval(async () => {
+      attempts++;
+      try {
+        const statusRes = await fetch('/api/build/status?edition=' + encodeURIComponent(editionId));
+        const statusData = await statusRes.json();
+
+        if (statusData.status === 'building') {
+          appendTerminal('[BUILD] Running... (' + attempts + 's elapsed)');
+          document.getElementById('build-status').textContent = '⏳ Building... ' + (attempts * 10) + 's elapsed';
+        } else if (statusData.status === 'complete' || statusData.status === 'success') {
+          appendTerminal('[OK] Build completed successfully!');
+          appendTerminal('[SYSTEM] ISO is ready for download.');
+          document.getElementById('build-status').textContent = '✅ Build Complete!';
+          document.getElementById('build-result').innerHTML = '<a href="' + escAttr(statusData.iso_url || data.edition) + '" class="btn btn-cinnamon">⬇ Download ISO</a>';
+          document.getElementById('build-result').style.display = 'block';
+          clearInterval(pollTimer);
+          // Reload editions grid after a moment
+          setTimeout(loadEditions, 5000);
+        } else if (statusData.status === 'failed') {
+          appendTerminal('[FAIL] Build failed.');
+          document.getElementById('build-status').textContent = '❌ Build Failed';
+          clearInterval(pollTimer);
+        } else if (statusData.status !== 'unknown' && attempts > 5) {
+          appendTerminal('[STATUS] ' + (statusData.status || 'pending'));
+        }
+
+        if (attempts >= maxAttempts) {
+          appendTerminal('[TIMEOUT] Build taking longer than expected. Check GitHub Actions for status.');
+          clearInterval(pollTimer);
+        }
+      } catch(e) {
+        if (attempts % 6 === 0) appendTerminal('[POLL] Checking...');
+      }
+    }, pollInterval);
+
+  } catch(e) {
+    appendTerminal('[ERROR] ' + e.message);
+    document.getElementById('build-status').textContent = '❌ Error';
+  }
+}
+
+function closeBuildModal() {
+  document.getElementById('build-modal').classList.remove('visible');
+  // Clear any poll timers
+  Object.keys(buildPollTimers).forEach(k => { clearInterval(buildPollTimers[k]); delete buildPollTimers[k]; });
+}
+
+window.addEventListener('DOMContentLoaded', loadEditions);
+</script>
 </div>
 <div style="background:rgba(243,156,18,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem">
 <h4 style="color:var(--acreetion-text-bright);margin-bottom:0.5rem">XL (XLibre) Edition</h4>
