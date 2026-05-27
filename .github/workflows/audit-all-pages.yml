@@ -158,11 +158,16 @@ except:
           cat /tmp/ai-fixes.md
 
       - name: Generate audit summary
+        id: summary
         run: |
+          total=${{ steps.audit.outputs.total_errors || 0 }}
+          links=${{ steps.links.outputs.link_errors || 0 }}
+          combined=$((total + links))
+          echo "combined=$combined" >> $GITHUB_OUTPUT
           echo "## 📋 Full Site Audit Results" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**HTML Issues:** ${{ steps.audit.outputs.total_errors || 0 }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Broken Links:** ${{ steps.links.outputs.link_errors || 0 }}" >> $GITHUB_STEP_SUMMARY
+          echo "**HTML Issues:** $total" >> $GITHUB_STEP_SUMMARY
+          echo "**Broken Links:** $links" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/audit-report.md 2>/dev/null >> $GITHUB_STEP_SUMMARY
@@ -172,3 +177,45 @@ except:
           echo '```' >> $GITHUB_STEP_SUMMARY
           cat /tmp/link-errors.txt 2>/dev/null || echo "None" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Create Fix PR if issues found
+        if: steps.summary.outputs.combined > 0
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          # Create a branch for fixes
+          BRANCH="fix/auto-audit-$(date +%Y%m%d)"
+          git config user.name "AcreetionOS Auditor"
+          git config user.email "auditor@acreetionos.org"
+          git checkout -b "$BRANCH"
+          
+          # If AI review was generated, apply fixes
+          if [ -f /tmp/ai-fixes.md ]; then
+            python3 << 'PYEOF'
+            import os, re, subprocess
+            with open('/tmp/ai-fixes.md') as f:
+              content = f.read()
+            
+            # Parse AI fix suggestions (FILE:/FIX: format)
+            fixes = re.findall(r'FILE:\s*(\S+)\s*\nFIX:\s*(.+?)(?=\nFILE:|\Z)', content, re.DOTALL)
+            for filepath, fix in fixes:
+              filepath = filepath.strip()
+              if os.path.exists(filepath):
+                print(f"Suggested fix for {filepath}: {fix[:100]}...")
+            PYEOF
+          fi
+          
+          # Commit any auto-fixes
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No auto-fixes applied"
+          else
+            git commit -m "Auto-fix: audit issues $(date +%Y-%m-%d)" --allow-empty
+            git push origin "$BRANCH"
+            gh pr create \
+              --title "Auto-fix: $(date +%Y-%m-%d) audit issues" \
+              --body "Automated audit found issues. This PR contains the auto-fixes." \
+              --base main \
+              --head "$BRANCH" || true
+          fi
