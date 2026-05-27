@@ -2424,7 +2424,7 @@ export default {
     }
   },
 
-  // Cron: run health check every 6 hours
+  // Cron: runs every 5 min while stabilizing. Change wrangler.toml to "0 */6 * * *" when stable.
   async scheduled(event, env, ctx) {
     console.log('Running scheduled health check...');
     const req = new Request('https://acreetionos.org/api/health/check');
