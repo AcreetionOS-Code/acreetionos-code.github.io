@@ -1898,6 +1898,20 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
+    // Serve flash.html directly from worker (bypasses broken GitHub Pages)
+    if (url.pathname === '/flash.html' && request.method === 'GET') {
+      const ghRes = await fetch(
+        'https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/contents/flash.html',
+        { headers: { 'User-Agent': 'AcreetionOS-Worker/1.0', 'Accept': 'application/vnd.github.raw+json' } }
+      );
+      if (ghRes.ok) {
+        const html = await ghRes.text();
+        return new Response(html, {
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' }
+        });
+      }
+    }
+
     // Page view counter — GET returns count, POST increments
     if (url.pathname === '/api/news') {
       return handleNews(env);
