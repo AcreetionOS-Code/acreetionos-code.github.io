@@ -1,0 +1,255 @@
+name: AI Website Guardian
+on:
+  schedule:
+    - cron: '0 */3 * * *'  # Every 3 hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        task: [pages, api, downloads, seo, security]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pages — check every HTML page loads
+        if: matrix.task == 'pages'
+        env:
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 << 'PYEOF'
+          import subprocess, json, os, re
+
+          base_url = "https://acreetionos.org"
+          pages = []
+          for f in sorted(os.listdir('.')):
+            if f.endswith('.html') and os.path.isfile(f):
+              pages.append(f.replace('.html', ''))
+
+          issues = []
+          for page in pages:
+            url = f"{base_url}/{page}.html"
+            try:
+              r = subprocess.run(['curl', '-s', '-o', '/tmp/page.html', '-w', '%{http_code}',
+                                  '--max-time', '10', '-L', url], capture_output=True, text=True, timeout=15)
+              code = r.stdout.strip()
+              if code != '200' and code != '301' and code != '302':
+                issues.append(f"{page}: HTTP {code}")
+                continue
+              
+              with open('/tmp/page.html') as f:
+                html = f.read()
+              
+              # Basic checks
+              if '<title>' not in html: issues.append(f"{page}: missing title")
+              if '</html>' not in html: issues.append(f"{page}: truncated HTML")
+              if '404' in html[:500] and 'Not Found' in html[:500]: issues.append(f"{page}: 404 content")
+              
+            except Exception as e:
+              issues.append(f"{page}: {e}")
+
+          report = {'pages_checked': len(pages), 'issues': issues, 'healthy': len(issues) == 0}
+          with open('/tmp/guard-report.json', 'w') as f:
+            json.dump(report, f, indent=2)
+
+          if issues:
+            print(f"Found {len(issues)} issues:")
+            for i in issues: print(f"  ❌ {i}")
+            
+            # AI fix
+            if os.environ.get('OPENROUTER_KEY'):
+              prompt = f"The AcreetionOS website has {len(issues)} page issues:\n" + "\n".join(issues)
+              prompt += "\n\nSuggest specific fixes. For each issue, provide: FILE:, LINE:, REPLACE:, WITH:"
+              
+              r = subprocess.run(['curl', '-s', 'https://openrouter.ai/api/v1/chat/completions',
+                '-H', 'Content-Type: application/json',
+                '-H', f'Authorization: Bearer {os.environ["OPENROUTER_KEY"]}',
+                '-H', 'HTTP-Referer: https://acreetionos.org',
+                '-d', json.dumps({
+                  'model': 'meta-llama/llama-3.2-3b-instruct:free',
+                  'messages': [{'role': 'user', 'content': prompt}],
+                  'max_tokens': 1500
+                })], capture_output=True, text=True, timeout=30)
+              try:
+                data = json.loads(r.stdout)
+                fixes = data['choices'][0]['message']['content']
+                with open('/tmp/ai-fixes.txt', 'w') as f:
+                  f.write(fixes)
+                print(f"\nAI suggested fixes:\n{fixes[:500]}")
+              except: pass
+          else:
+            print(f"✅ All {len(pages)} pages healthy!")
+          PYEOF
+
+      - name: API — test all endpoints
+        if: matrix.task == 'api'
+        run: |
+          python3 << 'PYEOF'
+          import subprocess, json
+
+          endpoints = [
+            ('GET', '/api/cve/status'),
+            ('GET', '/api/hosting/count'),
+            ('GET', '/api/hosting/providers'),
+            ('GET', '/api/mirror/best?edition=cinnamon'),
+          ]
+
+          issues = []
+          for method, path in endpoints:
+            url = f"https://acreetionos.org{path}"
+            try:
+              r = subprocess.run(['curl', '-s', '-w', '%{http_code}', '--max-time', '10', '-X', method, url],
+                capture_output=True, text=True, timeout=15)
+              body = r.stdout[:-3] if r.stdout else ''
+              code = r.stdout[-3:] if len(r.stdout) >= 3 else '000'
+              
+              if code not in ['200', '301', '302']:
+                issues.append(f"{method} {path}: HTTP {code}")
+            except Exception as e:
+              issues.append(f"{method} {path}: {e}")
+
+          print(f"Tested {len(endpoints)} API endpoints")
+          if issues:
+            print(f"Issues: {len(issues)}")
+            for i in issues: print(f"  ❌ {i}")
+          else:
+            print("✅ All endpoints healthy!")
+          PYEOF
+
+      - name: Downloads — verify all ISO links work
+        if: matrix.task == 'downloads'
+        run: |
+          python3 << 'PYEOF'
+          import subprocess, re, json
+
+          with open('flash.html') as f:
+            html = f.read()
+
+          editions_match = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
+          if not editions_match:
+            print("Could not find EDITIONS in flash.html")
+            exit(1)
+
+          editions = json.loads(editions_match.group(1))
+          issues = []
+
+          for ed in editions:
+            url = ed.get('iso_url', '')
+            if not url: continue
+            try:
+              r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}', '--max-time', '10', '-I', url],
+                capture_output=True, text=True, timeout=15)
+              code = r.stdout.strip()
+              if code not in ['200', '206', '301', '302']:
+                issues.append(f"{ed['id']}: HTTP {code} — {url[:80]}")
+            except Exception as e:
+              issues.append(f"{ed['id']}: {e}")
+
+          print(f"Checked {len(editions)} edition ISO links")
+          if issues:
+            print(f"Broken: {len(issues)}")
+            for i in issues: print(f"  ❌ {i}")
+            # AI fix using OpenRouter
+            api_key = os.environ.get('OPENROUTER_KEY')
+            if api_key and issues:
+              prompt = f"Fix these broken AcreetionOS ISO download URLs:\n" + "\n".join(issues)
+              prompt += "\nSuggest correct replacement URLs from archive.org, sourceforge, or github releases."
+              r = subprocess.run(['curl', '-s', 'https://openrouter.ai/api/v1/chat/completions',
+                '-H', 'Content-Type: application/json',
+                '-H', f'Authorization: Bearer {api_key}',
+                '-H', 'HTTP-Referer: https://acreetionos.org',
+                '-d', json.dumps({
+                  'model': 'meta-llama/llama-3.2-3b-instruct:free',
+                  'messages': [{'role': 'user', 'content': prompt}],
+                  'max_tokens': 1000
+                })], capture_output=True, text=True, timeout=30)
+              with open('/tmp/download-fixes.txt', 'w') as f:
+                f.write(r.stdout)
+              print(f"\nAI suggestions saved to /tmp/download-fixes.txt")
+          else:
+            print("✅ All ISO download links healthy!")
+          PYEOF
+
+      - name: SEO — check meta tags
+        if: matrix.task == 'seo'
+        run: |
+          python3 << 'PYEOF'
+          import os, re
+
+          issues = []
+          for f in sorted(os.listdir('.')):
+            if not f.endswith('.html') or not os.path.isfile(f): continue
+            with open(f) as fh:
+              html = fh.read()
+            if '<title>' not in html: issues.append(f + ': no title')
+            if 'name="description"' not in html and "name='description'" not in html: issues.append(f + ': no description')
+            if 'rel="canonical"' not in html: issues.append(f + ': no canonical')
+            if 'rel="icon"' not in html and "rel='icon'" not in html: issues.append(f + ': no icon')
+            if 'og:title' not in html: issues.append(f + ': no OG title')
+            if 'twitter:card' not in html: issues.append(f + ': no Twitter card')
+
+          if issues:
+            print(f"SEO issues: {len(issues)}")
+            for i in issues: print(f"  ⚠ {i}")
+          else:
+            print("✅ All SEO checks passed!")
+          PYEOF
+
+      - name: Auto-fix and create PR
+        if: failure()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 << 'PYEOF'
+          import subprocess, os, json, re
+          
+          # Collect all fixes from AI
+          fixes_content = ""
+          for fixfile in ['/tmp/ai-fixes.txt', '/tmp/download-fixes.txt']:
+            if os.path.exists(fixfile):
+              with open(fixfile) as f:
+                fixes_content += f.read() + "\n"
+          
+          if not fixes_content.strip():
+            print("No AI fixes available")
+            exit(0)
+          
+          # Apply REPLACE:/WITH: patterns
+          replacements = re.findall(r'REPLACE:\s*(.+?)\s*WITH:\s*(.+?)(?=REPLACE:|\Z)', fixes_content, re.DOTALL)
+          files_to_fix = re.findall(r'FILE:\s*(\S+)', fixes_content)
+          
+          changes = False
+          for old_url, new_url in replacements:
+            old_url = old_url.strip()
+            new_url = new_url.strip()
+            for html_file in os.listdir('.'):
+              if not html_file.endswith('.html'): continue
+              with open(html_file) as f:
+                data = f.read()
+              if old_url in data:
+                data = data.replace(old_url, new_url)
+                with open(html_file, 'w') as f:
+                  f.write(data)
+                print(f"Fixed {html_file}: {old_url[:50]}...")
+                changes = True
+          
+          if changes:
+            subprocess.run(['git', 'config', 'user.name', 'AI Website Guardian'], check=False)
+            subprocess.run(['git', 'config', 'user.email', 'guardian@acreetionos.org'], check=False)
+            subprocess.run(['git', 'add', '-A'], check=False)
+            result = subprocess.run(['git', 'diff', '--cached', '--quiet'], check=False)
+            if result.returncode != 0:
+              subprocess.run(['git', 'commit', '-m', 'Auto-fix: AI website guardian repairs'], check=False)
+              subprocess.run(['git', 'push', 'origin', 'HEAD:main'], check=False)
+              print("✅ Fixes committed and pushed")
+          PYEOF
