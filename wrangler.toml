@@ -2,7 +2,7 @@ name = "acreetionos-aiden-proxy"
 main = "index.js"
 compatibility_date = "2026-04-26"
 
-routes = ["acreetionos.org/api/*"]
+routes = ["acreetionos.org/api/*", "acreetionos.org/flash.html"]
 
 [triggers]
 # Check every 30 min: verify all ISOs downloadable, auto-fix broken
