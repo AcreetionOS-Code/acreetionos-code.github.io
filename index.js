@@ -1900,16 +1900,21 @@ export default {
 
     // Serve flash.html directly from worker (bypasses broken GitHub Pages)
     if (url.pathname === '/flash.html' && request.method === 'GET') {
-      const ghRes = await fetch(
-        'https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/contents/flash.html',
-        { headers: { 'User-Agent': 'AcreetionOS-Worker/1.0', 'Accept': 'application/vnd.github.raw+json' } }
-      );
-      if (ghRes.ok) {
-        const html = await ghRes.text();
-        return new Response(html, {
-          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' }
-        });
+      try {
+        const ghRes = await fetch(
+          'https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/contents/flash.html',
+          { headers: { 'User-Agent': 'AcreetionOS-Worker/1.0', 'Accept': 'application/vnd.github.raw+json' } }
+        );
+        if (ghRes.ok) {
+          const html = await ghRes.text();
+          return new Response(html, {
+            headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' }
+          });
+        }
+      } catch (e) {
+        console.error('flash.html fetch failed:', e.message);
       }
+      // Fallthrough to GitHub Pages if worker fetch fails
     }
 
     // Page view counter — GET returns count, POST increments
@@ -2362,7 +2367,7 @@ export default {
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
       const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://openrouter.ai https://api.github.com https://gitlab.acreetionos.org https://news.google.com https://api.allorigins.win https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
-      return new Response('AIDEN Proxy — POST /api/chat with {messages: [...]} | POST /api/transcribe with {audio: base64} | POST /api/news/ai with {messages: [...]}', {
+      return new Response('POST /api/chat with {messages: [...]} | POST /api/transcribe with {audio: base64} | POST /api/news/ai with {messages: [...]}', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }
       });

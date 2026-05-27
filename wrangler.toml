@@ -1,8 +1,11 @@
-name = "acreetionos-aiden-proxy"
+name = "acreetionos-worker"
 main = "index.js"
 compatibility_date = "2026-04-26"
 
-routes = ["acreetionos.org/api/*", "acreetionos.org/flash.html"]
+routes = [
+  { pattern = "acreetionos.org/api/*", zone_name = "acreetionos.org" },
+  { pattern = "acreetionos.org/flash.html", zone_name = "acreetionos.org" }
+]
 
 [triggers]
 # Check every 30 min: verify all ISOs downloadable, auto-fix broken
