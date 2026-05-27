@@ -1110,29 +1110,126 @@ async function handleHostingReactivate(request, env) {
 
 // ─── ISO Reachability Check ────────────────────────────
 
+const ISO_MIRRORS = {
+  cinnamon: [
+    'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso',
+    'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-latest.iso',
+    'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso',
+    'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso',
+    'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download',
+  ],
+  xl: [
+    'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
+    'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS_XL-latest.iso',
+    'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso',
+    'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso',
+    'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS_XL-1.0-x86_64.iso/download',
+  ],
+};
+
+function getEditionNameFromUrl(url) {
+  if (url.includes('AcreetionOS-1.0-x86_64') || url.includes('AcreetionOS-latest')) return 'cinnamon';
+  if (url.includes('AcreetionOS_XL')) return 'xl';
+  if (url.includes('AcreetionOS32')) return '32bit';
+  if (url.includes('Hyprland')) return 'hyprland';
+  if (url.includes('Plasma')) return 'plasma';
+  if (url.includes('MATE')) return 'mate';
+  if (url.includes('GNOME')) return 'gnome';
+  if (url.includes('XFCE')) return 'xfce';
+  if (url.includes('Sway')) return 'sway';
+  if (url.includes('i3')) return 'i3';
+  return null;
+}
+
 async function handleISOCheck(request, env) {
-  // GET /api/iso/check?url=... — proxies HEAD request to avoid CORS issues
   const url = new URL(request.url).searchParams.get('url');
   if (!url) {
     return new Response(JSON.stringify({ error: 'url parameter required', reachable: false }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
     });
   }
-  try {
-    const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
-    const reachable = res.ok || res.status === 301 || res.status === 302 || res.status === 206;
-    return new Response(JSON.stringify({
-      url, reachable, status: res.status, size: res.headers.get('Content-Length') || null,
-      type: res.headers.get('Content-Type') || null,
-      last_modified: res.headers.get('Last-Modified') || null
-    }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders(request) }
-    });
-  } catch (e) {
-    return new Response(JSON.stringify({ url, reachable: false, error: e.message }), {
-      headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-    });
+
+  // Try primary URL first
+  async function tryUrl(u) {
+    try {
+      const res = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
+      return { reachable: res.ok || res.status === 301 || res.status === 302 || res.status === 206, status: res.status };
+    } catch { return { reachable: false, status: 0 }; }
   }
+
+  let result = await tryUrl(url);
+
+  // If unreachable, try alternative mirrors
+  let foundUrl = null;
+  if (!result.reachable) {
+    const edition = getEditionNameFromUrl(url);
+    const mirrors = edition ? ISO_MIRRORS[edition] || [] : [];
+    // Also try generic fallback patterns
+    const alternatives = [
+      ...mirrors,
+      url.replace('https://', 'https://ftp2.osuosl.org/pub/acreetionos/').split('/').pop(),
+      url.replace('.iso', '.iso.zip'),
+    ].filter(u => u !== url).filter(Boolean);
+
+    for (const alt of alternatives) {
+      let altUrl = alt;
+      // If it's just a filename, prepend the OSUOSL base
+      if (!altUrl.startsWith('http')) {
+        altUrl = `https://ftp2.osuosl.org/pub/acreetionos/${altUrl}`;
+      }
+      const altResult = await tryUrl(altUrl);
+      if (altResult.reachable) {
+        foundUrl = altUrl;
+        result = { reachable: true, status: altResult.status, found_at: altUrl };
+        break;
+      }
+    }
+
+    // If found a working mirror, auto-fix the URL in flash.html via PR
+    if (foundUrl && env.GH_TOKEN) {
+      try {
+        const repo = 'AcreetionOS-Code/acreetionos-code.github.io';
+        const h = { 'Authorization': `Bearer ${env.GH_TOKEN}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-AutoFix/1.0' };
+        const api = (p) => `https://api.github.com/repos/${repo}/${p}`;
+
+        // Fetch current flash.html from GitHub
+        const flashRes = await fetch(api('contents/flash.html'), { headers: h });
+        if (flashRes.ok) {
+          const flashData = await flashRes.json();
+          let content = atob(flashData.content);
+          const sha = flashData.sha;
+
+          if (content.includes(url)) {
+            content = content.replace(url, foundUrl);
+            const branch = `fix/iso-${Date.now().toString(36)}`;
+            const base = await (await fetch(api('git/ref/heads/main'), { headers: h })).json();
+            const tree = await (await fetch(api('git/trees'), { method: 'POST', headers: h,
+              body: JSON.stringify({ base_tree: base.object.sha, tree: [{ path: 'flash.html', mode: '100644', type: 'blob', content }] })
+            })).json();
+            const commit = await (await fetch(api('git/commits'), { method: 'POST', headers: h,
+              body: JSON.stringify({ message: `Auto-fix: ${edition || 'ISO'} URL — was unreachable, found at mirror`, tree: tree.sha, parents: [base.object.sha] })
+            })).json();
+            await fetch(api('git/refs'), { method: 'POST', headers: h, body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }) });
+            const pr = await (await fetch(api('pulls'), { method: 'POST', headers: h,
+              body: JSON.stringify({ title: `Auto-fix: ${edition || 'ISO'} download URL`, body: `🤖 **Auto-fix**: ${url}\nwas broken, found working mirror at:\n${foundUrl}`, head: branch, base: 'main' })
+            })).json();
+            if (pr.number) {
+              await fetch(api(`pulls/${pr.number}/merge`), { method: 'PUT', headers: h, body: JSON.stringify({ merge_method: 'merge' }) }).catch(() => {});
+              await fetch(api(`git/refs/heads/${branch}`), { method: 'DELETE', headers: h }).catch(() => {});
+            }
+          }
+        }
+      } catch (e) { console.error('Auto-fix PR failed:', e.message); }
+    }
+  }
+
+  return new Response(JSON.stringify({
+    url, reachable: result.reachable, status: result.status,
+    found_at: result.found_at || null,
+    size: null, type: null, last_modified: null
+  }), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders(request) }
+  });
 }
 
 // ─── Site Health Check ──────────────────────────────────
