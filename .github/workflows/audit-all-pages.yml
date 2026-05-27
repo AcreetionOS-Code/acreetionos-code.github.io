@@ -1,0 +1,174 @@
+name: Full Site Audit
+on:
+  schedule:
+    - cron: '0 8 * * *'  # Daily at 8AM UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check all HTML pages exist and have valid structure
+        run: |
+          errors=0
+          issues=""
+          
+          for f in $(find . -maxdepth 1 -name '*.html' | sort); do
+            name=$(basename "$f")
+            issues="$issues\n## $name"
+            
+            # Check file is not empty
+            size=$(wc -c < "$f")
+            if [ "$size" -lt 100 ]; then
+              issues="$issues\n- ❌ EMPTY: only ${size} bytes"
+              errors=$((errors+1))
+              continue
+            fi
+            
+            # Check for title tag
+            if ! grep -qi '<title>' "$f"; then
+              issues="$issues\n- ❌ Missing <title>"
+              errors=$((errors+1))
+            fi
+            
+            # Check for meta description
+            if ! grep -qi 'meta.*description' "$f"; then
+              issues="$issues\n- ⚠ Missing meta description"
+              errors=$((errors+1))
+            fi
+            
+            # Check for viewport meta
+            if ! grep -qi 'viewport' "$f"; then
+              issues="$issues\n- ⚠ Missing viewport meta"
+              errors=$((errors+1))
+            fi
+            
+            # Check for broken JS syntax (basic)
+            if grep -qi '<script>' "$f" 2>/dev/null; then
+              if grep -q 'document.write' "$f"; then
+                issues="$issues\n- ⚠ Uses document.write (slow)"
+              fi
+            fi
+            
+            # Check for hardcoded http:// links (should be https)
+            http_links=$(grep -oP 'href="http://[^"]*"' "$f" | grep -v 'http://www.w3.org' | grep -v 'http://schemas.xmlsoap.org' | wc -l)
+            if [ "$http_links" -gt 0 ]; then
+              issues="$issues\n- ⚠ ${http_links} insecure http:// links"
+              errors=$((errors+1))
+            fi
+            
+            # Check for favicon
+            if ! grep -qi 'rel="icon"' "$f" && ! grep -qi "rel='icon'" "$f"; then
+              issues="$issues\n- ⚠ Missing favicon"
+            fi
+            
+            issues="$issues\n"
+          done
+          
+          echo "$issues" > /tmp/audit-report.md
+          echo "total_errors=$errors" >> $GITHUB_OUTPUT
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          echo "$issues" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check external links are reachable
+        run: |
+          errors=0
+          echo "Checking external links..."
+          
+          # Get all unique external links
+          grep -roPh 'https://[^"'"'"' )]*' . --include='*.html' | grep -v 'acreetionos.org' | grep -v 'localhost' | grep -v 'w3.org/schema' | grep -v 'schema.org' | sort -u > /tmp/external-links.txt
+          
+          total=$(wc -l < /tmp/external-links.txt)
+          echo "Found $total unique external links"
+          
+          while IFS= read -r url; do
+            [ -z "$url" ] && continue
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 10 -L "$url" 2>/dev/null || echo "FAIL")
+            if [ "$code" = "FAIL" ] || [ "$code" = "000" ]; then
+              echo "- ❌ $url → UNREACHABLE" >> /tmp/link-errors.txt
+              errors=$((errors+1))
+            elif [ "$code" = "404" ]; then
+              echo "- ❌ $url → 404 NOT FOUND" >> /tmp/link-errors.txt
+              errors=$((errors+1))
+            elif [ "$code" != "200" ] && [ "$code" != "301" ] && [ "$code" != "302" ]; then
+              echo "- ⚠ $url → HTTP $code" >> /tmp/link-errors.txt
+            fi
+          done < /tmp/external-links.txt
+          
+          echo "link_errors=$errors" >> $GITHUB_OUTPUT
+          echo "link_report<<EOF" >> $GITHUB_OUTPUT
+          cat /tmp/link-errors.txt 2>/dev/null || echo "No link errors"
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: AI Review via OpenRouter
+        if: always()
+        env:
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -z "$OPENROUTER_KEY" ]; then
+            echo "No OpenRouter key - skipping AI review"
+            exit 0
+          fi
+          
+          # Combine reports
+          {
+            echo "## HTML Structure Issues"
+            cat /tmp/audit-report.md 2>/dev/null || echo "None"
+            echo ""
+            echo "## Broken External Links"
+            cat /tmp/link-errors.txt 2>/dev/null || echo "None"
+          } > /tmp/full-report.md
+          
+          # Send to AI for analysis
+          REPORT=$(cat /tmp/full-report.md)
+          PROMPT="You are auditing the AcreetionOS website. Review these issues and suggest specific fixes for each one. For each issue, provide the exact file and line fix needed.
+
+$REPORT
+
+For each issue, respond with:
+FILE: <path>
+FIX: <what to change>"
+          
+          curl -s "https://openrouter.ai/api/v1/chat/completions" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENROUTER_KEY" \
+            -H "HTTP-Referer: https://acreetionos.org" \
+            -d "{
+              \"model\": \"meta-llama/llama-3.2-3b-instruct:free\",
+              \"messages\": [
+                {\"role\": \"system\", \"content\": \"You are a web auditor. Be precise and specific.\"},
+                {\"role\": \"user\", \"content\": $(echo "$PROMPT" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")}
+              ],
+              \"max_tokens\": 2000
+            }" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin)
+    content = data.get('choices',[{}])[0].get('message',{}).get('content','No response')
+    print(content)
+except:
+    print('Failed to parse AI response')
+" > /tmp/ai-fixes.md
+          
+          cat /tmp/ai-fixes.md
+
+      - name: Generate audit summary
+        run: |
+          echo "## 📋 Full Site Audit Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**HTML Issues:** ${{ steps.audit.outputs.total_errors || 0 }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Broken Links:** ${{ steps.links.outputs.link_errors || 0 }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/audit-report.md 2>/dev/null >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Broken Links" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat /tmp/link-errors.txt 2>/dev/null || echo "None" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
