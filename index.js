@@ -1149,8 +1149,18 @@ async function handleISOCheck(request, env) {
     });
   }
 
-  // Try primary URL first — download 1MB and verify ISO magic bytes
+  // Try URL — first with Range + magic byte check, fallback to HEAD
   async function tryUrl(u) {
+    // Try 1: HEAD request first (fast)
+    try {
+      const headRes = await fetch(u, { method: 'HEAD', signal: AbortSignal.timeout(8000) });
+      if (headRes.ok || headRes.status === 206 || headRes.status === 301 || headRes.status === 302) {
+        const cl = parseInt(headRes.headers.get('Content-Length') || '0');
+        if (cl >= 209715200) return { reachable: true, status: headRes.status };
+      }
+    } catch {}
+
+    // Try 2: Range request for magic byte verification
     try {
       const res = await fetch(u, {
         headers: { 'Range': 'bytes=0-1048575' },
@@ -1159,20 +1169,15 @@ async function handleISOCheck(request, env) {
       if (!res.ok && res.status !== 206) return { reachable: false, status: res.status };
       const chunk = await res.arrayBuffer();
       const bytes = new Uint8Array(chunk);
-      // Check ISO 9660 magic bytes at offset 32769 ("CD001")
       if (bytes.length >= 32774) {
         const magic = bytes.slice(32769, 32774);
         const isIso = magic[0] === 0x43 && magic[1] === 0x44 && magic[2] === 0x30 &&
                        magic[3] === 0x30 && magic[4] === 0x31;
-        if (!isIso) return { reachable: false, status: res.status, error: 'Not a valid ISO (bad magic bytes)' };
+        if (!isIso) return { reachable: false, status: res.status, error: 'Not valid ISO' };
       }
-      // Also check minimum size (200MB)
-      const contentRange = res.headers.get('Content-Range') || '';
-      const sizeMatch = contentRange.match(/\/(\d+)$/);
-      if (sizeMatch) {
-        const totalSize = parseInt(sizeMatch[1]);
-        if (totalSize < 209715200) return { reachable: false, status: res.status, error: `ISO too small: ${(totalSize/1048576).toFixed(0)}MB` };
-      }
+      const cr = res.headers.get('Content-Range') || '';
+      const sm = cr.match(/\/(\d+)$/);
+      if (sm) { const ts = parseInt(sm[1]); if (ts < 209715200) return { reachable: false, status: res.status, error: `ISO too small: ${(ts/1048576).toFixed(0)}MB` }; }
       return { reachable: true, status: res.status };
     } catch (e) { return { reachable: false, status: 0, error: e.message }; }
   }
@@ -1198,11 +1203,11 @@ async function handleISOCheck(request, env) {
         altUrl = `https://ftp2.osuosl.org/pub/acreetionos/${altUrl}`;
       }
       const altResult = await tryUrl(altUrl);
-      if (altResult.reachable) {
+    if (altResult.reachable) {
         foundUrl = altUrl;
-        result = { reachable: true, status: altResult.status, found_at: altUrl };
+        result = { reachable: true, status: altResult.status, found_at: altUrl, used_mirror: altUrl };
         break;
-      }
+    }
     }
 
     // If found a working mirror, auto-fix the URL in flash.html via PR
