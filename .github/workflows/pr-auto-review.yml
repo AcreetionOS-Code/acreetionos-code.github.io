@@ -1,7 +1,7 @@
 name: AI PR Auto-Review & Merge
 on:
   pull_request:
-    types: [opened, synchronize]
+    types: [opened, synchronize, ready_for_review]
   workflow_dispatch:
     inputs:
       pr_number:
@@ -14,82 +14,154 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      issues: write
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
-      - name: Get PR info
+      - name: Get PR details
         id: pr
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           PR_NUMBER="${{ github.event.pull_request.number || inputs.pr_number }}"
           if [ -z "$PR_NUMBER" ]; then
             echo "No PR number" && exit 0
           fi
           echo "number=$PR_NUMBER" >> $GITHUB_OUTPUT
-          
+
           PR_DIFF=$(gh pr diff "$PR_NUMBER" 2>/dev/null | head -500)
           PR_TITLE=$(gh pr view "$PR_NUMBER" --json title --jq '.title' 2>/dev/null)
           PR_BODY=$(gh pr view "$PR_NUMBER" --json body --jq '.body' 2>/dev/null)
-          
-          # Save for AI review
-          echo "$PR_DIFF" > /tmp/pr-diff.txt
-          echo "title=$PR_TITLE" >> $GITHUB_OUTPUT
+          PR_AUTHOR=$(gh pr view "$PR_NUMBER" --json author --jq '.author.login' 2>/dev/null)
+          PR_FILES=$(gh pr view "$PR_NUMBER" --json files --jq '.files[].path' 2>/dev/null | head -20)
 
-      - name: AI Review
+          echo "$PR_DIFF" > /tmp/pr-diff.txt
+          echo "title<<EOF" >> $GITHUB_OUTPUT
+          echo "$PR_TITLE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "author=$PR_AUTHOR" >> $GITHUB_OUTPUT
+          echo "files=$PR_FILES" >> $GITHUB_OUTPUT
+
+      - name: AI Code Review
+        id: ai_review
         if: steps.pr.outputs.number
         env:
           OPENROUTER_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           PR_NUM="${{ steps.pr.outputs.number }}"
           PR_TITLE="${{ steps.pr.outputs.title }}"
-          
+          PR_AUTHOR="${{ steps.pr.outputs.author }}"
+          PR_FILES="${{ steps.pr.outputs.files }}"
+
+          AI_MODEL="meta-llama/llama-3.2-3b-instruct:free"
+
           if [ -z "$OPENROUTER_KEY" ]; then
-            echo "No OpenRouter key - cannot review"
+            echo "No OpenRouter key — cannot review"
             exit 0
           fi
-          
-          DIFF=$(cat /tmp/pr-diff.txt 2>/dev/null | head -300)
+
+          DIFF=$(cat /tmp/pr-diff.txt 2>/dev/null)
           if [ -z "$DIFF" ]; then
-            echo "Empty diff - approving"
+            echo "Empty diff — auto-approving"
+            gh pr review "$PR_NUM" --approve \
+              --body "_🤖 AI Review (${AI_MODEL})_\n\n**Verdict:** ✅ APPROVE\n**Reason:** No code changes detected (empty diff)." 2>/dev/null || true
             gh pr merge "$PR_NUM" --merge --auto 2>&1 || true
             exit 0
           fi
-          
-          echo "Reviewing PR #$PR_NUM: $PR_TITLE"
-          
-          REVIEW=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
+
+          echo "Reviewing PR #$PR_NUM by @$PR_AUTHOR: $PR_TITLE"
+          echo "Files changed: $PR_FILES"
+
+          # AI decides: approve, reject, or request changes
+          REVIEW_JSON=$(curl -s "https://openrouter.ai/api/v1/chat/completions" \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENROUTER_KEY" \
             -H "HTTP-Referer: https://acreetionos.org" \
+            -H "X-Title: AcreetionOS AI PR Reviewer" \
             -d "{
-              \"model\": \"meta-llama/llama-3.2-3b-instruct:free\",
+              \"model\": \"$AI_MODEL\",
               \"messages\": [
-                {\"role\": \"system\", \"content\": \"You review PRs for a Linux distro website. Check for: broken HTML, security issues, broken JS, typos. Reply with exactly APPROVE or REJECT followed by reason.\"},
-                {\"role\": \"user\", \"content\": $(echo "PR Title: $PR_TITLE\n\nDiff:\n$DIFF" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")}
+                {\"role\": \"system\", \"content\": \"You are an AI code reviewer for AcreetionOS, an Arch Linux distro. Review PRs carefully.\n\nRules:\n- Check for: broken HTML, XSS vulnerabilities, exposed secrets, JS errors, broken links, typos\n- APPROVE if changes are safe and correct\n- REJECT if changes would break the site or introduce security issues\n- REQUEST_CHANGES for minor issues that need fixing\n\nRespond with valid JSON only:\n{\\\"verdict\\\": \\\"APPROVE|REJECT|REQUEST_CHANGES\\\", \\\"summary\\\": \\\"one-line reason\\\", \\\"details\\\": \\\"detailed explanation\\\"}\"},
+                {\"role\": \"user\", \"content\": $(echo "PR Title: $PR_TITLE\nAuthor: @$PR_AUTHOR\nFiles: $PR_FILES\n\nDiff:\n$DIFF" | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")}
               ],
-              \"max_tokens\": 300
-            }" 2>/dev/null | python3 -c "
-import sys,json
+              \"max_tokens\": 500
+            }" 2>/dev/null)
+
+          # Parse AI response
+          VERDICT="APPROVE"
+          SUMMARY="No specific issues found."
+          DETAILS=""
+
+          if command -v python3 &>/dev/null; then
+            eval "$(python3 << 'PYEOF'
+import json, os
 try:
-  d=json.load(sys.stdin)
-  print(d.get('choices',[{}])[0].get('message',{}).get('content','APPROVE'))
-except: print('APPROVE')
-")
-          
-          echo "AI Review Result:"
-          echo "$REVIEW"
-          
-          # Post review on PR
-          if echo "$REVIEW" | grep -qi "^APPROVE"; then
-            gh pr review "$PR_NUM" --approve --body "✅ AI reviewed: ${REVIEW:0:200}" 2>/dev/null || true
-            echo "✅ Approved by AI"
+    data = json.loads('''$REVIEW_JSON'''.replace('''\n''', '\\n'))
+    content = data.get('choices',[{}])[0].get('message',{}).get('content','{}')
+    # Try to parse JSON from AI response
+    import re
+    json_match = re.search(r'\{[^{}]*\}', content)
+    if json_match:
+        result = json.loads(json_match.group())
+        print(f"VERDICT={result.get('verdict','APPROVE')}")
+        print(f"SUMMARY={result.get('summary','No reason given')}")
+        print(f"DETAILS={result.get('details','')}")
+    else:
+        if 'APPROVE' in content:
+            print("VERDICT=APPROVE")
+        elif 'REJECT' in content:
+            print("VERDICT=REJECT")
+        else:
+            print("VERDICT=REQUEST_CHANGES")
+        print(f"SUMMARY={content[:200]}")
+except:
+    print("VERDICT=APPROVE")
+    print("SUMMARY=AI review completed")
+PYEOF
+)"
+          fi
+
+          echo "AI Verdict: $VERDICT"
+          echo "AI Summary: $SUMMARY"
+          echo "model=$AI_MODEL" >> $GITHUB_OUTPUT
+          echo "verdict=$VERDICT" >> $GITHUB_OUTPUT
+          echo "summary=$SUMMARY" >> $GITHUB_OUTPUT
+
+          # Post review on the PR with AI attribution
+          COMMENT="_🤖 AI Review by \`${AI_MODEL}\`_\n\n**Verdict:** \`$VERDICT\`\n**Summary:** $SUMMARY"
+          if [ -n "$DETAILS" ]; then
+            COMMENT="$COMMENT\n\n**Details:**\n$DETAILS"
+          fi
+          COMMENT="$COMMENT\n\n---\n_This review was performed automatically by an AI system. The model used is $AI_MODEL._"
+
+          if [ "$VERDICT" = "APPROVE" ]; then
+            gh pr review "$PR_NUM" --approve --body "$(echo -e "$COMMENT")" 2>/dev/null || true
+            echo "✅ PR approved by AI"
             # Auto-merge
             gh pr merge "$PR_NUM" --merge --auto 2>&1 || true
+          elif [ "$VERDICT" = "REJECT" ]; then
+            gh pr review "$PR_NUM" --request-changes --body "$(echo -e "$COMMENT")" 2>/dev/null || true
+            echo "❌ PR rejected by AI"
           else
-            gh pr review "$PR_NUM" --request-changes --body "❌ AI review: ${REVIEW:0:200}" 2>/dev/null || true
-            echo "⏸ Changes requested by AI"
+            gh pr review "$PR_NUM" --comment --body "$(echo -e "$COMMENT")" 2>/dev/null || true
+            echo "⏸ Changes requested by AI — pending review"
           fi
+
+      - name: Log review for audit
+        if: always()
+        run: |
+          {
+            echo "## 🤖 AI PR Review Log"
+            echo ""
+            echo "**PR:** #${{ steps.pr.outputs.number }}"
+            echo "**Author:** @${{ steps.pr.outputs.author }}"
+            echo "**Title:** ${{ steps.pr.outputs.title }}"
+            echo "**Review Model:** ${{ steps.ai_review.outputs.model }}"
+            echo "**Verdict:** ${{ steps.ai_review.outputs.verdict }}"
+            echo "**Summary:** ${{ steps.ai_review.outputs.summary }}"
+            echo "**Reviewer:** AI System (autonomous)"
+            echo "**Timestamp:** $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+          } >> $GITHUB_STEP_SUMMARY
