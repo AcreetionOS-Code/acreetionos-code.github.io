@@ -181,38 +181,60 @@ jobs:
               print(f"\n⚠ No fixes could be applied automatically")
           PYEOF
 
-      - name: Commit fixes
+      - name: Create PR with fixes
         if: hashFiles('/tmp/flash-fixed') != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           python3 << 'PYEOF'
-          import subprocess, os
+          import subprocess, os, re, json
 
           # Verify the fixed file still parses
           with open('flash.html') as f:
               html = f.read()
 
-          import re
           em = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
           if em:
-              import json
               js = re.sub(r"'", '"', em.group(1))
               js = re.sub(r',\s*([\]}])', r'\1', js)
               try:
                   editions = json.loads(js)
-                  print(f"✅ Fixed flash.html validates: {len(editions)} editions"
-                  )
+                  print(f"✅ Fixed flash.html validates: {len(editions)} editions")
               except json.JSONDecodeError as e:
                   print(f"❌ Fixed file still broken: {e}")
                   exit(1)
 
+          BRANCH = f"fix/flash-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
+          
           subprocess.run(['git', 'config', 'user.name', 'AI Flash Guardian'], check=False)
           subprocess.run(['git', 'config', 'user.email', 'flash@acreetionos.org'], check=False)
+          subprocess.run(['git', 'checkout', '-b', BRANCH], check=False)
           subprocess.run(['git', 'add', 'flash.html'], check=False)
+          
           r = subprocess.run(['git', 'diff', '--cached', '--quiet'], check=False)
           if r.returncode != 0:
-              subprocess.run(['git', 'commit', '-m', 'Auto-fix: AI flash.html guardian repairs'], check=False)
-              subprocess.run(['git', 'push', 'origin', 'HEAD:main'], check=False)
-              print("✅ Fixes committed and pushed")
+              subprocess.run(['git', 'commit', '-m', 'Auto-fix: AI flash.html guardian repairs\n\nAutomated fixes applied by AI flash.html guardian workflow.'], check=False)
+              
+              # Push and create PR
+              push_result = subprocess.run(['git', 'push', 'origin', BRANCH], capture_output=True, text=True, check=False)
+              if push_result.returncode != 0:
+                  print(f"Push failed: {push_result.stderr}")
+                  exit(1)
+              
+              pr_result = subprocess.run(
+                  ['gh', 'pr', 'create',
+                   '--title', 'Auto-fix: flash.html repairs',
+                   '--body', '🤖 **AI Flash Guardian** found and fixed issues in flash.html.\n\nThis PR was created automatically. The AI has validated the fix.',
+                   '--base', 'main',
+                   '--head', BRANCH,
+                   '--label', 'auto-fix'],
+                  capture_output=True, text=True, check=False
+              )
+              print(f"PR created: {pr_result.stdout.strip()}")
+              
+              # Auto-merge via AI review
+              subprocess.run(['gh', 'pr', 'merge', '--merge', '--auto'], check=False)
+              print("✅ PR created and auto-merge enabled")
           else:
               print("No changes to commit")
           PYEOF
