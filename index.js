@@ -1108,6 +1108,150 @@ async function handleHostingReactivate(request, env) {
   }
 }
 
+// ─── ISO Reachability Check ────────────────────────────
+
+async function handleISOCheck(request, env) {
+  // GET /api/iso/check?url=... — proxies HEAD request to avoid CORS issues
+  const url = new URL(request.url).searchParams.get('url');
+  if (!url) {
+    return new Response(JSON.stringify({ error: 'url parameter required', reachable: false }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  }
+  try {
+    const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
+    const reachable = res.ok || res.status === 301 || res.status === 302 || res.status === 206;
+    return new Response(JSON.stringify({
+      url, reachable, status: res.status, size: res.headers.get('Content-Length') || null,
+      type: res.headers.get('Content-Type') || null,
+      last_modified: res.headers.get('Last-Modified') || null
+    }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders(request) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ url, reachable: false, error: e.message }), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  }
+}
+
+// ─── Site Health Check ──────────────────────────────────
+
+const HEALTH_PAGES = [
+  '', 'flash.html', 'hosting.html', 'security.html', 'wiki.html',
+  'developers.html', 'contact.html', 'faq.html', 'install.html',
+  'git-tracker.html', 'blog.html', 'build.html', 'compare.html',
+  'contributing.html', 'governance.html', 'requirements.html',
+  '32bit.html', 'gnome.html', 'hyprland.html', 'i3.html',
+  'mate.html', 'openbox.html', 'plasma.html', 'sway.html',
+  'xfce.html', 'immutable.html', 'unofficial.html'
+];
+
+const HEALTH_APIS = [
+  'https://acreetionos.org/api/cve/status',
+  'https://acreetionos.org/api/hosting/count',
+  'https://acreetionos.org/api/mirror/best?edition=cinnamon'
+];
+
+async function handleHealthCheck(env) {
+  const results = { pages: [], apis: [], downloads: [], healthy: true, timestamp: new Date().toISOString() };
+  let totalIssues = 0;
+
+  // 1. Check all HTML pages
+  const pageChecks = HEALTH_PAGES.map(async (page) => {
+    const url = `https://acreetionos.org/${page}`;
+    try {
+      const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(10000) });
+      const ok = res.ok || res.status === 301 || res.status === 302;
+      results.pages.push({ page, status: res.status, healthy: ok });
+      if (!ok) totalIssues++;
+    } catch (e) {
+      results.pages.push({ page, status: 0, healthy: false, error: e.message });
+      totalIssues++;
+    }
+  });
+
+  // 2. Check API endpoints
+  const apiChecks = HEALTH_APIS.map(async (url) => {
+    try {
+      const res = await fetch(url, { method: 'GET', signal: AbortSignal.timeout(10000) });
+      const ok = res.ok;
+      results.apis.push({ url: url.replace('https://acreetionos.org', ''), status: res.status, healthy: ok });
+      if (!ok) totalIssues++;
+    } catch (e) {
+      results.apis.push({ url: url.replace('https://acreetionos.org', ''), status: 0, healthy: false, error: e.message });
+      totalIssues++;
+    }
+  });
+
+  // 3. Check ISO download links from flash.html EDITIONS
+  const isoChecks = (async () => {
+    try {
+      const flashRes = await fetch('https://acreetionos.org/flash.html', { signal: AbortSignal.timeout(10000) });
+      const html = await flashRes.text();
+      const match = html.match(/const EDITIONS\s*=\s*(\[[\s\S]*?\]);/);
+      if (match) {
+        let js = match[1].replace(/'/g, '"').replace(/,\s*([\]}])/g, '$1');
+        const editions = JSON.parse(js);
+        for (const ed of editions) {
+          const url = ed.iso_url;
+          if (!url) continue;
+          try {
+            const res = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(8000) });
+            const ok = res.ok || res.status === 301 || res.status === 302 || res.status === 401 || res.status === 403;
+            results.downloads.push({ edition: ed.id, status: res.status, healthy: ok });
+            if (!ok) totalIssues++;
+          } catch (e) {
+            results.downloads.push({ edition: ed.id, status: 0, healthy: false, error: e.message });
+            totalIssues++;
+          }
+        }
+      }
+    } catch (e) {
+      results.downloads.push({ edition: 'flash.html', status: 0, healthy: false, error: e.message });
+      totalIssues++;
+    }
+  });
+
+  await Promise.all([...pageChecks, ...apiChecks, isoChecks]);
+
+  results.healthy = totalIssues === 0;
+  results.issues = totalIssues;
+
+  // Store in R2 for status badge
+  await putR2(env, 'acreetionos-hosting', 'health-check.json', results).catch(() => {});
+
+  // If issues found, create a PR via GitHub
+  if (totalIssues > 0 && env.GH_TOKEN) {
+    const branch = `fix/health-auto-${Date.now().toString(36)}`;
+    let prBody = `🤖 **Site Health Check Report**\n\n**Issues found:** ${totalIssues}\n\n`;
+    for (const p of results.pages) { if (!p.healthy) prBody += `- ❌ Page /${p.page}: HTTP ${p.status}\n`; }
+    for (const a of results.apis) { if (!a.healthy) prBody += `- ❌ API ${a.url}: HTTP ${a.status}\n`; }
+    for (const d of results.downloads) { if (!d.healthy) prBody += `- ❌ ISO ${d.edition}: HTTP ${d.status}\n`; }
+    prBody += '\n---\n_Created automatically by the site health check._';
+
+    try {
+      const repo = 'AcreetionOS-Code/acreetionos-code.github.io';
+      const h = { 'Authorization': `Bearer ${env.GH_TOKEN}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-Health/1.0' };
+      const api = (p) => `https://api.github.com/repos/${repo}/${p}`;
+
+      const base = await (await fetch(api('git/ref/heads/main'), { headers: h })).json();
+      const tree = await (await fetch(api('git/trees'), { method: 'POST', headers: h, body: JSON.stringify({ base_tree: base.object.sha, tree: [] }) })).json();
+      const commit = await (await fetch(api('git/commits'), { method: 'POST', headers: h, body: JSON.stringify({ message: `Health check: ${totalIssues} issue(s)`, tree: tree.sha, parents: [base.object.sha] }) })).json();
+      await fetch(api('git/refs'), { method: 'POST', headers: h, body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }) });
+      const pr = await (await fetch(api('pulls'), { method: 'POST', headers: h, body: JSON.stringify({ title: `Health: ${totalIssues} issue(s) found`, body: prBody, head: branch, base: 'main' }) })).json();
+      if (pr.number) {
+        await fetch(api(`pulls/${pr.number}/merge`), { method: 'PUT', headers: h, body: JSON.stringify({ merge_method: 'merge' }) }).catch(() => {});
+        await fetch(api(`git/refs/heads/${branch}`), { method: 'DELETE', headers: h }).catch(() => {});
+      }
+    } catch (e) { console.error('PR creation failed:', e.message); }
+  }
+
+  return new Response(JSON.stringify(results), {
+    headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', ...corsHeaders({ headers: { get: () => '' } }) }
+  });
+}
+
 // ─── GitHub Auto-Fix PR Creator ────────────────────────────
 
 async function handleCreatePR(request, env) {
@@ -2039,6 +2183,16 @@ export default {
       return handleHostingReactivate(request, env);
     }
 
+    // ─── ISO reachability check (proxied to avoid CORS) ─────
+    if (url.pathname === '/api/iso/check' && request.method === 'GET') {
+      return handleISOCheck(request, env);
+    }
+
+    // ─── Site Health Check (runs periodically via cron) ──────
+    if (url.pathname === '/api/health/check' && request.method === 'GET') {
+      return handleHealthCheck(env);
+    }
+
     // ─── GitHub Auto-Fix PR Creator ───────────────────────────
     if (url.pathname === '/api/github/create-pr' && request.method === 'POST') {
       return handleCreatePR(request, env);
@@ -2170,5 +2324,14 @@ export default {
         headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
       });
     }
+  },
+
+  // Cron: run health check every 6 hours
+  async scheduled(event, env, ctx) {
+    console.log('Running scheduled health check...');
+    const req = new Request('https://acreetionos.org/api/health/check');
+    const resp = await handleHealthCheck(env);
+    const result = await resp.json();
+    console.log(`Health check complete: ${result.issues} issues, healthy: ${result.healthy}`);
   }
 };
