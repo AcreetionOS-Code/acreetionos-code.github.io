@@ -139,7 +139,15 @@ jobs:
             print("Could not find EDITIONS in flash.html")
             exit(1)
 
-          editions = json.loads(editions_match.group(1))
+          js_text = editions_match.group(1)
+          # Convert JS object syntax to valid JSON (single quotes → double quotes)
+          js_text = re.sub(r"'", '"', js_text)
+          # Convert boolean values
+          js_text = re.sub(r':\s*true', ': true', js_text)
+          js_text = re.sub(r':\s*false', ': false', js_text)
+          # Remove trailing commas before ] and }
+          js_text = re.sub(r',\s*([\]}])', r'\1', js_text)
+          editions = json.loads(js_text)
           issues = []
 
           for ed in editions:
