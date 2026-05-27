@@ -91,25 +91,34 @@ jobs:
             }" 2>/dev/null)
 
           # Save AI response to file for Python to read
-          echo "$REVIEW_JSON" > /tmp/ai-response.json
+          printf '%s' "$REVIEW_JSON" > /tmp/ai-response.json
 
-          # Parse AI response
-          VERDICT="APPROVE"
-          SUMMARY="No specific issues found."
-          DETAILS=""
-
-          if command -v python3 &>/dev/null; then
-            python3 << 'PYEOF'
-import json, re
+          PARSE_AI=$(python3 << 'PYEOF'
+import json, re, sys
 
 try:
     with open('/tmp/ai-response.json') as f:
-        raw = f.read()
+        raw = f.read().strip()
 
-    data = json.loads(raw)
+    if not raw:
+        print("VERDICT=APPROVE")
+        print("SUMMARY=Empty AI response")
+        sys.exit(0)
+
+    # Try to parse as JSON
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        # Might be shell wrapping - try to extract JSON from the raw text
+        data = json.loads(json.dumps({"choices":[{"message":{"content":raw}}]}))
+
     content = data.get('choices', [{}])[0].get('message', {}).get('content', '{}')
 
-    # Extract JSON from AI response (it may have markdown fences)
+    # Remove markdown code fences if present
+    content = re.sub(r'^```(?:json)?\s*', '', content.strip())
+    content = re.sub(r'\s*```$', '', content)
+
+    # Try to find and parse JSON object in the content
     json_match = re.search(r'\{[^{}]*\}', content)
     if json_match:
         result = json.loads(json_match.group())
@@ -119,37 +128,22 @@ try:
     else:
         verdict = 'APPROVE'
         if 'REJECT' in content.upper(): verdict = 'REJECT'
-        elif 'REQUEST_CHANGES' in content: verdict = 'REQUEST_CHANGES'
+        elif 'REQUEST_CHANGES' in content.upper(): verdict = 'REQUEST_CHANGES'
         print(f"VERDICT={verdict}")
         print(f"SUMMARY={content[:200].strip()}")
 
 except Exception as e:
     print(f"VERDICT=APPROVE")
-    print(f"SUMMARY=AI parse fallback: {e}")
+    print(f"SUMMARY=AI parse fallback, error: {str(e)[:100]}")
 PYEOF
+)
 
-            # Read the Python output into env vars
-            VERDICT=$(grep '^VERDICT=' /proc/self/fd/0 2>/dev/null || echo "APPROVE")
-            # Actually read from the Python script output via a temp file
-            python3 << 'PYEOF' > /tmp/ai-verdict.txt
-import json, re
-with open('/tmp/ai-response.json') as f:
-    raw = f.read()
-try:
-    data = json.loads(raw)
-    content = data.get('choices',[{}])[0].get('message',{}).get('content','{}')
-    jm = re.search(r'\{[^{}]*\}', content)
-    if jm:
-        r = json.loads(jm.group())
-        print(r.get('verdict','APPROVE'))
-    else:
-        print('APPROVE' if 'REJECT' not in content.upper() else 'REJECT')
-except:
-    print('APPROVE')
-PYEOF
-            VERDICT=$(cat /tmp/ai-verdict.txt)
-            SUMMARY="AI review completed"
-          fi
+          # Extract values from single Python run
+          VERDICT=$(echo "$PARSE_AI" | grep '^VERDICT=' | cut -d= -f2)
+          SUMMARY=$(echo "$PARSE_AI" | grep '^SUMMARY=' | cut -d= -f2-)
+          DETAILS=$(echo "$PARSE_AI" | grep '^DETAILS=' | cut -d= -f2-)
+          VERDICT="${VERDICT:-APPROVE}"
+          SUMMARY="${SUMMARY:-AI review completed}"
 
           echo "AI Verdict: $VERDICT"
           echo "AI Summary: $SUMMARY"
