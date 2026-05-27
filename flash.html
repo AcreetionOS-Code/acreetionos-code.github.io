@@ -157,24 +157,50 @@ const EDITIONS = [
 
 let buildPollTimers = {};
 
+// Edition → build script slug mapping
+const EDITION_SLUGS = {
+  cinnamon:'cinnamon', xl:'xl', '32bit':'32bit', hyprland:'hyprland',
+  plasma:'plasma', mate:'mate', gnome:'gnome', xfce:'xfce',
+  sway:'sway', i3:'i3'
+};
+
 async function checkEditionStatus(ed) {
+  // Try build status API first (reads from R2 build-status bucket)
   try {
-    const res = await fetch(ed.iso_url, { method:'HEAD', signal:AbortSignal.timeout(8000) });
-    return { built: res.ok || res.status === 302 || res.status === 301, status: res.status };
-  } catch(e) { return { built: false, status: 0 }; }
+    const slug = EDITION_SLUGS[ed.id] || ed.id;
+    const res = await fetch('/api/build/status?edition=' + encodeURIComponent(slug));
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'success' || data.status === 'complete') {
+        return { built: true, build_data: data, download_url: data.iso_url || ed.iso_url };
+      }
+      if (data.status === 'building') {
+        return { built: false, building: true, build_data: data };
+      }
+    }
+  } catch(e) {}
+
+  // Fallback: HEAD check on ISO URL (works for official editions on direct server)
+  try {
+    const res = await fetch(ed.iso_url, { method:'HEAD', signal:AbortSignal.timeout(5000) });
+    if (res.ok || res.status === 302 || res.status === 301) {
+      return { built: true, download_url: ed.iso_url };
+    }
+  } catch(e) {}
+  return { built: false };
 }
 
 async function loadEditions() {
   const c = document.getElementById('editions-container');
   c.innerHTML = '<p style="color:var(--acreetion-text);text-align:center;padding:1rem">Checking build status...</p>';
 
-  // Check all editions in parallel
   const checks = await Promise.all(EDITIONS.map(e => checkEditionStatus(e).then(s => ({...e,...s}))));
 
   const official = checks.filter(e => e.official);
   const unofficial = checks.filter(e => !e.official);
 
   let html = '<h3 style="color:var(--acreetion-green);margin:1.5rem 0 1rem">Official Editions</h3>';
+  html += '<p style="font-size:0.8rem;color:#888;margin-bottom:0.5rem">Automatically rebuilt every Monday.</p>';
   html += '<div class="edition-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:2rem">';
   official.forEach(e => { html += renderEdition(e); });
   html += '</div>';
@@ -188,19 +214,24 @@ async function loadEditions() {
 }
 
 function renderEdition(e) {
-  const label = e.label;
-  const desc = e.desc;
-  const built = e.built;
   const edId = e.id;
+  const dlUrl = e.download_url || e.iso_url;
 
   let btns = '';
-  if (built) {
-    btns += `<a href="${escAttr(e.iso_url)}" class="btn btn-cinnamon" target="_blank">⬇ Download ISO</a>`;
+  if (e.built) {
+    btns += `<a href="${escAttr(dlUrl)}" class="btn btn-cinnamon" target="_blank">⬇ Download ISO</a>`;
     if (e.mirrors) e.mirrors.forEach(m => {
       btns += `<a href="${escAttr(m.url)}" class="btn btn-storm" target="_blank" rel="noopener">${escAttr(m.name)}</a>`;
     });
+  } else if (e.building) {
+    btns += `<button class="btn btn-storm" style="opacity:0.6" disabled>⏳ Building...</button>`;
+    // Start polling if not already
+    if (!buildPollTimers[edId]) {
+      buildPollTimers[edId] = true;
+      setTimeout(() => loadEditions(), 15000);
+    }
   } else {
-    btns += `<button class="btn btn-storm" onclick="buildEdition('${edId}','${escAttr(label)}')">🔨 Build</button>`;
+    btns += `<button class="btn btn-storm" onclick="buildEdition('${edId}','${escAttr(e.label)}')">🔨 Build</button>`;
   }
 
   return `<div style="background:rgba(46,204,113,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem">
@@ -252,6 +283,9 @@ async function buildEdition(editionId, label) {
     document.getElementById('build-actions-link').style.display = 'inline-block';
     document.getElementById('build-actions-link').href = 'https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions';
 
+    // Store build state in localStorage so it persists until next rebuild
+    try { localStorage.setItem('build-' + editionId, JSON.stringify({building:true, started:Date.now()})); } catch(e) {}
+
     // Poll for status
     let attempts = 0;
     const maxAttempts = 120; // 20 minutes
@@ -270,11 +304,14 @@ async function buildEdition(editionId, label) {
           appendTerminal('[OK] Build completed successfully!');
           appendTerminal('[SYSTEM] ISO is ready for download.');
           document.getElementById('build-status').textContent = '✅ Build Complete!';
-          document.getElementById('build-result').innerHTML = '<a href="' + escAttr(statusData.iso_url || data.edition) + '" class="btn btn-cinnamon">⬇ Download ISO</a>';
+          const dlLink = statusData.iso_url || 'https://acreetionos.org/api/r2/get/' + encodeURIComponent(editionId + '-latest.iso');
+          document.getElementById('build-result').innerHTML = '<a href="' + escAttr(dlLink) + '" class="btn btn-cinnamon">⬇ Download ISO</a>';
           document.getElementById('build-result').style.display = 'block';
           clearInterval(pollTimer);
-          // Reload editions grid after a moment
-          setTimeout(loadEditions, 5000);
+          // Persist in localStorage until next rebuild
+          try { localStorage.setItem('build-' + editionId, JSON.stringify({built:true, url:dlLink, completed:Date.now()})); } catch(e) {}
+          // Reload editions grid so Build button changes to Download
+          loadEditions();
         } else if (statusData.status === 'failed') {
           appendTerminal('[FAIL] Build failed.');
           document.getElementById('build-status').textContent = '❌ Build Failed';
