@@ -4,6 +4,9 @@ compatibility_date = "2026-04-26"
 
 routes = ["acreetionos.org/api/*"]
 
+[triggers]
+crons = ["0 */6 * * *"]
+
 [vars]
 DISCORD_WEBHOOK_URL = ""
 ADMIN_KEY = ""
