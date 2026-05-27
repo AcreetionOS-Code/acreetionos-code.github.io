@@ -181,60 +181,51 @@ jobs:
               print(f"\n⚠ No fixes could be applied automatically")
           PYEOF
 
-      - name: Create PR with fixes
+      - name: Create PR via Cloudflare Worker
         if: hashFiles('/tmp/flash-fixed') != ''
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           python3 << 'PYEOF'
-          import subprocess, os, re, json
+          import json, os, re, subprocess, urllib.request
 
-          # Verify the fixed file still parses
           with open('flash.html') as f:
               html = f.read()
 
+          # Verify parses
           em = re.search(r'const EDITIONS\s*=\s*(\[[\s\S]*?\]);', html, re.DOTALL)
           if em:
               js = re.sub(r"'", '"', em.group(1))
               js = re.sub(r',\s*([\]}])', r'\1', js)
-              try:
-                  editions = json.loads(js)
-                  print(f"✅ Fixed flash.html validates: {len(editions)} editions")
-              except json.JSONDecodeError as e:
-                  print(f"❌ Fixed file still broken: {e}")
-                  exit(1)
+              editions = json.loads(js)
+              print(f"✅ Validated: {len(editions)} editions")
 
-          BRANCH = f"fix/flash-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
-          
-          subprocess.run(['git', 'config', 'user.name', 'AI Flash Guardian'], check=False)
-          subprocess.run(['git', 'config', 'user.email', 'flash@acreetionos.org'], check=False)
-          subprocess.run(['git', 'checkout', '-b', BRANCH], check=False)
-          subprocess.run(['git', 'add', 'flash.html'], check=False)
-          
-          r = subprocess.run(['git', 'diff', '--cached', '--quiet'], check=False)
-          if r.returncode != 0:
-              subprocess.run(['git', 'commit', '-m', 'Auto-fix: AI flash.html guardian repairs\n\nAutomated fixes applied by AI flash.html guardian workflow.'], check=False)
-              
-              # Push and create PR
-              push_result = subprocess.run(['git', 'push', 'origin', BRANCH], capture_output=True, text=True, check=False)
-              if push_result.returncode != 0:
-                  print(f"Push failed: {push_result.stderr}")
-                  exit(1)
-              
-              pr_result = subprocess.run(
-                  ['gh', 'pr', 'create',
-                   '--title', 'Auto-fix: flash.html repairs',
-                   '--body', '🤖 **AI Flash Guardian** found and fixed issues in flash.html.\n\nThis PR was created automatically. The AI has validated the fix.',
-                   '--base', 'main',
-                   '--head', BRANCH,
-                   '--label', 'auto-fix'],
-                  capture_output=True, text=True, check=False
-              )
-              print(f"PR created: {pr_result.stdout.strip()}")
-              
-              # Auto-merge via AI review
-              subprocess.run(['gh', 'pr', 'merge', '--merge', '--auto'], check=False)
-              print("✅ PR created and auto-merge enabled")
-          else:
-              print("No changes to commit")
+          branch = f"fix/flash-guardian-{os.popen('date +%Y%m%d-%H%M%S').read().strip()}"
+
+          # Call Cloudflare Worker to create PR
+          payload = json.dumps({
+              "branch": branch,
+              "title": "Auto-fix: flash.html repairs",
+              "body": "🤖 **AI Flash Guardian** found and fixed issues in flash.html.\n\nThis PR was created automatically via the Cloudflare Worker.",
+              "files": [{"path": "flash.html", "content": html}]
+          }).encode()
+
+          req = urllib.request.Request(
+              "https://acreetionos.org/api/github/create-pr",
+              data=payload,
+              headers={"Content-Type": "application/json"},
+              method="POST"
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=30) as resp:
+                  result = json.loads(resp.read())
+                  if result.get('pr'):
+                      print(f"✅ PR created: {result['pr']['url']}")
+                      print(f"   Branch: {result['pr']['branch']}")
+                      print(f"   Number: {result['pr']['number']}")
+                  else:
+                      print(f"❌ Failed: {result.get('error', 'unknown')}")
+          except urllib.error.HTTPError as e:
+              err = e.read().decode()
+              print(f"❌ HTTP {e.code}: {err[:300]}")
+          except Exception as e:
+              print(f"❌ Error: {e}")
           PYEOF
