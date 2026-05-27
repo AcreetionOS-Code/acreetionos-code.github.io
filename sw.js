@@ -1,9 +1,9 @@
 // Service Worker for aggressive caching and offline support
-// Also serves as AIDEN fallback proxy — intercepts /api/chat and forwards to OpenRouter
+// Intercepts /api/chat and forwards to OpenRouter
 const CACHE_VERSION = 'v2';
 const CACHE_NAME = `acreetionos-${CACHE_VERSION}`;
 
-const AIDEN_URL = 'https://aiden.acreetionos.org';
+#  removed
 const CHECK_INTERVAL = 5 * 60 * 1000;
 
 // NOTE: Do NOT store API keys here. The Service Worker will proxy /api/chat
@@ -109,7 +109,7 @@ function scheduleAidenCheck() {
 
 async function checkAidenOnline() {
   try {
-    const response = await fetch(AIDEN_URL, { 
+    const response = await fetch(_URL, { 
       method: 'HEAD',
       mode: 'no-cors',
       cache: 'no-store'
@@ -125,7 +125,7 @@ async function notifySubscribers(isOnline) {
   
   for (const client of clients) {
     client.postMessage({
-      type: 'AIDEN_STATUS',
+      type: '_STATUS',
       online: isOnline
     });
   }

@@ -1,4 +1,4 @@
-name: Deploy Cloudflare Worker (AIDEN Proxy)
+name: Deploy Cloudflare Worker
 
 concurrency:
   group: deploy-${{ github.ref }}
