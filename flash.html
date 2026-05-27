@@ -180,11 +180,12 @@ async function checkEditionStatus(ed) {
     }
   } catch(e) {}
 
-  // Fallback: HEAD check on ISO URL (works for official editions on direct server)
+  // Fallback: check via worker proxy (avoids CORS issues with port 8448)
   try {
-    const res = await fetch(ed.iso_url, { method:'HEAD', signal:AbortSignal.timeout(5000) });
-    if (res.ok || res.status === 302 || res.status === 301) {
-      return { built: true, download_url: ed.iso_url };
+    const res = await fetch('/api/iso/check?url=' + encodeURIComponent(ed.iso_url));
+    const data = await res.json();
+    if (data.reachable) {
+      return { built: true, download_url: data.found_at || ed.iso_url };
     }
   } catch(e) {}
   return { built: false };
