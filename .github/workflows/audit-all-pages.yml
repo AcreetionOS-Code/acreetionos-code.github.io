@@ -427,8 +427,14 @@ except: print('APPROVE')
                 
                 echo "AI Review: $REVIEW"
                 if echo "$REVIEW" | grep -qi "APPROVE"; then
-                  gh pr merge "$PR_NUMBER" --merge --auto --delete-branch 2>gh pr merge "$PR_NUMBER" --merge --auto 2>&11 || true
-                  echo "✅ PR auto-merged"
+                  # Only auto-merge if PR has actual changes
+                  PR_FILES=$(gh pr view "$PR_NUMBER" --json files --jq '.files | length' 2>/dev/null || echo "0")
+                  if [ "$PR_FILES" -gt 0 ]; then
+                    gh pr merge "$PR_NUMBER" --merge --auto --delete-branch 2>/dev/null || true
+                    echo "✅ PR auto-merged"
+                  else
+                    echo "⏸ PR approved but not auto-merged (no file changes)"
+                  fi
                 else
                   echo "⏸ PR needs manual review"
                 fi

@@ -17,6 +17,10 @@ jobs:
       - name: Install Lighthouse CI
         run: |
           npm install -g @lhci/cli@0.12.x
+      - name: Start local server
+        run: |
+          python3 -m http.server 8080 &
+          sleep 2
       - name: Run Lighthouse CI
         run: |
-          lhci autorun --collect.staticDistDir=. --collect.url=http://localhost:8080/index.html --collect.url=http://localhost:8080/blog.html --collect.url=http://localhost:8080/git-tracker.html --upload.target=temporary-public-storage
+          lhci autorun --collect.url=http://localhost:8080/index.html --collect.url=http://localhost:8080/blog.html --collect.url=http://localhost:8080/git-tracker.html --upload.target=temporary-public-storage

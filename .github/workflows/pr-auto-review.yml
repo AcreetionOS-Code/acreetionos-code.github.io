@@ -65,10 +65,9 @@ jobs:
 
           DIFF=$(cat /tmp/pr-diff.txt 2>/dev/null)
           if [ -z "$DIFF" ]; then
-            echo "Empty diff — auto-approving"
-            gh pr review "$PR_NUM" --approve \
-              --body "_🤖 AI Review (${AI_MODEL})_\n\n**Verdict:** ✅ APPROVE\n**Reason:** No code changes detected (empty diff)." 2>/dev/null || true
-            gh pr merge "$PR_NUM" --merge --auto --delete-branch 2>gh pr merge "$PR_NUM" --merge --auto 2>&11 || true
+            echo "Empty diff — skipping auto-merge"
+            gh pr review "$PR_NUM" --comment \
+              --body "_🤖 AI Review (${AI_MODEL})_\n\n**Verdict:** ⏸ SKIP\n**Reason:** No code changes detected (empty diff). Auto-merge disabled for empty PRs." 2>/dev/null || true
             exit 0
           fi
 
@@ -161,8 +160,13 @@ PYEOF
           if [ "$VERDICT" = "APPROVE" ]; then
             gh pr review "$PR_NUM" --approve --body "$(echo -e "$COMMENT")" 2>/dev/null || true
             echo "✅ PR approved by AI"
-            # Auto-merge
-            gh pr merge "$PR_NUM" --merge --auto --delete-branch 2>gh pr merge "$PR_NUM" --merge --auto 2>&11 || true
+            # Auto-merge only if PR has actual changes
+            PR_FILES=$(gh pr view "$PR_NUM" --json files --jq '.files | length' 2>/dev/null || echo "0")
+            if [ "$PR_FILES" -gt 0 ]; then
+              gh pr merge "$PR_NUM" --merge --auto --delete-branch 2>/dev/null || true
+            else
+              echo "⏸ PR approved but not auto-merged (no file changes)"
+            fi
           elif [ "$VERDICT" = "REJECT" ]; then
             gh pr review "$PR_NUM" --request-changes --body "$(echo -e "$COMMENT")" 2>/dev/null || true
             echo "❌ PR rejected by AI"

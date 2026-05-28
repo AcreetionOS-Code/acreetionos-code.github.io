@@ -140,13 +140,16 @@ jobs:
             exit(1)
 
           js_text = editions_match.group(1)
-          # Convert JS object syntax to valid JSON (single quotes → double quotes)
+          # Convert JS object syntax to valid JSON
+          # 1. Quote unquoted property names
+          js_text = re.sub(r'([{,]\s*)([a-zA-Z_][a-zA-Z0-9_]*)\s*:', r'\1"\2":', js_text)
+          # 2. Replace single quotes with double quotes (for string values)
+          # Use a simple heuristic: replace ' with " outside of already-quoted strings
           js_text = re.sub(r"'", '"', js_text)
-          # Convert boolean values
-          js_text = re.sub(r':\s*true', ': true', js_text)
-          js_text = re.sub(r':\s*false', ': false', js_text)
-          # Remove trailing commas before ] and }
+          # 3. Remove trailing commas before ] and }
           js_text = re.sub(r',\s*([\]}])', r'\1', js_text)
+          # 4. Fix any double-quoted strings that got extra quotes
+          js_text = re.sub(r'""', '"', js_text)
           editions = json.loads(js_text)
           issues = []
 
