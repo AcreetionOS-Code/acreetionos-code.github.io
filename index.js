@@ -27,6 +27,24 @@ const ALLOWED_ORIGINS = [
   'http://127.0.0.1:3000'
 ];
 
+const rateLimitMap = new Map();
+
+function checkRateLimit(ip, maxRequests = 20, windowMs = 60000) {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    return false;
+  }
+  if (entry.count >= maxRequests) return true;
+  entry.count++;
+  return false;
+}
+
+function getClientIP(request) {
+  return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown';
+}
+
 function securityHeaders() {
   return {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
@@ -2103,6 +2121,11 @@ export default {
     // Audio transcription via OpenRouter Whisper (free)
     // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
     if (request.method === 'POST' && url.pathname === '/api/transcribe') {
+      if (checkRateLimit(getClientIP(request))) {
+        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
+          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
+        });
+      }
       try {
         const body = await request.json();
         if (!body.audio) {
@@ -2192,6 +2215,11 @@ export default {
 
     // AI news article generation
     if (request.method === 'POST' && url.pathname === '/api/news/ai') {
+      if (checkRateLimit(getClientIP(request), 10)) {
+        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
+          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
+        });
+      }
       try {
         const body = await request.json();
         const apiKey = env.OPENROUTER_API_KEY;
@@ -2238,6 +2266,11 @@ export default {
 
     // Text-to-Speech via OpenRouter (Cartesia TTS — natural human voice)
     if (request.method === 'POST' && url.pathname === '/api/tts') {
+      if (checkRateLimit(getClientIP(request))) {
+        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
+          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
+        });
+      }
       try {
         const body = await request.json();
         if (!body.input) {
@@ -2367,6 +2400,12 @@ export default {
       return new Response('AcreetionOS Worker — POST /api/chat | POST /api/transcribe | POST /api/news/ai | /flash.html', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }
+      });
+    }
+
+    if (checkRateLimit(getClientIP(request))) {
+      return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
+        status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
       });
     }
 
