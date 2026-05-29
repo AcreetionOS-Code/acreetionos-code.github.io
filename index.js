@@ -1386,6 +1386,13 @@ async function handleCreatePR(request, env) {
   // POST /api/github/create-pr — creates a PR with auto-fixes
   // Body: { branch, title, body, files: [{ path, content }], base?: "main" }
   try {
+    const adminKey = request.headers.get('X-Admin-Key');
+    if (!adminKey || adminKey !== env.ADMIN_KEY) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+
     const body = await request.json();
     const ghToken = env.GH_TOKEN;
     if (!ghToken) {
@@ -1482,19 +1489,6 @@ async function handleCreatePR(request, env) {
     }
     const prData = await prRes.json();
 
-    // 6. Enable auto-merge with branch deletion
-    const mergeRes = await fetch(api(`pulls/${prData.number}/merge`), {
-      method: 'PUT', headers,
-      body: JSON.stringify({ merge_method: 'merge' })
-    }).catch(() => {});
-
-    // 7. Delete the branch after merge
-    if (mergeRes && mergeRes.ok) {
-      await fetch(api(`git/refs/heads/${branch}`), {
-        method: 'DELETE', headers
-      }).catch(() => {});
-    }
-
     return new Response(JSON.stringify({
       pr: { number: prData.number, url: prData.html_url, branch },
       success: true
@@ -1512,6 +1506,13 @@ async function handlePushFix(request, env) {
   // POST /api/github/push-fix — directly push a file fix to main
   // Body: { files: [{ path, content }], message }
   try {
+    const adminKey = request.headers.get('X-Admin-Key');
+    if (!adminKey || adminKey !== env.ADMIN_KEY) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
+    }
+
     const body = await request.json();
     const ghToken = env.GH_TOKEN;
     if (!ghToken) {
