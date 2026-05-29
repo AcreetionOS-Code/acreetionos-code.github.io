@@ -2342,6 +2342,12 @@ export default {
       return handleHostingAdminReject(request, env);
     }
     if (url.pathname === '/api/hosting/admin/pending' && request.method === 'GET') {
+      const adminKey = request.headers.get('X-Admin-Key');
+      if (!adminKey || adminKey !== env.ADMIN_KEY) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
       return handleHostingAdminPending(env);
     }
     if (url.pathname === '/api/hosting/subscribe' && request.method === 'POST') {
