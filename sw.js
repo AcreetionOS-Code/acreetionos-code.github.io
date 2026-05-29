@@ -70,7 +70,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Normal caching for GET requests
+    // Stale-while-revalidate for HTML pages: serve cache instantly, refresh in background
+  if (url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname === '') {
+    event.respondWith(
+      caches.open(CACHE_NAME).then((cache) => {
+        return cache.match(event.request).then((cached) => {
+          const networkFetch = fetch(event.request).then((response) => {
+            if (response.status === 200) {
+              cache.put(event.request, response.clone());
+            }
+            return response;
+          }).catch(() => cached);
+          return cached || networkFetch;
+        });
+      })
+    );
+    return;
+  }
+
+  // Cache-first for static assets (images, fonts, CSS, JS)
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
