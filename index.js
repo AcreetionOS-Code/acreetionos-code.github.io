@@ -1737,14 +1737,17 @@ async function handleBestMirror(request, env) {
         signal: AbortSignal.timeout(5000)
       });
       const latency = Date.now() - start;
-      return { ...mirror, latency, status: res.status, online: res.ok };
+      const isR2 = mirror.url.includes('.r2.dev');
+      const online = res.ok || (isR2 && (res.status === 401 || res.status === 403));
+      return { ...mirror, latency, status: res.status, online };
     } catch (e) {
       return { ...mirror, latency: 9999, status: 0, online: false };
     }
   }));
 
-  const online = results.filter(r => r.online).sort((a, b) => a.latency - b.latency);
-  const best = online[0] || results[0];
+  // Sort by priority first, latency as tiebreaker — so direct server always wins when online
+  const online = results.filter(r => r.online).sort((a, b) => a.priority - b.priority || a.latency - b.latency);
+  const best = online[0] || results.sort((a, b) => a.priority - b.priority)[0];
 
   return new Response(JSON.stringify({
     edition,
