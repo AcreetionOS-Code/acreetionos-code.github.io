@@ -228,18 +228,14 @@
         .btn-download-flasher { display: inline-block; margin-top: 1rem; font-size: 1.1rem; padding: 0.8rem 1.6rem; }
     </style>
 <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+<link rel="stylesheet" href="sidebar.css">
 </head>
-<body>
+<body><div id="page-wrap">
 
 <header class="page-header">
     <div class="header-content">
         <a href="index.html" class="logo">Acreetion<span>OS</span></a>
-        <nav class="main-nav">
-            <a href="hosting.html">ISO Hosting</a>
-            <a href="wiki.html">Wiki</a>
-            <a href="contact.html">Support</a>
-            <a href="https://github.com/acreetionos-code/" class="btn btn-storm btn-github">GitHub</a>
-        </nav>
+        <nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="developers.html">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav>
     </div>
 </header>
 
@@ -458,5 +454,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 </script>
 
+<script src="sidebar.js" defer></script>
+</div>
 </body>
 </html>
