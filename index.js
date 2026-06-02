@@ -2017,6 +2017,12 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+
+    // darren.acreetionos.org - redirect to main site
+    if (url.hostname === 'darren.acreetionos.org') {
+      return Response.redirect('https://acreetionos.org', 301);
+    }
+
     // CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
