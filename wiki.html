@@ -1,14 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8" >
 <meta name="robots" content="index, follow" >
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0" >
 <meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Wiki, Search, Documentation" >
 <meta name="referrer" content="strict-origin-when-cross-origin" >
-<!-- Security Policy to allow Arch Wiki and Pollinations AI -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://wiki.archlinux.org; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://wiki.archlinux.org https://text.pollinations.ai; frame-ancestors 'none'; base-uri 'self';" >
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://wiki.archlinux.org https://text.pollinations.ai; base-uri 'self'" >
 <title>AcreetionOS - Wiki Hub</title>
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://acreetionos.org/wiki.html">
@@ -23,212 +19,156 @@
 <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
 <meta name="description" content="Search the Arch Linux Wiki through AcreetionOS. Get beginner-friendly guides and AI-powered explanations for Linux topics." >
 <link rel="canonical" href="https://acreetionos.org/wiki.html" >
-
 <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="fonts.css">
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-
-<style>
-:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222222;--acreetion-box-border:#333333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46, 204, 113, 0.1);--storm-color:#61afef;--font-sans:'Roboto', sans-serif;--font-mono:'Fira Code', monospace;}
-*, *::before, *::after{box-sizing: border-box; margin: 0; padding: 0;}
-body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden;}
-
-/* Header */
-.page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000;}
-.header-content{display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto;padding:0.75rem 2rem;}
-.logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none;}
-.logo-img{height:40px;width: auto;}
-.logo-text span{color:var(--acreetion-green);}
-.main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500;}
-.main-nav a:hover{color:var(--acreetion-text-bright);}
-
-/* Wrapper */
-.page-wrapper{max-width:1000px;margin:2rem auto;padding:0 2rem;}
-.content-box{background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);}
-.box-header{padding:0.8rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);background-color:#1a1a1a;}
-.box-header h2{font-family:var(--font-mono);font-size:1.3rem;color:var(--acreetion-text-bright);}
-.box-body{padding:2rem;}
-
-/* Search */
-.search-form{display:flex;width:100%;border:1px solid var(--acreetion-box-border);background:var(--acreetion-body-bg);}
-.search-input{flex-grow:1;background:transparent;border:none;padding:1.2rem 1.5rem;color:var(--acreetion-text-bright);font-size:1.1rem;outline:none;}
-.search-btn{background:var(--acreetion-green);border:none;color:#000;padding:0 2.5rem;cursor:pointer;font-weight:700;font-family:var(--font-mono);text-transform:uppercase;}
-
-/* List */
-.results-list { max-height: 400px; overflow-y: auto; background: var(--acreetion-panel-bg); border: 1px solid var(--acreetion-box-border); margin-top: 1.5rem; display: none; }
-.result-item { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--acreetion-box-border); cursor: pointer; transition: 0.2s;}
-.result-item:hover { background-color: #262626; border-left: 4px solid var(--acreetion-green); padding-left: calc(1.5rem - 4px); }
-.result-item h4 { color: var(--acreetion-green); font-family: var(--font-mono); margin-bottom: 0.3rem; }
-.result-item p { color: var(--acreetion-text); font-size: 0.9rem; }
-
-.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;overflow-y:auto;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}.modal-overlay.visible{display:flex;opacity:1;visibility:visible;transition:opacity 0.3s ease,visibility 0.3s ease}.modal-box{position:relative;cursor:default;background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);padding:2rem 3rem;max-width:700px}.modal-close-btn{position:absolute;top:1rem;right:1rem;background-color:var(--acreetion-green);color:black;font-family:var(--font-sans);font-size:1.5rem;font-weight:700;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;line-height:40px;text-align:center;z-index:1001}.modal-close-btn:hover{background-color:#d15c64;transform:scale(1.05)}.modal-box h2{color:var(--acreetion-green)}
-.page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem}.page-footer p{color:#777;margin-bottom:0.5rem;text-align:center}.page-footer a{color:var(--acreetion-green);text-decoration:none}.page-footer a:hover{text-decoration:underline}</style>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous" media="print" onload="this.media=\'all\'"><noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous"></noscript>
 <link rel="stylesheet" href="sidebar.css">
-</head>
-<body>
-<a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap">
-
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="developers.html">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header>
-
-<div id="main-content" class="page-wrapper">
-    <article class="content-box">
-        <div class="box-header"><h1>Documentation Engine</h1></div>
-        <div class="box-body">
-            <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid var(--acreetion-green); padding: 1.5rem; margin-bottom: 2rem; color: var(--acreetion-text-bright); border-radius: 8px;">
-                <strong style="color: var(--acreetion-green); display: block; margin-bottom: 0.5rem; font-size: 1.1rem;">Why maintain a separate wiki in 2026?</strong>
-                <p style="margin: 0; color: var(--acreetion-text); line-height: 1.6;">The Arch Linux Wiki is the definitive, community-maintained resource for Arch-based distributions. Rather than duplicating decades of expert knowledge, we believe in working <em>smarter, not harder</em> — directing you to the source while our AI engine translates complex technical documentation into beginner-friendly guidance tailored for AcreetionOS.</p>
-            </div>
-
-            <p style="margin-bottom: 1.5rem;">Enter a topic to get a beginner-friendly guide.</p>
-            
-            <form id="wiki-search-form" class="search-form" onsubmit="return false;">
-                <input type="text" id="wiki-search-input" class="search-input" placeholder="Search (e.g. 'Software Updates', 'WiFi', 'Bluetooth')" autofocus>
-                <button type="submit" class="search-btn">Search</button>
-            </form>
-
-            <div id="results-list" class="results-list"></div>
-        </div>
-    </article>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous" media="print" onload="this.media='all'">
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+<style>
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
+.wrap{max-width:860px;margin:2rem auto;padding:0 1.5rem}
+h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-bright);margin-bottom:.5rem}
+.sub{color:var(--acreetion-text);font-size:.95rem;margin-bottom:1.5rem;line-height:1.7}
+.search-card{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem;margin-bottom:2rem}
+.search-card .bar{display:flex;border:1px solid var(--acreetion-box-border);border-radius:8px;overflow:hidden;background:var(--acreetion-body-bg);transition:border-color.2s}
+.search-card .bar:focus-within{border-color:var(--acreetion-green)}
+.search-card .bar input{flex:1;background:transparent;border:none;padding:1rem 1.2rem;color:var(--acreetion-text-bright);font-size:1rem;outline:none}
+.search-card .bar input::placeholder{color:#555}
+.search-card .bar button{padding:0 2rem;background:var(--acreetion-green);border:none;color:#000;font-weight:700;font-family:var(--font-mono);cursor:pointer;transition:opacity.2s}
+.search-card .bar button:hover{opacity:.9}
+.results{margin-top:1rem;max-height:420px;overflow-y:auto;display:none}
+.results .item{padding:1rem 1.2rem;border:1px solid var(--acreetion-box-border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:all.15s}
+.results .item:hover{background:var(--acreetion-box-bg);border-color:var(--acreetion-green);padding-left:1.4rem}
+.results .item h4{color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem;margin-bottom:.25rem}
+.results .item p{color:var(--acreetion-text);font-size:.85rem;line-height:1.5}
+.results .item .src{font-size:.7rem;color:#555;margin-top:.3rem}
+.quick{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border)}
+.quick span{font-size:.8rem;color:#555;padding-top:.15rem}
+.quick a{padding:.35rem .9rem;border:1px solid var(--acreetion-box-border);border-radius:6px;color:var(--acreetion-text);text-decoration:none;font-size:.82rem;transition:all.15s}
+.quick a:hover{border-color:var(--acreetion-green);color:var(--acreetion-green);background:rgba(46,204,113,.05)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}
+.modal-overlay.show{display:flex;opacity:1;visibility:visible;transition:opacity.3s}
+.modal-box{position:relative;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:16px;padding:2rem;max-width:720px;width:100%;max-height:80vh;overflow-y:auto}
+.modal-close{position:absolute;top:1rem;right:1rem;background:var(--acreetion-green);color:#000;border:none;border-radius:50%;width:36px;height:36px;font-size:1.3rem;cursor:pointer;line-height:36px;text-align:center}
+.modal-close:hover{background:#d15c64}
+.modal-box h2{color:var(--acreetion-green);font-family:var(--font-mono);border-bottom:1px solid var(--acreetion-box-border);padding-bottom:.75rem;margin-bottom:1.25rem;font-size:1.2rem}
+.ai-content{color:var(--acreetion-text);font-size:.93rem;line-height:1.8}
+.ai-content h3{color:var(--acreetion-text-bright);font-size:1.05rem;margin:1.5rem 0 .5rem}
+.ai-content p{margin-bottom:.75rem}
+.ai-content code{background:var(--acreetion-code-bg);border:1px solid rgba(46,204,113,.2);padding:.15em .4em;border-radius:6px;font-family:var(--font-mono);font-size:.85rem;color:var(--acreetion-text-bright)}
+.ai-content pre{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);padding:1rem;border-radius:8px;overflow-x:auto;margin:.75rem 0;font-size:.85rem}
+.ai-content pre code{background:none;border:none;padding:0}
+.ai-content ul,.ai-content ol{padding-left:1.5rem;margin-bottom:.75rem}
+.ai-content li{margin-bottom:.3rem}
+.ai-content a{color:var(--acreetion-green)}
+.loading{text-align:center;padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem}
+.loading .spin{display:inline-block;width:24px;height:24px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem}
+.page-footer a{color:var(--acreetion-green);text-decoration:none}
+.page-footer a:hover{text-decoration:underline}
+</style>
+</head><body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div id="page-wrap">
+<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="developers.html">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header>
+<div id="main-content" class="wrap">
+<h1>Documentation Engine</h1>
+<p class="sub">Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.</p>
+<div class="search-card">
+<div class="bar">
+<input type="text" id="search-input" placeholder="e.g. Software Updates, WiFi, Bluetooth, GRUB..." autofocus>
+<button type="button" id="search-btn">Search</button>
 </div>
-
+<div id="results" class="results"></div>
+<div class="quick">
+<span>Popular:</span>
+<a href="#" data-q="System maintenance">System maintenance</a>
+<a href="#" data-q="Installing software">Installing software</a>
+<a href="#" data-q="WiFi">WiFi</a>
+<a href="#" data-q="Bluetooth">Bluetooth</a>
+<a href="#" data-q="Printer setup">Printer setup</a>
+<a href="#" data-q="NVIDIA drivers">NVIDIA drivers</a>
+<a href="#" data-q="Firewall">Firewall</a>
+</div>
+</div>
+</div>
 <div id="wiki-modal" class="modal-overlay">
-    <div class="modal-box">
-        <button type="button" class="modal-close-btn" id="wiki-modal-close">×</button>
-        
-        <!-- Only "Let's Produce" shows in the box while loading -->
-        <div id="loading-indicator">
-            <div class="produce-text">Let's Produce</div>
-        </div>
-
-        <div id="modal-content-area" style="display:none;">
-            <h2 id="modal-title" style="color:var(--acreetion-green); font-family:var(--font-mono); border-bottom:1px solid var(--acreetion-box-border); padding-bottom:10px; margin-bottom:20px;">&#8203;</h2>
-            <div id="modal-ai-content" class="ai-content"></div>
-            <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--acreetion-box-border);">
-                <a id="modal-original-link" href="#" target="_blank" class="btn-storm">Original Wiki Source →</a>
-            </div>
-        </div>
-    </div>
+<div class="modal-box">
+<button type="button" class="modal-close" id="modal-close">&times;</button>
+<div id="loading" class="loading"><div class="spin"></div><p>Let's Produce</p></div>
+<div id="content-area" style="display:none">
+<h2 id="modal-title">&#8203;</h2>
+<div id="modal-body" class="ai-content"></div>
+<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border)">
+<a id="modal-link" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:.6rem 1.2rem;background:var(--acreetion-green);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:.85rem">View on Arch Wiki &rarr;</a>
 </div>
-
-<footer class="page-footer"><p>AcreetionOS is an independent project proudly built on the powerful and flexible foundation of <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. We are immensely grateful to the Arch community for their incredible work.</p><p>Follow our development on <a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer"><i class="bi bi-github"></i> GitHub</a> and our self-hosted <a href="https://gitlab.acreetionos.org"><i class="bi bi-gitlab"></i> GitLab</a>.</p><p>&copy; 2026 AcreetionOS Project. Based in Spokane, WA. <a href="contributing.html" style="color: var(--acreetion-text); margin-left: 1rem;">Contributing</a> <a href="governance.html" style="color: var(--acreetion-text); margin-left: 1rem;">Governance</a></p></footer>
-
-<script>
-const searchForm = document.getElementById('wiki-search-form');
-const searchInput = document.getElementById('wiki-search-input');
-const resultsList = document.getElementById('results-list');
-const modal = document.getElementById('wiki-modal');
-const loadingIndicator = document.getElementById('loading-indicator');
-const contentArea = document.getElementById('modal-content-area');
-
-document.getElementById('wiki-modal-close').addEventListener('click', closeModal);
-searchForm.addEventListener('submit', async () => {
-    const q = searchInput.value.trim();
-    if(!q) return;
-    resultsList.style.display = 'block';
-    resultsList.innerHTML = '<div style="padding:2rem; color:var(--acreetion-green); font-family:var(--font-mono);">SEARCHING...</div>';
-    
-    try {
-        const res = await fetch(`https://wiki.archlinux.org/api.php?action=query&list=search&srsearch=${encodeURIComponent(q)}&format=json&origin=*`);
-        const data = await res.json();
-        resultsList.innerHTML = '';
-        if(!data.query.search.length) {
-            resultsList.innerHTML = '<div style="padding:2rem; color:#e74c3c;">No results found.</div>';
-            return;
-        }
-        data.query.search.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'result-item';
-            el.innerHTML = `<h3>${item.title}</h3><p>${item.snippet}...</p>`;
-            el.onclick = () => produceGuide(item.title);
-            resultsList.appendChild(el);
-        });
-    } catch(e) {
-        resultsList.innerHTML = '<div style="padding:2rem; color:#e74c3c;">Error connecting to Wiki database.</div>';
-    }
-});
-
-async function produceGuide(title) {
-    modal.classList.add('visible');
-    document.body.style.overflow = 'hidden';
-    loadingIndicator.style.display = 'block';
-    contentArea.style.display = 'none';
-
-    try {
-        // Pull technical context from Wiki
-        const wikiRes = await fetch(`https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=1800&redirects=1&titles=${encodeURIComponent(title)}&format=json&origin=*`);
-        const wikiData = await wikiRes.json();
-        const page = Object.values(wikiData.query.pages)[0];
-        const rawText = page.extract || "";
-
-        // Send to AI for "Common Language" rewrite
-        const prompt = `Rewrite this for an absolute computer beginner on AcreetionOS (Cinnamon Desktop). 
-        Use common language. Explain steps using the mouse/menus where possible.
-        Topic: ${title}
-        Technical Context: ${rawText}
-        RESPONSE: PURE MARKDOWN ONLY.`;
-
-        const aiRes = await fetch('https://text.pollinations.ai/', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                messages: [{role: 'user', content: prompt}],
-                model: 'openai',
-                private: true
-            })
-        });
-
-        let finalBody = await aiRes.text();
-
-        // Safety parsing in case JSON leaks
-        try {
-            const json = JSON.parse(finalBody);
-            finalBody = json.choices?.[0]?.message?.content || json.content || json.reasoning_content || finalBody;
-        } catch(e) {}
-
-        // Cleanup AI artifacts
-        finalBody = finalBody.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-
-        loadingIndicator.style.display = 'none';
-        contentArea.style.display = 'block';
-        document.getElementById('modal-title').innerText = title;
-        document.getElementById('modal-ai-content').innerHTML = marked.parse(finalBody);
-        document.getElementById('modal-original-link').href = `https://wiki.archlinux.org/title/${encodeURIComponent(title.replace(/ /g, '_'))}`;
-
-    } catch(e) {
-        loadingIndicator.style.display = 'none';
-        contentArea.style.display = 'block';
-        document.getElementById('modal-ai-content').innerHTML = "<p>Process failed. Please try another article.</p>";
-    }
-}
-
-function closeModal() {
-    modal.classList.remove('visible');
-    document.body.style.overflow = '';
-}
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if(entry.isIntersecting) {
-                entry.target.classList.add('active');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.05, rootMargin: "0px 0px -30px 0px" });
-    document.querySelectorAll('.content-box, .dev-card, .event-card, .repo-card').forEach(el => {
-        el.classList.add('reveal');
-        observer.observe(el);
-    });
-});
-</script>
-<button type="button" id="back-to-top" title="Back to top">↑</button>
-<script src="back-to-top.js" defer></script>
+</div>
+</div>
+</div>
+<footer class="page-footer"><p>AcreetionOS is an independent project built on <a href="https://archlinux.org" target="_blank" rel="noopener">Arch Linux</a>. Grateful to the Arch community for their incredible work.</p><p><a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener"><i class="bi bi-github"></i> GitHub</a> &middot; <a href="https://gitlab.acreetionos.org"><i class="bi bi-gitlab"></i> GitLab</a></p></footer>
+</div>
 <script src="sidebar.js" defer></script>
-</div>
-</body>
-</html>
+<script>
+const input=document.getElementById('search-input'),btn=document.getElementById('search-btn'),results=document.getElementById('results'),modal=document.getElementById('wiki-modal'),loading=document.getElementById('loading'),contentArea=document.getElementById('content-area');
+document.getElementById('modal-close').addEventListener('click',function(){modal.classList.remove('show');document.body.style.overflow=''});
+
+async function doSearch(q){
+  if(!q)return;
+  results.style.display='block';
+  results.innerHTML='<div style="padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.85rem">Searching...</div>';
+  try{
+    const res=await fetch('https://wiki.archlinux.org/api.php?action=query&list=search&srsearch='+encodeURIComponent(q)+'&format=json&origin=*');
+    const data=await res.json();
+    results.innerHTML='';
+    if(!data.query.search.length){
+      results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">No results found.</div>';
+      return;
+    }
+    data.query.search.forEach(function(item){
+      var el=document.createElement('div');
+      el.className='item';
+      el.innerHTML='<h4>'+item.title+'</h4><p>'+item.snippet+'...</p><div class="src">wiki.archlinux.org</div>';
+      el.addEventListener('click',function(){produceGuide(item.title);});
+      results.appendChild(el);
+    });
+  }catch(e){results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">Failed to reach Wiki.</div>';}
+}
+
+btn.addEventListener('click',function(){doSearch(input.value);});
+input.addEventListener('keydown',function(e){if(e.key==='Enter')doSearch(input.value);});
+
+document.querySelectorAll('.quick a').forEach(function(a){
+  a.addEventListener('click',function(e){e.preventDefault();input.value=this.getAttribute('data-q');doSearch(input.value);});
+});
+
+async function produceGuide(title){
+  modal.classList.add('show');
+  document.body.style.overflow='hidden';
+  loading.style.display='block';
+  contentArea.style.display='none';
+  try{
+    var wikiRes=await fetch('https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=1800&redirects=1&titles='+encodeURIComponent(title)+'&format=json&origin=*');
+    var wikiData=await wikiRes.json();
+    var page=Object.values(wikiData.query.pages)[0];
+    var rawText=page.extract||'';
+    var prompt='Rewrite this for an absolute computer beginner on AcreetionOS (Cinnamon Desktop). Use common language. Explain steps using the mouse/menus where possible.\n\nTopic: '+title+'\n\nTechnical Context: '+rawText+'\n\nRESPONSE: PURE MARKDOWN ONLY.';
+    var aiRes=await fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],model:'openai',private:true})});
+    var finalBody=await aiRes.text();
+    try{var j=JSON.parse(finalBody);finalBody=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||finalBody;}catch(e){}
+    finalBody=finalBody.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+    loading.style.display='none';
+    contentArea.style.display='block';
+    document.getElementById('modal-title').innerText=title;
+    document.getElementById('modal-body').innerHTML=marked.parse(finalBody);
+    document.getElementById('modal-link').href='https://wiki.archlinux.org/title/'+encodeURIComponent(title.replace(/ /g,'_'));
+  }catch(e){
+    loading.style.display='none';
+    contentArea.style.display='block';
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Failed to generate guide. Try another topic.</p>';
+  }
+}
+</script>
+</body></html>
