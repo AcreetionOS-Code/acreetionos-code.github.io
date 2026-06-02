@@ -718,6 +718,30 @@ async function handleHostingUnsubscribe(request, env) {
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
+async function handleNewsletterSubscribe(request, env) {
+  try {
+    const body = await request.json();
+    if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+    const key = 'nl-subscriber-' + body.email.replace(/[@.]/g, '_');
+    const existing = await getR2(env, 'acreetionos-hosting', key);
+    if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+    await putR2(env, 'acreetionos-hosting', key, {
+      email: body.email, subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
+    });
+    return new Response(JSON.stringify({ success: true, message: 'Subscribed to newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
+  }
+}
+
+async function handleNewsletterUnsubscribe(request, env) {
+  const email = request.url.searchParams?.get?.('email') || '';
+  if (!email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+  const key = 'nl-subscriber-' + email.replace(/[@.]/g, '_');
+  await deleteR2(env, 'acreetionos-hosting', key);
+  return new Response(JSON.stringify({ success: true, message: 'Unsubscribed from newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+}
+
 // ─── Malware Scanning ──────────────────────────────────────────
 
 const SUSPICIOUS_FILENAME_PATTERNS = /\.(exe|bat|cmd|scr|ps1|vbs|jar|dll|zip|rar|7z)$/i;
@@ -2430,6 +2454,12 @@ export default {
     }
     if (url.pathname === '/api/hosting/subscribe' && request.method === 'POST') {
       return handleHostingSubscribe(request, env);
+    }
+    if (url.pathname === '/api/newsletter/subscribe' && request.method === 'POST') {
+      return handleNewsletterSubscribe(request, env);
+    }
+    if (url.pathname === '/api/newsletter/unsubscribe' && request.method === 'GET') {
+      return handleNewsletterUnsubscribe(request, env);
     }
     if (url.pathname === '/api/hosting/unsubscribe' && request.method === 'GET') {
       return handleHostingUnsubscribe(request, env);
