@@ -23,6 +23,10 @@ body.sidebar-open{overflow-x:hidden}
 .sidebar-external{padding:.25rem 1.2rem .5rem}
 .sidebar-external-btn{display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--acreetion-green,#2ecc71);text-decoration:none;font-size:.85rem;font-weight:600;transition:all.2s}
 .sidebar-external-btn:hover{background:rgba(46,204,113,0.2);border-color:var(--acreetion-green,#2ecc71);transform:translateY(-1px)}
+.sidebar-authors{padding:.25rem 1.2rem .5rem;display:flex;flex-direction:column;gap:4px}
+.sidebar-author-link{display:flex;align-items:center;gap:.5rem;padding:.5rem .75rem;border-radius:6px;color:var(--acreetion-text,#b2b2b2);text-decoration:none;font-size:.85rem;transition:all.15s}
+.sidebar-author-link:hover{background:var(--acreetion-panel-bg,#1a1a1a);color:var(--acreetion-green,#2ecc71)}
+.sidebar-author-avatar{width:22px;height:22px;border-radius:50%;object-fit:cover}
 .sidebar-footer{display:flex;gap:.5rem;padding:.75rem 1rem;border-top:1px solid var(--acreetion-box-border,#333)}
 .sidebar-footer a{flex:1;text-align:center;padding:.5rem;border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none}
 .sidebar-footer a:first-child{background:var(--acreetion-green,#2ecc71);color:#000}
