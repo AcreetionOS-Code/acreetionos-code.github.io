@@ -1877,12 +1877,32 @@ async function handleCVEEmbed() {
       headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
     });
     if (!res.ok) return new Response('Failed to load advisories', { status: 502 });
-    const html = await res.text();
+    let html = await res.text();
+    const darkModeCSS = `<style>
+      :root{--bg:#1a1a1a;--surface:#222;--border:#333;--text:#ccc;--text-bright:#e5e5e5;--link:#2ecc71;--red:#e74c3c}
+      body{background:var(--bg)!important;color:var(--text)!important}
+      a{color:var(--link)!important}
+      h1,h2,h3,h4{color:var(--text-bright)!important}
+      table,tr,td,th{border-color:var(--border)!important;background:var(--surface)!important;color:var(--text)!important}
+      tr:nth-child(even){background:#2a2a2a!important}
+      .advisory,.advisory-row,.cve-entry,.entry{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)!important}
+      code,pre{background:#2a2a2a!important;color:#e5e5e5!important;border-color:var(--border)!important}
+      input,textarea,select{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
+      nav,.nav,.header,.top-bar{background:var(--surface)!important;border-color:var(--border)!important}
+      footer,.footer{background:var(--surface)!important;color:var(--text)!important}
+      .severity-critical,.sev-critical{color:var(--red)!important}
+      ::-webkit-scrollbar{width:8px}
+      ::-webkit-scrollbar-track{background:var(--bg)}
+      ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+    </style>`;
+    html = html.replace('</head>', darkModeCSS + '</head>');
+    // Fix relative links to open in top frame
+    html = html.replace(/href="\//g, 'href="https://security.archlinux.org/');
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=300',
-        'X-Frame-Options': '',  // allow iframe embedding
+        'X-Frame-Options': '',
         'Content-Security-Policy': "frame-ancestors 'self' https://acreetionos.org https://www.acreetionos.org",
         ...corsHeaders({ headers: { get: () => '' } })
       }
