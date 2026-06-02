@@ -98,12 +98,18 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 <div id="wiki-modal" class="modal-overlay">
 <div class="modal-box">
 <button type="button" class="modal-close" id="modal-close">&times;</button>
-<div id="loading" class="loading"><div class="spin"></div><p>Let's Produce</p></div>
+<div id="progress-area">
+<h2 id="modal-title" style="color:var(--acreetion-green);font-family:var(--font-mono);font-size:1.1rem;margin-bottom:1rem;display:none">&#8203;</h2>
+<div id="progress-steps" style="margin-bottom:1rem"></div>
+<div id="preview-area" style="display:none;margin-bottom:1rem;padding:.8rem;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:8px;max-height:200px;overflow-y:auto;font-size:.8rem;color:var(--acreetion-text);white-space:pre-wrap;font-family:var(--font-mono)"></div>
+<div id="loading-spinner" class="loading" style="padding:1rem 0"><div class="spin"></div></div>
+</div>
 <div id="content-area" style="display:none">
-<h2 id="modal-title">&#8203;</h2>
+<h2 id="modal-title-result">&#8203;</h2>
 <div id="modal-body" class="ai-content"></div>
-<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border)">
+<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border);display:flex;gap:.5rem;flex-wrap:wrap">
 <a id="modal-link" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:.6rem 1.2rem;background:var(--acreetion-green);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:.85rem">View on Arch Wiki &rarr;</a>
+<button id="show-raw-btn" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--acreetion-box-border);color:var(--acreetion-text);border-radius:8px;cursor:pointer;font-size:.85rem">Show raw source</button>
 </div>
 </div>
 </div>
@@ -158,52 +164,75 @@ document.querySelectorAll('.quick a').forEach(function(a){
   });
 });
 
+function setStep(id,label,state){
+  var el=document.getElementById(id);
+  if(state==='done'){el.innerHTML='<span style="color:var(--acreetion-green)">\u2713</span> '+label;}
+  else if(state==='active'){el.innerHTML='<span class="spin" style="display:inline-block;width:12px;height:12px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin.7s linear infinite;vertical-align:middle;margin-right:4px"></span> '+label;}
+  else{el.innerHTML='<span style="color:#555">\u25CB</span> '+label;}
+}
+
 async function produceGuide(title){
   modal.classList.add('show');
   document.body.style.overflow='hidden';
-  loading.style.display='block';
-  contentArea.style.display='none';
+  document.getElementById('progress-area').style.display='block';
+  document.getElementById('content-area').style.display='none';
+  document.getElementById('loading-spinner').style.display='block';
+  document.getElementById('progress-steps').innerHTML=
+    '<div id="step-fetch"></div><div id="step-analyze"></div><div id="step-translate"></div><div id="step-render"></div>';
+  document.getElementById('preview-area').style.display='none';
+  document.getElementById('modal-title').style.display='none';
+
+  setStep('step-fetch','Fetching Wiki article','active');
   var rawText='',originalUrl='https://wiki.archlinux.org/title/'+encodeURIComponent(title.replace(/ /g,'_'));
   try{
-    var wikiRes=await fetch('https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=3000&redirects=1&titles='+encodeURIComponent(title)+'&format=json&origin=*');
+    var wikiRes=await fetch('https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=1500&redirects=1&titles='+encodeURIComponent(title)+'&format=json&origin=*');
     var wikiData=await wikiRes.json();
     var page=Object.values(wikiData.query.pages)[0];
     rawText=page.extract||'';
-  }catch(e){}
+    setStep('step-fetch','Fetching Wiki article','done');
+  }catch(e){setStep('step-fetch','Fetching Wiki article','done');}
 
+  setStep('step-analyze','Analyzing technical content','active');
+  document.getElementById('preview-area').style.display='block';
+  document.getElementById('preview-area').textContent=rawText.slice(0,500)+(rawText.length>500?'\n\n[...]':'');
+  await new Promise(function(r){setTimeout(r,200);});
+  setStep('step-analyze','Analyzing technical content','done');
+
+  setStep('step-translate','Translating for beginners','active');
   var finalBody=null;
-  var attempts=[
-    {model:'openai',system:'You are a patient Linux teacher for complete beginners on AcreetionOS (Cinnamon Desktop, Arch-based). Write clear, step-by-step guides using plain English. Assume the user knows nothing about the terminal. Default to GUI methods (menus, clicks) first, then offer terminal alternatives marked as "(Advanced)".'},
-    {model:'mistral',system:'You explain Linux simply for beginners on AcreetionOS. Use GUI-first instructions. No jargon without explanation.'}
-  ];
+  var prompt='You are a patient Linux teacher for beginners on AcreetionOS (Cinnamon Desktop, Arch-based). Write clear step-by-step guides in plain English. GUI first, terminal as "(Advanced)".\n\n## Topic: '+title+'\n\n## Technical Context\n'+rawText+'\n\n## Format\n1. **What is this?**\n2. **What you need**\n3. **Step-by-step**\n4. **Troubleshooting**\n\nMarkdown only.';
+  try{
+    var aiRes=await fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],model:'openai',private:true})});
+    var text=await aiRes.text();
+    try{var j=JSON.parse(text);text=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||text;}catch(e){}
+    text=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+    if(text&&text.length>30)finalBody=text;
+  }catch(e){}
+  setStep('step-translate','Translating for beginners',finalBody?'done':'done');
 
-  for(var a=0;a<attempts.length;a++){
-    try{
-      var prompt=attempts[a].system+'\n\n## Topic: '+title+'\n\n## Technical Context\n'+rawText+'\n\n## Instructions\nWrite a beginner-friendly guide with these sections:\n1. **What is this?** — one sentence summary\n2. **What you need** — prerequisites if any\n3. **Step-by-step** — numbered GUI steps, then terminal alternative if applicable\n4. **Troubleshooting** — common issues\n\nUse markdown. Keep it simple. No theory dumps.';
-      var aiRes=await fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],model:attempts[a].model,private:true})});
-      var text=await aiRes.text();
-      try{var j=JSON.parse(text);text=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||text;}catch(e){}
-      text=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
-      if(text&&text.length>50){finalBody=text;break;}
-    }catch(e){}
-  }
-
-  loading.style.display='none';
-  contentArea.style.display='block';
+  document.getElementById('loading-spinner').style.display='none';
+  document.getElementById('progress-area').style.display='none';
+  document.getElementById('content-area').style.display='block';
 
   if(finalBody){
-    document.getElementById('modal-title').innerText=title;
+    document.getElementById('modal-title-result').innerText=title;
     document.getElementById('modal-body').innerHTML=marked.parse(finalBody);
     document.getElementById('modal-link').href=originalUrl;
   } else if(rawText){
-    document.getElementById('modal-title').innerText=title+' (AI unavailable)';
-    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c;margin-bottom:1rem">AI guide generation failed. Showing the raw Arch Wiki content instead:</p>'+marked.parse(rawText.slice(0,3000));
+    document.getElementById('modal-title-result').innerText=title+' (raw)';
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c;margin-bottom:1rem">AI guide unavailable. Raw Arch Wiki content:</p>'+marked.parse(rawText);
     document.getElementById('modal-link').href=originalUrl;
   } else {
-    document.getElementById('modal-title').innerText='Error';
-    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Could not load this topic. <button onclick="produceGuide(\''+title.replace(/'/g,"\\'")+'\')" style="background:none;border:1px solid var(--acreetion-green);color:var(--acreetion-green);padding:.3rem .8rem;border-radius:6px;cursor:pointer;margin-left:.5rem">Try Again</button></p>';
+    document.getElementById('modal-title-result').innerText='Error';
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Failed. <button onclick="produceGuide(\''+title.replace(/'/g,"\\'")+'\')" style="background:var(--acreetion-green);color:#000;border:none;padding:.4rem 1rem;border-radius:6px;cursor:pointer;margin-left:.5rem;font-weight:700">Try Again</button></p>';
     document.getElementById('modal-link').href=originalUrl;
   }
+
+  document.getElementById('show-raw-btn').addEventListener('click',function(){
+    var pa=document.getElementById('preview-area');
+    if(pa.style.display==='none'||!pa.style.display||pa.style.display===''){pa.style.display='block';this.textContent='Hide raw source';}
+    else{pa.style.display='none';this.textContent='Show raw source';}
+  });
 }
 </script>
 </body></html>
