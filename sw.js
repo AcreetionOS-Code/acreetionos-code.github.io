@@ -1,5 +1,5 @@
 // Service Worker for caching and offline support
-const CACHE_VERSION = 'v7';
+const CACHE_VERSION = 'v8';
 const CACHE_NAME = `acreetionos-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -90,8 +90,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first for HTML pages: always fetch fresh from server, fall back to cache if offline
-  if (url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname === '') {
+  // Network-first for HTML and JS: always fetch fresh, fall back to cache if offline
+  if (url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname === '' || url.pathname.endsWith('.js')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -106,7 +106,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first for static assets (images, fonts, CSS, JS)
+  // Cache-first for static assets (images, fonts, CSS)
   event.respondWith(
     caches.match(event.request).then((response) => {
       if (response) {
