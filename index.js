@@ -1882,6 +1882,7 @@ async function handleCVEStatus(env) {
 
 async function handleCVEEmbed() {
   try {
+    const nonce = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2, 10);
     const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
       headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
     });
@@ -1899,7 +1900,7 @@ async function handleCVEEmbed() {
       return `<tr><td><a href="https://security.archlinux.org/${cveId}" target="_blank" style="color:#e74c3c;font-family:monospace;font-size:0.85rem">${cveId}</a></td><td style="color:#999;font-size:0.8rem">${date}</td><td><span style="color:${color};font-weight:700;font-size:0.8rem">${sev.toUpperCase()}</span></td><td style="color:#ccc;font-size:0.85rem">${c.package || ''}</td><td style="color:#999;font-size:0.8rem">${summary}</td></tr>`;
     }).join('\n');
 
-    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Arch Linux Security Advisories</title><style>
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Arch Linux Security Advisories</title><style nonce="${nonce}">
       *{box-sizing:border-box;margin:0;padding:0}
       body{background:#1a1a1a;color:#ccc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:1rem}
       h1{color:#e5e5e5;font-size:1.3rem;margin-bottom:0.25rem}
@@ -1924,7 +1925,7 @@ async function handleCVEEmbed() {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'public, max-age=300',
         'X-Frame-Options': '',
-        'Content-Security-Policy': "frame-ancestors 'self' https://acreetionos.org https://www.acreetionos.org",
+        'Content-Security-Policy': "default-src 'self'; script-src 'self' 'nonce-" + nonce + "'; style-src 'self' 'nonce-" + nonce + "'; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; frame-ancestors 'self' https://acreetionos.org https://www.acreetionos.org; object-src 'none'",
         ...corsHeaders({ headers: { get: () => '' } })
       }
     });
