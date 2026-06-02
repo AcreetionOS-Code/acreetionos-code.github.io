@@ -1873,31 +1873,43 @@ async function handleCVEStatus(env) {
 
 async function handleCVEEmbed() {
   try {
-    const res = await fetch('https://security.archlinux.org/advisory/', {
+    const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
       headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
     });
     if (!res.ok) return new Response('Failed to load advisories', { status: 502 });
-    let html = await res.text();
-    const darkModeCSS = `<style>
-      :root{--bg:#1a1a1a;--surface:#222;--border:#333;--text:#ccc;--text-bright:#e5e5e5;--link:#2ecc71;--red:#e74c3c}
-      body{background:var(--bg)!important;color:var(--text)!important}
-      a{color:var(--link)!important}
-      h1,h2,h3,h4{color:var(--text-bright)!important}
-      table,tr,td,th{border-color:var(--border)!important;background:var(--surface)!important;color:var(--text)!important}
-      tr:nth-child(even){background:#2a2a2a!important}
-      .advisory,.advisory-row,.cve-entry,.entry{background:var(--surface)!important;border-color:var(--border)!important;color:var(--text)!important}
-      code,pre{background:#2a2a2a!important;color:#e5e5e5!important;border-color:var(--border)!important}
-      input,textarea,select{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important}
-      nav,.nav,.header,.top-bar{background:var(--surface)!important;border-color:var(--border)!important}
-      footer,.footer{background:var(--surface)!important;color:var(--text)!important}
-      .severity-critical,.sev-critical{color:var(--red)!important}
+    const xml = await res.text();
+    const cves = parseArchAtom(xml);
+
+    const severityColor = { critical: '#e74c3c', high: '#f39c12', medium: '#3498db', low: '#2ecc71', unknown: '#888' };
+    const rows = cves.map(c => {
+      const sev = (c.severity || 'unknown').toLowerCase();
+      const color = severityColor[sev] || '#888';
+      const cveId = c.primary_cve || (c.cves && c.cves[0]) || '';
+      const date = c.date ? new Date(c.date).toLocaleDateString() : '';
+      const summary = (c.summary || '').replace(/</g, '&lt;').slice(0, 200);
+      return `<tr><td><a href="https://security.archlinux.org/${cveId}" target="_blank" style="color:#e74c3c;font-family:monospace;font-size:0.85rem">${cveId}</a></td><td style="color:#999;font-size:0.8rem">${date}</td><td><span style="color:${color};font-weight:700;font-size:0.8rem">${sev.toUpperCase()}</span></td><td style="color:#ccc;font-size:0.85rem">${c.package || ''}</td><td style="color:#999;font-size:0.8rem">${summary}</td></tr>`;
+    }).join('\n');
+
+    const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Arch Linux Security Advisories</title><style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{background:#1a1a1a;color:#ccc;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;padding:1rem}
+      h1{color:#e5e5e5;font-size:1.3rem;margin-bottom:0.25rem}
+      .sub{color:#888;font-size:0.85rem;margin-bottom:1rem}
+      table{width:100%;border-collapse:collapse}
+      th{text-align:left;padding:0.5rem 0.75rem;border-bottom:2px solid #333;color:#888;font-size:0.75rem;text-transform:uppercase;letter-spacing:0.5px}
+      td{padding:0.5rem 0.75rem;border-bottom:1px solid #2a2a2a;vertical-align:top}
+      tr:hover td{background:#222}
       ::-webkit-scrollbar{width:8px}
-      ::-webkit-scrollbar-track{background:var(--bg)}
-      ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
-    </style>`;
-    html = html.replace('</head>', darkModeCSS + '</head>');
-    // Fix relative links to open in top frame
-    html = html.replace(/href="\//g, 'href="https://security.archlinux.org/');
+      ::-webkit-scrollbar-track{background:#1a1a1a}
+      ::-webkit-scrollbar-thumb{background:#333;border-radius:4px}
+      ::-webkit-scrollbar-thumb:hover{background:#444}
+      @media(max-width:768px){td,th{padding:0.4rem 0.5rem;font-size:0.8rem}}
+    </style></head><body>
+    <h1>Arch Linux Security Advisories</h1>
+    <p class="sub">This is security.archlinux.org but with dark mode. — <a href="https://security.archlinux.org" target="_blank" style="color:#2ecc71">View original</a></p>
+    <table><thead><tr><th>CVE</th><th>Date</th><th>Severity</th><th>Package</th><th>Summary</th></tr></thead><tbody>${rows}</tbody></table>
+    </body></html>`;
+
     return new Response(html, {
       headers: {
         'Content-Type': 'text/html; charset=utf-8',
@@ -1908,7 +1920,7 @@ async function handleCVEEmbed() {
       }
     });
   } catch (e) {
-    return new Response('Advisory proxy error', { status: 502 });
+    return new Response('Advisory proxy error: ' + e.message, { status: 502 });
   }
 }
 
