@@ -1871,6 +1871,27 @@ async function handleCVEStatus(env) {
   return handleCVEFeed(env);
 }
 
+async function handleCVEEmbed() {
+  try {
+    const res = await fetch('https://security.archlinux.org/advisory/', {
+      headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
+    });
+    if (!res.ok) return new Response('Failed to load advisories', { status: 502 });
+    const html = await res.text();
+    return new Response(html, {
+      headers: {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=300',
+        'X-Frame-Options': '',  // allow iframe embedding
+        'Content-Security-Policy': "frame-ancestors 'self' https://acreetionos.org https://www.acreetionos.org",
+        ...corsHeaders({ headers: { get: () => '' } })
+      }
+    });
+  } catch (e) {
+    return new Response('Advisory proxy error', { status: 502 });
+  }
+}
+
 async function handleCVEFix(request, env) {
   try {
     const body = await request.json();
@@ -2413,6 +2434,9 @@ export default {
     }
     if (url.pathname === '/api/cve/fix' && request.method === 'POST') {
       return handleCVEFix(request, env);
+    }
+    if (url.pathname === '/api/cve/embed') {
+      return handleCVEEmbed();
     }
 
     // Chat endpoint
