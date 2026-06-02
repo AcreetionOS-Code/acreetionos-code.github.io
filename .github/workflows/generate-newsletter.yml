@@ -3,7 +3,7 @@ name: Generate Newsletter
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 10 * * *"
+    - cron: "0 10,22 * * *"
 
 permissions:
   contents: write
