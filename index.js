@@ -1983,11 +1983,6 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    // security.acreetionos.org — serves proxied Arch Linux advisories with dark mode
-    if (url.hostname === 'security.acreetionos.org') {
-      return handleCVEEmbed();
-    }
-
     // CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
