@@ -80,13 +80,13 @@ def main():
         "You are the AcreetionOS newsletter writer. "
         "Write a daily newsletter update in a professional but friendly tone. "
         "Include sections for: 1) Development Updates, 2) Community News, 3) Tips & Highlights. "
-        "Keep the total length to about 300–500 words. "
-        "Format with plain text, no markdown."
+        "Write exactly 9 paragraphs. Each paragraph should be 2-4 sentences. "
+        "Use plain text, no markdown, no bullet lists."
     )
     user_prompt = (
         f"Generate today's AcreetionOS newsletter for {date_display}. "
         f"Here is the recent activity to base it on:\n\n{activity_summary}\n\n"
-        f"Write the newsletter body (plain text, no markdown). "
+        f"Write the newsletter body (plain text, no markdown, exactly 9 paragraphs). "
         f"Start with a subject line like 'Daily AcreetionOS Update - {date_display}'."
     )
 
@@ -100,7 +100,7 @@ def main():
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": user_prompt},
                     ],
-                    "max_tokens": 1024,
+                    "max_tokens": 2048,
                 }).encode(),
                 timeout=120,
             )
