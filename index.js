@@ -21,10 +21,6 @@ const ALLOWED_ORIGINS = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
-  'http://localhost:8080',
-  'http://localhost:3000',
-  'http://127.0.0.1:8080',
-  'http://127.0.0.1:3000'
 ];
 
 const rateLimitMap = new Map();
@@ -45,7 +41,7 @@ function getClientIP(request) {
   return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown';
 }
 
-function securityHeaders() {
+function securityHeaders(nonce) {
   return {
     'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'X-Frame-Options': 'DENY',
@@ -53,19 +49,23 @@ function securityHeaders() {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Embedder-Policy': 'require-corp',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://openrouter.ai; base-uri 'self'; form-action 'self' https://www.qwant.com"
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'nonce-" + nonce + "' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
   };
 }
 
-function corsHeaders(request) {
+function corsHeaders(request, nonce) {
   const origin = request.headers.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+  if (!nonce) {
+    nonce = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+  }
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Content-Encoding, Authorization',
     'Access-Control-Max-Age': '86400',
-    ...securityHeaders()
+    'Vary': 'Origin',
+    ...securityHeaders(nonce)
   };
 }
 
@@ -463,14 +463,22 @@ async function listR2(env, bucket, prefix) {
   return data?.result?.objects || [];
 }
 
-function hashPassword(password) {
-  let h = 0;
-  for (let i = 0; i < password.length; i++) { const c = password.charCodeAt(i); h = ((h << 5) - h) + c; h |= 0; }
-  return 'h' + Math.abs(h).toString(36);
+async function timingSafeCompare(a, b) {
+  if (a.length !== b.length) return false;
+  const enc = new TextEncoder();
+  const buf = new Uint8Array(a.length);
+  for (let i = 0; i < a.length; i++) buf[i] = a.charCodeAt(i) ^ b.charCodeAt(i);
+  return buf.reduce((acc, v) => acc | v, 0) === 0;
 }
 
-function getCors() {
-  return { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };
+async function hashPassword(password, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+  const saltBytes = enc.encode(salt || 'acreetionos-hosting');
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
+  const hashArr = Array.from(new Uint8Array(bits));
+  const saltStr = salt || btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
+  return saltStr + ':' + btoa(String.fromCharCode(...hashArr));
 }
 
 async function sendDiscordWebhook(env, message) {
@@ -499,20 +507,23 @@ async function handleHostingGetProviders(env) {
     const data = await getR2(env, 'acreetionos-hosting', obj.key);
     if (data) providers.push(data);
   }
-  return new Response(JSON.stringify({ providers }), { headers: getCors() });
+  return new Response(JSON.stringify({ providers }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function handleHostingRegister(request, env) {
+  if (checkRateLimit(getClientIP(request), 3, 3600000)) {
+    return new Response(JSON.stringify({ error: 'Too many registration attempts, please try again later' }), { status: 429, headers: corsHeaders({ headers: { get: () => '' } }) });
+  }
   try {
     const body = await request.json();
     if (!body.org || !body.email || !body.password || !body.mirror_url || !body.location) {
-      return new Response(JSON.stringify({ error: 'org, email, password, mirror_url, and location are required' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'org, email, password, mirror_url, and location are required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
     // Validate organization domain (skip if personal checkbox checked)
     const orgCheck = await validateOrgDomain(env, body.email, body.org, body.personal_email === true);
     if (!orgCheck.valid) {
-      return new Response(JSON.stringify({ success: false, error: orgCheck.reason }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ success: false, error: orgCheck.reason }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
     // Run background vetting checks
@@ -525,7 +536,7 @@ async function handleHostingRegister(request, env) {
       return new Response(JSON.stringify({
         success: false, error: 'Registration rejected by automated security vetting. Contact developers@acreetionos.org if you believe this is an error.',
         vetting: { score: vetResult.score, flags: vetResult.flags }
-      }), { status: 403, headers: getCors() });
+      }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
     const id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
@@ -533,7 +544,7 @@ async function handleHostingRegister(request, env) {
       id, org: body.org, email: body.email, website: body.website || '',
       mirror_url: body.mirror_url, location: body.location,
       bandwidth: body.bandwidth || '', notes: body.notes || '',
-      password: hashPassword(body.password),
+      password: await hashPassword(body.password),
       status: vetResult.needs_manual_review ? 'flagged' : 'pending',
       created: new Date().toISOString(),
       removal_requested: false,
@@ -545,7 +556,7 @@ async function handleHostingRegister(request, env) {
       expiry_warning_sent: false
     };
     const ok = await putR2(env, 'acreetionos-hosting', 'provider-' + id, provider);
-    if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: getCors() });
+    if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
 
     // Mailing list subscription
     if (body.subscribe && body.email) {
@@ -574,9 +585,9 @@ async function handleHostingRegister(request, env) {
         ? 'Registration submitted — flagged for manual review due to security indicators'
         : 'Registration submitted for review';
 
-    return new Response(JSON.stringify({ success: true, message: msg, id, vetting: { score: vetResult.score, flagged: vetResult.needs_manual_review } }), { headers: getCors() });
+    return new Response(JSON.stringify({ success: true, message: msg, id, vetting: { score: vetResult.score, flagged: vetResult.needs_manual_review } }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
@@ -584,22 +595,22 @@ async function handleHostingRemoveRequest(request, env) {
   try {
     const body = await request.json();
     if (!body.email || !body.password) {
-      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
     const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
     let found = null;
     for (const obj of objects) {
       const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email === body.email && data.password === hashPassword(body.password)) { found = data; break; }
+      if (data && data.email === body.email && data.password === await hashPassword(body.password, data.password.split(':')[0])) { found = data; break; }
     }
-    if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: getCors() });
+    if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
     found.removal_requested = true;
     found.removal_reason = body.notes || 'No reason given';
     await putR2(env, 'acreetionos-hosting', 'provider-' + found.id, found);
     sendDiscordWebhook(env, `**Removal Requested**\n**Provider:** ${found.org} (${found.email})\n**Reason:** ${body.notes || 'None'}\n**ID:** ${found.id}`);
-    return new Response(JSON.stringify({ success: true, message: 'Removal request submitted for admin approval' }), { headers: getCors() });
+    return new Response(JSON.stringify({ success: true, message: 'Removal request submitted for admin approval' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
@@ -607,30 +618,30 @@ async function handleHostingUpdateRequest(request, env) {
   try {
     const body = await request.json();
     if (!body.email || !body.password) {
-      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
     const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
     let found = null;
     for (const obj of objects) {
       const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email === body.email && data.password === hashPassword(body.password)) { found = data; break; }
+      if (data && data.email === body.email && data.password === await hashPassword(body.password, data.password.split(':')[0])) { found = data; break; }
     }
-    if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: getCors() });
+    if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
     found.notes = body.notes || found.notes;
     await putR2(env, 'acreetionos-hosting', 'provider-' + found.id, found);
-    return new Response(JSON.stringify({ success: true, message: 'Listing updated' }), { headers: getCors() });
+    return new Response(JSON.stringify({ success: true, message: 'Listing updated' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
 async function handleHostingAdminApprove(request, env) {
   try {
     const body = await request.json();
-    if (!body.admin_key || body.admin_key !== env.ADMIN_KEY) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: getCors() });
-    if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: getCors() });
+    if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.ADMIN_KEY))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
+    if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const data = await getR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
-    if (!data) return new Response(JSON.stringify({ error: 'Provider not found' }), { status: 404, headers: getCors() });
+    if (!data) return new Response(JSON.stringify({ error: 'Provider not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (body.action === 'approve-removal' || body.action === 'remove') {
       await deleteR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
       sendDiscordWebhook(env, `**Provider Removed (Admin Approved)**\n**Provider:** ${data.org} (${data.email})`);
@@ -640,7 +651,7 @@ async function handleHostingAdminApprove(request, env) {
           `Hi ${data.org},\n\nYour hosting provider listing for AcreetionOS has been removed as requested.\n\nThank you for your support.\n- AcreetionOS Team`);
       }
       triggerRedeploy(env);
-      return new Response(JSON.stringify({ success: true, message: 'Provider removed and redeploy triggered' }), { headers: getCors() });
+      return new Response(JSON.stringify({ success: true, message: 'Provider removed and redeploy triggered' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     }
     // Approve registration
     data.status = 'active';
@@ -653,22 +664,22 @@ async function handleHostingAdminApprove(request, env) {
         `Hi ${data.org},\n\nYour hosting provider application has been approved!\n\nMirror URL: ${data.mirror_url}\nStatus: Active\n\nYou are now subscribed to hosting updates. We'll notify you of any changes.\n\nTo unsubscribe: https://acreetionos.org/api/hosting/unsubscribe?email=${encodeURIComponent(data.email)}\n\n- AcreetionOS Team`);
     }
     triggerRedeploy(env);
-    return new Response(JSON.stringify({ success: true, message: 'Provider approved and redeploy triggered' }), { headers: getCors() });
+    return new Response(JSON.stringify({ success: true, message: 'Provider approved and redeploy triggered' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
 async function handleHostingAdminReject(request, env) {
   try {
     const body = await request.json();
-    if (!body.admin_key || body.admin_key !== env.ADMIN_KEY) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: getCors() });
-    if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: getCors() });
+    if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.ADMIN_KEY))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
+    if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     await deleteR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
     sendDiscordWebhook(env, `**Provider Registration Rejected**\n**ID:** ${body.provider_id}`);
-    return new Response(JSON.stringify({ success: true, message: 'Provider registration rejected and removed' }), { headers: getCors() });
+    return new Response(JSON.stringify({ success: true, message: 'Provider registration rejected and removed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
@@ -680,31 +691,31 @@ async function handleHostingAdminPending(env) {
     if (data) all.push(data);
   }
   const pending = all.filter(p => p.status === 'pending' || p.removal_requested);
-  return new Response(JSON.stringify({ pending, total: all.length }), { headers: getCors() });
+  return new Response(JSON.stringify({ pending, total: all.length }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function handleHostingSubscribe(request, env) {
   try {
     const body = await request.json();
-    if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: getCors() });
+    if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const key = 'subscriber-' + body.email.replace(/[@.]/g, '_');
     const existing = await getR2(env, 'acreetionos-hosting', key);
-    if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: getCors() });
+    if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     await putR2(env, 'acreetionos-hosting', key, {
       email: body.email, org: body.org || '', subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
     });
-    return new Response(JSON.stringify({ success: true, message: 'Subscribed to hosting updates' }), { headers: getCors() });
+    return new Response(JSON.stringify({ success: true, message: 'Subscribed to hosting updates' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
 async function handleHostingUnsubscribe(request, env) {
   const email = request.url.searchParams?.get?.('email') || '';
-  if (!email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: getCors() });
+  if (!email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
   const key = 'subscriber-' + email.replace(/[@.]/g, '_');
   await deleteR2(env, 'acreetionos-hosting', key);
-  return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: getCors() });
+  return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 // ─── Malware Scanning ──────────────────────────────────────────
@@ -994,8 +1005,8 @@ async function handleHostingScan(request, env) {
   // POST /api/hosting/scan — triggers full scan of all provider ISOs
   // Requires admin_key
   const body = await request.json().catch(() => ({}));
-  if (body.admin_key !== env.ADMIN_KEY) {
-    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: getCors() });
+  if (!(await timingSafeCompare(body.admin_key, env.ADMIN_KEY))) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
   const result = await scanISOSuspicious(env);
 
@@ -1046,7 +1057,7 @@ async function handleHostingScan(request, env) {
     triggerRedeploy(env);
   }
 
-  return new Response(JSON.stringify(result), { headers: getCors() });
+  return new Response(JSON.stringify(result), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function handleHostingCount(env) {
@@ -1056,7 +1067,7 @@ async function handleHostingCount(env) {
     const data = await getR2(env, 'acreetionos-hosting', obj.key);
     if (data && data.status === 'active') active++;
   }
-  return new Response(JSON.stringify({ count: active, threshold: 5, show_fastest: active >= 5 }), { headers: getCors() });
+  return new Response(JSON.stringify({ count: active, threshold: 5, show_fastest: active >= 5 }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function triggerClamavScan(env) {
@@ -1077,10 +1088,10 @@ async function handleHostingReactivate(request, env) {
   try {
     const body = await request.json();
     if (!body.email || !body.password) {
-      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
     if (!body.agreement) {
-      return new Response(JSON.stringify({ error: 'You must accept the hosting agreement to reactivate' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'You must accept the hosting agreement to reactivate' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
     // Check if provider exists (including deleted/expired — we can't find deleted ones)
@@ -1090,7 +1101,7 @@ async function handleHostingReactivate(request, env) {
     let providerKey = '';
     for (const obj of objects) {
       const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email === body.email && data.password === hashPassword(body.password)) {
+      if (data && data.email === body.email && data.password === await hashPassword(body.password, data.password.split(':')[0])) {
         found = data; providerKey = obj.key; break;
       }
     }
@@ -1100,7 +1111,7 @@ async function handleHostingReactivate(request, env) {
       return new Response(JSON.stringify({
         success: true, message: 'If your account exists, we will verify your mirror and reactivate it within 24 hours if it remains online.',
         verification_pending: true
-      }), { headers: getCors() });
+      }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
     // Mark as pending reactivation with timestamp
@@ -1120,9 +1131,9 @@ async function handleHostingReactivate(request, env) {
       success: true,
       message: 'Reactivation requested. Your mirror will be checked every 6 hours. If it stays online for 24 hours, you will be automatically reactivated.',
       verification_pending: true
-    }), { headers: getCors() });
+    }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
@@ -1262,8 +1273,7 @@ async function handleISOCheck(request, env) {
               body: JSON.stringify({ title: `Auto-fix: ${edition || 'ISO'} download URL`, body: `🤖 **Auto-fix**: ${url}\nwas broken, found working mirror at:\n${foundUrl}`, head: branch, base: 'main' })
             })).json();
             if (pr.number) {
-              await fetch(api(`pulls/${pr.number}/merge`), { method: 'PUT', headers: h, body: JSON.stringify({ merge_method: 'merge' }) }).catch(() => {});
-              await fetch(api(`git/refs/heads/${branch}`), { method: 'DELETE', headers: h }).catch(() => {});
+              // PR created but NOT auto-merged — requires manual review
             }
           }
         }
@@ -1387,8 +1397,7 @@ async function handleHealthCheck(env) {
       await fetch(api('git/refs'), { method: 'POST', headers: h, body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }) });
       const pr = await (await fetch(api('pulls'), { method: 'POST', headers: h, body: JSON.stringify({ title: `Health: ${totalIssues} issue(s) found`, body: prBody, head: branch, base: 'main' }) })).json();
       if (pr.number) {
-        await fetch(api(`pulls/${pr.number}/merge`), { method: 'PUT', headers: h, body: JSON.stringify({ merge_method: 'merge' }) }).catch(() => {});
-        await fetch(api(`git/refs/heads/${branch}`), { method: 'DELETE', headers: h }).catch(() => {});
+        // PR created but NOT auto-merged — requires manual review
       }
     } catch (e) { console.error('PR creation failed:', e.message); }
   }
@@ -1405,7 +1414,7 @@ async function handleCreatePR(request, env) {
   // Body: { branch, title, body, files: [{ path, content }], base?: "main" }
   try {
     const adminKey = request.headers.get('X-Admin-Key');
-    if (!adminKey || adminKey !== env.ADMIN_KEY) {
+    if (!adminKey || !(await timingSafeCompare(adminKey, env.ADMIN_KEY))) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
       });
@@ -1525,7 +1534,7 @@ async function handlePushFix(request, env) {
   // Body: { files: [{ path, content }], message }
   try {
     const adminKey = request.headers.get('X-Admin-Key');
-    if (!adminKey || adminKey !== env.ADMIN_KEY) {
+    if (!adminKey || !(await timingSafeCompare(adminKey, env.ADMIN_KEY))) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
       });
@@ -1839,7 +1848,7 @@ async function handleCVEFeed(env, ctx) {
     });
   }
 
-  return new Response(JSON.stringify({ error: 'No CVE data available', cves: [], count: 0 }), { headers: getCors() });
+  return new Response(JSON.stringify({ error: 'No CVE data available', cves: [], count: 0 }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function handleCVEStatus(env) {
@@ -1928,11 +1937,11 @@ async function handleCVEFix(request, env) {
   try {
     const body = await request.json();
     if (!body.cve || body.accepted !== true) {
-      return new Response(JSON.stringify({ error: 'CVE ID and acceptance required' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'CVE ID and acceptance required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
     const cveId = body.cve.toUpperCase();
     if (!/^CVE-\d{4}-\d+$/.test(cveId)) {
-      return new Response(JSON.stringify({ error: 'Invalid CVE ID format' }), { status: 400, headers: getCors() });
+      return new Response(JSON.stringify({ error: 'Invalid CVE ID format' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
     const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json');
@@ -1961,9 +1970,9 @@ async function handleCVEFix(request, env) {
       source: 'Arch Linux Security Advisory',
       source_url: cveData?.link || `https://security.archlinux.org/${cveId}`,
       disclaimer: 'This script is provided as-is. The AcreetionOS project is not responsible for any damage or data loss. By using this script, you accept full responsibility for your system.'
-    }), { headers: getCors() });
+    }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: getCors() });
+    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
 }
 
@@ -2411,7 +2420,7 @@ export default {
     }
     if (url.pathname === '/api/hosting/admin/pending' && request.method === 'GET') {
       const adminKey = request.headers.get('X-Admin-Key');
-      if (!adminKey || adminKey !== env.ADMIN_KEY) {
+      if (!adminKey || !(await timingSafeCompare(adminKey, env.ADMIN_KEY))) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
@@ -2473,7 +2482,7 @@ export default {
 
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
-      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://openrouter.ai https://api.github.com https://gitlab.acreetionos.org https://news.google.com https://api.allorigins.win https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
+      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://openrouter.ai https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
       return new Response('AcreetionOS Worker — POST /api/chat | POST /api/transcribe | POST /api/news/ai | /flash.html', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }

@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="robots" content="index, follow" />
-<meta name="robots" content="index, follow" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Wiki, Search, Documentation" />
-<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta charset="UTF-8" >
+<meta name="robots" content="index, follow" >
+<meta name="robots" content="index, follow" >
+<meta name="viewport" content="width=device-width, initial-scale=1.0" >
+<meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Wiki, Search, Documentation" >
+<meta name="referrer" content="strict-origin-when-cross-origin" >
 <!-- Security Policy to allow Arch Wiki and Pollinations AI -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://wiki.archlinux.org; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://wiki.archlinux.org https://text.pollinations.ai; frame-ancestors 'none'; base-uri 'self';" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://wiki.archlinux.org; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://wiki.archlinux.org https://text.pollinations.ai; frame-ancestors 'none'; base-uri 'self';" >
 <title>AcreetionOS - Wiki Hub</title>
 
 <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
@@ -58,7 +58,7 @@ body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);colo
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="flash.html">Downloads</a><a href="hosting.html">ISO Hosting</a><a href="wiki.html" aria-current="page" class="active">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact & Support</a><a href="git-tracker.html" class="btn btn-storm">Git Tracker</a><a href="/acreetionos-news-tracker/" class="btn btn-storm" style="background-color: var(--acreetion-green); color: #000;">News Tracker</a><a href="unofficial.html" class="btn btn-storm" style="background-color:var(--acreetion-purple);color:#fff">Unofficial</a><a href="https://github.com/acreetionos-code/" class="btn btn-storm" style="background-color:#333">GitHub</a><a href="https://gitlab.acreetionos.org" class="btn btn-storm">GitLab</a></nav></div></header>
+<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="flash.html">Downloads</a><a href="hosting.html">ISO Hosting</a><a href="wiki.html" aria-current="page" class="active">Wiki</a><a href="developers.html">Developers</a><a href="contact.html">Contact &amp; Support</a><a href="git-tracker.html" class="btn btn-storm">Git Tracker</a><a href="/acreetionos-news-tracker/" class="btn btn-storm" style="background-color: var(--acreetion-green); color: #000;">News Tracker</a><a href="unofficial.html" class="btn btn-storm" style="background-color:var(--acreetion-purple);color:#fff">Unofficial</a><a href="https://github.com/acreetionos-code/" class="btn btn-storm" style="background-color:#333">GitHub</a><a href="https://gitlab.acreetionos.org" class="btn btn-storm">GitLab</a></nav></div></header>
 
 <div id="main-content" class="page-wrapper">
     <article class="content-box">
@@ -83,7 +83,7 @@ body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);colo
 
 <div id="wiki-modal" class="modal-overlay">
     <div class="modal-box">
-        <button class="modal-close-btn" onclick="closeModal()">×</button>
+        <button type="button" class="modal-close-btn" id="wiki-modal-close">×</button>
         
         <!-- Only "Let's Produce" shows in the box while loading -->
         <div id="loading-indicator">
@@ -91,7 +91,7 @@ body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);colo
         </div>
 
         <div id="modal-content-area" style="display:none;">
-            <h2 id="modal-title" style="color:var(--acreetion-green); font-family:var(--font-mono); border-bottom:1px solid var(--acreetion-box-border); padding-bottom:10px; margin-bottom:20px;"></h2>
+            <h2 id="modal-title" style="color:var(--acreetion-green); font-family:var(--font-mono); border-bottom:1px solid var(--acreetion-box-border); padding-bottom:10px; margin-bottom:20px;">&#8203;</h2>
             <div id="modal-ai-content" class="ai-content"></div>
             <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--acreetion-box-border);">
                 <a id="modal-original-link" href="#" target="_blank" class="btn-storm">Original Wiki Source →</a>
@@ -110,6 +110,7 @@ const modal = document.getElementById('wiki-modal');
 const loadingIndicator = document.getElementById('loading-indicator');
 const contentArea = document.getElementById('modal-content-area');
 
+document.getElementById('wiki-modal-close').addEventListener('click', closeModal);
 searchForm.addEventListener('submit', async () => {
     const q = searchInput.value.trim();
     if(!q) return;
@@ -212,17 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-<button id="back-to-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'});">↑</button>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const btn = document.getElementById('back-to-top');
-    if(!btn) return;
-    window.addEventListener('scroll', () => {
-        if(window.scrollY > 400){btn.classList.add('visible');}
-        else{btn.classList.remove('visible');}
-    });
-});
-</script>
+<button type="button" id="back-to-top" title="Back to top">↑</button>
+<script src="back-to-top.js" defer></script>
 </body>
 </html>

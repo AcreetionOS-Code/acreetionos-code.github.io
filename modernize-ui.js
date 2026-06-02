@@ -7,7 +7,7 @@ const backToTopCSS = `
 #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4);}
 `;
 
-const backToTopHTML = `<button id="back-to-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'});">↑</button>`;
+const backToTopHTML = `<button id="back-to-top" title="Back to top" >↑</button>`;
 
 const backToTopScript = `
 <script>

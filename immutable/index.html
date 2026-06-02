@@ -197,19 +197,19 @@ cd immutable
 </footer>
 
 <!-- AIDEN chatbot -->
-<button id="aiden-btn" onclick="toggleAiden()">💬</button>
+<button type="button" id="aiden-btn">💬</button>
 <div id="aiden-widget">
 <div class="aw-header">
 <div class="aw-avatar">A</div>
 <div><div class="aw-name">AIDEN</div><div class="aw-sub">AcreetionOS Immutable Assistant</div></div>
-<button class="aw-close" onclick="toggleAiden()">×</button>
+<button type="button" class="aw-close" id="aw-close-btn">×</button>
 </div>
 <div class="aw-messages" id="aw-msgs">
 <div class="aw-msg bot">i am here to uwu *nuzzles your kernel* 💚 ask me anything about AcreetionOS Immutable or AcreetionOS~</div>
 </div>
 <div class="aw-input-row">
 <input class="aw-input" id="aw-input" placeholder="ask aiden..." autocomplete="off"/>
-<button class="aw-send" onclick="askAiden()">➤</button>
+<button type="button" class="aw-send" id="aw-send-btn">➤</button>
 </div>
 </div>
 <script>
@@ -264,6 +264,9 @@ async function askAiden(){
   },100)
 }
 document.getElementById('aw-input').addEventListener('keydown',e=>{if(e.key==='Enter')askAiden()})
+document.getElementById('aiden-btn').addEventListener('click',toggleAiden)
+document.getElementById('aw-close-btn').addEventListener('click',toggleAiden)
+document.getElementById('aw-send-btn').addEventListener('click',askAiden)
 // Fetch latest ISOs for download page
 fetch('/api/r2/list').then(r=>r.json()).then(d=>{
   const isos=d.isos||[]

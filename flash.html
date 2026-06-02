@@ -270,7 +270,7 @@
 <!-- Build Terminal Modal -->
 <div id="build-modal" class="modal-overlay">
     <div class="modal-box">
-        <button type="button" onclick="closeBuildModal()" class="modal-close-btn">&times;</button>
+        <button type="button" id="build-modal-close" class="modal-close-btn">&times;</button>
         <h2 id="build-title" class="h3-accent">Building...</h2>
         <div id="build-status"></div>
         <pre id="build-terminal" class="modal-terminal">Waiting to start...</pre>
@@ -400,7 +400,10 @@ function closeBuildModal() {
     document.getElementById('build-modal').classList.remove('visible');
 }
 
-document.addEventListener('DOMContentLoaded', loadEditions);
+document.addEventListener('DOMContentLoaded', function() {
+  loadEditions();
+  document.getElementById('build-modal-close').addEventListener('click', closeBuildModal);
+});
 
 const FLASHER_URLS = {
     windows: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-win64-5.3.1.exe',
