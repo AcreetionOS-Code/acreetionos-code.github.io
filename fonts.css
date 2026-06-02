@@ -1,5 +1,5 @@
-@font-face{font-family:'Fira Code';font-style:normal;font-weight:400;src:local('Fira Code'),url('FreeMono.ttf') format('truetype')}
-@font-face{font-family:'Fira Code';font-style:normal;font-weight:700;src:local('Fira Code'),url('FreeMonoBold.ttf') format('truetype')}
-@font-face{font-family:'Roboto';font-style:normal;font-weight:400;src:local('Roboto'),url('FreeSans.ttf') format('truetype')}
-@font-face{font-family:'Roboto';font-style:normal;font-weight:500;src:local('Roboto'),url('FreeSansBold.ttf') format('truetype')}
-@font-face{font-family:'Roboto';font-style:normal;font-weight:700;src:local('Roboto'),url('FreeSansBold.ttf') format('truetype')}
+@font-face{font-family:'Fira Code';font-style:normal;font-weight:400;src:local('Fira Code'),url('fira-code-latin-400-normal.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Fira Code';font-style:normal;font-weight:700;src:local('Fira Code'),url('fira-code-latin-700-normal.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Roboto';font-style:normal;font-weight:400;src:local('Roboto'),url('roboto-latin-400-normal.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Roboto';font-style:normal;font-weight:500;src:local('Roboto'),url('roboto-latin-500-normal.woff2') format('woff2');font-display:swap}
+@font-face{font-family:'Roboto';font-style:normal;font-weight:700;src:local('Roboto'),url('roboto-latin-700-normal.woff2') format('woff2');font-display:swap}
