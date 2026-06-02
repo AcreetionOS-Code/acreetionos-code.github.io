@@ -29,7 +29,8 @@ function init(){
       links+='<li><a href="'+h.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">'+t.replace(/</g,'&lt;')+'</a></li>';
     }
   }
-  sidebar.innerHTML='<div class="sidebar-body"><ul>'+links+'</ul></div><div class="sidebar-footer"><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener">Discord</a><a href="contact.html">Contact</a></div>';
+  var externalSection='<div class="sidebar-section-title">External Projects</div><div class="sidebar-external"><a href="https://flatfree.pages.dev" target="_blank" rel="noopener" class="sidebar-external-btn"><i class="bi bi-box"></i> FlatFree</a></div>';
+  sidebar.innerHTML='<div class="sidebar-body"><ul>'+links+'</ul>'+externalSection+'</div><div class="sidebar-footer"><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener">Discord</a><a href="contact.html">Contact</a></div>';
   document.body.appendChild(sidebar);
 }
 function toggle(){if(isOpen){close();}else{open();}}

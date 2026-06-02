@@ -19,6 +19,10 @@ body.sidebar-open{overflow-x:hidden}
 .sidebar-body ul{list-style:none;padding:0;margin:0}
 .sidebar-body ul li a{display:flex;align-items:center;gap:.5rem;padding:.8rem 1.2rem;color:var(--acreetion-text,#b2b2b2);text-decoration:none;font-size:.95rem;transition:all.15s;border-left:3px solid transparent;border-bottom:1px solid var(--acreetion-box-border,#222)}
 .sidebar-body ul li a:hover{background:var(--acreetion-panel-bg,#1a1a1a);color:var(--acreetion-green,#2ecc71);border-left-color:var(--acreetion-green,#2ecc71)}
+.sidebar-section-title{padding:.75rem 1.2rem .25rem;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--acreetion-green,#2ecc71);border-top:1px solid var(--acreetion-box-border,#333);margin-top:.5rem}
+.sidebar-external{padding:.25rem 1.2rem .5rem}
+.sidebar-external-btn{display:flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:8px;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);color:var(--acreetion-green,#2ecc71);text-decoration:none;font-size:.85rem;font-weight:600;transition:all.2s}
+.sidebar-external-btn:hover{background:rgba(46,204,113,0.2);border-color:var(--acreetion-green,#2ecc71);transform:translateY(-1px)}
 .sidebar-footer{display:flex;gap:.5rem;padding:.75rem 1rem;border-top:1px solid var(--acreetion-box-border,#333)}
 .sidebar-footer a{flex:1;text-align:center;padding:.5rem;border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none}
 .sidebar-footer a:first-child{background:var(--acreetion-green,#2ecc71);color:#000}
