@@ -112,36 +112,50 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 </div>
 <script src="sidebar.js" defer></script>
 <script>
+var searchCache={};
 const input=document.getElementById('search-input'),btn=document.getElementById('search-btn'),results=document.getElementById('results'),modal=document.getElementById('wiki-modal'),loading=document.getElementById('loading'),contentArea=document.getElementById('content-area');
 document.getElementById('modal-close').addEventListener('click',function(){modal.classList.remove('show');document.body.style.overflow=''});
 
 async function doSearch(q){
   if(!q)return;
   results.style.display='block';
+  if(searchCache[q]){
+    renderResults(searchCache[q]);
+    return;
+  }
   results.innerHTML='<div style="padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.85rem">Searching...</div>';
   try{
     const res=await fetch('https://wiki.archlinux.org/api.php?action=query&list=search&srsearch='+encodeURIComponent(q)+'&format=json&origin=*');
     const data=await res.json();
-    results.innerHTML='';
-    if(!data.query.search.length){
-      results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">No results found.</div>';
-      return;
-    }
-    data.query.search.forEach(function(item){
-      var el=document.createElement('div');
-      el.className='item';
-      el.innerHTML='<h4>'+item.title+'</h4><p>'+item.snippet+'...</p><div class="src">wiki.archlinux.org</div>';
-      el.addEventListener('click',function(){produceGuide(item.title);});
-      results.appendChild(el);
-    });
+    searchCache[q]=data.query.search;
+    renderResults(data.query.search);
   }catch(e){results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">Failed to reach Wiki.</div>';}
+}
+
+function renderResults(items){
+  results.innerHTML='';
+  if(!items.length){results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">No results found.</div>';return;}
+  items.forEach(function(item){
+    var el=document.createElement('div');
+    el.className='item';
+    el.innerHTML='<h4>'+item.title+'</h4><p>'+item.snippet+'...</p><div class="src">wiki.archlinux.org</div>';
+    el.addEventListener('click',function(){produceGuide(item.title);});
+    results.appendChild(el);
+  });
 }
 
 btn.addEventListener('click',function(){doSearch(input.value);});
 input.addEventListener('keydown',function(e){if(e.key==='Enter')doSearch(input.value);});
 
 document.querySelectorAll('.quick a').forEach(function(a){
-  a.addEventListener('click',function(e){e.preventDefault();input.value=this.getAttribute('data-q');doSearch(input.value);});
+  a.addEventListener('click',function(e){
+    e.preventDefault();
+    var q=this.getAttribute('data-q');
+    input.value=q;
+    results.style.display='block';
+    results.innerHTML='<div style="padding:1.5rem;color:var(--acreetion-text);font-size:.85rem">Generating guide for <strong>'+q+'</strong>...</div>';
+    produceGuide(q);
+  });
 });
 
 async function produceGuide(title){
