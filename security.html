@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8" />
 <meta name="robots" content="index, follow" /><meta name="robots" content="index, follow" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cloudflareinsights.com; base-uri 'self'; frame-src 'self'; object-src 'none'" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cloudflareinsights.com https://services.nvd.nist.gov; base-uri 'self'; frame-src 'self'; object-src 'none'" />
 <meta http-equiv="Permissions-Policy" content="browsing-topics=(), interest-cohort=()" />
 <meta name="referrer" content="strict-origin-when-cross-origin" /><title>Security - Arch Linux CVE Monitor - AcreetionOS</title><meta name="description" content="Monitor Arch Linux CVEs affecting AcreetionOS. View vulnerabilities, impact analysis, and generate fix scripts." /><link rel="canonical" href="https://acreetionos.org/security.html" /><link rel="icon" type="image/webp" href="acreetionoslogo.webp"><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 <style>:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--box:#222;--border:#333;--text-bright:#e5e5e5;--text:#b2b2b2;--red:#e74c3c;--orange:#f39c12;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);line-height:1.6}.page-header{background:rgba(24,26,27,0.85);backdrop-filter:blur(12px);border-bottom:2px solid var(--red);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000}.header-content{display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto;padding:0.75rem 2rem}.logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--text-bright);text-decoration:none}.logo span{color:var(--green)}.logo-img{height:40px}.main-nav a{color:var(--text);text-decoration:none;margin-left:2rem;font-weight:500;transition:0.2s}.main-nav a:hover{color:var(--text-bright)}.container{max-width:1000px;margin:2rem auto;padding:0 2rem}h1{font-size:2.4rem;color:var(--red);margin-bottom:0.5rem;font-family:var(--font-mono)}.subtitle{color:var(--text);font-size:1.05rem;margin-bottom:2rem}.cve-card{background:var(--box);border:1px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:0.8rem;transition:0.2s;cursor:pointer}.cve-card:hover{border-color:var(--red);transform:translateX(3px)}.cve-card.critical{border-left:4px solid var(--red)}.cve-card.high{border-left:4px solid var(--orange)}.cve-card.medium{border-left:4px solid #3498db}.cve-card.low{border-left:4px solid var(--green)}.cve-header{display:flex;justify-content:space-between;align-items:start;gap:1rem;flex-wrap:wrap}.cve-id{font-family:var(--font-mono);font-size:0.85rem;color:var(--red);font-weight:700}.cve-pkg{font-size:0.8rem;color:var(--orange);background:rgba(243,156,18,0.1);padding:0.15rem 0.5rem;border-radius:4px}.cve-title{font-size:0.9rem;color:var(--text-bright);margin:0.3rem 0}.cve-desc{font-size:0.8rem;color:var(--text);margin-top:0.3rem}.cve-date{font-size:0.75rem;color:#666}.cve-detail{display:none;margin-top:0.8rem;padding-top:0.8rem;border-top:1px solid var(--border)}.cve-card.open .cve-detail{display:block}.severity-badge{display:inline-block;padding:0.15rem 0.5rem;border-radius:4px;font-size:0.7rem;font-weight:700}.sev-critical{background:var(--red);color:#fff}.sev-high{background:var(--orange);color:#000}.sev-medium{background:#3498db;color:#fff}.sev-low{background:var(--green);color:#000}.cve-stats{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap}.stat-box{flex:1;min-width:120px;background:var(--box);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center}.stat-box .num{font-size:2rem;font-weight:700;font-family:var(--font-mono)}.stat-box .label{font-size:0.8rem;color:var(--text);margin-top:0.3rem}.stat-box.critical .num{color:var(--red)}.stat-box.high .num{color:var(--orange)}.stat-box.total .num{color:var(--green)}.btn{display:inline-block;padding:0.5rem 1rem;border-radius:8px;font-weight:600;text-decoration:none;border:none;cursor:pointer;transition:0.2s;font-size:0.85rem;margin:0.2rem}.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#c0392b;transform:translateY(-1px)}.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:var(--red)}.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:1rem}.modal-overlay.visible{display:flex}.modal-box{background:var(--box);border:1px solid var(--border);border-radius:16px;padding:2rem;max-width:700px;width:100%;max-height:80vh;overflow-y:auto}.modal-box h2{color:var(--red);margin-bottom:0.5rem}.modal-box p{color:var(--text);font-size:0.9rem;margin-bottom:1rem}.modal-close{position:absolute;top:1rem;right:1rem;background:var(--red);color:#fff;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1.2rem;line-height:36px;text-align:center}.pre-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:var(--font-mono);font-size:0.8rem;color:var(--text);overflow-x:auto;white-space:pre-wrap;max-height:300px;overflow-y:auto}.checkbox-label{display:flex;align-items:start;gap:0.5rem;margin:1rem 0;cursor:pointer;font-size:0.85rem;color:var(--text)}.checkbox-label input{margin-top:0.2rem;width:auto}.loading{text-align:center;padding:3rem;color:var(--text)}.loading .spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;margin-bottom:1rem}@keyframes spin{to{transform:rotate(360deg)}}.search-bar{width:100%;padding:0.7rem;background:var(--panel);border:1px solid var(--border);border-radius:8px;color:var(--text-bright);font-size:0.95rem;margin-bottom:1rem}.search-bar:focus{outline:none;border-color:var(--red)}.filter-btns{display:flex;gap:0.4rem;margin-bottom:1rem;flex-wrap:wrap}.filter-btn{padding:0.4rem 0.8rem;border-radius:6px;background:var(--panel);border:1px solid var(--border);color:var(--text);cursor:pointer;font-size:0.8rem;transition:0.2s}.filter-btn.active{background:var(--red);color:#fff;border-color:var(--red)}.filter-btn:hover:not(.active){border-color:var(--red)}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--border);color:#777;font-size:0.9rem}.page-footer p{color:#777;margin-bottom:0.5rem}.page-footer a{color:var(--green);text-decoration:none}::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:var(--red)}@media(max-width:768px){h1{font-size:1.8rem}.container{padding:0 1rem}.header-content{flex-direction:column;gap:1rem}.main-nav a{margin-left:1rem;font-size:0.85rem}.stat-box{min-width:80px}.stat-box .num{font-size:1.4rem}}
@@ -26,7 +26,6 @@
 </div>
 
 <div id="cve-list"><div class="loading"><div class="spinner"></div><p>Loading CVEs...</p></div></div>
-</div>
 
 <!-- Fix Script Modal -->
 <div id="fix-modal" class="modal-overlay">
@@ -43,113 +42,120 @@
 <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
 <button class="btn btn-red" id="fix-download-btn" disabled onclick="downloadFixScript()">Download Fix Script</button>
 <button class="btn btn-outline" onclick="copyFixScript()">Copy to Clipboard</button>
-<a id="fix-arch-link" href="https://security.archlinux.org/" target="_blank" class="btn btn-outline">View on Arch Security</a>
+<a id="fix-arch-link" href="https://security.archlinux.org/" target="_blank" rel="noopener" class="btn btn-outline">View on Arch Security</a>
 </div>
 </div>
 </div>
 
-<footer class="page-footer"><p>AcreetionOS is built on <a href="https://archlinux.org" target="_blank" rel="noopener">Arch Linux</a>. CVE data sourced from <a href="https://security.archlinux.org" target="_blank">security.archlinux.org</a>.</p><p>&copy; 2026 AcreetionOS Project. <a href="contributing.html">Contributing</a> <a href="governance.html">Governance</a></p></footer>
+<footer class="page-footer"><p>AcreetionOS is built on <a href="https://archlinux.org" target="_blank" rel="noopener">Arch Linux</a>. CVE data sourced from the <a href="https://nvd.nist.gov" target="_blank" rel="noopener">National Vulnerability Database</a>.</p><p>&copy; 2026 AcreetionOS Project. <a href="contributing.html">Contributing</a> <a href="governance.html">Governance</a></p></footer>
 </div>
 
 <script>
 let allCVEs = [];
 let currentFilter = 'all';
 
+const NVD_API = 'https://services.nvd.nist.gov/rest/json/cves/2.0';
+
 function severity(cve) {
-  // Use enriched CVSS severity first, then Arch severity, then keyword fallback
-  const cvss = cve.cross_ref?.nvd?.cvss_severity;
-  if (cvss === 'CRITICAL') return 'critical';
-  if (cvss === 'HIGH') return 'high';
-  if (cvss === 'MEDIUM') return 'medium';
-  if (cvss === 'LOW') return 'low';
-
-  const s = (cve.severity || '').toLowerCase();
-  if (s === 'critical') return 'critical';
-  if (s === 'high') return 'high';
-  if (s === 'medium') return 'medium';
-  if (s === 'low') return 'low';
-
-  const t = (cve.title || '').toLowerCase() + ' ' + (cve.summary || '').toLowerCase();
-  if (t.includes('critical')) return 'critical';
-  if (t.includes('arbitrary code') || t.includes('privilege escalation') || t.includes('remote code') || t.includes('high')) return 'high';
-  if (t.includes('denial of service') || t.includes('information disclosure') || t.includes('medium')) return 'medium';
+  const cvss = (cve.metrics && cve.metrics.cvssMetricV31) ? cve.metrics.cvssMetricV31[0] : null
+      || (cve.metrics && cve.metrics.cvssMetricV30) ? cve.metrics.cvssMetricV30[0] : null;
+  if (!cvss) return 'low';
+  const sev = cvss.cvssData.baseSeverity || '';
+  if (sev === 'CRITICAL') return 'critical';
+  if (sev === 'HIGH') return 'high';
+  if (sev === 'MEDIUM') return 'medium';
+  if (sev === 'LOW') return 'low';
   return 'low';
+}
+
+function cvssScore(cve) {
+  const cvss = (cve.metrics && cve.metrics.cvssMetricV31) ? cve.metrics.cvssMetricV31[0] : null
+      || (cve.metrics && cve.metrics.cvssMetricV30) ? cve.metrics.cvssMetricV30[0] : null;
+  return cvss ? cvss.cvssData.baseScore : null;
+}
+
+function description(cve) {
+  const en = (cve.descriptions || []).find(d => d.lang === 'en');
+  return en ? en.value : '';
 }
 
 async function loadCVEs() {
   try {
-    const res = await fetch('/api/cve/feed');
+    const sixMonthsAgo = new Date(Date.now() - 180 * 864e5).toISOString().split('T')[0] + 'T00:00:00.000';
+    const res = await fetch(NVD_API + '?keywordSearch=linux&pubStartDate=' + sixMonthsAgo + '&resultsPerPage=50&noRejected');
     const data = await res.json();
-    allCVEs = data.cves || [];
-    renderStats(data);
+    allCVEs = (data.vulnerabilities || []).map(v => v.cve);
+    renderStats();
     renderCVEs();
   } catch (e) {
-    document.getElementById('cve-list').innerHTML = '<p style="color:var(--red);text-align:center;padding:2rem">Failed to load CVE data.</p>';
+    document.getElementById('cve-list').innerHTML = '<p style="color:var(--red);text-align:center;padding:2rem">Failed to load CVE data from NVD. <a href="https://nvd.nist.gov" target="_blank" rel="noopener">Visit NVD</a></p>';
   }
 }
 
-function renderStats(data) {
-  const cves = data.cves || [];
-  const total = data.count || 0;
-  const critical = cves.filter(c => severity(c) === 'critical').length;
-  const high = cves.filter(c => severity(c) === 'high').length;
-  const exploitable = cves.filter(c => c.cross_ref?.nvd?.cisa_kev).length;
-  const avgCvss = cves.map(c => c.cross_ref?.nvd?.cvss_score).filter(Boolean);
-  const meanCvss = avgCvss.length > 0 ? (avgCvss.reduce((a,b) => a+b, 0) / avgCvss.length).toFixed(1) : '—';
+function renderStats() {
+  const c = document.getElementById('cve-stats');
+  const critical = allCVEs.filter(v => severity(v) === 'critical').length;
+  const high = allCVEs.filter(v => severity(v) === 'high').length;
+  const total = allCVEs.length;
+  const scores = allCVEs.map(v => cvssScore(v)).filter(Boolean);
+  const avg = scores.length > 0 ? (scores.reduce((a,b) => a+b, 0) / scores.length).toFixed(1) : '\u2014';
   c.innerHTML = `
     <div class="stat-box critical"><div class="num">${critical}</div><div class="label">Critical</div></div>
     <div class="stat-box high"><div class="num">${high}</div><div class="label">High</div></div>
     <div class="stat-box total"><div class="num">${total}</div><div class="label">Total CVEs</div></div>
-    <div class="stat-box"><div class="num" style="color:${exploitable > 0 ? '#e74c3c' : '#888'};font-size:1.4rem">${exploitable > 0 ? '⚠ ' + exploitable : '0'}</div><div class="label">Known Exploited</div></div>
-    <div class="stat-box"><div class="num" style="color:#888">${meanCvss}</div><div class="label">Avg CVSS</div></div>
-    <div class="stat-box"><div class="num" style="color:#888">${data.updated ? new Date(data.updated).toLocaleDateString() : '—'}</div><div class="label">Last Updated</div></div>
+    <div class="stat-box"><div class="num" style="font-size:1.4rem;color:#888">${avg}</div><div class="label">Avg CVSS</div></div>
+    <div class="stat-box"><div class="num" style="font-size:0.9rem;color:#888">Last 180 days</div><div class="label">Time Range</div></div>
+    <div class="stat-box"><div class="num" style="font-size:0.9rem;color:#888">NVD</div><div class="label">Source</div></div>
   `;
 }
 
 function renderCVEs() {
   const list = document.getElementById('cve-list');
-  const filtered = currentFilter === 'all' ? allCVEs : allCVEs.filter(c => severity(c) === currentFilter);
+  let filtered = currentFilter === 'all' ? allCVEs : allCVEs.filter(c => severity(c) === currentFilter);
   const search = (document.getElementById('cve-search').value || '').toLowerCase();
-  const matched = search ? filtered.filter(c => c.cve.toLowerCase().includes(search) || (c.package||'').toLowerCase().includes(search) || (c.title||'').toLowerCase().includes(search)) : filtered;
+  if (search) {
+    filtered = filtered.filter(c => c.id.toLowerCase().includes(search) || description(c).toLowerCase().includes(search));
+  }
 
-  if (matched.length === 0) {
+  if (!allCVEs.length) {
+    list.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading CVEs from NVD...</p></div>';
+    return;
+  }
+
+  if (filtered.length === 0) {
     list.innerHTML = '<p style="color:var(--text);text-align:center;padding:2rem">No CVEs match your criteria.</p>';
     return;
   }
 
-  list.innerHTML = matched.map(c => {
+  list.innerHTML = filtered.map(c => {
     const sev = severity(c);
     const sevLabel = sev.charAt(0).toUpperCase() + sev.slice(1);
-    const cveId = c.primary_cve || (c.cves && c.cves[0]) || '';
-    const cvss = c.cross_ref?.nvd;
-    const cvssBadge = cvss?.cvss_score ? `<span class="severity-badge sev-${sev}" title="CVSS ${cvss.cvss_score} · ${cvss.cvss_severity || ''}">CVSS ${cvss.cvss_score}</span>` : '';
-    const cisaBadge = cvss?.cisa_kev ? `<span class="severity-badge sev-critical" style="margin-left:0.3rem" title="Known to be exploited in the wild">CISA KEV</span>` : '';
-    const extraCves = (c.cves && c.cves.length > 1) ? `+${c.cves.length - 1} more` : '';
-    const allCves = c.cves ? c.cves.join(', ') : cveId;
+    const score = cvssScore(c);
+    const cvssBadge = score ? '<span class="severity-badge sev-' + sev + '" title="CVSS ' + score + ' \u00b7 ' + sevLabel + '">CVSS ' + score + '</span>' : '';
+    const desc = description(c);
+    const date = c.published ? new Date(c.published).toLocaleDateString() : '';
+    const vector = (c.metrics && c.metrics.cvssMetricV31) ? c.metrics.cvssMetricV31[0].cvssData.vectorString
+                : (c.metrics && c.metrics.cvssMetricV30) ? c.metrics.cvssMetricV30[0].cvssData.vectorString : '';
     return `
     <div class="cve-card ${sev}" onclick="toggleCVE(this)">
       <div class="cve-header">
         <div>
-          <span class="cve-id">${cveId}</span>
-          ${extraCves ? `<span style="font-size:0.7rem;color:#888">${extraCves}</span>` : ''}
-          ${c.package ? `<span class="cve-pkg">${esc(c.package)}</span>` : ''}
+          <span class="cve-id">${esc(c.id)}</span>
           <span class="severity-badge sev-${sev}">${sevLabel}</span>
-          ${cvssBadge}${cisaBadge}
+          ${cvssBadge}
         </div>
-        <span class="cve-date">${c.date ? new Date(c.date).toLocaleDateString() : ''}</span>
+        <span class="cve-date">${date}</span>
       </div>
-      <div class="cve-title">${esc(c.title)}</div>
-      <div class="cve-desc">${esc(c.summary || c.content || '').slice(0, 200)}${((c.summary||c.content||'').length > 200) ? '...' : ''}</div>
+      <div class="cve-title">${esc(desc.substring(0, 120))}${desc.length > 120 ? '...' : ''}</div>
+      <div class="cve-desc">${esc(desc.substring(0, 200))}${desc.length > 200 ? '...' : ''}</div>
       <div class="cve-detail">
-        ${c.cross_ref?.nvd?.cvss_vector ? `<p style="font-size:0.7rem;color:#666;font-family:monospace;margin-bottom:0.5rem">Vector: ${esc(c.cross_ref.nvd.cvss_vector)}</p>` : ''}
-        <p style="color:var(--text);font-size:0.85rem;margin-bottom:0.8rem">${esc(c.summary || c.content || 'No description available.')}</p>
-        ${c.cross_ref?.osv?.affected?.length > 0 ? `<p style="font-size:0.75rem;color:#888;margin-bottom:0.5rem">Affected ecosystems: ${c.cross_ref.osv.affected.map(a => esc(a.ecosystem || a.package)).join(', ')}</p>` : ''}
+        ${vector ? '<p style="font-size:0.7rem;color:#666;font-family:monospace;margin-bottom:0.5rem">Vector: ' + esc(vector) + '</p>' : ''}
+        <p style="color:var(--text);font-size:0.85rem;margin-bottom:0.8rem">${esc(desc)}</p>
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
-          <button class="btn btn-red" onclick="event.stopPropagation();openFixModal('${cveId}','${esc(c.package||'')}','${esc(c.title)}','${esc(c.summary||'')}')">Generate Fix Script</button>
-          <a href="https://security.archlinux.org/${cveId}" target="_blank" class="btn btn-outline">Arch Security</a>
-          <a href="https://nvd.nist.gov/vuln/detail/${cveId}" target="_blank" class="btn btn-outline">NVD</a>
-          <a href="https://www.cve.org/CVERecord?id=${cveId}" target="_blank" class="btn btn-outline">CVE.org</a>
-          ${c.cross_ref?.nvd?.cisa_kev ? `<span class="btn btn-outline" style="border-color:#e74c3c;color:#e74c3c">⚠ Known Exploited</span>` : ''}
+          <button class="btn btn-red" onclick="event.stopPropagation();openFixModal('${esc(c.id)}')">Generate Fix Script</button>
+          <a href="https://nvd.nist.gov/vuln/detail/${c.id}" target="_blank" rel="noopener" class="btn btn-outline">NVD</a>
+          <a href="https://www.cve.org/CVERecord?id=${c.id}" target="_blank" rel="noopener" class="btn btn-outline">CVE.org</a>
+          <a href="https://security.archlinux.org/${c.id}" target="_blank" rel="noopener" class="btn btn-outline">Arch Security</a>
         </div>
       </div>
     </div>`;
@@ -175,27 +181,41 @@ function esc(s) {
 
 let currentCVE = null;
 
-async function openFixModal(cve, pkg, title, desc) {
-  currentCVE = cve;
+function openFixModal(cveId) {
+  currentCVE = cveId;
   document.getElementById('fix-modal').classList.add('visible');
-  document.getElementById('fix-title').textContent = 'Fix Script: ' + cve;
-  document.getElementById('fix-details').innerHTML = `<p><strong>Package:</strong> ${pkg || 'Unknown'}</p><p><strong>Title:</strong> ${esc(title)}</p>`;
-  document.getElementById('fix-script').textContent = 'Generating fix script...';
+  document.getElementById('fix-title').textContent = 'Fix Script: ' + cveId;
+
+  const cve = allCVEs.find(c => c.id === cveId);
+  const desc = cve ? description(cve) : '';
+  const pkg = (cve && cve.configurations) ? 'Affected package(s) — check NVD for CPE details' : 'Unknown';
+  document.getElementById('fix-details').innerHTML = '<p><strong>CVE:</strong> ' + esc(cveId) + '</p><p><strong>Description:</strong> ' + esc(desc.substring(0, 200)) + '</p>';
+
+  const script = [
+    '#!/bin/bash',
+    '# Fix script generated by AcreetionOS Security Monitor',
+    '# CVE: ' + cveId,
+    '# Generated: ' + new Date().toISOString(),
+    '#',
+    '# WARNING: Review this script before running.',
+    '# The AcreetionOS project is not responsible for any damage or data loss.',
+    '',
+    'echo "=== AcreetionOS CVE Fix: ' + cveId + ' ==="',
+    'echo ""',
+    'echo "Updating all packages (safest approach):"',
+    'echo "  sudo pacman -Syu"',
+    'echo ""',
+    'echo "To apply fixes immediately:"',
+    'sudo pacman -Syu --noconfirm',
+    '',
+    'echo ""',
+    'echo "Fix applied. Reboot if kernel was updated."'
+  ].join('\n');
+
+  document.getElementById('fix-script').textContent = script;
   document.getElementById('fix-agree').checked = false;
   document.getElementById('fix-download-btn').disabled = true;
-  document.getElementById('fix-arch-link').href = 'https://security.archlinux.org/' + cve;
-
-  try {
-    const res = await fetch('/api/cve/fix', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cve, accepted: true })
-    });
-    const data = await res.json();
-    document.getElementById('fix-script').textContent = data.script || 'Error generating script';
-  } catch (e) {
-    document.getElementById('fix-script').textContent = 'Error: ' + e.message;
-  }
+  document.getElementById('fix-arch-link').href = 'https://security.archlinux.org/' + cveId;
 
   document.getElementById('fix-agree').onchange = function() {
     document.getElementById('fix-download-btn').disabled = !this.checked;
@@ -220,10 +240,12 @@ function downloadFixScript() {
 function copyFixScript() {
   const script = document.getElementById('fix-script').textContent;
   navigator.clipboard.writeText(script).then(() => {
-    const btn = document.querySelector('.btn-outline');
-    const orig = btn.textContent;
-    btn.textContent = '✓ Copied!';
-    setTimeout(() => btn.textContent = orig, 2000);
+    const btn = document.querySelectorAll('.btn-outline')[0];
+    if (btn) {
+      const orig = btn.textContent;
+      btn.textContent = '\u2713 Copied!';
+      setTimeout(() => btn.textContent = orig, 2000);
+    }
   }).catch(() => {});
 }
 

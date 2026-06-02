@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AcreetionOS USB Flasher — Download & Flash</title>
-    <meta name="description" content="Download and flash AcreetionOS ISOs. Featuring Cinnamon, XLibre, and more." />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcreetionOS USB Flasher — Download &amp; Flash</title>
+    <meta name="description" content="Download and flash AcreetionOS ISOs. Featuring Cinnamon, XLibre, and more.">
 
     <!-- Schema.org JSON-LD -->
     <script type="application/ld+json">
@@ -104,6 +104,7 @@
             padding: 0.6rem 1.2rem;
             border-radius: 8px;
             font-weight: 700;
+            font-family: var(--font-sans);
             border: none;
             cursor: pointer;
             transition: transform 0.2s;
@@ -181,6 +182,38 @@
             max-width: 700px;
             position: relative;
         }
+
+        .btn-github { background: #333; }
+        .loading-text { text-align: center; color: var(--acreetion-text); }
+        .divider { border: 0; border-top: 1px solid var(--acreetion-box-border); margin: 3rem 0; }
+        .h3-accent { color: var(--acreetion-green); }
+        .h3-accent.mt-2 { margin-top: 2rem; }
+        .info-box { background: rgba(46,204,113,0.05); border: 1px solid var(--acreetion-box-border); border-radius: 12px; padding: 1.5rem; }
+        .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; }
+        .form-input { width: 100%; padding: 0.6rem; background: #111; color: #fff; border: 1px solid #444; border-radius: 6px; margin-bottom: 1rem; }
+        .dd-output { display: none; margin-top: 1rem; }
+        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #fff; cursor: pointer; font-size: 1.5rem; }
+        .modal-terminal { max-height: 300px; overflow-y: auto; }
+        .modal-result { margin-top: 1rem; }
+        .section-title-official { color: var(--acreetion-green); border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .section-title-community { color: var(--storm-color); border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-top: 2.5rem; }
+        .card-title { margin: 0 0 0.5rem 0; color: var(--acreetion-text-bright); }
+        .card-desc { font-size: 0.85rem; color: var(--acreetion-text); margin-bottom: 1rem; }
+        .card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-mirror {
+            padding: 0.4rem 0.8rem;
+            font-size:0.75rem;
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+        }
+        .btn-mirror:hover {
+            background: var(--storm-color);
+            filter: none;
+            transform: translateY(-1px);
+        }
+        .btn-download-flasher { display: inline-block; margin-top: 1rem; font-size: 1.1rem; padding: 0.8rem 1.6rem; }
     </style>
 </head>
 <body>
@@ -192,7 +225,7 @@
             <a href="hosting.html">ISO Hosting</a>
             <a href="wiki.html">Wiki</a>
             <a href="contact.html">Support</a>
-            <a href="https://github.com/acreetionos-code/" class="btn btn-storm" style="background:#333">GitHub</a>
+            <a href="https://github.com/acreetionos-code/" class="btn btn-storm btn-github">GitHub</a>
         </nav>
     </div>
 </header>
@@ -208,32 +241,26 @@
 
                 <!-- This is where JavaScript injects the Cinnamon and other editions -->
                 <div id="editions-container">
-                    <p style="text-align:center; color:var(--acreetion-text);">Loading editions...</p>
+                    <p class="loading-text">Loading editions...</p>
                 </div>
 
-                <hr style="border:0; border-top:1px solid var(--acreetion-box-border); margin:3rem 0;">
+                <hr class="divider">
 
-                <h3 style="color:var(--acreetion-green);">Option 1: Desktop App Flasher</h3>
-                <div style="background:rgba(46,204,113,0.05); border:1px solid var(--acreetion-box-border); border-radius:12px; padding:1.5rem;">
+                <h3 class="h3-accent">Option 1: Desktop App for make USB Drive</h3>
+                <div class="info-box">
                     <p>The easiest way. A cross-platform app to select an edition and flash directly.</p>
-                    <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:1rem;">
-                        <a href="https://github.com/spivanatalie64/acreetionos-flasher/releases/latest" class="btn btn-flasher"><i class="bi bi-windows"></i> Windows</a>
-                        <a href="https://github.com/spivanatalie64/acreetionos-flasher/releases/latest" class="btn btn-flasher"><i class="bi bi-apple"></i> macOS</a>
-                        <a href="https://github.com/spivanatalie64/acreetionos-flasher/releases/latest" class="btn btn-flasher"><i class="bi bi-linux"></i> Linux (AppImage)</a>
-                    </div>
+                    <a id="flasher-download-btn" href="https://github.com/spivanatalie64/AcreetionMediaWriter/releases" class="btn btn-flasher btn-download-flasher">Download USB Maker</a>
                 </div>
 
-                <h3 style="color:var(--acreetion-green); margin-top:2rem;">Option 2: Terminal <code>dd</code> Command</h3>
-                <div style="background:rgba(46,204,113,0.05); border:1px solid var(--acreetion-box-border); border-radius:12px; padding:1.5rem;">
-                    <label style="display:block; margin-bottom:0.5rem;">1. Select Edition:</label>
-                    <select id="dd-edition" style="width:100%; padding:0.6rem; background:#111; color:#fff; border:1px solid #444; border-radius:6px; margin-bottom:1rem;">
-                        <option value="https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso">Cinnamon Edition (Official)</option>
-                        <option value="https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS_XL-1.0-x86_64.iso/download">XL (XLibre) Edition</option>
+                <h3 class="h3-accent mt-2">Option 2: Terminal <code>dd</code> Command</h3>
+                <div class="info-box">
+                    <label class="form-label">1. Select Edition:</label>
+                    <select id="dd-edition" class="form-input">
                     </select>
-                    <label style="display:block; margin-bottom:0.5rem;">2. USB Device (e.g., /dev/sdX):</label>
-                    <input id="dd-device" type="text" value="/dev/sdX" style="width:100%; padding:0.6rem; background:#111; color:#fff; border:1px solid #444; border-radius:6px; margin-bottom:1rem;">
-                    <button onclick="generateDD()" class="btn btn-cinnamon">Generate Command</button>
-                    <pre id="dd-output" style="display:none; margin-top:1rem;"><code id="dd-code"></code></pre>
+                    <label class="form-label">2. USB Device (e.g., /dev/sdX):</label>
+                    <input id="dd-device" type="text" value="/dev/sdX" class="form-input">
+                    <button type="button" onclick="generateDD()" class="btn btn-cinnamon">Generate Command</button>
+                    <pre id="dd-output" class="dd-output"><code id="dd-code"></code></pre>
                 </div>
             </div>
         </article>
@@ -243,11 +270,11 @@
 <!-- Build Terminal Modal -->
 <div id="build-modal" class="modal-overlay">
     <div class="modal-box">
-        <button onclick="closeBuildModal()" style="position:absolute; top:1rem; right:1rem; background:none; border:none; color:#fff; cursor:pointer; font-size:1.5rem;">&times;</button>
-        <h2 id="build-title" style="color:var(--acreetion-green)">Building...</h2>
+        <button type="button" onclick="closeBuildModal()" class="modal-close-btn">&times;</button>
+        <h2 id="build-title" class="h3-accent">Building...</h2>
         <div id="build-status"></div>
-        <pre id="build-terminal" style="max-height:300px; overflow-y:auto;">Waiting to start...</pre>
-        <div id="build-result" style="margin-top:1rem;"></div>
+        <pre id="build-terminal" class="modal-terminal">Waiting to start...</pre>
+        <div id="build-result" class="modal-result"></div>
     </div>
 </div>
 
@@ -255,12 +282,34 @@
 const EDITIONS = [
   {id:'cinnamon', label:'Cinnamon Edition', desc:'The main AcreetionOS flagship desktop. Stable and feature-rich.', official:true,
    iso_url:'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso',
-   mirrors:[{url:'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso',name:'Archive.org'},
-            {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download',name:'SourceForge'}]},
+   mirrors:[{url:'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso',name:'Internet Archive'},
+             {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download',name:'SourceForge'},
+             {url:'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso',name:'OSUOSL'},
+             {url:'https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS-1.0-x86_64.iso',name:'RWTH Aachen'}]},
 
-  {id:'xl', label:'XL (XLibre) Edition', desc:'Experimental edition featuring the XLibre display server.', official:true,
+  {id:'xl', label:'XL (XLibre) Edition', desc:'Featuring the XLibre display server, the successor to Xorg.', official:true,
    iso_url:'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
-   mirrors:[{url:'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso',name:'IA'}]},
+    mirrors:[{url:'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso',name:'Internet Archive'},
+             {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS_XL-1.0-x86_64.iso/download',name:'SourceForge'},
+             {url:'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso',name:'OSUOSL'},
+             {url:'https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS_XL-1.0-x86_64.iso',name:'RWTH Aachen'}]},
+
+
+
+  {id:'mate', label:'Mate Edition', desc:'AcreetionOS Configured with the MATE Desktop Environment.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Mate-latest.iso'},
+  
+  {id:'lxqt', label:'LXQT Edition', desc:'AcreetionOS Configured with the LXQT Desktop Environment.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-LXQT-latest.iso'},
+
+   {id:'lxde', label:'LXDE Edition', desc:'AcreetionOS Configured with the LXDE Desktop Environment.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-LXDE-latest.iso'},
+
+   {id:'budgie', label:'Budgie Edition', desc:'AcreetionOS Configured with the Budgie Desktop Environment.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Budgie-latest.iso'},
+
+   {id:'cosmic', label:'Cosmic Edition', desc:'AcreetionOS Configured with the Cosmic Desktop Environment.', official:false,
+   iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Cosmic-latest.iso'},
 
   {id:'plasma', label:'Plasma Edition', desc:'Modern, powerful KDE Plasma desktop experience.', official:false,
    iso_url:'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-Plasma-latest.iso'},
@@ -280,36 +329,61 @@ function loadEditions() {
     const official = EDITIONS.filter(e => e.official);
     const unofficial = EDITIONS.filter(e => !e.official);
 
-    let html = `<h3 style="color:var(--acreetion-green); border-bottom:1px solid #333; padding-bottom:0.5rem;">Official Editions</h3>`;
+    let html = `<h3 class="section-title-official">Official Editions</h3>`;
     html += `<div class="edition-grid">`;
     official.forEach(e => { html += renderEditionCard(e); });
     html += `</div>`;
 
-    html += `<h3 style="color:var(--storm-color); border-bottom:1px solid #333; padding-bottom:0.5rem; margin-top:2.5rem;">Community Editions</h3>`;
-    html += `<div class="edition-grid">`;
-    unofficial.forEach(e => { html += renderEditionCard(e); });
+    html += `<h3 class="section-title-community">Community Editions &mdash; Preview</h3>`;
+    html += `<div class="info-box" style="margin-bottom:1.5rem; background:rgba(97,175,239,0.05); border-color:var(--storm-color)">`;
+    html += `<p style="margin:0 0 0.75rem 0"><strong><i class="bi bi-info-circle"></i> These editions are on the way.</strong> When they drop, you can flash them with the Terminal <code>dd</code> command above — just paste the ISO URL, enter your USB device, and hit <em>Generate Command</em>. Or use the <strong>Desktop App Flasher</strong> for a point-and-click experience.</p>`;
+    html += `<p style="margin:0; font-size:0.85rem; color:var(--acreetion-text)">New to <code>dd</code>? It&rsquo;s simple: <code>sudo dd if=/path/to/iso of=/dev/sdX bs=4M status=progress && sync</code>. <strong>Double-check your device</strong> — <code>dd</code> will overwrite whatever you point it at.</p>`;
     html += `</div>`;
+    html += `<div class="edition-grid">`;
+    unofficial.forEach(e => { html += renderEditionCard(e, true); });
+    html += `</div>`;
+     html += `<div style="margin-top:2rem; background: linear-gradient(135deg, rgba(88,101,242,0.1) 0%, rgba(88,101,242,0.05) 100%); border: 1px solid #5865F2; border-radius: 12px; padding: 1.5rem; text-align: center">
+         <i class="bi bi-discord" style="font-size:1.5rem;color:#5865F2;display:block;margin-bottom:0.5rem"></i>
+         <p style="margin:0 0 1rem 0;font-size:0.95rem;color:var(--acreetion-text)">Want more Window Managers, Compositors, or Desktop Environments?</p>
+         <a href="https://discord.acreetionos.org" class="btn btn-storm" style="background:#5865F2;color:#fff;font-size:0.9rem" target="_blank" rel="noopener"><i class="bi bi-discord"></i> Join our Discord</a>
+     </div>`;
 
     container.innerHTML = html;
-}
 
-function renderEditionCard(e) {
-    let mirrorButtons = '';
-    if (e.mirrors) {
-        e.mirrors.forEach(m => {
-            mirrorButtons += `<a href="${m.url}" class="btn btn-storm" style="font-size:0.7rem; padding:0.4rem 0.8rem;">${m.name}</a>`;
+    const ddSelect = document.getElementById('dd-edition');
+    if (ddSelect) {
+        ddSelect.innerHTML = '';
+        official.forEach(e => {
+            const opt = document.createElement('option');
+            opt.value = e.iso_url;
+            opt.textContent = e.label;
+            ddSelect.appendChild(opt);
         });
     }
+}
+
+function renderEditionCard(e, isCommunity = false) {
+    let mirrorHTML = '';
+    if (e.mirrors && e.mirrors.length > 0) {
+        e.mirrors.forEach(m => {
+            mirrorHTML += `<a href="${m.url}" class="btn btn-mirror" target="_blank" rel="noopener">${m.name}</a>`;
+        });
+    }
+
+    const maintainerBtn = isCommunity
+        ? `<a href="https://tally.so/r/rjvgKL" class="btn" style="background:linear-gradient(135deg,var(--acreetion-purple),#8e44ad);color:#fff;padding:0.55rem 1rem;font-size:0.8rem;box-shadow:0 4px 14px rgba(155,89,182,0.3);margin-left:4px" target="_blank" rel="noopener" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(155,89,182,0.45)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(155,89,182,0.3)'"><i class="bi bi-person-plus"></i> Apply for Maintainership</a>`
+        : '';
 
     return `
     <div class="edition-card">
         <div>
-            <h4 style="margin:0 0 0.5rem 0; color:var(--acreetion-text-bright);">${e.label}</h4>
-            <p style="font-size:0.85rem; color:var(--acreetion-text); margin-bottom:1rem;">${e.desc}</p>
+            <h4 class="card-title">${e.label}</h4>
+            <p class="card-desc">${e.desc}</p>
         </div>
-        <div style="display:flex; flex-wrap:wrap; gap:8px;">
-            <a href="${e.iso_url}" class="btn btn-cinnamon">Download ISO</a>
-            ${mirrorButtons}
+        <div class="card-actions">
+            <a href="${e.iso_url}" class="btn btn-cinnamon">${isCommunity ? 'Coming Soon' : 'Download ISO'}</a>
+            ${maintainerBtn}
+            ${mirrorHTML}
         </div>
     </div>`;
 }
@@ -327,6 +401,45 @@ function closeBuildModal() {
 }
 
 document.addEventListener('DOMContentLoaded', loadEditions);
+
+const FLASHER_URLS = {
+    windows: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-win64-5.3.1.exe',
+    macos_intel: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-macos-5.3.1.dmg',
+    macos_arm: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-macos-arm64-5.3.1.dmg',
+    linux: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-linux-x86_64-5.3.1.AppImage',
+    fallback: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases'
+};
+
+function detectOS() {
+    const ua = navigator.userAgent;
+    if (ua.includes('Windows')) return 'windows';
+    if (ua.includes('Linux') && !ua.includes('Android')) return 'linux';
+    if (ua.includes('Mac')) return 'macos';
+    return null;
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const btn = document.getElementById('flasher-download-btn');
+    if (!btn) return;
+
+    const os = detectOS();
+    if (!os) return;
+
+    if (os === 'macos') {
+        let isArm = false;
+        try {
+            if (navigator.userAgentData?.getHighEntropyValues) {
+                const ua = await navigator.userAgentData.getHighEntropyValues(['architecture']);
+                isArm = ua.architecture === 'arm';
+            }
+        } catch (e) {}
+        btn.href = isArm ? FLASHER_URLS.macos_arm : FLASHER_URLS.macos_intel;
+    } else if (os === 'windows') {
+        btn.href = FLASHER_URLS.windows;
+    } else if (os === 'linux') {
+        btn.href = FLASHER_URLS.linux;
+    }
+});
 </script>
 
 </body>

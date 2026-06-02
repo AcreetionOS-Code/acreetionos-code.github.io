@@ -25,5 +25,5 @@
                                 class="result-title-link" @click.stop>{{ result.title }}</a></h3><div class="result-snippet" v-html="result.snippet"></div></div></template><div v-else-if="infoMessage" class="notice" v-html="infoMessage"></div><div v-if="hasSearched" class="external-search-section"><h2>External Search</h2><p style="text-align: center; margin-bottom: 15px; font-size: 0.9em; opacity: 0.8;">
                         Direct search API for some sources may be unavailable. Use these links to search externally.
                     </p><a v-for="source in externalSources" :key="source.key" :href="generateExternalUrl(source.key)"
-                        target="_blank" rel="noopener noreferrer" class="external-link"
+                        target="_blank" rel="noopener noreferrer" class="external-link">{{ source.key }}</a>
 <button id="back-to-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'});">↑</button><script>document.addEventListener('DOMContentLoaded',() => {const btn = document.getElementById('back-to-top');if(!btn) return;window.addEventListener('scroll',() => {if(window.scrollY > 400){btn.classList.add('visible')} else{btn.classList.remove('visible')}})});</script><script src="social-icons.js" defer></script></body></html>
