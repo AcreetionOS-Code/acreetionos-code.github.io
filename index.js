@@ -14,7 +14,7 @@ const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
 const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
 // Use only explicitly free community models. Keep the values in one place.
-const FREE_MODEL = 'google/gemma-2-2b-it:free';
+const FREE_MODEL = 'openrouter/auto';
 const WHISPER_MODEL = 'openai/whisper-large-v3';
 const TTS_MODEL = 'cartesia-ai/cartesia-tts';
 const ALLOWED_ORIGINS = [
