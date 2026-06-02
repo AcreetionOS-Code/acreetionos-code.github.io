@@ -149,25 +149,46 @@ async function produceGuide(title){
   document.body.style.overflow='hidden';
   loading.style.display='block';
   contentArea.style.display='none';
+  var rawText='',originalUrl='https://wiki.archlinux.org/title/'+encodeURIComponent(title.replace(/ /g,'_'));
   try{
-    var wikiRes=await fetch('https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=1800&redirects=1&titles='+encodeURIComponent(title)+'&format=json&origin=*');
+    var wikiRes=await fetch('https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=3000&redirects=1&titles='+encodeURIComponent(title)+'&format=json&origin=*');
     var wikiData=await wikiRes.json();
     var page=Object.values(wikiData.query.pages)[0];
-    var rawText=page.extract||'';
-    var prompt='Rewrite this for an absolute computer beginner on AcreetionOS (Cinnamon Desktop). Use common language. Explain steps using the mouse/menus where possible.\n\nTopic: '+title+'\n\nTechnical Context: '+rawText+'\n\nRESPONSE: PURE MARKDOWN ONLY.';
-    var aiRes=await fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],model:'openai',private:true})});
-    var finalBody=await aiRes.text();
-    try{var j=JSON.parse(finalBody);finalBody=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||finalBody;}catch(e){}
-    finalBody=finalBody.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
-    loading.style.display='none';
-    contentArea.style.display='block';
+    rawText=page.extract||'';
+  }catch(e){}
+
+  var finalBody=null;
+  var attempts=[
+    {model:'openai',system:'You are a patient Linux teacher for complete beginners on AcreetionOS (Cinnamon Desktop, Arch-based). Write clear, step-by-step guides using plain English. Assume the user knows nothing about the terminal. Default to GUI methods (menus, clicks) first, then offer terminal alternatives marked as "(Advanced)".'},
+    {model:'mistral',system:'You explain Linux simply for beginners on AcreetionOS. Use GUI-first instructions. No jargon without explanation.'}
+  ];
+
+  for(var a=0;a<attempts.length;a++){
+    try{
+      var prompt=attempts[a].system+'\n\n## Topic: '+title+'\n\n## Technical Context\n'+rawText+'\n\n## Instructions\nWrite a beginner-friendly guide with these sections:\n1. **What is this?** — one sentence summary\n2. **What you need** — prerequisites if any\n3. **Step-by-step** — numbered GUI steps, then terminal alternative if applicable\n4. **Troubleshooting** — common issues\n\nUse markdown. Keep it simple. No theory dumps.';
+      var aiRes=await fetch('https://text.pollinations.ai/',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],model:attempts[a].model,private:true})});
+      var text=await aiRes.text();
+      try{var j=JSON.parse(text);text=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||text;}catch(e){}
+      text=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+      if(text&&text.length>50){finalBody=text;break;}
+    }catch(e){}
+  }
+
+  loading.style.display='none';
+  contentArea.style.display='block';
+
+  if(finalBody){
     document.getElementById('modal-title').innerText=title;
     document.getElementById('modal-body').innerHTML=marked.parse(finalBody);
-    document.getElementById('modal-link').href='https://wiki.archlinux.org/title/'+encodeURIComponent(title.replace(/ /g,'_'));
-  }catch(e){
-    loading.style.display='none';
-    contentArea.style.display='block';
-    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Failed to generate guide. Try another topic.</p>';
+    document.getElementById('modal-link').href=originalUrl;
+  } else if(rawText){
+    document.getElementById('modal-title').innerText=title+' (AI unavailable)';
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c;margin-bottom:1rem">AI guide generation failed. Showing the raw Arch Wiki content instead:</p>'+marked.parse(rawText.slice(0,3000));
+    document.getElementById('modal-link').href=originalUrl;
+  } else {
+    document.getElementById('modal-title').innerText='Error';
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Could not load this topic. <button onclick="produceGuide(\''+title.replace(/'/g,"\\'")+'\')" style="background:none;border:1px solid var(--acreetion-green);color:var(--acreetion-green);padding:.3rem .8rem;border-radius:6px;cursor:pointer;margin-left:.5rem">Try Again</button></p>';
+    document.getElementById('modal-link').href=originalUrl;
   }
 }
 </script>
