@@ -1780,59 +1780,59 @@ async function handleBestMirror(request, env) {
 }
 
 async function handleCVEFeed(env, ctx) {
-  // Stale-while-revalidate: serve cached data immediately, refresh in background
+  // Serve cached data immediately if available, refresh in background
   const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json').catch(() => null);
   const cacheAge = cached ? (Date.now() - new Date(cached.updated || 0).getTime()) : Infinity;
-  const isFresh = cacheAge < 5 * 60 * 1000; // 5 minutes
 
-  if (cached && isFresh) {
+  if (cached && cacheAge < 5 * 60 * 1000) {
     return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, source: 'cached' }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
 
-  // Background refresh function — fire and forget
-  async function refreshCache() {
+  async function enrichAndCache(cves) {
     try {
-      const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
-        headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' },
-        signal: AbortSignal.timeout(20000)
-      });
-      if (!res.ok) return;
-      const xml = await res.text();
-      const cves = parseArchAtom(xml);
-
-      // Enrich first 5 CVEs only
-      const toEnrich = cves.slice(0, 5);
+      const toEnrich = cves.slice(0, 3);
       const enriched = await Promise.all(toEnrich.map(async (cve) => {
         const crossRef = await crossReferenceCVE(cve.primary_cve).catch(() => null);
         return { ...cve, cross_ref: crossRef };
       }));
-      const allCves = [...enriched, ...cves.slice(5).map(c => ({ ...c, cross_ref: null }))];
-
+      const allCves = [...enriched, ...cves.slice(3).map(c => ({ ...c, cross_ref: null }))];
       await putR2(env, 'acreetionos-hosting', 'cve-cache.json', {
         updated: new Date().toISOString(), cves: allCves, count: allCves.length,
         source: 'security.archlinux.org/advisory/feed.atom'
       });
-    } catch (e) { /* background refresh failed, stale cache will be served next time */ }
+    } catch (e) { /* enrichment failed */ }
   }
 
+  // Fetch Atom feed with a short timeout — if it's slow, serve stale cache or fail fast
+  let atomCves = null;
+  try {
+    const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
+      headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (res.ok) {
+      atomCves = parseArchAtom(await res.text());
+    }
+  } catch (e) { /* timeout or error */ }
+
+  if (atomCves && atomCves.length > 0) {
+    // Return immediately with unenriched data, enrich in background
+    const payload = { cves: atomCves.map(c => ({ ...c, cross_ref: null })), count: atomCves.length, updated: new Date().toISOString(), source: 'security.archlinux.org' };
+    ctx.waitUntil(enrichAndCache(atomCves));
+    return new Response(JSON.stringify(payload), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=120', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  }
+
+  // Atom feed failed — serve stale cache if available
   if (cached) {
-    // Serve stale cache now, refresh in background
-    ctx.waitUntil(refreshCache());
     return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, source: 'cached (stale)', cached: true }), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
 
-  // No cache at all — wait for fresh data
-  await refreshCache();
-  const fresh = await getR2(env, 'acreetionos-hosting', 'cve-cache.json').catch(() => null);
-  if (fresh && fresh.cves) {
-    return new Response(JSON.stringify({ cves: fresh.cves, count: fresh.count, updated: fresh.updated, source: 'fresh' }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
-    });
-  }
   return new Response(JSON.stringify({ error: 'No CVE data available', cves: [], count: 0 }), { headers: getCors() });
 }
 
