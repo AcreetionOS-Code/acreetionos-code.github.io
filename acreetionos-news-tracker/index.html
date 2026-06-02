@@ -7,11 +7,14 @@
   <meta name="theme-color" content="#2ecc71">
   <title>AcreetionOS News Tracker</title>
   <link rel="icon" href="https://acreetionos.org/acreetionoslogo.webp">
+  <link rel="stylesheet" href="../sidebar.css">
   <link rel="stylesheet" href="fonts.css">
   <style>
     :root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--box:#222;--border:#333;--bright:#e5e5e5;--muted:#b2b2b2;--purple:#9b59b6;--blue:#61afef;--orange:#f39c12;--red:#e74c3c;--sans:'Roboto',sans-serif;--mono:'Fira Code',monospace}
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:var(--sans);background:var(--bg);color:var(--bright);line-height:1.6;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px;min-height:100vh}
+    #page-wrap{width:100%;min-width:0;background:var(--bg);overflow-wrap:break-word}
+    body.sidebar-open #page-wrap{margin-left:300px;max-width:calc(100vw - 300px)}
     header{background:rgba(24,26,27,0.9);backdrop-filter:blur(12px);border-bottom:2px solid var(--green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:100;padding:0.75rem 2rem;display:flex;align-items:center;justify-content:space-between}
     header h1{font-family:var(--mono);font-size:1.4rem;color:var(--green);display:flex;align-items:center;gap:0.6rem}
     .live-dot{width:8px;height:8px;background:var(--red);border-radius:50%;animation:pulse 1.2s ease-in-out infinite}
@@ -69,16 +72,17 @@
   </style>
 </head>
 <body>
-<header>
-  <h1><span class="live-dot"></span> AcreetionOS News</h1>
-  <nav>
-    <a href="https://acreetionos.org">Home</a>
-    <a href="https://acreetionos.org/developers.html">Devs</a>
-    <a href="https://github.com/AcreetionOS-Code">GitHub</a>
-  </nav>
-</header>
-
-<div class="container">
+  <div id="page-wrap">
+  <header>
+    <h1><span class="live-dot"></span> AcreetionOS News Tracker</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../git-tracker.html">Git Tracker</a>
+      <a href="../build.html">ISO Builder</a>
+    </nav>
+  </header>
+  <div class="container">
   <div class="status-bar" id="status-bar">
     <span class="spinner" id="spinner"></span>
     <span id="status-text">Fetching latest news…</span>
@@ -390,5 +394,7 @@
   setInterval(function(){ fetchNews(true); }, 300000);
 })();
 </script>
+<script src="../sidebar.js" defer></script>
+</div>
 </body>
 </html>

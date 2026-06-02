@@ -16,84 +16,158 @@
 <meta property="twitter:description" content="Build any AcreetionOS edition on demand." >
 <meta property="twitter:image" content="https://acreetionos.org/logo.webp" >
 <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
 <link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="contact.css">
+<link rel="stylesheet" href="sidebar.css">
 <style>
-:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--storm-color:#61afef;--flasher-color:#f39c12;--acreetion-purple:#9b59b6;--font-sans:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:'Fira Code',monospace}
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--storm-color:#61afef;--flasher-color:#f39c12;--acreetion-purple:#9b59b6;--cinnamon-color:#2ecc71;--xlibre-color:#e67e22;--bit32-color:#3498db;--hyprland-color:#9b59b6;--mate-color:#f1c40f;--gnome-color:#e06c75;--plasma-color:#61afef;--xfce-color:#f39c12;--sway-color:#1abc9c;--i3-color:#95a5a6;--openbox-color:#e74c3c;--immutable-color:#2c3e50;--font-sans:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:'Fira Code',monospace}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
-.page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);position:sticky;top:0;z-index:1000}
+body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px}
+.skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0}
+.skip-link:focus{top:0}
+.page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000}
 .header-content{display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto;padding:0.75rem 2rem}
 .logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none}
-.logo-img{height:40px;width:auto}
+.logo-img{height:40px;width:auto;border-radius:6px}
 .logo-text span{color:var(--acreetion-green)}
-.main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500}
-.main-nav a:hover{color:var(--acreetion-text-bright)}
-.btn-storm{background-color:var(--storm-color)}
+.main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500;transition:color 0.2s}
+.main-nav a:hover,.main-nav a.active{color:var(--acreetion-text-bright)}
 .main-nav a.btn-storm{color:#fff}
-.content-box{background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);max-width:1400px;margin:2rem auto;padding:0}
+.btn-storm{background-color:var(--storm-color);color:#fff!important}
+.page-wrapper{max-width:1400px;margin:2rem auto;padding:0 2rem}
+.content-box{background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;margin-bottom:2rem;overflow:hidden;transition:transform 0.3s ease,box-shadow 0.3s ease}
+.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5)}
 .box-header{padding:0.8rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);background-color:#1a1a1a}
-.box-header h2{font-family:var(--font-mono);font-size:1.3rem;color:var(--acreetion-text-bright);font-weight:700}
+.box-header h2{font-family:var(--font-mono);font-size:1.3rem;color:var(--acreetion-text-bright);font-weight:700;display:flex;align-items:center;gap:0.75rem}
 .box-body{padding:1.5rem}
 .box-body h3{font-family:var(--font-mono);font-size:1.1rem;margin-top:1.5rem;margin-bottom:0.5rem;border-bottom:1px solid var(--acreetion-box-border);padding-bottom:0.5rem}
-select{width:100%;padding:0.8rem 1rem;background:var(--acreetion-code-bg);color:var(--acreetion-text-bright);border:1px solid var(--acreetion-box-border);font-family:var(--font-sans);font-size:1rem;margin-bottom:1rem;cursor:pointer}
-select:focus{border-color:var(--acreetion-green);outline:none}
-.btn{display:inline-block;color:#000;text-decoration:none;padding:0.7rem 1.5rem;font-weight:700;border:none;cursor:pointer;font-family:var(--font-sans);font-size:1rem}
-.btn:hover{filter:brightness(1.1)}
+.edition-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin:1.5rem 0}
+.edition-card{background:var(--acreetion-panel-bg);border:2px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem;cursor:pointer;transition:all 0.25s ease;text-align:center;position:relative;overflow:hidden;user-select:none}
+.edition-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:12px 12px 0 0;transition:height 0.25s ease}
+.edition-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.edition-card:hover::before{height:6px}
+.edition-card.selected{border-color:var(--acreetion-green);box-shadow:0 0 20px rgba(46,204,113,0.15)}
+.edition-card.selected::after{content:'\2713';position:absolute;top:8px;right:10px;font-size:1.2rem;font-weight:700;color:var(--acreetion-green)}
+.edition-card .edition-icon{font-size:2rem;margin-bottom:0.5rem;display:block}
+.edition-card .edition-name{font-weight:700;font-size:0.95rem;color:var(--acreetion-text-bright);display:block}
+.edition-card .edition-desc{font-size:0.78rem;color:var(--acreetion-text);margin-top:0.3rem;display:block}
+.edition-card.disabled{opacity:0.5;cursor:default;pointer-events:none}
+.btn{display:inline-block;color:#000;text-decoration:none;padding:0.7rem 1.5rem;font-weight:700;border:none;cursor:pointer;font-family:var(--font-sans);font-size:1rem;border-radius:12px;transition:all 0.3s ease}
+.btn:hover{filter:brightness(1.1);box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px)}
 .btn-cinnamon{background-color:var(--acreetion-green)}
-.btn-storm{background-color:var(--storm-color)}
 .btn-flasher{background-color:var(--flasher-color)}
 .btn-purple{background-color:var(--acreetion-purple);color:#fff!important}
 .btn-dark{background-color:#333;color:#fff!important}
-#build-btn{width:100%;padding:1rem;font-size:1.2rem;margin-bottom:0.5rem}
-#build-btn:disabled{opacity:0.5;cursor:not-allowed}
+#build-btn{width:100%;padding:1rem;font-size:1.2rem;margin-bottom:0.5rem;border-radius:12px}
+#build-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
 .progress-section{display:none;margin-top:1.5rem}
-.progress-bar-track{width:100%;height:24px;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);overflow:hidden;margin-bottom:0.5rem}
-.progress-bar-fill{height:100%;background:var(--acreetion-green);width:0%;transition:width 1s ease}
+.progress-bar-track{width:100%;height:24px;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;overflow:hidden;margin-bottom:0.5rem}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--acreetion-green),#27ae60);width:0%;transition:width 1s ease;border-radius:12px}
 .progress-text{font-family:var(--font-mono);font-size:0.9rem;color:var(--acreetion-text);margin-bottom:1rem}
-.status-card{padding:1rem;margin-top:1rem;border-left:3px solid var(--acreetion-green);background:rgba(46,204,113,0.05)}
+.status-card{padding:1rem;margin-top:1rem;border-radius:12px;border-left:3px solid var(--acreetion-green);background:rgba(46,204,113,0.05)}
 .status-card.failed{border-left-color:#e74c3c;background:rgba(231,76,60,0.05)}
 .status-card.building{border-left-color:var(--flasher-color);background:rgba(243,156,18,0.05)}
 .status-card a{color:var(--acreetion-green);text-decoration:none;font-weight:500}
-.download-btn{display:block;text-align:center;padding:1.2rem;font-size:1.3rem;margin-top:1rem;background:var(--acreetion-green);color:#000;text-decoration:none;font-weight:700;animation:pulse 2s infinite}
+.download-btn{display:block;text-align:center;padding:1.2rem;font-size:1.3rem;margin-top:1rem;background:linear-gradient(135deg,var(--acreetion-green),#27ae60);color:#000;text-decoration:none;font-weight:700;border-radius:12px;animation:pulse 2s infinite}
 @keyframes pulse{0%{opacity:1}50%{opacity:0.7}100%{opacity:1}}
 .all-statuses{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.5rem;margin-top:1rem}
-.mini-status{padding:0.5rem 0.75rem;font-size:0.85rem;border:1px solid var(--acreetion-box-border);background:var(--acreetion-panel-bg)}
+.mini-status{padding:0.5rem 0.75rem;font-size:0.85rem;border:1px solid var(--acreetion-box-border);border-radius:8px;background:var(--acreetion-panel-bg)}
 .mini-status .edition-name{font-weight:700;color:var(--acreetion-text-bright)}
-.mini-status .badge{display:inline-block;font-size:0.75rem;padding:0.15rem 0.5rem;margin-left:0.5rem;font-weight:700}
+.mini-status .badge{display:inline-block;font-size:0.75rem;padding:0.15rem 0.5rem;margin-left:0.5rem;font-weight:700;border-radius:4px}
 .badge-success{background:var(--acreetion-green);color:#000}
 .badge-building{background:var(--flasher-color);color:#000}
 .badge-failed{background:#e74c3c;color:#fff}
 .badge-unknown{background:var(--acreetion-box-border);color:var(--acreetion-text)}
-.gh-link{text-align:center;margin-top:1rem;padding:1rem;background:rgba(97,175,239,0.05);border:1px solid var(--acreetion-box-border)}
+.gh-link{text-align:center;margin-top:1rem;padding:1rem;background:rgba(97,175,239,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px}
 .gh-link a{color:var(--storm-color)}
-.page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem}
+.page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem;background-color:var(--acreetion-panel-bg)}
+.page-footer p{color:#777;margin-bottom:0.5rem;text-align:center}
 .page-footer a{color:var(--acreetion-green);text-decoration:none}
-#log-area{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);padding:1rem;font-family:var(--font-mono);font-size:0.85rem;color:var(--acreetion-text);max-height:300px;overflow-y:auto;margin-top:0.5rem;display:none;white-space:pre-wrap}
-</style><link rel="stylesheet" href="sidebar.css">
-</head><body><div id="page-wrap">
+.page-footer a:hover{text-decoration:underline}
+#log-area{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:8px;padding:1rem;font-family:var(--font-mono);font-size:0.85rem;color:var(--acreetion-text);max-height:300px;overflow-y:auto;margin-top:0.5rem;display:none;white-space:pre-wrap}
+#back-to-top{position:fixed;bottom:30px;right:30px;background:var(--acreetion-green);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px}
+#back-to-top.visible{opacity:1;visibility:visible}
+#back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)}
+::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright)}
+:focus-visible{outline:2px solid var(--acreetion-green);outline-offset:3px;border-radius:4px}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--acreetion-body-bg)}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green)}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);will-change:opacity,transform}.reveal.active{opacity:1;transform:translateY(0)}
+html{scroll-behavior:smooth}
+@media(max-width:768px){.header-content{flex-direction:column;gap:1rem;padding:0.75rem 1rem}.main-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem}.main-nav a{margin-left:0;padding:0.5rem 0.75rem;font-size:0.85rem}.logo{font-size:1.5rem}.logo-img{height:35px}.page-wrapper{padding:0 1rem;margin:1rem auto}.box-body{padding:1rem}.content-box{margin-bottom:1rem}.edition-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.75rem}}
+@media(max-width:480px){.edition-grid{grid-template-columns:repeat(2,1fr);gap:0.5rem}.box-body{padding:0.75rem}.edition-card{padding:0.75rem}.edition-card .edition-icon{font-size:1.5rem}.page-wrapper{padding:0 0.5rem}#back-to-top{bottom:20px;right:20px;width:40px;height:40px;font-size:1rem}}
+</style>
+</head><body><a href="#main-content" class="skip-link">Skip to main content</a>
+<div id="page-wrap">
 <h1 style="display:none">AcreetionOS ISO Builder</h1>
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="async" loading="eager" fetchpriority="high"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="developers.html">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header>
+<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="async" loading="eager" fetchpriority="high"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html" class="active">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header>
 
-<div class="content-box"><div class="box-header"><h2><i class="bi bi-gear-wide-connected"></i> AcreetionOS ISO Builder</h2></div><div class="box-body">
+<div class="page-wrapper" id="main-content">
+<div class="content-box reveal"><div class="box-header"><h2><i class="bi bi-gear-wide-connected"></i> AcreetionOS ISO Builder</h2></div><div class="box-body">
 <p style="margin-bottom:1rem;color:var(--acreetion-text)">Select an edition below and trigger an automated build. The ISO will be compiled in our GitHub Actions pipeline and uploaded to Cloudflare R2. You can watch the build progress in real-time.</p>
 
-<label for="edition-select" style="display:block;margin-bottom:0.5rem;color:var(--acreetion-text-bright);font-weight:700">Choose Edition:</label>
-<select id="edition-select">
-<option value="">— Select an edition —</option>
-<option value="Cinnamon">Cinnamon (Main Edition)</option>
-<option value="XL (XLibre)">XL / XLibre Edition</option>
-<option value="32-bit">32-bit (i686) Edition</option>
-<option value="Hyprland">Hyprland Edition</option>
-<option value="MATE">MATE Edition</option>
-<option value="GNOME">GNOME Edition</option>
-<option value="Plasma">Plasma (KDE) Edition</option>
-<option value="XFCE">XFCE Edition</option>
-<option value="Sway">Sway Edition</option>
-<option value="i3">i3 Edition</option>
-<option value="Openbox">Openbox Edition</option>
-<option value="Immutable Cinnamon">Immutable Cinnamon</option>
-<option value="Immutable XLibre">Immutable XLibre</option>
-</select>
+<div class="edition-grid" id="edition-grid">
+<div class="edition-card" data-edition="Cinnamon" data-color="var(--cinnamon-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-cpu"></i></span>
+<span class="edition-name">Cinnamon</span>
+<span class="edition-desc">Main Edition — Flagship desktop</span>
+</div>
+<div class="edition-card" data-edition="XL (XLibre)" data-color="var(--xlibre-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-display"></i></span>
+<span class="edition-name">XL / XLibre</span>
+<span class="edition-desc">XLibre display server edition</span>
+</div>
+<div class="edition-card" data-edition="32-bit" data-color="var(--bit32-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-phone"></i></span>
+<span class="edition-name">32-bit</span>
+<span class="edition-desc">i686 architecture edition</span>
+</div>
+<div class="edition-card" data-edition="Hyprland" data-color="var(--hyprland-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-layers"></i></span>
+<span class="edition-name">Hyprland</span>
+<span class="edition-desc">Wayland tiling compositor</span>
+</div>
+<div class="edition-card" data-edition="MATE" data-color="var(--mate-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-window-desktop"></i></span>
+<span class="edition-name">MATE</span>
+<span class="edition-desc">Traditional desktop experience</span>
+</div>
+<div class="edition-card" data-edition="GNOME" data-color="var(--gnome-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-windows"></i></span>
+<span class="edition-name">GNOME</span>
+<span class="edition-desc">Modern, sleek desktop</span>
+</div>
+<div class="edition-card" data-edition="Plasma" data-color="var(--plasma-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-droplet"></i></span>
+<span class="edition-name">Plasma</span>
+<span class="edition-desc">KDE Plasma edition</span>
+</div>
+<div class="edition-card" data-edition="XFCE" data-color="var(--xfce-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-lightning"></i></span>
+<span class="edition-name">XFCE</span>
+<span class="edition-desc">Lightweight and fast</span>
+</div>
+<div class="edition-card" data-edition="Sway" data-color="var(--sway-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-grid-3x3-gap"></i></span>
+<span class="edition-name">Sway</span>
+<span class="edition-desc">i3-compatible Wayland</span>
+</div>
+<div class="edition-card" data-edition="i3" data-color="var(--i3-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-columns-gap"></i></span>
+<span class="edition-name">i3</span>
+<span class="edition-desc">Tiling window manager</span>
+</div>
+<div class="edition-card" data-edition="Openbox" data-color="var(--openbox-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-box"></i></span>
+<span class="edition-name">Openbox</span>
+<span class="edition-desc">Stacking window manager</span>
+</div>
+<div class="edition-card" data-edition="Immutable" data-color="var(--immutable-color)" onclick="selectEdition(this)">
+<span class="edition-icon"><i class="bi bi-shield-lock"></i></span>
+<span class="edition-name">Immutable</span>
+<span class="edition-desc">Read-only root filesystem</span>
+</div>
+</div>
 
 <button type="button" id="build-btn" class="btn btn-cinnamon" onclick="triggerBuild()" disabled>Select an edition above</button>
 
@@ -107,60 +181,59 @@ select:focus{border-color:var(--acreetion-green);outline:none}
 
 <div class="gh-link">
 <p style="margin-bottom:0.5rem;color:var(--acreetion-text)">The API trigger is not yet configured? You can manually trigger a build on GitHub:</p>
-<a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/build-all.yml" target="_blank" rel="noopener" class="btn btn-storm">Trigger Build on GitHub</a>
+<a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/build-all.yml" target="_blank" rel="noopener" class="btn btn-storm"><i class="bi bi-github"></i> Trigger Build on GitHub</a>
 </div>
 </div></div>
 
-<div class="content-box"><div class="box-header"><h2>Build Status Overview</h2></div><div class="box-body">
+<div class="content-box reveal"><div class="box-header"><h2><i class="bi bi-bar-chart"></i> Build Status Overview</h2></div><div class="box-body">
 <p style="margin-bottom:1rem;color:var(--acreetion-text)">Current build status for all editions:</p>
 <div class="all-statuses" id="status-grid">
-<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--acreetion-text)">Loading build statuses...</div>
+<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--acreetion-text)"><i class="bi bi-arrow-repeat" style="animation:spin 1s linear infinite;display:inline-block;margin-right:0.5rem"></i>Loading build statuses...</div>
 </div>
 </div></div>
+</div>
 
-<footer class="page-footer"><p>&copy; 2026 AcreetionOS Project. <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/actions">View all builds on GitHub</a></p></footer>
+<footer class="page-footer"><div class="acreetion-social-bar" style="display:flex;justify-content:center;gap:1.5rem;margin:1.5rem 0;flex-wrap:wrap"><a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer" class="acreetion-social-link" title="GitHub" aria-label="GitHub" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);color:var(--acreetion-green);font-size:1.5rem;transition:all 0.3s ease;text-decoration:none"><i class="bi bi-github"></i></a><a href="https://gitlab.acreetionos.org" target="_blank" rel="noopener noreferrer" class="acreetion-social-link" title="GitLab" aria-label="GitLab" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);color:var(--acreetion-green);font-size:1.5rem;transition:all 0.3s ease;text-decoration:none"><i class="bi bi-gitlab"></i></a><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer" class="acreetion-social-link" title="Discord" aria-label="Discord" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);color:var(--acreetion-green);font-size:1.5rem;transition:all 0.3s ease;text-decoration:none"><i class="bi bi-discord"></i></a><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer" class="acreetion-social-link" title="Root" aria-label="Root Community" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);color:var(--acreetion-green);font-size:1.5rem;transition:all 0.3s ease;text-decoration:none"><i class="bi bi-tree-fill"></i></a><a href="https://acreetionos.org" target="_blank" rel="noopener noreferrer" class="acreetion-social-link" title="Website" aria-label="AcreetionOS Website" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);color:var(--acreetion-green);font-size:1.5rem;transition:all 0.3s ease;text-decoration:none"><i class="bi bi-globe"></i></a><a href="https://github.com/spivanatalie64" target="_blank" rel="noopener noreferrer" class="acreetion-social-link" title="Founder GitHub" aria-label="Founder GitHub" style="display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.05);color:var(--acreetion-green);font-size:1.5rem;transition:all 0.3s ease;text-decoration:none"><i class="bi bi-github"></i></a></div><p>AcreetionOS is an independent project proudly built on the powerful and flexible foundation of <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. We are immensely grateful to the Arch community for their incredible work.</p><p>Follow our development on <a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer"><i class="bi bi-github"></i> GitHub</a> and our self-hosted <a href="https://gitlab.acreetionos.org"><i class="bi bi-gitlab"></i> GitLab</a>.</p><p>&copy; 2026 AcreetionOS Project. Based in Spokane, WA. <a href="contributing.html" style="color:var(--acreetion-text);margin-left:1rem">Contributing</a> <a href="governance.html" style="color:var(--acreetion-text);margin-left:1rem">Governance</a></p></footer>
+
+<button type="button" id="back-to-top" title="Back to top">↑</button>
 
 <script>
 const EDITIONS = [
   'cinnamon', 'xl', '32bit', 'hyprland', 'mate', 'gnome',
-  'plasma', 'xfce', 'sway', 'i3', 'openbox',
-  'immutable-cinnamon', 'immutable-xlibre'
+  'plasma', 'xfce', 'sway', 'i3', 'openbox', 'immutable'
 ];
 
 const EDITION_NAMES = {
   'cinnamon': 'Cinnamon', 'xl': 'XL (XLibre)', '32bit': '32-bit',
   'hyprland': 'Hyprland', 'mate': 'MATE', 'gnome': 'GNOME',
   'plasma': 'Plasma', 'xfce': 'XFCE', 'sway': 'Sway', 'i3': 'i3',
-  'openbox': 'Openbox',
-  'immutable-cinnamon': 'Immutable Cinnamon',
-  'immutable-xlibre': 'Immutable XLibre'
+  'openbox': 'Openbox', 'immutable': 'Immutable'
 };
 
 const EDITION_MAP = {
   'Cinnamon': 'cinnamon', 'XL (XLibre)': 'xl', '32-bit': '32bit',
   'Hyprland': 'hyprland', 'MATE': 'mate', 'GNOME': 'gnome',
   'Plasma': 'plasma', 'XFCE': 'xfce', 'Sway': 'sway', 'i3': 'i3',
-  'Openbox': 'openbox',
-  'Immutable Cinnamon': 'immutable-cinnamon',
-  'Immutable XLibre': 'immutable-xlibre'
+  'Openbox': 'openbox', 'Immutable': 'immutable'
 };
 
 let pollInterval = null;
 let currentEdition = '';
 let currentSlug = '';
+let selectedCard = null;
 
-document.getElementById('edition-select').addEventListener('change', function() {
+function selectEdition(el) {
+  if (selectedCard) selectedCard.classList.remove('selected');
+  selectedCard = el;
+  selectedCard.classList.add('selected');
+  currentEdition = el.dataset.edition;
+  currentSlug = EDITION_MAP[currentEdition];
   const btn = document.getElementById('build-btn');
-  if (this.value) {
-    btn.disabled = false;
-    btn.textContent = 'Build ' + this.value;
-  } else {
-    btn.disabled = true;
-    btn.textContent = 'Select an edition above';
-  }
+  btn.disabled = false;
+  btn.textContent = 'Build ' + currentEdition;
   document.getElementById('progress-section').style.display = 'none';
   if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
-});
+}
 
 function addLog(msg) {
   const log = document.getElementById('log-area');
@@ -170,29 +243,23 @@ function addLog(msg) {
 }
 
 function triggerBuild() {
-  const edition = document.getElementById('edition-select').value;
-  if (!edition) return;
-
-  currentEdition = edition;
-  currentSlug = EDITION_MAP[edition];
-
+  if (!currentEdition) return;
   const btn = document.getElementById('build-btn');
   btn.disabled = true;
   btn.textContent = 'Build triggered...';
-
   document.getElementById('progress-section').style.display = 'block';
   document.getElementById('dl-btn').style.display = 'none';
   document.getElementById('progress-bar').style.width = '5%';
+  document.getElementById('progress-bar').style.background = 'linear-gradient(90deg,var(--acreetion-green),#27ae60)';
   document.getElementById('progress-text').textContent = 'Triggering build...';
   document.getElementById('log-area').textContent = '';
   document.getElementById('log-area').style.display = 'none';
   document.getElementById('status-card').className = 'status-card building';
   document.getElementById('status-card').innerHTML = '<strong>Build triggered!</strong> Waiting for GitHub Actions to start...';
-
   fetch('/api/build/trigger', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ edition })
+    body: JSON.stringify({ edition: currentEdition })
   }).then(r => r.json()).then(data => {
     if (data.error) {
       document.getElementById('status-card').className = 'status-card failed';
@@ -204,7 +271,7 @@ function triggerBuild() {
     }
     document.getElementById('progress-bar').style.width = '10%';
     document.getElementById('progress-text').textContent = 'Build triggered! Waiting for runner...';
-    addLog('Build triggered for ' + edition);
+    addLog('Build triggered for ' + currentEdition);
     addLog('Waiting for GitHub Actions runner to pick up the job...');
     pollInterval = setInterval(pollStatus, 5000);
   }).catch(err => {
@@ -227,15 +294,13 @@ function getSlugForEdition(edition) {
   if (edition === 'Sway') return 'sway';
   if (edition === 'i3') return 'i3';
   if (edition === 'Openbox') return 'openbox';
-  if (edition === 'Immutable Cinnamon') return 'immutable-cinnamon';
-  if (edition === 'Immutable XLibre') return 'immutable-xlibre';
+  if (edition === 'Immutable') return 'immutable';
   return edition.toLowerCase().replace(/\s+/g, '-');
 }
 
 function pollStatus() {
   const slug = getSlugForEdition(currentEdition);
   if (!slug) { stopPolling(); return; }
-
   fetch('/api/build/status?edition=' + slug, { headers: { 'Cache-Control': 'no-cache' } })
     .then(r => r.json()).then(data => {
       if (!data || data.error) return;
@@ -248,12 +313,12 @@ function updateUI(data) {
   const bar = document.getElementById('progress-bar');
   const text = document.getElementById('progress-text');
   const dlBtn = document.getElementById('dl-btn');
-
   if (data.status === 'building') {
     card.className = 'status-card building';
     card.innerHTML = '<strong>Building...</strong><br>Started: ' + (data.started || '') +
       '<br><a href="' + (data.run_url || '#') + '" target="_blank" rel="noopener">View on GitHub</a>';
     bar.style.width = '50%';
+    bar.style.background = 'linear-gradient(90deg,var(--flasher-color),#e67e22)';
     text.textContent = 'Building ISO... this takes 10-20 minutes.';
     addLog('Build is running...');
     addLog('Started at: ' + (data.started || 'unknown'));
@@ -263,6 +328,7 @@ function updateUI(data) {
     card.innerHTML = '<strong>Build complete!</strong><br>ISO: ' + (data.iso_name || '') +
       '<br>Finished: ' + (data.finished || '');
     bar.style.width = '100%';
+    bar.style.background = 'linear-gradient(90deg,var(--acreetion-green),#27ae60)';
     text.textContent = 'Build complete!';
     addLog('Build completed successfully!');
     addLog('ISO: ' + (data.iso_name || ''));
@@ -325,7 +391,24 @@ function loadAllStatuses() {
 
 loadAllStatuses();
 setInterval(loadAllStatuses, 30000);
+
+document.addEventListener('DOMContentLoaded', function() {
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(function(el) {
+    observer.observe(el);
+  });
+});
 </script>
+<script src="back-to-top.js" defer></script>
+<script src="social-icons.js" defer></script>
+<script src="user-counter.js" defer></script>
 <script src="sidebar.js" defer></script>
 </div>
 </body></html>

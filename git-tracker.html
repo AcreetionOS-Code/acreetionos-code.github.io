@@ -1,35 +1,115 @@
 <!DOCTYPE html><html lang="en"><head>
-<meta http-equiv="Cache-Control" content="max-age=3600"><meta charset="UTF-8" >
-<meta name="robots" content="index, follow" >
-<meta name="viewport" content="width=device-width, initial-scale=1.0" ><title>Git Tracker - Live Development of AcreetionOS</title>
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://acreetionos.org/git-tracker.html">
-    <meta property="og:title" content="Git Tracker - AcreetionOS">
-    <meta property="og:description" content="Track AcreetionOS Git repositories - commits and activity.">
-    <meta property="og:image" content="https://acreetionos.org/logo.webp">
-    <meta property="og:site_name" content="AcreetionOS">
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://acreetionos.org/git-tracker.html">
-    <meta property="twitter:title" content="Git Tracker - AcreetionOS">
-    <meta property="twitter:description" content="Track AcreetionOS Git repositories - commits and activity.">
-    <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-    <meta name="description" content="Track the real-time development of AcreetionOS. Monitor our repositories, latest commits, and community contributions to the best Arch-based Linux OS." ><link rel="canonical" href="https://acreetionos.org/git-tracker.html" ><script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "AcreetionOS Git Tracker",
-      "url": "https://acreetionos.org/git-tracker.html",
-      "description": "A live dashboard for tracking the development status and code commits of the AcreetionOS project.",
-      "applicationCategory": "DeveloperApplication",
-      "operatingSystem": "Web"
-    }
-    </script><!-- Fonts --><link rel="dns-prefetch" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="fonts.css"><style>:root {--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222222;--acreetion-box-border:#333333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--storm-color:#61afef;--flasher-color:#f39c12;--font-sans:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:'Fira Code',monospace} *,*::before,*::after {box-sizing:border-box;margin:0;padding:0} body {font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden} .announcement-bar {background-color:var(--acreetion-panel-bg);border-bottom:1px solid var(--acreetion-box-border);padding:0.5rem 0;text-align:center;font-size:0.95rem} .announcement-bar a {color:var(--acreetion-green);font-weight:bold;text-decoration:none} .separator {margin:0 1.5rem;color:var(--acreetion-box-border)} .page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000} .header-content {display:flex;justify-content:space-between;align-items:center;max-width:1400px;margin:0 auto;padding:0.75rem 2rem} .logo {display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none} .logo span {color:var(--acreetion-green)} .logo-img {height:40px} .main-nav a {color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500;transition:0.2s} .main-nav a:hover {color:var(--acreetion-text-bright)} .page-wrapper {display:grid;grid-template-columns:1fr 350px;gap:2rem;max-width:1400px;margin:2rem auto;padding:0 2rem} .tracker-hero {background:linear-gradient(135deg,#1a1a1a 0%,#121212 100%);border:1px solid var(--acreetion-box-border);padding:3rem 2rem;text-align:center;position:relative;overflow:hidden;margin-bottom:2rem} .glow {position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(46,204,113,0.05) 0%,transparent 70%);pointer-events:none} .tracker-title {font-family:var(--font-mono);font-size:2.5rem;color:var(--acreetion-green);margin-bottom:1rem} .tracker-subtitle {color:var(--acreetion-text);margin-bottom:2rem;max-width:700px;margin-inline:auto} #repo-search {width:100%;max-width:500px;padding:0.8rem 1.2rem;background:#000;border:1px solid var(--acreetion-box-border);color:white;font-family:var(--font-mono);outline:none;transition:border-color 0.3s;margin-bottom:1.5rem;border-radius:20px} #repo-search:focus {border-color:var(--acreetion-green)} .tracker-btn {background-color:var(--acreetion-green);color:black;padding:0.7rem 1.5rem;font-weight:700;border:none;cursor:pointer;font-family:var(--font-sans);transition:0.3s;margin:0 5px} .tracker-btn.active-filter {box-shadow:0 0 10px var(--acreetion-green)} .tracker-btn:hover {filter:brightness(1.1);transform:translateY(-2px)} .btn-storm {background-color:var(--storm-color);color:black;padding:0.7rem 1.5rem;text-decoration:none;font-weight:700;display:inline-block} .repo-list {display:flex;flex-direction:column;gap:1rem} .repo-item {background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);padding:1.5rem;transition:border-color 0.3s,transform 0.2s;cursor:pointer;position:relative} .repo-item:hover {border-color:var(--acreetion-green);transform:translateX(5px)} .repo-item h3 {font-family:var(--font-mono);color:var(--acreetion-green);margin-bottom:0.5rem;font-size:1.2rem} .repo-item p {color:var(--acreetion-text);font-size:0.95rem;margin-bottom:1rem} .repo-stats {display:flex;gap:15px;margin-bottom:0.5rem;font-family:var(--font-mono);font-size:0.85rem;color:var(--acreetion-text-bright)} .repo-stats span {display:flex;align-items:center;gap:5px} .active-badge {position:absolute;top:1.5rem;right:1.5rem;font-size:0.7rem;color:var(--acreetion-green);border:1px solid var(--acreetion-green);padding:2px 6px;font-family:var(--font-mono);text-transform:uppercase} .content-box {background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);margin-bottom:2rem} .box-header {padding:0.8rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);background-color:#1a1a1a} .box-header h2 {font-family:var(--font-mono);font-size:1.1rem;color:var(--acreetion-text-bright)} .box-body {padding:1.5rem} .sidebar-nav {list-style:none} .sidebar-nav a {display:block;text-decoration:none;color:var(--acreetion-green);padding:0.5rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border)} .sidebar-nav a:hover {background-color:#3a3a3a} #modal {display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:9999;justify-content:center;align-items:center;padding:1rem} #modal-content-wrapper {background:var(--acreetion-box-bg);border:1px solid var(--acreetion-green);padding:2rem;max-width:700px;width:100%;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 20px 50px rgba(0,0,0,0.5)} .modal-close-btn {position:absolute;top:1rem;right:1rem;background:transparent;color:var(--acreetion-green);font-size:2rem;line-height:1;border:none;cursor:pointer} .modal-close-btn:hover {color:#fff} #modal-body h2 {color:var(--acreetion-green);font-family:var(--font-mono);border-bottom:1px solid var(--acreetion-box-border);padding-bottom:10px;margin-bottom:15px} #modal-body h3 {color:var(--storm-color);font-family:var(--font-mono);margin-top:20px;margin-bottom:10px;font-size:1.1rem} #modal-body ul {list-style:none} #modal-body li {padding:8px 0;border-bottom:1px solid #333;font-size:0.9rem} #modal-body a {color:var(--acreetion-green)} .repo-link {display:inline-block;background:var(--acreetion-green);color:black !important;padding:8px 16px;font-weight:700;text-decoration:none !important;margin-right:10px} footer {text-align:center;padding:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;margin-top:4rem} @media (max-width:1024px) {.page-wrapper {grid-template-columns:1fr} .sidebar {order:1}} ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212)}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71)} .btn{transition:all 0.3s ease}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px)}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5)} .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);will-change:opacity,transform}.reveal.active{opacity:1;transform:translateY(0)} html{scroll-behavior:smooth} ::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff)} :focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px} a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px} .skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0} .skip-link:focus{top:0} @media (prefers-reduced-motion:reduce) {html{scroll-behavior:auto} *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}} /* removed pageLoadFade keyframes */ /* removed pageLoadFade body animation */ @media (prefers-reduced-motion:reduce){body{animation:none} a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative} a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px} #back-to-top{position:fixed;bottom:30px;right:30px;background:var(--acreetion-green,#2ecc71);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px} #back-to-top.visible{opacity:1;visibility:visible} #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)} body{background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px} .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem}.active-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-right:4px}.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;overflow-y:auto;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}.modal-overlay.visible{display:flex;opacity:1;visibility:visible;transition:opacity 0.3s ease,visibility 0.3s ease}.modal-box{position:relative;cursor:default;background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);padding:2rem 3rem;max-width:700px}.modal-close-btn{position:absolute;top:1rem;right:1rem;background-color:var(--acreetion-green);color:black;font-family:var(--font-sans);font-size:1.5rem;font-weight:700;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;line-height:40px;text-align:center;z-index:1001}.modal-close-btn:hover{background-color:#d15c64;transform:scale(1.05)}.modal-box h2{color:var(--acreetion-green)}.page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem}.page-footer p{color:#777;margin-bottom:0.5rem;text-align:center}.page-footer a{color:var(--acreetion-green);text-decoration:none}.page-footer a:hover{text-decoration:underline}</style><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous" media="print" onload="this.media=\'all\'"><noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous"></noscript><link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-<link rel="stylesheet" href="sidebar.css">
-</head><body><a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap"><div class="announcement-bar"><div class="announcement-content"><span style="font-weight: bold; color: var(--acreetion-green);">Development Update:</span> 
-            Explore our source code below. 
-            <span class="separator">|</span><a href="https://discord.gg/VHqQkJASw7" target="_blank">Join Developer Discord</a><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank">Join Developer Root</a></div></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="developers.html">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header><div class="page-wrapper"><main id="main-content" class="content-feed"><section class="tracker-hero"><div class="glow"></div><h1 class="tracker-title">Git Tracker</h1><p class="tracker-subtitle">The pulse of AcreetionOS. Monitor repositories, commits, and the evolution of the best Arch-based distribution in real-time.</p><input type="text" id="repo-search" placeholder="Filter repositories by name or description..." autocomplete="off"><div id="action-buttons"><button type="button" id="show-active" class="tracker-btn">Recent Activity</button><button type="button" id="show-all" class="tracker-btn" style="background-color: #444; color: white;">Show All Repos</button></div></section><div class="content-box"><div class="box-header"><h1>Repositories</h1></div><div class="box-body"><div id="loading-status" style="text-align: center; color: var(--acreetion-green); font-family: var(--font-mono);">Initializing connection...</div><div id="repo-list" class="repo-list"></div></div></div></main><aside class="sidebar"><div class="content-box sidebar-box"><div class="box-header"><h2>Resources</h2></div><div class="box-body" style="padding: 0;"><ul class="sidebar-nav"><li><a href="https://github.com/AcreetionOS-Code" target="_blank">GitHub Org</a></li><li><a href="https://acreetionos.org/install.html" target="_blank">Download ISO</a></li><li><a href="https://gitlab.acreetionos.org">GitLab</a></li><li><a href="https://blog.natalie.acreetionos.org" target="_blank">Blog</a></li><li><a href="https://discord.gg/VHqQkJASw7" target="_blank">Discord</a></li></ul></div></div><div class="content-box sidebar-box" style="margin-top: 2rem;"><div class="box-header"><h2>Contribute</h2></div><div class="box-body"><p style="color: var(--acreetion-text); font-size: 0.9rem; margin-bottom: 1rem;">
-                        Found a bug? We welcome contributions from everyone, including those using AI tools.
-                    </p><a href="mailto:&#100;&#101;&#118;&#101;&#108;&#111;&#112;&#101;&#114;&#115;&#64;&#97;&#99;&#114;&#101;&#101;&#116;&#105;&#111;&#110;&#111;&#115;&#46;&#111;&#114;&#103;" class="btn-storm" style="width: 100%; text-align: center;">Email Dev Team</a></div></div></aside></div><!-- MODAL STRUCTURE --><div id="modal"><div id="modal-content-wrapper"><button type="button" class="modal-close-btn" id="git-modal-close">×</button><div id="modal-body"><!-- JS Content Injected Here --></div></div></div><footer class="page-footer"><p>AcreetionOS is an independent project proudly built on the powerful and flexible foundation of <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. We are immensely grateful to the Arch community for their incredible work.</p><p>Follow our development on <a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer"><i class="bi bi-github"></i> GitHub</a> and our self-hosted <a href="https://gitlab.acreetionos.org"><i class="bi bi-gitlab"></i> GitLab</a>.</p><p>&copy; 2026 AcreetionOS Project. Based in Spokane, WA. <a href="contributing.html" style="color: var(--acreetion-text); margin-left: 1rem;">Contributing</a> <a href="governance.html" style="color: var(--acreetion-text); margin-left: 1rem;">Governance</a></p></footer><!-- ROBUST JAVASCRIPT LOGIC --><script>console.log('Git tracker script loaded');
+<meta http-equiv="Cache-Control" content="max-age=3600"><meta charset="UTF-8">
+<meta name="robots" content="index, follow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Git Tracker - Live Development of AcreetionOS</title>
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://acreetionos.org/git-tracker.html">
+<meta property="og:title" content="Git Tracker - AcreetionOS">
+<meta property="og:description" content="Track AcreetionOS Git repositories - commits and activity.">
+<meta property="og:image" content="https://acreetionos.org/logo.webp">
+<meta property="og:site_name" content="AcreetionOS">
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://acreetionos.org/git-tracker.html">
+<meta property="twitter:title" content="Git Tracker - AcreetionOS">
+<meta property="twitter:description" content="Track AcreetionOS Git repositories - commits and activity.">
+<meta property="twitter:image" content="https://acreetionos.org/logo.webp">
+<meta name="description" content="Track the real-time development of AcreetionOS. Monitor our repositories, latest commits, and community contributions to the best Arch-based Linux OS."><link rel="canonical" href="https://acreetionos.org/git-tracker.html"><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "AcreetionOS Git Tracker",
+  "url": "https://acreetionos.org/git-tracker.html",
+  "description": "A live dashboard for tracking the development status and code commits of the AcreetionOS project.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Web"
+}
+</script><link rel="dns-prefetch" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="sidebar.css"><link rel="stylesheet" href="contact.css"><style>
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--storm-color:#61afef;--flasher-color:#f39c12;--font-sans:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:'Fira Code',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px}
+.announcement-bar{background-color:var(--acreetion-panel-bg);border-bottom:1px solid var(--acreetion-box-border);padding:0.5rem 0;text-align:center;font-size:0.95rem}
+.announcement-bar a{color:var(--acreetion-green);font-weight:bold;text-decoration:none}
+.separator{margin:0 1.5rem;color:var(--acreetion-box-border)}
+.skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top.3s;border-radius:0 0 8px 0}
+.skip-link:focus{top:0}
+.page-wrapper{display:grid;grid-template-columns:1fr 350px;gap:2rem;max-width:1400px;margin:0 auto;padding:0 2rem}
+.content-feed{min-width:0}
+.tracker-hero{position:relative;text-align:center;padding:3rem 1rem 2rem;background:var(--acreetion-panel-bg);border-bottom:2px solid var(--acreetion-green);overflow:hidden}
+.tracker-hero .glow{position:absolute;top:10%;left:50%;width:600px;height:200px;background:radial-gradient(circle,var(--acreetion-green) 0%,transparent 70%);filter:blur(60px);opacity:0.4;transform:translateX(-50%);z-index:1}
+.tracker-title{font-family:var(--font-mono);font-size:2.8rem;color:var(--acreetion-green);margin-bottom:0.5rem;letter-spacing:2px;text-shadow:0 2px 16px #222,0 0 32px var(--acreetion-green);position:relative;z-index:2}
+.tracker-subtitle{font-size:1.2rem;color:var(--acreetion-text);margin-bottom:1.5rem;position:relative;z-index:2}
+.tracker-controls{display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:center;align-items:center;position:relative;z-index:2}
+#repo-search{padding:0.75rem 1.2rem;font-size:1rem;border-radius:24px;border:1px solid var(--acreetion-box-border);background:var(--acreetion-box-bg);color:var(--acreetion-text-bright);width:320px;max-width:90vw;outline:none;transition:border-color 0.2s,box-shadow 0.2s}
+#repo-search:focus{border-color:var(--acreetion-green);box-shadow:0 0 0 3px rgba(46,204,113,0.15)}
+.filter-group{display:flex;gap:0.5rem;flex-wrap:wrap;justify-content:center}
+.tracker-btn{padding:0.6rem 1.2rem;border-radius:20px;border:none;background:var(--acreetion-box-bg);color:var(--acreetion-text);font-weight:600;cursor:pointer;transition:all 0.2s;font-size:0.9rem}
+.tracker-btn:hover{background:rgba(46,204,113,0.15);color:var(--acreetion-green)}
+.tracker-btn.active{background:var(--acreetion-green);color:#000}
+.tracker-btn.active:hover{background:var(--acreetion-green);color:#000}
+.repo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;padding:1.5rem 0 2rem}
+.repo-card{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:14px;padding:1.25rem;cursor:pointer;transition:transform 0.25s cubic-bezier(0.22,1,0.36,1),box-shadow 0.25s ease;display:flex;flex-direction:column;gap:0.6rem}
+.repo-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.5);border-color:var(--acreetion-green)}
+.repo-card-header{display:flex;justify-content:space-between;align-items:flex-start;gap:0.5rem}
+.repo-card-title{font-family:var(--font-mono);font-size:1.1rem;color:var(--acreetion-green);font-weight:700;word-break:break-all}
+.repo-card-tags{display:flex;gap:0.4rem;flex-wrap:wrap;flex-shrink:0}
+.tag{display:inline-block;padding:0.2rem 0.6rem;border-radius:10px;font-size:0.72rem;font-weight:600;letter-spacing:0.3px}
+.tag-active{background:rgba(46,204,113,0.2);color:var(--acreetion-green)}
+.tag-github{background:rgba(110,84,148,0.2);color:#9b7bbd}
+.tag-gitlab{background:rgba(252,109,38,0.15);color:#fc6d26}
+.repo-card-desc{color:var(--acreetion-text);font-size:0.9rem;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.repo-card-meta{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:auto;padding-top:0.5rem}
+.repo-card-meta span{background:rgba(255,255,255,0.03);padding:0.25rem 0.65rem;border-radius:10px;font-size:0.82rem;color:var(--acreetion-text)}
+.repo-card-footer{display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:#666;border-top:1px solid var(--acreetion-box-border);padding-top:0.6rem;margin-top:auto}
+.repo-card-footer a{color:#8a8a8a;text-decoration:none}
+.repo-card-footer a:hover{color:var(--acreetion-green)}
+.repo-stats-icon{opacity:0.7}
+.loading-status{text-align:center;color:var(--acreetion-green);font-style:italic;padding:2rem 0;font-size:1rem}
+.aside-card{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:14px;padding:1.5rem;margin-bottom:1.5rem}
+.aside-card h3{font-family:var(--font-mono);color:var(--acreetion-green);font-size:1rem;margin-bottom:0.75rem}
+.aside-card p{color:var(--acreetion-text);font-size:0.9rem;line-height:1.6;margin-bottom:0.75rem}
+.aside-card p:last-child{margin-bottom:0}
+.aside-card a{color:var(--acreetion-green);text-decoration:none;font-weight:500}
+.aside-card a:hover{text-decoration:underline}
+.aside-stats{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem}
+.stat-box{background:rgba(255,255,255,0.02);padding:0.75rem;border-radius:10px;text-align:center}
+.stat-box .stat-number{font-family:var(--font-mono);font-size:1.4rem;color:var(--acreetion-text-bright);font-weight:700}
+.stat-box .stat-label{font-size:0.75rem;color:var(--acreetion-text);margin-top:0.2rem}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:2000;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+.modal-content-wrapper{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:16px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;position:relative;padding:2rem;box-shadow:0 24px 64px rgba(0,0,0,0.6)}
+.modal-close-btn{position:absolute;top:1rem;right:1rem;background:rgba(224,108,117,0.2);color:var(--acreetion-text-bright);border:none;border-radius:50%;width:36px;height:36px;font-size:1.3rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;line-height:1}
+.modal-close-btn:hover{background:rgba(224,108,117,0.4);color:#fff}
+.modal h2{font-family:var(--font-mono);color:var(--acreetion-green);margin-bottom:0.5rem;padding-right:2rem}
+.modal .repo-desc{color:var(--acreetion-text);font-size:0.95rem;margin-bottom:1rem}
+.modal-actions{display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap}
+.repo-link-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.1rem;border-radius:10px;background:var(--acreetion-green);color:#000;font-weight:700;text-decoration:none;font-size:0.9rem;transition:all 0.2s}
+.repo-link-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.repo-link-btn.secondary{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);color:var(--acreetion-text)}
+.repo-link-btn.secondary:hover{background:var(--acreetion-panel-bg);border-color:var(--acreetion-green);color:var(--acreetion-green)}
+.modal h3{font-family:var(--font-mono);color:var(--acreetion-text-bright);font-size:0.95rem;margin-bottom:0.75rem;border-bottom:1px solid var(--acreetion-box-border);padding-bottom:0.5rem}
+.modal-commit-list{list-style:none;padding:0}
+.modal-commit-list li{padding:0.6rem 0;border-bottom:1px solid rgba(51,51,51,0.5);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.3rem;font-size:0.88rem}
+.modal-commit-list li:last-child{border-bottom:none}
+.modal-commit-list .commit-author{color:var(--acreetion-text-bright);font-weight:600}
+.modal-commit-list .commit-msg{color:var(--acreetion-text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0 0.5rem}
+.modal-commit-list .commit-date{color:#666;font-size:0.78rem;white-space:nowrap}
+.modal-loading{color:var(--acreetion-green);font-style:italic;padding:0.5rem 0}
+#back-to-top{position:fixed;bottom:30px;right:30px;background:var(--acreetion-green);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px}
+#back-to-top.visible{opacity:1;visibility:visible}
+#back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)}
+.reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);will-change:opacity,transform}
+.reveal.active{opacity:1;transform:translateY(0)}
+html{scroll-behavior:smooth}
+::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright)}
+:focus-visible{outline:2px solid var(--acreetion-green);outline-offset:3px;border-radius:4px}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--acreetion-body-bg)}
+::-webkit-scrollbar-thumb{background:var(--acreetion-box-border);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green)}
+@media(max-width:1024px){.page-wrapper{grid-template-columns:1fr}.aside-column{order:-1}}
+@media(max-width:768px){.tracker-title{font-size:1.8rem}.tracker-subtitle{font-size:1rem}.repo-grid{grid-template-columns:1fr;gap:1rem}.page-wrapper{padding:0 1rem;margin:0}.repo-card{padding:1rem}.modal-content-wrapper{padding:1.25rem}}
+@media(max-width:480px){.tracker-title{font-size:1.4rem}.tracker-hero{padding:2rem 0.75rem 1.5rem}#repo-search{width:100%;font-size:0.95rem}.tracker-btn{padding:0.5rem 0.9rem;font-size:0.85rem}.repo-card-title{font-size:1rem}}
+</style>
+</head><body><a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap"><div class="announcement-bar"><div class="announcement-content"><span style="font-weight:bold;color:var(--acreetion-green);">Development Update:</span> Explore our source code below.<span class="separator">|</span><a href="https://discord.gg/VHqQkJASw7" target="_blank">Join Developer Discord</a><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank">Join Developer Root</a></div></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header><div class="page-wrapper"><main id="main-content" class="content-feed"><section class="tracker-hero"><div class="glow"></div><h1 class="tracker-title">Git Tracker</h1><p class="tracker-subtitle">The pulse of AcreetionOS. Monitor repositories, commits, and the evolution of the best Arch-based distribution in real-time.</p><div class="tracker-controls"><input type="text" id="repo-search" placeholder="Search repositories by name or description..." autocomplete="off"><div class="filter-group"><button type="button" id="show-all" class="tracker-btn active">All Repos</button><button type="button" id="show-active" class="tracker-btn">Recent Activity</button></div></div></section><div id="loading-status" class="loading-status">Initializing data sources...</div><div id="repo-list" class="repo-grid"></div></main><aside class="aside-column"><div class="aside-card"><h3>About This Tracker</h3><p>This dashboard monitors all publicly developed repositories across the AcreetionOS project. Data is fetched from <a href="https://github.com/AcreetionOS-Code" target="_blank">GitHub</a> and <a href="https://gitlab.acreetionos.org" target="_blank">GitLab</a> and cached locally for 15 minutes.</p><p>Click any repository card to view its latest commits and activity.</p></div><div class="aside-card"><h3>Repository Stats</h3><div class="aside-stats"><div class="stat-box"><div class="stat-number" id="stat-total">0</div><div class="stat-label">Total Repos</div></div><div class="stat-box"><div class="stat-number" id="stat-active">0</div><div class="stat-label">Active (30d)</div></div><div class="stat-box"><div class="stat-number" id="stat-github">0</div><div class="stat-label">GitHub</div></div><div class="stat-box"><div class="stat-number" id="stat-gitlab">0</div><div class="stat-label">GitLab</div></div></div></div><div class="aside-card"><h3>Sources</h3><p>GitLab: <strong>darren</strong>, <strong>natalie</strong></p><p>GitHub: <strong>spivanatalie64</strong>, <strong>cobra3282000</strong>, <strong>AcreetionOS-Code</strong></p><p>Found a bug? We welcome contributions from everyone, including those using AI tools.</p><a href="mailto:&#100;&#101;&#118;&#101;&#108;&#111;&#112;&#101;&#114;&#115;&#64;&#97;&#99;&#114;&#101;&#101;&#116;&#105;&#111;&#110;&#111;&#115;&#46;&#111;&#114;&#103;" class="btn btn-storm" style="width:100%;text-align:center;display:block;margin-top:0.5rem;">Email Dev Team</a></div></aside></div><!-- MODAL --><div id="modal" class="modal"><div class="modal-content-wrapper"><button type="button" class="modal-close-btn" id="git-modal-close">&times;</button><div id="modal-body"></div></div></div><footer class="page-footer"><p>AcreetionOS is an independent project proudly built on the powerful and flexible foundation of <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>. We are immensely grateful to the Arch community for their incredible work.</p><p>Follow our development on <a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener noreferrer"><i class="bi bi-github"></i> GitHub</a> and our self-hosted <a href="https://gitlab.acreetionos.org"><i class="bi bi-gitlab"></i> GitLab</a>.</p><p>&copy; 2026 AcreetionOS Project. Based in Spokane, WA. <a href="contributing.html" style="color:var(--acreetion-text);margin-left:1rem;">Contributing</a> <a href="governance.html" style="color:var(--acreetion-text);margin-left:1rem;">Governance</a></p></footer><script>
 const SOURCES = [
   {type:'gitlab', host:'gitlab.acreetionos.org', user:'darren'},
   {type:'gitlab', host:'gitlab.acreetionos.org', user:'natalie'},
@@ -43,6 +123,10 @@ const repoListEl = document.getElementById('repo-list');
 const loadingEl = document.getElementById('loading-status');
 const modalEl = document.getElementById('modal');
 const searchInput = document.getElementById('repo-search');
+const statTotal = document.getElementById('stat-total');
+const statActive = document.getElementById('stat-active');
+const statGitHub = document.getElementById('stat-github');
+const statGitLab = document.getElementById('stat-gitlab');
 let allRepos = [];
 
 async function fetchGitHub(url) {
@@ -50,8 +134,6 @@ async function fetchGitHub(url) {
   if (!res.ok) throw new Error('GitHub API error: ' + res.status);
   const data = await res.json();
   if (!Array.isArray(data)) return [];
-
-  // Map basic repo fields first
   const repos = data.map(r => ({
     name: r.name,
     description: r.description,
@@ -64,12 +146,9 @@ async function fetchGitHub(url) {
     owner: r.owner.login,
     owner_api: r.owner.url,
     owner_html: r.owner.html_url,
-    owner_name: r.owner.login, // fallback to login
+    owner_name: r.owner.login,
     full_name: r.full_name
   }));
-
-  // Fetch owner display names (real names) where available to show nicer owner info.
-  // We fetch unique owner API URLs to avoid duplicate requests.
   const ownerUrls = Array.from(new Set(repos.map(r => r.owner_api).filter(Boolean)));
   const ownerMap = {};
   for (const u of ownerUrls) {
@@ -82,12 +161,9 @@ async function fetchGitHub(url) {
       console.warn('Failed to fetch owner info', u, e);
     }
   }
-
-  // Attach owner_name to repos
   for (const repo of repos) {
     if (repo.owner && ownerMap[repo.owner]) repo.owner_name = ownerMap[repo.owner];
   }
-
   return repos;
 }
 
@@ -171,6 +247,7 @@ async function initTracker() {
   allRepos = repos;
   loadingEl.style.display = 'none';
   renderRepos(allRepos);
+  updateStats(allRepos);
   searchInput.addEventListener('input', function(e) {
     const term = e.target.value.toLowerCase();
     const filtered = allRepos.filter(function(r) {
@@ -180,30 +257,50 @@ async function initTracker() {
   });
 }
 
+function updateStats(repos) {
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 30);
+  const active = repos.filter(function(r) { return new Date(r.pushed_at) > cutoff; });
+  const gh = repos.filter(function(r) { return r.source_type === 'github'; });
+  const gl = repos.filter(function(r) { return r.source_type === 'gitlab'; });
+  statTotal.textContent = repos.length;
+  statActive.textContent = active.length;
+  statGitHub.textContent = gh.length;
+  statGitLab.textContent = gl.length;
+}
+
 function renderRepos(repos) {
   repoListEl.innerHTML = '';
   if (repos.length === 0) {
-    repoListEl.innerHTML = '<p style="text-align:center;color:#777">No matching repositories found.</p>';
+    repoListEl.innerHTML = '<p style="text-align:center;color:#777;grid-column:1/-1;padding:2rem 0;">No matching repositories found.</p>';
     return;
   }
   repos.forEach(function(repo) {
     const daysAgo = Math.floor((new Date() - new Date(repo.pushed_at)) / (1000 * 60 * 60 * 24));
     const isRecent = daysAgo < 30;
     const sourceBadge = repo.source_type === 'gitlab'
-      ? '<span class="active-badge" style="background:rgba(252,109,38,0.2);color:#fc6d26;">GitLab</span>'
-      : '<span class="active-badge" style="background:rgba(110,84,148,0.2);color:#6e5494;">GitHub</span>';
+      ? '<span class="tag tag-gitlab">GitLab</span>'
+      : '<span class="tag tag-github">GitHub</span>';
     const card = document.createElement('div');
-    card.className = 'repo-item';
+    card.className = 'repo-card';
     card.onclick = function() { openModal(repo); };
     const ownerDisplay = repo.owner_name ? (repo.owner_name + ' (' + repo.owner + ')') : repo.owner;
-    const ownerLink = repo.owner_html ? ('<a href="' + repo.owner_html + '" target="_blank" style="color:#9aa">' + ownerDisplay + '</a>') : ownerDisplay;
+    const ownerLink = repo.owner_html ? ('<a href="' + repo.owner_html + '" target="_blank" style="color:#8a8a8a">' + ownerDisplay + '</a>') : ownerDisplay;
     card.innerHTML =
-      '<div style="display:flex;justify-content:space-between;align-items:flex-start;">' +
-      '<h3>' + repo.name + '</h3>' +
-      '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' + (isRecent ? '<span class="active-badge">Active</span>' : '') + sourceBadge + '</div>' +
-      '</div><p>' + (repo.description || 'No description available.') + '</p>' +
-      '<div class="repo-stats"><span>⭐ ' + repo.stargazers_count + '</span><span>🍴 ' + repo.forks_count + '</span><span>💻 ' + (repo.language || 'N/A') + '</span></div>' +
-      '<div style="font-size:0.8rem;color:#666;">Updated: ' + new Date(repo.pushed_at).toLocaleDateString() + ' &middot; ' + ownerLink + '</div>';
+      '<div class="repo-card-header">' +
+      '<div class="repo-card-title">' + repo.name + '</div>' +
+      '<div class="repo-card-tags">' + (isRecent ? '<span class="tag tag-active">Active</span>' : '') + sourceBadge + '</div>' +
+      '</div>' +
+      '<div class="repo-card-desc">' + (repo.description || 'No description available.') + '</div>' +
+      '<div class="repo-card-meta">' +
+      '<span><span class="repo-stats-icon">&#9733;</span> ' + repo.stargazers_count + '</span>' +
+      '<span><span class="repo-stats-icon">&#9829;</span> ' + repo.forks_count + '</span>' +
+      '<span><span class="repo-stats-icon">&#9881;</span> ' + (repo.language || 'N/A') + '</span>' +
+      '</div>' +
+      '<div class="repo-card-footer">' +
+      '<span>Updated ' + new Date(repo.pushed_at).toLocaleDateString() + '</span>' +
+      '<span>' + ownerLink + '</span>' +
+      '</div>';
     repoListEl.appendChild(card);
   });
 }
@@ -214,13 +311,14 @@ async function openModal(repo) {
   const sourceLabel = repo.source_type === 'gitlab' ? 'View on GitLab' : 'View on GitHub';
   const issuesUrl = repo.source_type === 'gitlab' ? (repo.html_url + '/-/issues') : (repo.html_url + '/issues');
   body.innerHTML =
-    '<h2>' + repo.name + '</h2><p>' + (repo.description || 'No description.') + '</p>' +
-    '<div style="margin:1rem 0;">' +
-    '<a href="' + repo.html_url + '" target="_blank" class="repo-link">' + sourceLabel + '</a>' +
-    '<a href="' + issuesUrl + '" target="_blank" class="repo-link" style="background:#444;color:white;">Issues</a>' +
-    '</div><h3>Recent Activity</h3>' +
-    '<div id="modal-loading" style="color:var(--acreetion-green)">Loading commits...</div>' +
-    '<ul id="modal-commits"></ul>';
+    '<h2>' + repo.name + '</h2>' +
+    '<p class="repo-desc">' + (repo.description || 'No description.') + '</p>' +
+    '<div class="modal-actions">' +
+    '<a href="' + repo.html_url + '" target="_blank" class="repo-link-btn">' + sourceLabel + '</a>' +
+    '<a href="' + issuesUrl + '" target="_blank" class="repo-link-btn secondary">Issues</a>' +
+    '</div><h3>Recent Commits</h3>' +
+    '<div class="modal-loading" id="modal-loading">Loading commits...</div>' +
+    '<ul class="modal-commit-list" id="modal-commits"></ul>';
   try {
     let commitsUrl;
     if (repo.source_type === 'gitlab') {
@@ -244,7 +342,7 @@ async function openModal(repo) {
           message = c.commit.message.split('\n')[0].substring(0, 50);
           date = c.commit.author.date;
         }
-        return '<li><span style="color:#fff;font-weight:bold;">' + author + '</span>: ' + message + '... <span style="float:right;opacity:0.5;font-size:0.8rem;">' + new Date(date).toLocaleDateString() + '</span></li>';
+        return '<li><span class="commit-author">' + escapeHtml(author) + '</span><span class="commit-msg">' + escapeHtml(message) + '...</span><span class="commit-date">' + new Date(date).toLocaleDateString() + '</span></li>';
       }).join('');
     } else {
       list.innerHTML = '<li style="color:red">API Limit Reached for Details</li>';
@@ -254,14 +352,18 @@ async function openModal(repo) {
   }
 }
 
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.appendChild(document.createTextNode(str));
+  return div.innerHTML;
+}
+
 const showActiveBtn = document.getElementById('show-active');
 const showAllBtn = document.getElementById('show-all');
 
 function setActiveFilter(activeBtn) {
-  showActiveBtn.style.backgroundColor = activeBtn === showActiveBtn ? '#61afef' : '#444';
-  showActiveBtn.style.color = activeBtn === showActiveBtn ? '#fff' : '#fff';
-  showAllBtn.style.backgroundColor = activeBtn === showAllBtn ? 'var(--acreetion-green)' : '#444';
-  showAllBtn.style.color = activeBtn === showAllBtn ? '#232526' : '#fff';
+  showAllBtn.classList.toggle('active', activeBtn === showAllBtn);
+  showActiveBtn.classList.toggle('active', activeBtn === showActiveBtn);
 }
 
 showActiveBtn.addEventListener('click', function() {
@@ -285,7 +387,6 @@ document.getElementById('git-modal-close').addEventListener('click', function() 
 });
 initTracker();
 setActiveFilter(showAllBtn);
-</script><script>document.addEventListener('DOMContentLoaded',() => {const observer = new IntersectionObserver((entries) => {entries.forEach(entry => {if(entry.isIntersecting) {entry.target.classList.add('active');observer.unobserve(entry.target)}})},{threshold:0.05,rootMargin:"0px 0px -30px 0px"});document.querySelectorAll('.content-box,.dev-card,.event-card,.repo-card').forEach(el => {el.classList.add('reveal');observer.observe(el)})});</script></div>
-<button type="button" id="back-to-top" title="Back to top">↑</button><script src="back-to-top.js" defer></script><script src="social-icons.js" defer></script><script src="sidebar.js" defer></script>
-</div>
-</body></html>
+</script><script>
+document.addEventListener('DOMContentLoaded',() => {const observer = new IntersectionObserver((entries) => {entries.forEach(entry => {if(entry.isIntersecting) {entry.target.classList.add('active');observer.unobserve(entry.target)}})},{threshold:0.05,rootMargin:"0px 0px -30px 0px"});document.querySelectorAll('.repo-card,.aside-card').forEach(el => {el.classList.add('reveal');observer.observe(el)})});
+</script><button type="button" id="back-to-top" title="Back to top">&uarr;</button><script src="back-to-top.js" defer></script><script src="social-icons.js" defer></script><script src="sidebar.js" defer></script></div></body></html>
