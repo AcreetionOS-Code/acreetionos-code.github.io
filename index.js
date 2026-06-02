@@ -1780,56 +1780,62 @@ async function handleBestMirror(request, env) {
 }
 
 async function handleCVEFeed(env, ctx) {
-  // Serve cached data immediately if available, refresh in background
-  const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json').catch(() => null);
-  const cacheAge = cached ? (Date.now() - new Date(cached.updated || 0).getTime()) : Infinity;
-
-  if (cached && cacheAge < 5 * 60 * 1000) {
-    return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, source: 'cached' }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
-    });
-  }
-
-  async function enrichAndCache(cves) {
-    try {
-      const toEnrich = cves.slice(0, 3);
-      const enriched = await Promise.all(toEnrich.map(async (cve) => {
-        const crossRef = await crossReferenceCVE(cve.primary_cve).catch(() => null);
-        return { ...cve, cross_ref: crossRef };
-      }));
-      const allCves = [...enriched, ...cves.slice(3).map(c => ({ ...c, cross_ref: null }))];
-      await putR2(env, 'acreetionos-hosting', 'cve-cache.json', {
-        updated: new Date().toISOString(), cves: allCves, count: allCves.length,
-        source: 'security.archlinux.org/advisory/feed.atom'
-      });
-    } catch (e) { /* enrichment failed */ }
-  }
-
-  // Fetch Atom feed with a short timeout — if it's slow, serve stale cache or fail fast
-  let atomCves = null;
+  // Try fetching Atom feed first — this is the primary data source
+  let atomCves = [];
   try {
     const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
-      headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' },
-      signal: AbortSignal.timeout(8000)
+      headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
     });
     if (res.ok) {
       atomCves = parseArchAtom(await res.text());
     }
-  } catch (e) { /* timeout or error */ }
+  } catch (e) { /* feed fetch failed */ }
 
-  if (atomCves && atomCves.length > 0) {
-    // Return immediately with unenriched data, enrich in background
-    const payload = { cves: atomCves.map(c => ({ ...c, cross_ref: null })), count: atomCves.length, updated: new Date().toISOString(), source: 'security.archlinux.org' };
-    ctx.waitUntil(enrichAndCache(atomCves));
+  // Check cache for enrichment data (CVSS, CISA KEV)
+  const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json').catch(() => null);
+  const cacheAge = cached ? (Date.now() - new Date(cached.updated || 0).getTime()) : Infinity;
+  const cacheUsable = cached && cached.cves && cached.cves.length > 0;
+
+  // Merge: use atom CVEs with enrichment from cache where available
+  if (atomCves.length > 0) {
+    const cveMap = {};
+    if (cacheUsable) {
+      for (const c of cached.cves) {
+        cveMap[c.primary_cve] = c.cross_ref;
+      }
+    }
+    const merged = atomCves.map(c => ({ ...c, cross_ref: cveMap[c.primary_cve] || null }));
+    const payload = { cves: merged, count: merged.length, updated: new Date().toISOString(), source: 'security.archlinux.org' };
+
+    // Trigger background enrichment + cache update for next visit
+    ctx.waitUntil((async () => {
+      try {
+        const toEnrich = atomCves.slice(0, 3).filter(c => !cveMap[c.primary_cve]);
+        if (toEnrich.length > 0) {
+          const enriched = await Promise.all(toEnrich.map(async (cve) => {
+            const crossRef = await crossReferenceCVE(cve.primary_cve).catch(() => null);
+            return { ...cve, cross_ref: crossRef };
+          }));
+          const enrichedMap = {};
+          for (const c of enriched) enrichedMap[c.primary_cve] = c.cross_ref;
+          const updatedCves = atomCves.map(c => ({ ...c, cross_ref: enrichedMap[c.primary_cve] || cveMap[c.primary_cve] || null }));
+          await putR2(env, 'acreetionos-hosting', 'cve-cache.json', {
+            updated: new Date().toISOString(), cves: updatedCves, count: updatedCves.length,
+            source: 'security.archlinux.org/advisory/feed.atom'
+          });
+        }
+      } catch (e) { /* enrichment failed */ }
+    })());
+
     return new Response(JSON.stringify(payload), {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=120', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
 
-  // Atom feed failed — serve stale cache if available
-  if (cached) {
-    return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, source: 'cached (stale)', cached: true }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=60', ...corsHeaders({ headers: { get: () => '' } }) }
+  // Atom feed failed — serve full cache if available
+  if (cacheUsable) {
+    return new Response(JSON.stringify({ cves: cached.cves, count: cached.count, updated: cached.updated, source: 'cached', cached: true }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
 
