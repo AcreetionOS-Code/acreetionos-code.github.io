@@ -66,7 +66,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .loading{text-align:center;padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem}
 .loading .spin{display:inline-block;width:24px;height:24px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:.5rem}
 @keyframes spin{to{transform:rotate(360deg)}}
-#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:1.8;color:var(--acreetion-text)}#progress-steps>div{padding:2px 0}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem}
+#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem}
 .page-footer a{color:var(--acreetion-green);text-decoration:none}
 .page-footer a:hover{text-decoration:underline}
 </style>
@@ -99,10 +99,9 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 <div class="modal-box">
 <button type="button" class="modal-close" id="modal-close">&times;</button>
 <div id="progress-area">
-<h2 id="modal-title" style="color:var(--acreetion-green);font-family:var(--font-mono);font-size:1.1rem;margin-bottom:1rem;display:none">&#8203;</h2>
-<div id="progress-steps" style="margin-bottom:1rem"></div>
+<div id="progress-track" style="height:4px;background:var(--acreetion-box-border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden"><div id="progress-bar" style="height:100%;width:0%;background:var(--acreetion-green);border-radius:2px;transition:width.4s ease"></div></div>
+<div id="progress-steps"></div>
 <div id="preview-area" style="display:none;margin-bottom:1rem;padding:.8rem;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:8px;max-height:200px;overflow-y:auto;font-size:.8rem;color:var(--acreetion-text);white-space:pre-wrap;font-family:var(--font-mono)"></div>
-<div id="loading-spinner" class="loading" style="padding:1rem 0"><div class="spin"></div></div>
 </div>
 <div id="content-area" style="display:none">
 <h2 id="modal-title-result">&#8203;</h2>
@@ -164,11 +163,12 @@ document.querySelectorAll('.quick a').forEach(function(a){
   });
 });
 
-function setStep(id,label,state){
-  var el=document.getElementById(id);
-  if(state==='done'){el.innerHTML='<span style="color:var(--acreetion-green)">\u2713</span> '+label;}
-  else if(state==='active'){el.innerHTML='<span class="spin" style="display:inline-block;width:12px;height:12px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin.7s linear infinite;vertical-align:middle;margin-right:4px"></span> '+label;}
-  else{el.innerHTML='<span style="color:#555">\u25CB</span> '+label;}
+var BAR=document.getElementById('progress-bar'),PSTEP=document.getElementById('progress-steps'),PREV=document.getElementById('preview-area');
+
+function setStep(label,state){
+  if(state==='progress'){PSTEP.innerHTML='<div style="color:var(--acreetion-green);font-size:.85rem"><span style="display:inline-block;width:16px;height:16px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin.7s linear infinite;vertical-align:middle;margin-right:6px"></span> '+label+'</div>';}
+  else if(state==='done'){PSTEP.innerHTML='<div style="color:var(--acreetion-green);font-size:.85rem"><span style="color:var(--acreetion-green);font-weight:700;margin-right:6px">\u2713</span> '+label+'</div>';}
+  else{PSTEP.innerHTML='<div style="color:#666;font-size:.85rem"><span style="margin-right:6px">\u25CB</span> '+label+'</div>';}
 }
 
 async function produceGuide(title){
@@ -176,29 +176,29 @@ async function produceGuide(title){
   document.body.style.overflow='hidden';
   document.getElementById('progress-area').style.display='block';
   document.getElementById('content-area').style.display='none';
-  document.getElementById('loading-spinner').style.display='block';
-  document.getElementById('progress-steps').innerHTML=
-    '<div id="step-fetch"></div><div id="step-analyze"></div><div id="step-translate"></div><div id="step-render"></div>';
-  document.getElementById('preview-area').style.display='none';
-  document.getElementById('modal-title').style.display='none';
+  PREV.style.display='none';
+  BAR.style.width='0%';
 
-  setStep('step-fetch','Fetching Wiki article','active');
+  setStep('Fetching Wiki article','progress');
+  BAR.style.width='20%';
   var rawText='',originalUrl='https://wiki.archlinux.org/title/'+encodeURIComponent(title.replace(/ /g,'_'));
   try{
     var wikiRes=await fetch('https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true&exchars=1500&redirects=1&titles='+encodeURIComponent(title)+'&format=json&origin=*');
     var wikiData=await wikiRes.json();
     var page=Object.values(wikiData.query.pages)[0];
     rawText=page.extract||'';
-    setStep('step-fetch','Fetching Wiki article','done');
-  }catch(e){setStep('step-fetch','Fetching Wiki article','done');}
+  }catch(e){}
+  setStep('Fetching Wiki article','done');
+  BAR.style.width='40%';
 
-  setStep('step-analyze','Analyzing technical content','active');
-  document.getElementById('preview-area').style.display='block';
-  document.getElementById('preview-area').textContent=rawText.slice(0,500)+(rawText.length>500?'\n\n[...]':'');
-  await new Promise(function(r){setTimeout(r,200);});
-  setStep('step-analyze','Analyzing technical content','done');
+  setStep('Analyzing technical content','progress');
+  if(rawText){PREV.style.display='block';PREV.textContent=rawText.slice(0,500)+(rawText.length>500?'\n\n[...]':'');}
+  await new Promise(function(r){setTimeout(r,100);});
+  setStep('Analyzing technical content','done');
+  BAR.style.width='55%';
 
-  setStep('step-translate','Translating for beginners','active');
+  setStep('Generating guide','progress');
+  BAR.style.width='70%';
   var finalBody=null;
   var prompt='You are a patient Linux teacher for beginners on AcreetionOS (Cinnamon Desktop, Arch-based). Write clear step-by-step guides in plain English. GUI first, terminal as "(Advanced)".\n\n## Topic: '+title+'\n\n## Technical Context\n'+rawText+'\n\n## Format\n1. **What is this?**\n2. **What you need**\n3. **Step-by-step**\n4. **Troubleshooting**\n\nMarkdown only.';
   try{
@@ -208,9 +208,10 @@ async function produceGuide(title){
     text=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
     if(text&&text.length>30)finalBody=text;
   }catch(e){}
-  setStep('step-translate','Translating for beginners',finalBody?'done':'done');
+  setStep('Generating guide','done');
+  BAR.style.width='100%';
 
-  document.getElementById('loading-spinner').style.display='none';
+  await new Promise(function(r){setTimeout(r,300);});
   document.getElementById('progress-area').style.display='none';
   document.getElementById('content-area').style.display='block';
 
