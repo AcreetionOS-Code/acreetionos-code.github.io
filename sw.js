@@ -1,5 +1,5 @@
 // Service Worker for caching and offline support
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const CACHE_NAME = `acreetionos-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
