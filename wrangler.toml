@@ -4,7 +4,8 @@ compatibility_date = "2026-04-26"
 
 routes = [
   { pattern = "acreetionos.org/api/*", zone_name = "acreetionos.org" },
-  { pattern = "acreetionos.org/flash.html", zone_name = "acreetionos.org" }
+  { pattern = "acreetionos.org/flash.html", zone_name = "acreetionos.org" },
+  { pattern = "security.acreetionos.org", zone_name = "acreetionos.org" }
 ]
 
 [triggers]
