@@ -13,6 +13,14 @@ const repoList = document.getElementById('repo-list');
 const repoSearch = document.getElementById('repo-search');
 const modal = document.getElementById('modal');
 
+function esc(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function safeUrl(url) {
+    const u = String(url ?? '');
+    return (u.startsWith('https://') || u.startsWith('http://')) ? u : '#';
+}
+
 // Use the GitHub organization name (lowercase is conventional)
 const ORG = 'AcreetionOS-Code';
 const API_URL = `https://api.github.com/orgs/${ORG}/repos`;
@@ -21,16 +29,16 @@ let allRepos = [];
 let allEvents = [];
 
 function createRepoCard(repo) {
-    return `<div class="repo-card" data-repo="${repo.name}">
-        <div class="repo-title">${repo.name}</div>
-        <div class="repo-desc">${repo.description ? repo.description : 'No description provided.'}</div>
+    return `<div class="repo-card" data-repo="${esc(repo.name)}">
+        <div class="repo-title">${esc(repo.name)}</div>
+        <div class="repo-desc">${repo.description ? esc(repo.description) : 'No description provided.'}</div>
         <div class="repo-meta">
             <span title="Stars">⭐ ${repo.stargazers_count}</span>
             <span title="Forks">🍴 ${repo.forks_count}</span>
             <span title="Open Issues">🐞 ${repo.open_issues_count}</span>
-            <span title="Language">💻 ${repo.language ? repo.language : 'N/A'}</span>
+            <span title="Language">💻 ${repo.language ? esc(repo.language) : 'N/A'}</span>
         </div>
-        <a class="repo-link" href="${repo.html_url}" target="_blank">View on GitHub</a>
+        <a class="repo-link" href="${safeUrl(repo.html_url)}" target="_blank">View on GitHub</a>
     </div>`;
 }
 
@@ -46,7 +54,7 @@ function createEventCard(event) {
         case 'PushEvent':
             icon = '🚀';
             action = `Pushed ${event.payload.commits ? event.payload.commits.length : 0} commits to`;
-            details = event.payload.commits ? event.payload.commits[0].message.split('\n')[0] : '';
+            details = event.payload.commits ? esc(event.payload.commits[0].message.split('\n')[0]) : '';
             break;
         case 'CreateEvent':
             if (event.payload.ref_type === 'repository') {
@@ -54,18 +62,18 @@ function createEventCard(event) {
                 action = 'Created repository';
             } else {
                 icon = '🌿';
-                action = `Created ${event.payload.ref_type} ${event.payload.ref}`;
+                action = `Created ${esc(event.payload.ref_type)} ${esc(event.payload.ref)}`;
             }
             break;
         case 'IssuesEvent':
             icon = event.payload.action === 'opened' ? '🐛' : '✅';
             action = `${event.payload.action.charAt(0).toUpperCase() + event.payload.action.slice(1)} issue`;
-            details = event.payload.issue.title;
+            details = esc(event.payload.issue.title);
             break;
         case 'PullRequestEvent':
             icon = event.payload.action === 'opened' ? '🔄' : '✅';
             action = `${event.payload.action.charAt(0).toUpperCase() + event.payload.action.slice(1)} pull request`;
-            details = event.payload.pull_request.title;
+            details = esc(event.payload.pull_request.title);
             break;
         case 'ForkEvent':
             icon = '🍴';
@@ -84,9 +92,9 @@ function createEventCard(event) {
         <div class="event-icon">${icon}</div>
         <div class="event-content">
             <div class="event-header">
-                <span class="event-actor">${event.actor.login}</span>
+                <span class="event-actor">${esc(event.actor.login)}</span>
                 <span class="event-action">${action}</span>
-                <a href="https://github.com/${event.repo.name}" target="_blank" class="event-repo">${repoName}</a>
+                <a href="https://github.com/${esc(event.repo.name)}" target="_blank" class="event-repo">${esc(repoName)}</a>
             </div>
             ${details ? `<div class="event-details">${details}</div>` : ''}
             <div class="event-time">${timeAgo}</div>
@@ -185,19 +193,19 @@ async function showRepoDetails(repoName) {
         modal.querySelector('.modal-content').insertAdjacentHTML('beforeend', `
             <div class="modal-section">
                 <h3>Top Contributors</h3>
-                <ul>${contributors.map(c => `<li><a href="${c.html_url}" target="_blank">${c.login}</a> (${c.contributions} commits)</li>`).join('') || '<li>No contributors found.</li>'}</ul>
+                <ul>${contributors.map(c => `<li><a href="${safeUrl(c.html_url)}" target="_blank">${esc(c.login)}</a> (${c.contributions} commits)</li>`).join('') || '<li>No contributors found.</li>'}</ul>
             </div>
             <div class="modal-section">
                 <h3>Latest Commits</h3>
-                <ul>${commits.map(cm => `<li><a href="${cm.html_url}" target="_blank">${cm.commit.message.split('\n')[0]}</a> by ${cm.commit.author.name}</li>`).join('') || '<li>No commits found.</li>'}</ul>
+                <ul>${commits.map(cm => `<li><a href="${safeUrl(cm.html_url)}" target="_blank">${esc(cm.commit.message.split('\n')[0])}</a> by ${esc(cm.commit.author.name)}</li>`).join('') || '<li>No commits found.</li>'}</ul>
             </div>
             <div class="modal-section">
                 <h3>Open Issues</h3>
-                <ul>${issues.filter(i => !i.pull_request).map(i => `<li><a href="${i.html_url}" target="_blank">${i.title}</a></li>`).join('') || '<li>No open issues.</li>'}</ul>
+                <ul>${issues.filter(i => !i.pull_request).map(i => `<li><a href="${safeUrl(i.html_url)}" target="_blank">${esc(i.title)}</a></li>`).join('') || '<li>No open issues.</li>'}</ul>
             </div>
             <div class="modal-section">
                 <h3>Open Pull Requests</h3>
-                <ul>${prs.map(pr => `<li><a href="${pr.html_url}" target="_blank">${pr.title}</a></li>`).join('') || '<li>No open PRs.</li>'}</ul>
+                <ul>${prs.map(pr => `<li><a href="${safeUrl(pr.html_url)}" target="_blank">${esc(pr.title)}</a></li>`).join('') || '<li>No open PRs.</li>'}</ul>
             </div>
         `);
     } catch (error) {
