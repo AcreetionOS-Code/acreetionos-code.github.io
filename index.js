@@ -510,6 +510,77 @@ async function handleHostingGetProviders(env) {
   return new Response(JSON.stringify({ providers }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
+function escHtml(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function safeUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  if (!url.startsWith('https://')) return '';
+  return url;
+}
+
+async function handleHostingSnippets(env) {
+  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  const providers = [];
+  for (const obj of objects) {
+    const data = await getR2(env, 'acreetionos-hosting', obj.key);
+    if (data) providers.push(data);
+  }
+  const active = providers.filter(p => p.status === 'active');
+  const count = active.length;
+
+  let listHtml = '<div class="provider-list">\n';
+  for (const p of active) {
+    const url = safeUrl(p.mirror_url);
+    listHtml += '<div class="provider-item">\n';
+    listHtml += '<div class="info">\n';
+    listHtml += `<div class="name">${escHtml(p.org)} <span class="tag tag-active">Active</span></div>\n`;
+    listHtml += `<div class="url"><a href="${escHtml(url)}" target="_blank" rel="noopener">${escHtml(url)}</a></div>\n`;
+    listHtml += `<div class="provider-detail">${escHtml(p.location)}${p.bandwidth ? ' · ' + escHtml(p.bandwidth) : ''}</div>\n`;
+    listHtml += '</div>\n</div>\n';
+  }
+  listHtml += '</div>\n';
+
+  let selectHtml;
+  if (count >= 5) {
+    selectHtml = '<div class="fastest-provider">\n';
+    selectHtml += '<label for="fastest-mirror">Fastest Provider:</label>\n';
+    selectHtml += '<select id="fastest-mirror">\n';
+    selectHtml += '<option value="">Select a mirror...</option>\n';
+    for (const p of active) {
+      const url = safeUrl(p.mirror_url);
+      selectHtml += `<option value="${escHtml(url)}">${escHtml(p.org)} — ${escHtml(p.location)}</option>\n`;
+    }
+    selectHtml += '</select>\n';
+    selectHtml += '<a href="/hosting.html" class="btn btn-small">All Hosting Providers</a>\n';
+    selectHtml += '</div>\n';
+  } else {
+    selectHtml = '<div class="mirror-list">\n';
+    for (const p of active) {
+      const url = safeUrl(p.mirror_url);
+      selectHtml += '<div class="mirror-item">';
+      selectHtml += `<strong>${escHtml(p.org)}</strong>`;
+      selectHtml += `<span class="mirror-location">${escHtml(p.location)}</span>`;
+      selectHtml += `<a href="${escHtml(url)}" target="_blank" rel="noopener" class="btn btn-small">Download ISO</a>`;
+      selectHtml += '</div>\n';
+    }
+    selectHtml += '</div>\n';
+    if (count > 0) {
+      selectHtml += '<a href="/hosting.html" class="btn btn-small">View All Providers</a>\n';
+    }
+  }
+
+  return new Response(JSON.stringify({
+    count,
+    list_html: listHtml,
+    select_html: selectHtml,
+    updated_at: new Date().toISOString()
+  }), {
+    headers: corsHeaders({ headers: { get: () => '' } })
+  });
+}
+
 async function handleHostingRegister(request, env) {
   if (checkRateLimit(getClientIP(request), 3, 3600000)) {
     return new Response(JSON.stringify({ error: 'Too many registration attempts, please try again later' }), { status: 429, headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -650,8 +721,7 @@ async function handleHostingAdminApprove(request, env) {
         sendHostingEmail(env, data.email, 'AcreetionOS Hosting - Your Provider Has Been Removed',
           `Hi ${data.org},\n\nYour hosting provider listing for AcreetionOS has been removed as requested.\n\nThank you for your support.\n- AcreetionOS Team`);
       }
-      triggerRedeploy(env);
-      return new Response(JSON.stringify({ success: true, message: 'Provider removed and redeploy triggered' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+      return new Response(JSON.stringify({ success: true, message: 'Provider removed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     }
     // Approve registration
     data.status = 'active';
@@ -663,8 +733,7 @@ async function handleHostingAdminApprove(request, env) {
       sendHostingEmail(env, data.email, 'Welcome to AcreetionOS Hosting Program!',
         `Hi ${data.org},\n\nYour hosting provider application has been approved!\n\nMirror URL: ${data.mirror_url}\nStatus: Active\n\nYou are now subscribed to hosting updates. We'll notify you of any changes.\n\nTo unsubscribe: https://acreetionos.org/api/hosting/unsubscribe?email=${encodeURIComponent(data.email)}\n\n- AcreetionOS Team`);
     }
-    triggerRedeploy(env);
-    return new Response(JSON.stringify({ success: true, message: 'Provider approved and redeploy triggered' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+    return new Response(JSON.stringify({ success: true, message: 'Provider approved' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
@@ -955,7 +1024,6 @@ async function scanISOSuspicious(env) {
           sendDiscordWebhook(env,
             `**✅ Provider Auto-Reactivated**\n**Provider:** ${data.org}\n**Email:** ${data.email}\n**ISO:** ${data.mirror_url}\n**Online for:** ${hoursOnline.toFixed(1)} hours\n\nProvider has been reactivated after 24+ hours of uptime.`
           );
-          triggerRedeploy(env);
         }
       }
 
@@ -1055,11 +1123,6 @@ async function handleHostingScan(request, env) {
     );
   }
 
-  // Trigger CI ClamAV deep scan for locally-flagged providers
-  if (needsClamav) {
-    triggerClamavScan(env);
-  }
-
   if (result.flagged.length === 0 && result.errors.length === 0) {
     sendDiscordWebhook(env, '**ISO Malware Scan Complete** — No threats detected across all providers.');
   }
@@ -1076,11 +1139,6 @@ async function handleHostingScan(request, env) {
     );
   }
 
-  // Trigger redeploy if providers were removed or expired
-  if (result.flagged.length > 0 || expired.length > 0) {
-    triggerRedeploy(env);
-  }
-
   return new Response(JSON.stringify(result), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
@@ -1092,18 +1150,6 @@ async function handleHostingCount(env) {
     if (data && data.status === 'active') active++;
   }
   return new Response(JSON.stringify({ count: active, threshold: 5, show_fastest: active >= 5 }), { headers: corsHeaders({ headers: { get: () => '' } }) });
-}
-
-async function triggerClamavScan(env) {
-  const ghToken = env.GH_TOKEN;
-  if (!ghToken) return;
-  try {
-    await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/scan-provider-isos.yml/dispatches', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-Hosting' },
-      body: JSON.stringify({ ref: 'main' })
-    });
-  } catch (e) { console.error('ClamAV scan trigger failed:', e); }
 }
 
 async function handleHostingReactivate(request, env) {
@@ -1148,8 +1194,6 @@ async function handleHostingReactivate(request, env) {
     sendDiscordWebhook(env,
       `**🔄 Reactivation Requested**\n**Provider:** ${found.org} (${found.email})\n**ISO:** ${found.mirror_url}\n**Agreement accepted:** Yes\n\nMirror will be verified every 6 hours. If online for 24+ consecutive hours, it will be automatically reactivated.`
     );
-
-    triggerRedeploy(env);
 
     return new Response(JSON.stringify({
       success: true,
@@ -1268,41 +1312,7 @@ async function handleISOCheck(request, env) {
     }
     }
 
-    // If found a working mirror, auto-fix the URL in flash.html via PR
-    if (foundUrl && env.GH_TOKEN) {
-      try {
-        const repo = 'AcreetionOS-Code/acreetionos-code.github.io';
-        const h = { 'Authorization': `Bearer ${env.GH_TOKEN}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-AutoFix/1.0' };
-        const api = (p) => `https://api.github.com/repos/${repo}/${p}`;
 
-        // Fetch current flash.html from GitHub
-        const flashRes = await fetch(api('contents/flash.html'), { headers: h });
-        if (flashRes.ok) {
-          const flashData = await flashRes.json();
-          let content = atob(flashData.content);
-          const sha = flashData.sha;
-
-          if (content.includes(url)) {
-            content = content.replace(url, foundUrl);
-            const branch = `fix/iso-${Date.now().toString(36)}`;
-            const base = await (await fetch(api('git/ref/heads/main'), { headers: h })).json();
-            const tree = await (await fetch(api('git/trees'), { method: 'POST', headers: h,
-              body: JSON.stringify({ base_tree: base.object.sha, tree: [{ path: 'flash.html', mode: '100644', type: 'blob', content }] })
-            })).json();
-            const commit = await (await fetch(api('git/commits'), { method: 'POST', headers: h,
-              body: JSON.stringify({ message: `Auto-fix: ${edition || 'ISO'} URL — was unreachable, found at mirror`, tree: tree.sha, parents: [base.object.sha] })
-            })).json();
-            await fetch(api('git/refs'), { method: 'POST', headers: h, body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }) });
-            const pr = await (await fetch(api('pulls'), { method: 'POST', headers: h,
-              body: JSON.stringify({ title: `Auto-fix: ${edition || 'ISO'} download URL`, body: `🤖 **Auto-fix**: ${url}\nwas broken, found working mirror at:\n${foundUrl}`, head: branch, base: 'main' })
-            })).json();
-            if (pr.number) {
-              // PR created but NOT auto-merged — requires manual review
-            }
-          }
-        }
-      } catch (e) { console.error('Auto-fix PR failed:', e.message); }
-    }
   }
 
   return new Response(JSON.stringify({
@@ -1401,187 +1411,11 @@ async function handleHealthCheck(env) {
   // Store in R2 for status badge
   await putR2(env, 'acreetionos-hosting', 'health-check.json', results).catch(() => {});
 
-  // If issues found, create a PR via GitHub
-  if (totalIssues > 0 && env.GH_TOKEN) {
-    const branch = `fix/health-auto-${Date.now().toString(36)}`;
-    let prBody = `🤖 **Site Health Check Report**\n\n**Issues found:** ${totalIssues}\n\n`;
-    for (const p of results.pages) { if (!p.healthy) prBody += `- ❌ Page /${p.page}: HTTP ${p.status}\n`; }
-    for (const a of results.apis) { if (!a.healthy) prBody += `- ❌ API ${a.url}: HTTP ${a.status}\n`; }
-    for (const d of results.downloads) { if (!d.healthy) prBody += `- ❌ ISO ${d.edition}: HTTP ${d.status}\n`; }
-    prBody += '\n---\n_Created automatically by the site health check._';
 
-    try {
-      const repo = 'AcreetionOS-Code/acreetionos-code.github.io';
-      const h = { 'Authorization': `Bearer ${env.GH_TOKEN}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-Health/1.0' };
-      const api = (p) => `https://api.github.com/repos/${repo}/${p}`;
-
-      const base = await (await fetch(api('git/ref/heads/main'), { headers: h })).json();
-      const tree = await (await fetch(api('git/trees'), { method: 'POST', headers: h, body: JSON.stringify({ base_tree: base.object.sha, tree: [] }) })).json();
-      const commit = await (await fetch(api('git/commits'), { method: 'POST', headers: h, body: JSON.stringify({ message: `Health check: ${totalIssues} issue(s)`, tree: tree.sha, parents: [base.object.sha] }) })).json();
-      await fetch(api('git/refs'), { method: 'POST', headers: h, body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commit.sha }) });
-      const pr = await (await fetch(api('pulls'), { method: 'POST', headers: h, body: JSON.stringify({ title: `Health: ${totalIssues} issue(s) found`, body: prBody, head: branch, base: 'main' }) })).json();
-      if (pr.number) {
-        // PR created but NOT auto-merged — requires manual review
-      }
-    } catch (e) { console.error('PR creation failed:', e.message); }
-  }
 
   return new Response(JSON.stringify(results), {
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache', ...corsHeaders({ headers: { get: () => '' } }) }
   });
-}
-
-// ─── GitHub Auto-Fix PR Creator ────────────────────────────
-
-async function handleCreatePR(request, env) {
-  // POST /api/github/create-pr — creates a PR with auto-fixes
-  // Body: { branch, title, body, files: [{ path, content }], base?: "main" }
-  try {
-    const adminKey = request.headers.get('X-Admin-Key');
-    if (!adminKey || !(await timingSafeCompare(adminKey, env.ADMIN_KEY))) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-
-    const body = await request.json();
-    const ghToken = env.GH_TOKEN;
-    if (!ghToken) {
-      return new Response(JSON.stringify({ error: 'GitHub not configured', pr: null }), {
-        status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-
-    const repo = 'AcreetionOS-Code/acreetionos-code.github.io';
-    const base = body.base || 'main';
-    const branch = body.branch || `fix/auto-${Date.now().toString(36)}`;
-    const headers = {
-      'Authorization': `Bearer ${ghToken}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/vnd.github.v3+json',
-      'User-Agent': 'AcreetionOS-AutoFix/1.0'
-    };
-    const api = (path) => `https://api.github.com/repos/${repo}/${path}`;
-
-    // 1. Get the latest commit SHA on base branch
-    const baseRes = await fetch(api(`git/ref/heads/${base}`), { headers });
-    if (!baseRes.ok) {
-      return new Response(JSON.stringify({ error: 'Failed to get base ref', pr: null }), {
-        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-    const baseData = await baseRes.json();
-    const baseSha = baseData.object.sha;
-
-    // 2. Create a new tree with the file changes
-    const treeItems = (body.files || []).map(f => ({
-      path: f.path,
-      mode: '100644',
-      type: 'blob',
-      content: f.content
-    }));
-
-    const treeRes = await fetch(api('git/trees'), {
-      method: 'POST', headers,
-      body: JSON.stringify({ base_tree: baseSha, tree: treeItems })
-    });
-    if (!treeRes.ok) {
-      const err = await treeRes.text();
-      return new Response(JSON.stringify({ error: 'Tree creation failed', detail: err.slice(0, 300), pr: null }), {
-        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-    const treeData = await treeRes.json();
-
-    // 3. Create a commit
-    const commitRes = await fetch(api('git/commits'), {
-      method: 'POST', headers,
-      body: JSON.stringify({
-        message: body.title || 'Auto-fix: AI website guardian repairs',
-        tree: treeData.sha,
-        parents: [baseSha]
-      })
-    });
-    if (!commitRes.ok) {
-      const err = await commitRes.text();
-      return new Response(JSON.stringify({ error: 'Commit failed', detail: err.slice(0, 300), pr: null }), {
-        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-    const commitData = await commitRes.json();
-
-    // 4. Create the branch
-    const branchRes = await fetch(api(`git/refs`), {
-      method: 'POST', headers,
-      body: JSON.stringify({ ref: `refs/heads/${branch}`, sha: commitData.sha })
-    });
-    if (!branchRes.ok) {
-      const err = await branchRes.text();
-      return new Response(JSON.stringify({ error: 'Branch creation failed', detail: err.slice(0, 300), pr: null }), {
-        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-
-    // 5. Create the PR
-    const prRes = await fetch(api('pulls'), {
-      method: 'POST', headers,
-      body: JSON.stringify({
-        title: body.title || 'Auto-fix: AI guardian repairs',
-        body: (body.body || '🤖 **Auto-fix PR**\n\nCreated automatically by the AcreetionOS AI Guardian.') + '\n\n_Generated via Cloudflare Worker_',
-        head: branch,
-        base: base
-      })
-    });
-    if (!prRes.ok) {
-      const err = await prRes.text();
-      return new Response(JSON.stringify({ error: 'PR creation failed', detail: err.slice(0, 300), pr: null }), {
-        status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-    const prData = await prRes.json();
-
-    return new Response(JSON.stringify({
-      pr: { number: prData.number, url: prData.html_url, branch },
-      success: true
-    }), {
-      headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-    });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message, pr: null }), {
-      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-    });
-  }
-}
-
-async function handlePushFix(request, env) {
-  // POST /api/github/push-fix — directly push a file fix to main
-  // Body: { files: [{ path, content }], message }
-  try {
-    const adminKey = request.headers.get('X-Admin-Key');
-    if (!adminKey || !(await timingSafeCompare(adminKey, env.ADMIN_KEY))) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-        status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-
-    const body = await request.json();
-    const ghToken = env.GH_TOKEN;
-    if (!ghToken) {
-      return new Response(JSON.stringify({ error: 'GitHub not configured' }), {
-        status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-      });
-    }
-
-    // First try to create a PR, fallback to direct push
-    const prResult = await handleCreatePR(request.clone ? request.clone() : request, env).then(r => r.json());
-    return new Response(JSON.stringify(prResult), {
-      headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-    });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), {
-      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-    });
-  }
 }
 
 // ─── CVE Security Monitoring ──────────────────────────────────
@@ -2001,18 +1835,6 @@ async function handleCVEFix(request, env) {
   }
 }
 
-async function triggerRedeploy(env) {
-  const ghToken = env.GH_TOKEN;
-  if (!ghToken) return;
-  try {
-    await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/deploy-hosting-providers.yml/dispatches', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${ghToken}`, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json', 'User-Agent': 'AcreetionOS-Hosting' },
-      body: JSON.stringify({ ref: 'main' })
-    });
-  } catch (e) { console.error('Redeploy trigger failed:', e); }
-}
-
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -2126,51 +1948,6 @@ export default {
         });
       } catch (e) {
         return new Response('Download error', { status: 500 });
-      }
-    }
-
-    // Build system — trigger GitHub Actions builds and check status
-    if (url.pathname === '/api/build/trigger' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const edition = body.edition;
-        if (!edition) {
-          return new Response(JSON.stringify({ error: 'edition required' }), {
-            status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const ghToken = env.GH_TOKEN;
-        if (!ghToken) {
-          return new Response(JSON.stringify({ error: 'Build trigger not configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const ghRes = await fetch('https://api.github.com/repos/AcreetionOS-Code/acreetionos-code.github.io/actions/workflows/build-all.yml/dispatches', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${ghToken}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/vnd.github.v3+json',
-            'User-Agent': 'AcreetionOS-Build-Trigger'
-          },
-          body: JSON.stringify({
-            ref: 'main',
-            inputs: { edition }
-          })
-        });
-        if (!ghRes.ok) {
-          const errText = await ghRes.text();
-          return new Response(JSON.stringify({ error: 'GitHub trigger failed', detail: errText.slice(0, 300) }), {
-            status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        return new Response(JSON.stringify({ triggered: true, edition }), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: 'Trigger error: ' + err.message }), {
-          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
       }
     }
 
@@ -2434,6 +2211,9 @@ export default {
     if (url.pathname === '/api/hosting/providers' && request.method === 'GET') {
       return handleHostingGetProviders(env);
     }
+    if (url.pathname === '/api/hosting/providers/snippets' && request.method === 'GET') {
+      return handleHostingSnippets(env);
+    }
     if (url.pathname === '/api/hosting/register' && request.method === 'POST') {
       return handleHostingRegister(request, env);
     }
@@ -2488,14 +2268,6 @@ export default {
     // ─── Site Health Check (runs periodically via cron) ──────
     if (url.pathname === '/api/health/check' && request.method === 'GET') {
       return handleHealthCheck(env);
-    }
-
-    // ─── GitHub Auto-Fix PR Creator ───────────────────────────
-    if (url.pathname === '/api/github/create-pr' && request.method === 'POST') {
-      return handleCreatePR(request, env);
-    }
-    if (url.pathname === '/api/github/push-fix' && request.method === 'POST') {
-      return handlePushFix(request, env);
     }
 
     // ─── Smart Mirror Selection ────────────────────────────────
