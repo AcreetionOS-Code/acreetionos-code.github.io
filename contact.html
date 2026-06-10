@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8" >
-<meta name="viewport" content="width=device-width, initial-scale=1.0" >
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" ><meta name="viewport" content="width=device-width, initial-scale=1.0" >
 <meta name="referrer" content="strict-origin-when-cross-origin" >
 <title>Contact Us - AcreetionOS Support &amp; Community</title>
 <meta name="description" content="Get in touch with the AcreetionOS team. Find support through our community Discord, GitLab issues, email, and social channels." >
@@ -55,8 +55,8 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
 @media(max-width:480px){.grid{grid-template-columns:1fr}.team-grid{flex-direction:column;align-items:center}}
 </style>
 </head><body>
-<div id="page-wrap">
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header>
+<div id="page-wrap"><div id="page-scale">
+<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="git-tracker.html">Git Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a></nav></div></header>
 <div class="wrap">
 <div class="hero">
 <img src="acreetionoslogo.webp" alt="AcreetionOS" width="80" height="80">
@@ -104,11 +104,12 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
 <h2>Frequently Asked</h2>
 <div class="faq-item"><div class="faq-q">How fast can I expect a response? <span class="arrow">&#x25bc;</span></div><div class="faq-a">Discord is fastest — usually within a few hours. Email responses within 48 hours. GitHub/GitLab issues are triaged weekly.</div></div>
 <div class="faq-item"><div class="faq-q">Do you offer phone support? <span class="arrow">&#x25bc;</span></div><div class="faq-a">Not at this time. We're a two-person team and rely on async communication channels.</div></div>
-<div class="faq-item"><div class="faq-q">Can I contribute to AcreetionOS? <span class="arrow">&#x25bc;</span></div><div class="faq-a">Absolutely! Check our <a href="contributing.html" style="color:var(--green)">contributing page</a> or join the Discord to get involved.</div></div>
+<div class="faq-item"><div class="faq-q">Can I contribute to AcreetionOS? <span class="arrow">&#x25bc;</span></div><div class="faq-a">Absolutely! Check our <a href="docs.html" style="color:var(--green)">contributing page</a> or join the Discord to get involved.</div></div>
 </div>
 </div>
 </div>
+<script src="scale-page.js" defer></script>
 <script src="sidebar.js" defer></script>
 
 <script src="contact-page.js"></script>
-</body></html>
+<script src="footer.js" defer></script></body></html>

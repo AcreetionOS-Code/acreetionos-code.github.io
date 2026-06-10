@@ -18,13 +18,14 @@ async function doSearch(q){
   }catch(e){results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">Failed to reach Wiki.</div>';}
 }
 
+function escHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function renderResults(items){
   results.innerHTML='';
   if(!items.length){results.innerHTML='<div style="padding:1.5rem;color:#e74c3c;font-size:.9rem">No results found.</div>';return;}
   items.forEach(function(item){
     var el=document.createElement('div');
     el.className='item';
-    el.innerHTML='<h4>'+item.title+'</h4><p>'+item.snippet+'...</p><div class="src">wiki.archlinux.org</div>';
+    el.innerHTML='<h4>'+escHtml(item.title)+'</h4><p>'+escHtml(item.snippet)+'...</p><div class="src">wiki.archlinux.org</div>';
     el.addEventListener('click',function(){produceGuide(item.title);});
     results.appendChild(el);
   });
@@ -39,7 +40,7 @@ document.querySelectorAll('.quick a').forEach(function(a){
     var q=this.getAttribute('data-q');
     input.value=q;
     results.style.display='block';
-    results.innerHTML='<div style="padding:1.5rem;color:var(--acreetion-text);font-size:.85rem">Generating guide for <strong>'+q+'</strong>...</div>';
+    results.innerHTML='<div style="padding:1.5rem;color:var(--acreetion-text);font-size:.85rem">Generating guide for <strong>'+escHtml(q)+'</strong>...</div>';
     produceGuide(q);
   });
 });
@@ -101,18 +102,34 @@ async function produceGuide(title){
   document.getElementById('progress-area').style.display='none';
   document.getElementById('content-area').style.display='block';
 
+  function sanitizeHtml(html) {
+    var d=document.createElement('div');
+    d.innerHTML=html;
+    var all=d.querySelectorAll('*');
+    for(var i=0;i<all.length;i++){
+      for(var j=0;j<all[i].attributes.length;j++){
+        var attr=all[i].attributes[j];
+        if(attr.name.indexOf('on')===0||attr.value.indexOf('javascript:')!==-1){
+          all[i].removeAttribute(attr.name);
+          j--;
+        }
+      }
+    }
+    return d.innerHTML;
+  }
   if(finalBody){
     document.getElementById('modal-title-result').innerText=title;
-    document.getElementById('modal-body').innerHTML=marked.parse(finalBody);
+    document.getElementById('modal-body').innerHTML=sanitizeHtml(marked.parse(finalBody));
     document.getElementById('modal-link').href=originalUrl;
   } else if(rawText){
     document.getElementById('modal-title-result').innerText=title+' (raw)';
-    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c;margin-bottom:1rem">AI guide unavailable. Raw Arch Wiki content:</p>'+marked.parse(rawText);
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c;margin-bottom:1rem">AI guide unavailable. Raw Arch Wiki content:</p>'+sanitizeHtml(marked.parse(rawText));
     document.getElementById('modal-link').href=originalUrl;
   } else {
     document.getElementById('modal-title-result').innerText='Error';
-    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Failed. <button onclick="produceGuide(\''+title.replace(/'/g,"\\'")+'\')" style="background:var(--acreetion-green);color:#000;border:none;padding:.4rem 1rem;border-radius:6px;cursor:pointer;margin-left:.5rem;font-weight:700">Try Again</button></p>';
+    document.getElementById('modal-body').innerHTML='<p style="color:#e74c3c">Failed.</p><button id="retry-btn" style="background:var(--acreetion-green);color:#000;border:none;padding:.4rem 1rem;border-radius:6px;cursor:pointer;margin-left:.5rem;font-weight:700">Try Again</button>';
     document.getElementById('modal-link').href=originalUrl;
+    document.getElementById('retry-btn').addEventListener('click',function(){produceGuide(title);});
   }
 
   document.getElementById('show-raw-btn').addEventListener('click',function(){

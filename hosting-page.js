@@ -29,7 +29,7 @@ async function loadProviders() {
       <div class="provider-item">
         <div class="info">
           <div class="name">${esc(p.org)} <span class="tag tag-active">Active</span></div>
-          <div class="url"><a href="${esc(p.mirror_url)}" target="_blank" rel="noopener">${esc(p.mirror_url)}</a></div>
+          <div class="url"><a href="${safeUrl(p.mirror_url)}" target="_blank" rel="noopener">${esc(p.mirror_url)}</a></div>
           <div class="provider-detail">${esc(p.location)} ${p.bandwidth ? '· ' + esc(p.bandwidth) : ''}</div>
         </div>
       </div>
@@ -43,6 +43,11 @@ function esc(s) {
   const d = document.createElement('div');
   d.textContent = s || '';
   return d.innerHTML;
+}
+function safeUrl(s) {
+  if (!s || typeof s !== 'string') return '';
+  if (s.indexOf('javascript:') === 0 || s.indexOf('data:') === 0 || s.indexOf('vbscript:') === 0) return '';
+  return s;
 }
 
 async function registerProvider(e) {

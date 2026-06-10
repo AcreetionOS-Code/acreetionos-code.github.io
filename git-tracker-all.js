@@ -172,18 +172,18 @@ function renderRepos(repos) {
     const card = document.createElement('div');
     card.className = 'repo-card';
     card.onclick = function() { openModal(repo); };
-    const ownerDisplay = repo.owner_name ? (repo.owner_name + ' (' + repo.owner + ')') : repo.owner;
-    const ownerLink = repo.owner_html ? ('<a href="' + repo.owner_html + '" target="_blank" style="color:#8a8a8a">' + ownerDisplay + '</a>') : ownerDisplay;
+    const ownerDisplay = repo.owner_name ? (escHtml(repo.owner_name) + ' (' + escHtml(repo.owner) + ')') : escHtml(repo.owner);
+    const ownerLink = safeUrl(repo.owner_html) ? ('<a href="' + safeUrl(repo.owner_html) + '" target="_blank" rel="noopener noreferrer" style="color:#8a8a8a">' + ownerDisplay + '</a>') : ownerDisplay;
     card.innerHTML =
       '<div class="repo-card-header">' +
-      '<div class="repo-card-title">' + repo.name + '</div>' +
+      '<div class="repo-card-title">' + escHtml(repo.name) + '</div>' +
       '<div class="repo-card-tags">' + (isRecent ? '<span class="tag tag-active">Active</span>' : '') + sourceBadge + '</div>' +
       '</div>' +
-      '<div class="repo-card-desc">' + (repo.description || 'No description available.') + '</div>' +
+      '<div class="repo-card-desc">' + escHtml(repo.description || 'No description available.') + '</div>' +
       '<div class="repo-card-meta">' +
       '<span><span class="repo-stats-icon">&#9733;</span> ' + repo.stargazers_count + '</span>' +
       '<span><span class="repo-stats-icon">&#9829;</span> ' + repo.forks_count + '</span>' +
-      '<span><span class="repo-stats-icon">&#9881;</span> ' + (repo.language || 'N/A') + '</span>' +
+      '<span><span class="repo-stats-icon">&#9881;</span> ' + escHtml(repo.language || 'N/A') + '</span>' +
       '</div>' +
       '<div class="repo-card-footer">' +
       '<span>Updated ' + new Date(repo.pushed_at).toLocaleDateString() + '</span>' +
@@ -199,11 +199,11 @@ async function openModal(repo) {
   const sourceLabel = repo.source_type === 'gitlab' ? 'View on GitLab' : 'View on GitHub';
   const issuesUrl = repo.source_type === 'gitlab' ? (repo.html_url + '/-/issues') : (repo.html_url + '/issues');
   body.innerHTML =
-    '<h2>' + repo.name + '</h2>' +
-    '<p class="repo-desc">' + (repo.description || 'No description.') + '</p>' +
+    '<h2>' + escHtml(repo.name) + '</h2>' +
+    '<p class="repo-desc">' + escHtml(repo.description || 'No description.') + '</p>' +
     '<div class="modal-actions">' +
-    '<a href="' + repo.html_url + '" target="_blank" class="repo-link-btn">' + sourceLabel + '</a>' +
-    '<a href="' + issuesUrl + '" target="_blank" class="repo-link-btn secondary">Issues</a>' +
+    '<a href="' + safeUrl(repo.html_url) + '" target="_blank" rel="noopener noreferrer" class="repo-link-btn">' + sourceLabel + '</a>' +
+    '<a href="' + safeUrl(issuesUrl) + '" target="_blank" rel="noopener noreferrer" class="repo-link-btn secondary">Issues</a>' +
     '</div><h3>Recent Commits</h3>' +
     '<div class="modal-loading" id="modal-loading">Loading commits...</div>' +
     '<ul class="modal-commit-list" id="modal-commits"></ul>';
@@ -240,6 +240,8 @@ async function openModal(repo) {
   }
 }
 
+function escHtml(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function safeUrl(url) { if (!url || typeof url !== 'string') return ''; if (!url.startsWith('https://')) return ''; return url; }
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.appendChild(document.createTextNode(str));

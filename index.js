@@ -1,27 +1,21 @@
-// Cloudflare Worker — AIDEN AI proxy + Page View Counter + Audio Transcription
+// Cloudflare Worker — Page View Counter + AI Chat Proxy + ISO Hosting
 // Holds the API key securely on the server, never exposed to the browser
 // Maintainers: Natalie Spiva (spivanatalie64), Darren Clift (cobra3282000)
-// Website: https://acreetionos.org — contact via the project channels for AIDEN
-// The worker proxies the site to OpenRouter server-side. Pollinations.ai support removed.
+// Website: https://acreetionos.org
 // This worker provides:
 //   GET  /api/news    — aggregates AcreetionOS news from GitHub, GitLab, and RSS, generates articles with AI
 //   POST /api/chat    — server-side OpenRouter chat (free model)
-//   POST /api/transcribe — audio transcription via OpenRouter Whisper (free)
 //   GET  /api/counter — returns current active user count
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const WHISPER_URL = 'https://openrouter.ai/api/v1/audio/transcriptions';
-const TTS_URL = 'https://openrouter.ai/api/v1/audio/speech';
-// Use only explicitly free community models. Keep the values in one place.
 const FREE_MODEL = 'openrouter/auto';
-const WHISPER_MODEL = 'openai/whisper-large-v3';
-const TTS_MODEL = 'cartesia-ai/cartesia-tts';
-const ALLOWED_ORIGINS = [
+let allowedOrigins = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
 ];
+const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
 const rateLimitMap = new Map();
 
@@ -53,9 +47,16 @@ function securityHeaders(nonce) {
   };
 }
 
+function jsonResponse(data, init, request) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}), ...corsHeaders(request || { headers: { get: () => '' } }) }
+  });
+}
+
 function corsHeaders(request, nonce) {
   const origin = request.headers.get('Origin') || '';
-  const allowed = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+  const allowed = allowedOrigins.includes(origin) ? origin : '';
   if (!nonce) {
     nonce = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
   }
@@ -97,24 +98,28 @@ async function persistCount() {
 
 async function handleNews(env) {
   const GH_ORG = 'AcreetionOS-Code';
-  const GL_URL = 'https://gitlab.acreetionos.org';
+  const GL_HOST = 'gitlab.acreetionos.org';
   const RSS_FEEDS = [
     'https://news.google.com/rss/search?q=%22AcreetionOS%22&hl=en-US&gl=US&ceid=US:en',
     'https://news.google.com/rss/search?q=AcreetionOS+Arch+Linux&hl=en-US&gl=US&ceid=US:en',
-    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en'
+    'https://news.google.com/rss/search?q=Arch+Linux+news&hl=en-US&gl=US&ceid=US:en',
+    'https://news.google.com/rss/search?q=Arch+Linux+Cinnamon&hl=en-US&gl=US&ceid=US:en',
+    'https://www.reddit.com/r/acreetionos/.rss',
+    'https://www.reddit.com/r/archlinux/.rss?limit=10',
+    'https://lwn.net/headlines/newrss'
   ];
 
   try {
     const [gh, gl, rss] = await Promise.all([
       (async () => {
         try {
-          const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=5&sort=pushed');
+          const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=50&sort=pushed', { headers: { 'User-Agent': CHROME_UA } });
           if (!reposRes.ok) return [];
           const repos = await reposRes.json();
-          const repoFetches = repos.slice(0, 3).map(repo =>
+          const repoFetches = repos.slice(0, 50).map(repo =>
             Promise.all([
-              fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/commits?per_page=2'),
-              fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/releases?per_page=1')
+              fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/commits?per_page=2', { headers: { 'User-Agent': CHROME_UA } }),
+              fetch('https://api.github.com/repos/' + GH_ORG + '/' + repo.name + '/releases?per_page=1', { headers: { 'User-Agent': CHROME_UA } })
             ]).then(async ([commitsRes, releasesRes]) => {
               const items = [];
               if (commitsRes.ok) {
@@ -138,17 +143,17 @@ async function handleNews(env) {
       })(),
       (async () => {
         try {
-          const projectsRes = await fetch(GL_URL + '/api/v4/projects?per_page=5&order_by=last_activity_at');
+          const projectsRes = await fetch('https://' + GL_HOST + '/api/v4/projects?per_page=50&order_by=last_activity_at', { headers: { 'User-Agent': CHROME_UA } });
           if (!projectsRes.ok) return [];
           const projects = await projectsRes.json();
-          const projFetches = projects.slice(0, 3).map(proj =>
-            fetch(GL_URL + '/api/v4/projects/' + proj.id + '/repository/commits?per_page=2')
+          const projFetches = projects.slice(0, 50).map(proj =>
+            fetch('https://' + GL_HOST + '/api/v4/projects/' + proj.id + '/repository/commits?per_page=2', { headers: { 'User-Agent': CHROME_UA } })
               .then(async (commitsRes) => {
                 const items = [];
                 if (commitsRes.ok) {
                   const commits = await commitsRes.json();
                   for (const c of commits) {
-                    items.push({ type: 'commit', repo: proj.path_with_namespace || proj.name, message: c.title || c.message || '', author: c.author_name || 'Unknown', date: c.created_at, url: c.web_url || (GL_URL + '/' + proj.path_with_namespace + '/-/commit/' + c.id), source: 'GitLab' });
+                    items.push({ type: 'commit', repo: proj.path_with_namespace || proj.name, message: c.title || c.message || '', author: c.author_name || 'Unknown', date: c.created_at, url: c.web_url || ('https://' + GL_HOST + '/' + proj.path_with_namespace + '/-/commit/' + c.id), source: 'GitLab' });
                   }
                 }
                 return items;
@@ -160,7 +165,7 @@ async function handleNews(env) {
       })(),
       (async () => {
         const feedFetches = RSS_FEEDS.map(feedUrl =>
-          fetch(feedUrl, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AcreetionOS-News-Bot)' } })
+          fetch(feedUrl, { headers: { 'User-Agent': CHROME_UA } })
             .then(async (res) => {
               if (!res.ok) return [];
               const xml = await res.text();
@@ -211,84 +216,28 @@ async function handleNews(env) {
 
 // ─── Hosting Provider Vetting ─────────────────────────────────
 
-const THREAT_ACTORS = new Set([
-  'lazarus', 'kimsuks', 'apt38', 'hiddencobra', 'bluenoroff',
-  'fancybear', 'apt28', 'sofacy', 'pawnstorm', 'sednit',
-  'cozybear', 'apt29', 'midnightblizzard', 'nobelium',
-  'wizardspider', 'trickbot', 'fin7', 'carbanak',
-  'darkhotel', 'apt32', 'oceanlotus', 'mustangpanda',
-  'taowu', 'panda', 'apt1', 'commentcrew',
-  'shuckworm', 'armageddon', 'gamaredon', 'actinium',
-  'belarusian', 'ghostwriter', 'unc1151', 'stardust',
-  'sandworm', 'apt44', 'blackenergy', 'telebots',
-  'scatteredspider', 'scatteredsPIDEr', '0ktapus', 'octopus',
-  'apt41', 'winnti', 'blacktech', 'bronzesunset',
-  'bluenorthern', 'redquiet', 'blessed', 'muddywater',
-  'tortoiseshell', 'imperialkitten', 'raqqah', 'thedarkoverlord',
-  'darkoverlord', 'thedarkoverlord', 'thedarkoverlord',
-  'conti', 'revil', 'ransomware', 'lockbit', 'blackcat',
-  'alphv', 'clop', 'cryak', 'darkside', 'blackmatter',
-  'blypts', 'grief', 'nokoyawa', 'vicesociety', 'ransomhouse',
-  'vigorous', 'rigorous', 'hades', 'hellokitty',
-  'lapsus', 'lapus', 'lgroth', 'teamtnt', 'webshell',
-  'chinanet', 'barium', 'mgbot', 'mirai', 'botnet',
-  'c2server', 'payloadbin', 'ddos', 'stresser', 'booter',
-  'nulled', 'cracked', 'hackforums', 'raidforums',
-  'breachforums', 'exploit', 'exploit.in', 'xss.is',
-  'dread', 'hackerwanted', 'mostwanted', 'cybercriminal',
-  'carding', 'carder', 'dumps', 'fullz', 'ssndob',
-  'hijack', 'phish', 'phishing', 'malware', 'ransomware',
-  'bankingtrojan', 'infostealer', 'inifil', 'formbook',
-  'agenttesla', 'nanocore', 'remcos', 'darkcomet',
-]);
-
-const SANCTIONED_COUNTRIES = ['iran', 'north korea', 'syria', 'cuba', 'russia', 'belarus', 'crimea'];
-
-async function checkEmailBreaches(env, email) {
-  // Have I Been Pwned k-anonymity API (no key needed)
-  try {
-    const crypto = globalThis.crypto || {};
-    const encoder = new TextEncoder();
-    const data = encoder.encode(email);
-    const hashBuffer = await crypto.subtle.digest('SHA-1', data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
-    const prefix = hashHex.slice(0, 5);
-    const suffix = hashHex.slice(5);
-    const res = await fetch(`https://api.pwnedpasswords.com/range/${prefix}`, { signal: AbortSignal.timeout(10000) });
-    if (res.ok) {
-      const text = await res.text();
-      const match = text.split('\n').find(line => line.startsWith(suffix));
-      if (match) {
-        const count = parseInt(match.split(':')[1] || '0');
-        if (count > 3) return { breached: true, breach_count: count, url: `https://haveibeenpwned.com/account/${encodeURIComponent(email)}` };
-      }
-    }
-  } catch (e) { console.error('HIBP check failed:', e); }
-  return { breached: false };
-}
-
 async function validateOrgDomain(env, email, org, isPersonal) {
-  // Skip validation if personal checkbox was checked
   if (isPersonal) return { valid: true, note: 'personal' };
 
   const domain = email.split('@')[1];
   if (!domain) return { valid: false, reason: 'Invalid email domain' };
 
-  // Known open source project hosting platforms
   const ossPlatforms = ['github.io', 'gitlab.io', 'bitbucket.io', 'sourceforge.io', 'gitlab.com', 'github.com'];
   const isOSS = ossPlatforms.some(p => domain.endsWith('.' + p) || domain === p);
   if (isOSS) return { valid: true, note: 'open_source_platform' };
 
+  if (domain === 'localhost' || domain === '127.0.0.1' || domain === '0.0.0.0' || domain === '[::1]' ||
+      /^\d+\.\d+\.\d+\.\d+$/.test(domain) || domain.endsWith('.local') || domain.endsWith('.internal')) {
+    return { valid: false, reason: 'Disallowed domain' };
+  }
+
   try {
-    // Check if domain has a resolvable website (proves it's a real organization)
-    const headRes = await fetch(`https://${domain}`, {
+    const headRes = await fetch('https://' + domain, {
       method: 'HEAD',
       signal: AbortSignal.timeout(8000)
     }).catch(() => null);
 
-    // Also check www subdomain
-    const wwwRes = !headRes?.ok ? await fetch(`https://www.${domain}`, {
+    const wwwRes = !headRes?.ok ? await fetch('https://www.' + domain, {
       method: 'HEAD',
       signal: AbortSignal.timeout(8000)
     }).catch(() => null) : headRes;
@@ -297,19 +246,9 @@ async function validateOrgDomain(env, email, org, isPersonal) {
       return { valid: true, note: 'verified_domain' };
     }
 
-    // Try HTTP as fallback
-    const httpRes = !headRes && !wwwRes ? await fetch(`http://${domain}`, {
-      method: 'HEAD',
-      signal: AbortSignal.timeout(5000)
-    }).catch(() => null) : null;
-
-    if (httpRes?.ok) {
-      return { valid: true, note: 'verified_domain_http' };
-    }
-
-    return { valid: false, reason: `Domain "${domain}" has no reachable website. Organization email must belong to an open source project or business with an active website, or check "personal use".` };
+    return { valid: false, reason: 'Domain "' + domain + '" has no reachable website. Organization email must belong to an open source project or business with an active website, or check "personal use".' };
   } catch (e) {
-    return { valid: false, reason: `Could not verify domain "${domain}": ${e.message}` };
+    return { valid: false, reason: 'Could not verify domain "' + domain + '": ' + e.message };
   }
 }
 
@@ -323,35 +262,29 @@ async function vetProvider(env, body) {
   const notesLower = (notes || '').toLowerCase();
   const locationLower = (location || '').toLowerCase();
 
-  // 1. Check org name against known threat actors
-  for (const actor of THREAT_ACTORS) {
-    if (orgLower.includes(actor)) {
-      flags.push(`Organization name matches known threat actor keyword: "${actor}"`);
+  // 1. Check org name against threat intel keywords (loaded from secret)
+  const threatKB = env.WATCH_LIST ? JSON.parse(env.WATCH_LIST) : [];
+  for (const keyword of threatKB) {
+    if (orgLower.includes(keyword)) {
+      flags.push('Organization name matches known threat indicator');
       score += 50;
     }
-    if (notesLower.includes(actor) || emailLower.includes(actor)) {
-      flags.push(`Communication references threat actor: "${actor}"`);
+    if (notesLower.includes(keyword) || emailLower.includes(keyword)) {
+      flags.push('Communication references known threat indicator');
       score += 40;
     }
   }
 
-  // 2. Check email for breach history
-  const breachCheck = await checkEmailBreaches(env, email);
-  if (breachCheck.breached) {
-    flags.push(`Email appears in ${breachCheck.breach_count} known data breaches (${breachCheck.url})`);
-    score += breachCheck.breach_count > 20 ? 30 : 15;
-  }
-
-  // 3. Check domain against threat intel blocklist
+  // 2. Check domain against threat intel blocklist
   let domain = '';
   try {
     domain = new URL(mirror_url || website || '').hostname.replace(/^www\./, '').toLowerCase();
   } catch (e) {}
-  if (domain && env.CLOUDFLARE_API_TOKEN && env.CLOUDFLARE_ACCOUNT_ID) {
+  if (domain && env.SPICY_SAUCE && env.TACO_BELL) {
     const blockedDomains = [];
     try {
-      const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`, {
-        headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` }
+      const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`, {
+        headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` }
       });
       if (res.ok) {
         const text = await res.text();
@@ -367,44 +300,9 @@ async function vetProvider(env, body) {
     }
   }
 
-  // 4. Check location against sanctioned countries
-  for (const country of SANCTIONED_COUNTRIES) {
-    if (locationLower.includes(country)) {
-      flags.push(`Location "${location}" is a sanctioned/embargoed country`);
-      score += 40;
-    }
-  }
+  // Remove public suspicious patterns and disposable domain checks — moved to background worker via CRED_I
 
-  // 5. Check notes for suspicious patterns
-  const suspiciousPatterns = [
-    { pattern: /(credit.?card|cc.?num|ssn|social.?security|dumps|fullz)/i, weight: 40, msg: 'Financial fraud indicators in notes' },
-    { pattern: /(hack|crack|c2|rat|remote.?access.?trojan|keylogger|spyware)/i, weight: 35, msg: 'Hacking tools referenced in notes' },
-    { pattern: /(terrorist|extremist|jihad|isil|isis|taliban)/i, weight: 50, msg: 'Extremist references in notes' },
-    { pattern: /(proxy|vpn|relay|tor|onion|i2p)/i, weight: 5, msg: 'Anonymization tools referenced' },
-    { pattern: /(money.?launder|wash|sanction.?evade|tax.?haven)/i, weight: 45, msg: 'Financial crime indicators in notes' },
-  ];
-  for (const sp of suspiciousPatterns) {
-    if (sp.pattern.test(notesLower) || sp.pattern.test(orgLower)) {
-      flags.push(sp.msg);
-      score += sp.weight;
-    }
-  }
-
-  // 6. Check if email domain is a disposable/temporary email provider
-  const disposableDomains = [
-    'mailinator.com', 'guerrillamail.com', 'tempmail.com', '10minutemail.com',
-    'throwaway.email', 'yopmail.com', 'mail.tm', 'tempmail.net', 'temp-mail.org',
-    'dispostable.com', 'getnada.com', 'sharklasers.com', 'burnermail.io',
-    'spamgourmet.com', 'mailmetrash.com', 'trashmail.com', 'fakeinbox.com',
-    'mailexpire.com', 'emailondeck.com', 'temp-mail.io', 'temp-inbox.com',
-  ];
-  const emailDomain = emailLower.split('@')[1];
-  if (disposableDomains.includes(emailDomain)) {
-    flags.push(`Disposable email provider: ${emailDomain}`);
-    score += 25;
-  }
-
-  // 7. Check if mirror URL matches known malicious URL patterns
+  // 5. Check if mirror URL matches known malicious URL patterns
   try {
     const mirrorPath = new URL(mirror_url).pathname.toLowerCase();
     if (/\.(exe|bat|cmd|scr|ps1|vbs|jar|dll)$/i.test(mirrorPath)) {
@@ -428,42 +326,43 @@ async function vetProvider(env, body) {
 // ─── ISO Hosting Provider Management ───────────────────────────────
 
 async function getR2(env, bucket, key) {
-  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return null;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
+  if (!env.SPICY_SAUCE || !env.TACO_BELL) return null;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects/${key}`;
+  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
   if (!res.ok) return null;
   // R2 GET returns the raw object body directly (not wrapped in { result: ... })
   return await res.json();
 }
 
 async function putR2(env, bucket, key, body) {
-  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return false;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
+  if (!env.SPICY_SAUCE || !env.TACO_BELL) return false;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects/${key}`;
   const res = await fetch(url, {
     method: 'PUT',
-    headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   return res.ok;
 }
 
 async function deleteR2(env, bucket, key) {
-  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return false;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
-  const res = await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
+  if (!env.SPICY_SAUCE || !env.TACO_BELL) return false;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects/${key}`;
+  const res = await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
   return res.ok;
 }
 
 async function listR2(env, bucket, prefix) {
-  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return [];
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects?prefix=${prefix}`;
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
+  if (!env.SPICY_SAUCE || !env.TACO_BELL) return [];
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects?prefix=${prefix}`;
+  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
   if (!res.ok) return [];
   const data = await res.json();
   return data?.result?.objects || [];
 }
 
 async function timingSafeCompare(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
   if (a.length !== b.length) return false;
   const enc = new TextEncoder();
   const buf = new Uint8Array(a.length);
@@ -474,15 +373,21 @@ async function timingSafeCompare(a, b) {
 async function hashPassword(password, salt) {
   const enc = new TextEncoder();
   const keyMaterial = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
-  const saltBytes = enc.encode(salt || 'acreetionos-hosting');
+  let saltBytes, saltStr;
+  if (salt) {
+    saltBytes = Uint8Array.from(atob(salt), c => c.charCodeAt(0));
+    saltStr = salt;
+  } else {
+    saltBytes = crypto.getRandomValues(new Uint8Array(16));
+    saltStr = btoa(String.fromCharCode(...saltBytes));
+  }
   const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt: saltBytes, iterations: 100000, hash: 'SHA-256' }, keyMaterial, 256);
   const hashArr = Array.from(new Uint8Array(bits));
-  const saltStr = salt || btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(16))));
   return saltStr + ':' + btoa(String.fromCharCode(...hashArr));
 }
 
 async function sendDiscordWebhook(env, message) {
-  const webhook = env.DISCORD_WEBHOOK_URL;
+  const webhook = env.ALERT_SIREN;
   if (!webhook) return;
   try {
     await fetch(webhook, {
@@ -495,7 +400,7 @@ async function sendDiscordWebhook(env, message) {
 
 async function sendHostingEmail(env, to, subject, body) {
   // Store email job in R2 for Cloudflare Email Worker to pick up
-  const job = { to, subject, body, from: env.EMAIL_FROM || 'developers@acreetionos.org', created: new Date().toISOString() };
+  const job = { to, subject, body, from: env.RETURN_ADDRESS || 'developers@acreetionos.org', created: new Date().toISOString() };
   const key = 'email-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
   await putR2(env, 'acreetionos-hosting', key, job);
 }
@@ -505,9 +410,15 @@ async function handleHostingGetProviders(env) {
   const providers = [];
   for (const obj of objects) {
     const data = await getR2(env, 'acreetionos-hosting', obj.key);
-    if (data) providers.push(data);
+    if (data) providers.push({
+      org: data.org,
+      mirror_url: data.mirror_url,
+      location: data.location,
+      bandwidth: data.bandwidth || '',
+      status: data.status
+    });
   }
-  return new Response(JSON.stringify({ providers }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+  return jsonResponse({ providers }, {}, null);
 }
 
 function escHtml(s) {
@@ -631,8 +542,10 @@ async function handleHostingRegister(request, env) {
 
     // Mailing list subscription
     if (body.subscribe && body.email) {
+      const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
+      const token = btoa(String.fromCharCode(...tokenBytes)).replace(/[/+]/g, '').slice(0, 32);
       await putR2(env, 'acreetionos-hosting', 'subscriber-' + body.email.replace(/[@.]/g, '_'), {
-        email: body.email, org: body.org, subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
+        email: body.email, org: body.org, subscribed: new Date().toISOString(), unsubscribe_token: token
       });
     }
 
@@ -641,7 +554,7 @@ async function handleHostingRegister(request, env) {
 
     // Notify Discord
     sendDiscordWebhook(env,
-      `${statusEmoji} **New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**Vetting Score:** ${vetResult.score}\n**Status:** ${statusLabel}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "YOUR_ADMIN_KEY" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
+      `${statusEmoji} **New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**Vetting Score:** ${vetResult.score}\n**Status:** ${statusLabel}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "ADMIN_SECRET" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
     );
 
     if (vetResult.flags.length > 0) {
@@ -709,7 +622,7 @@ async function handleHostingUpdateRequest(request, env) {
 async function handleHostingAdminApprove(request, env) {
   try {
     const body = await request.json();
-    if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.ADMIN_KEY))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
+    if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.SECRET_SAUCE))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const data = await getR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
     if (!data) return new Response(JSON.stringify({ error: 'Provider not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -742,7 +655,7 @@ async function handleHostingAdminApprove(request, env) {
 async function handleHostingAdminReject(request, env) {
   try {
     const body = await request.json();
-    if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.ADMIN_KEY))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
+    if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.SECRET_SAUCE))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     await deleteR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
     sendDiscordWebhook(env, `**Provider Registration Rejected**\n**ID:** ${body.provider_id}`);
@@ -770,8 +683,10 @@ async function handleHostingSubscribe(request, env) {
     const key = 'subscriber-' + body.email.replace(/[@.]/g, '_');
     const existing = await getR2(env, 'acreetionos-hosting', key);
     if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+    const hTokenBytes = crypto.getRandomValues(new Uint8Array(32));
+    const hToken = btoa(String.fromCharCode(...hTokenBytes)).replace(/[/+]/g, '').slice(0, 32);
     await putR2(env, 'acreetionos-hosting', key, {
-      email: body.email, org: body.org || '', subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
+      email: body.email, org: body.org || '', subscribed: new Date().toISOString(), unsubscribe_token: hToken
     });
     return new Response(JSON.stringify({ success: true, message: 'Subscribed to hosting updates' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
@@ -781,8 +696,12 @@ async function handleHostingSubscribe(request, env) {
 
 async function handleHostingUnsubscribe(request, env) {
   const email = request.url.searchParams?.get?.('email') || '';
-  if (!email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+  const token = request.url.searchParams?.get?.('token') || '';
+  if (!email || !token) return new Response(JSON.stringify({ error: 'email and token required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
   const key = 'subscriber-' + email.replace(/[@.]/g, '_');
+  const record = await getR2(env, 'acreetionos-hosting', key);
+  if (!record) return new Response(JSON.stringify({ error: 'Subscriber not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
+  if (record.unsubscribe_token !== token) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
   await deleteR2(env, 'acreetionos-hosting', key);
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
@@ -794,8 +713,10 @@ async function handleNewsletterSubscribe(request, env) {
     const key = 'nl-subscriber-' + body.email.replace(/[@.]/g, '_');
     const existing = await getR2(env, 'acreetionos-hosting', key);
     if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+    const nlTokenBytes = crypto.getRandomValues(new Uint8Array(32));
+    const nlToken = btoa(String.fromCharCode(...nlTokenBytes)).replace(/[/+]/g, '').slice(0, 32);
     await putR2(env, 'acreetionos-hosting', key, {
-      email: body.email, subscribed: new Date().toISOString(), unsubscribe_token: Math.random().toString(36).slice(2, 10)
+      email: body.email, subscribed: new Date().toISOString(), unsubscribe_token: nlToken
     });
     return new Response(JSON.stringify({ success: true, message: 'Subscribed to newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
@@ -805,8 +726,12 @@ async function handleNewsletterSubscribe(request, env) {
 
 async function handleNewsletterUnsubscribe(request, env) {
   const email = request.url.searchParams?.get?.('email') || '';
-  if (!email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+  const token = request.url.searchParams?.get?.('token') || '';
+  if (!email || !token) return new Response(JSON.stringify({ error: 'email and token required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
   const key = 'nl-subscriber-' + email.replace(/[@.]/g, '_');
+  const record = await getR2(env, 'acreetionos-hosting', key);
+  if (!record) return new Response(JSON.stringify({ error: 'Subscriber not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
+  if (record.unsubscribe_token !== token) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
   await deleteR2(env, 'acreetionos-hosting', key);
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed from newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
@@ -833,8 +758,8 @@ async function getThreatIntel(env) {
       return data.body.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
     }
     // raw text stored differently - try fetching directly
-    const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`;
-    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
+    const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`;
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
     if (res.ok) {
       const text = await res.text();
       return text.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
@@ -926,7 +851,7 @@ async function scanISOSuspicious(env) {
   const vtDisabled = [];
 
   let quota = await getScanQuota(env);
-  let useVt = !quota.vt_disabled && env.VIRUSTOTAL_API_KEY;
+  let useVt = !quota.vt_disabled && env.SCAN_MASTER;
 
   for (const obj of objects) {
     const data = await getR2(env, 'acreetionos-hosting', obj.key);
@@ -941,7 +866,7 @@ async function scanISOSuspicious(env) {
       try {
         const submitRes = await fetch('https://www.virustotal.com/api/v3/urls', {
           method: 'POST',
-          headers: { 'x-apikey': env.VIRUSTOTAL_API_KEY, 'Content-Type': 'application/x-www-form-urlencoded' },
+          headers: { 'x-apikey': env.SCAN_MASTER, 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams({ url: isoUrl })
         });
 
@@ -965,7 +890,7 @@ async function scanISOSuspicious(env) {
           if (analysisId) {
             await new Promise(r => setTimeout(r, 5000));
             const resultRes = await fetch(`https://www.virustotal.com/api/v3/analyses/${analysisId}`, {
-              headers: { 'x-apikey': env.VIRUSTOTAL_API_KEY }
+              headers: { 'x-apikey': env.SCAN_MASTER }
             });
             if (resultRes.ok) {
               const resultData = await resultRes.json();
@@ -1097,7 +1022,7 @@ async function handleHostingScan(request, env) {
   // POST /api/hosting/scan — triggers full scan of all provider ISOs
   // Requires admin_key
   const body = await request.json().catch(() => ({}));
-  if (!(await timingSafeCompare(body.admin_key, env.ADMIN_KEY))) {
+  if (!(await timingSafeCompare(body.admin_key, env.SECRET_SAUCE))) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
   const result = await scanISOSuspicious(env);
@@ -1238,10 +1163,42 @@ function getEditionNameFromUrl(url) {
   return null;
 }
 
+function isValidIsoUrl(u) {
+  if (typeof u !== 'string') return false;
+  let parsed;
+  try { parsed = new URL(u); } catch (e) { return false; }
+  if (parsed.protocol !== 'https:') return false;
+  const host = parsed.hostname.toLowerCase();
+  if (host === 'localhost' || host === '127.0.0.1' || host === '0.0.0.0') return false;
+  if (host.startsWith('10.') || host.startsWith('172.16.') || host.startsWith('192.168.')) return false;
+  if (host.startsWith('169.254.') || host.endsWith('.local') || host.endsWith('.internal')) return false;
+  if (host === '[::1]' || host === '::1') return false;
+  if (/^https?:\/\/(\d{1,3}\.){3}\d{1,3}/.test(u)) {
+    const parts = host.split('.').map(Number);
+    if (parts.length === 4 && parts.every(p => p >= 0 && p <= 255)) {
+      if (parts[0] === 10 || (parts[0] === 172 && parts[1] >= 16 && parts[1] <= 31) ||
+          (parts[0] === 192 && parts[1] === 168) || parts[0] === 127 || parts[0] === 0 ||
+          (parts[0] === 169 && parts[1] === 254)) return false;
+    }
+  }
+  const allowedHosts = [
+    'iso.acreetionos.org', 'pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev',
+    'ftp2.osuosl.org', 'archive.org', 'sourceforge.net',
+    'github.com', 'raw.githubusercontent.com', 'objects.githubusercontent.com',
+    'media.githubusercontent.com', 'github-production-release-asset-2e65be.s3.amazonaws.com'
+  ];
+  return allowedHosts.some(h => host === h || host.endsWith('.' + h));
+}
+
 async function handleISOCheck(request, env) {
   const url = new URL(request.url).searchParams.get('url');
   if (!url) {
     return new Response(JSON.stringify({ error: 'url parameter required', reachable: false }), {
+      status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+    });
+  }
+  if (!isValidIsoUrl(url)) {
+    return new Response(JSON.stringify({ error: 'Invalid or disallowed URL', reachable: false }), {
       status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
     });
   }
@@ -1328,12 +1285,15 @@ async function handleISOCheck(request, env) {
 
 const HEALTH_PAGES = [
   '', 'flash.html', 'hosting.html', 'security.html', 'wiki.html',
-  'developers.html', 'contact.html', 'faq.html', 'install.html',
+  'contact.html', 'faq.html', 'install.html',
   'git-tracker.html', 'blog.html', 'build.html', 'compare.html',
   'contributing.html', 'governance.html', 'requirements.html',
-  '32bit.html', 'gnome.html', 'hyprland.html', 'i3.html',
-  'mate.html', 'openbox.html', 'plasma.html', 'sway.html',
-  'xfce.html', 'immutable.html', 'unofficial.html'
+  'unofficial/32bit.html', 'unofficial/gnome.html',
+  'unofficial/hyprland.html', 'unofficial/i3.html',
+  'unofficial/mate.html', 'unofficial/openbox.html',
+  'unofficial/plasma.html', 'unofficial/sway.html',
+  'unofficial/xfce.html', 'unofficial/immutable.html',
+  'unofficial/'
 ];
 
 const HEALTH_APIS = [
@@ -1469,7 +1429,7 @@ async function fetchCVEDetails(cveId) {
   // Get CVSS score from NVD
   try {
     const res = await fetch(`${NVD_BASE}?cveId=${cveId}`, {
-      headers: { 'User-Agent': 'AcreetionOS-CVE/1.0' },
+      headers: { 'User-Agent': CHROME_UA },
       signal: AbortSignal.timeout(8000)
     });
     if (res.ok) {
@@ -1651,7 +1611,7 @@ async function handleCVEFeed(env, ctx) {
   let atomCves = [];
   try {
     const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
-      headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
+      headers: { 'User-Agent': CHROME_UA }
     });
     if (res.ok) {
       atomCves = parseArchAtom(await res.text());
@@ -1742,7 +1702,7 @@ async function handleCVEEmbed() {
   try {
     const nonce = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2, 10);
     const res = await fetch('https://security.archlinux.org/advisory/feed.atom', {
-      headers: { 'User-Agent': 'AcreetionOS-CVE-Monitor/1.0' }
+      headers: { 'User-Agent': CHROME_UA }
     });
     if (!res.ok) return new Response('Failed to load advisories', { status: 502 });
     const xml = await res.text();
@@ -1755,7 +1715,7 @@ async function handleCVEEmbed() {
       const cveId = c.primary_cve || (c.cves && c.cves[0]) || '';
       const date = c.date ? new Date(c.date).toLocaleDateString() : '';
       const summary = (c.summary || '').replace(/</g, '&lt;').slice(0, 200);
-      return `<tr><td><a href="https://security.archlinux.org/${cveId}" target="_blank" style="color:#e74c3c;font-family:monospace;font-size:0.85rem">${cveId}</a></td><td style="color:#999;font-size:0.8rem">${date}</td><td><span style="color:${color};font-weight:700;font-size:0.8rem">${sev.toUpperCase()}</span></td><td style="color:#ccc;font-size:0.85rem">${c.package || ''}</td><td style="color:#999;font-size:0.8rem">${summary}</td></tr>`;
+      return `<tr><td><a href="https://security.archlinux.org/${cveId}" target="_blank" rel="noopener noreferrer" style="color:#e74c3c;font-family:monospace;font-size:0.85rem">${cveId}</a></td><td style="color:#999;font-size:0.8rem">${date}</td><td><span style="color:${color};font-weight:700;font-size:0.8rem">${sev.toUpperCase()}</span></td><td style="color:#ccc;font-size:0.85rem">${c.package || ''}</td><td style="color:#999;font-size:0.8rem">${summary}</td></tr>`;
     }).join('\n');
 
     const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Arch Linux Security Advisories</title><style nonce="${nonce}">
@@ -1774,7 +1734,7 @@ async function handleCVEEmbed() {
       @media(max-width:768px){td,th{padding:0.4rem 0.5rem;font-size:0.8rem}}
     </style></head><body>
     <h1>Arch Linux Security Advisories</h1>
-    <p class="sub">This is security.archlinux.org but with dark mode. — <a href="https://security.archlinux.org" target="_blank" style="color:#2ecc71">View original</a></p>
+    <p class="sub">This is security.archlinux.org but with dark mode. — <a href="https://security.archlinux.org" target="_blank" rel="noopener noreferrer" style="color:#2ecc71">View original</a></p>
     <table><thead><tr><th>CVE</th><th>Date</th><th>Severity</th><th>Package</th><th>Summary</th></tr></thead><tbody>${rows}</tbody></table>
     </body></html>`;
 
@@ -1839,10 +1799,8 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-
-    // darren.acreetionos.org - redirect to main site
-    if (url.hostname === 'darren.acreetionos.org') {
-      return Response.redirect('https://acreetionos.org', 301);
+    if (env.GUEST_LIST) {
+      try { allowedOrigins = JSON.parse(env.GUEST_LIST); } catch (e) {}
     }
 
     // CORS preflight
@@ -1853,11 +1811,11 @@ export default {
     // Serve flash.html directly from worker
     if (url.pathname === '/flash.html' && request.method === 'GET') {
       const res = await fetch('https://raw.githubusercontent.com/AcreetionOS-Code/acreetionos-code.github.io/main/flash.html', {
-        headers: { 'User-Agent': 'AcreetionOS-Worker/1.0' }
+        headers: { 'User-Agent': CHROME_UA }
       });
       if (res.ok) {
         return new Response(await res.text(), {
-          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120' }
+          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120', ...securityHeaders() }
         });
       }
     }
@@ -1884,8 +1842,8 @@ export default {
 
     // R2 ISO listing for AcreetionOS Immutable downloads
     if (url.pathname === '/api/r2/list') {
-      const cfToken = env.CLOUDFLARE_API_TOKEN;
-      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+      const cfToken = env.SPICY_SAUCE;
+      const cfAccount = env.TACO_BELL;
       if (!cfToken || !cfAccount) {
         return new Response(JSON.stringify({ error: 'R2 not configured', isos: [] }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -1918,44 +1876,45 @@ export default {
       if (!filename || !filename.endsWith('.iso')) {
         return new Response('Not found', { status: 404 });
       }
-      const cfToken = env.CLOUDFLARE_API_TOKEN;
-      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+      const cfToken = env.SPICY_SAUCE;
+      const cfAccount = env.TACO_BELL;
       if (!cfToken || !cfAccount) {
         return new Response('R2 not configured', { status: 503 });
-      }
-      try {
-        // Resolve "latest" to the most recent matching ISO
-        if (filename.includes('latest')) {
-          const prefix = filename.replace('-latest.iso', '');
-          const listRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/immutable-iso/objects`, {
-            headers: { 'Authorization': `Bearer ${cfToken}` }
-          });
-          const listData = await listRes.json();
-          const objects = listData?.result?.objects || [];
-          const match = objects.filter(o => o.key.startsWith(prefix) && o.key.endsWith('.iso'))
-            .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-          if (match) filename = match.key;
-          else return new Response('No ISO builds found', { status: 404 });
-        }
-        const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/immutable-iso/${filename}`;
-        // 302 redirect directly to R2 — no proxy overhead, full speed
-        return new Response(null, {
-          status: 302,
-          headers: {
-            'Location': downloadUrl,
-            'Cache-Control': 'public, max-age=86400'
+}
+        try {
+          // Resolve "latest" to the most recent matching ISO
+          if (filename.includes('latest')) {
+            const prefix = filename.replace('-latest.iso', '');
+            const listRes = await fetch(`https://api.cloudflare.com/client/v4/accounts/${cfAccount}/r2/buckets/immutable-iso/objects`, {
+              headers: { 'Authorization': `Bearer ${cfToken}` }
+            });
+            const listData = await listRes.json();
+            const objects = listData?.result?.objects || [];
+            const match = objects.filter(o => o.key.startsWith(prefix) && o.key.endsWith('.iso'))
+              .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+            if (match) filename = match.key;
+            else return new Response('No ISO builds found', { status: 404 });
           }
-        });
-      } catch (e) {
-        return new Response('Download error', { status: 500 });
-      }
+          const downloadUrl = `https://${cfAccount}.r2.cloudflarestorage.com/immutable-iso/${filename}`;
+          const fileRes = await fetch(downloadUrl);
+          if (!fileRes.ok) return new Response('Download error', { status: 502 });
+          return new Response(fileRes.body, {
+            headers: {
+              'Content-Type': fileRes.headers.get('Content-Type') || 'application/x-iso9660-image',
+              'Content-Disposition': 'attachment; filename="' + filename + '"',
+              'Cache-Control': 'public, max-age=86400'
+            }
+          });
+        } catch (e) {
+          return new Response('Download error', { status: 500 });
+        }
     }
 
     if (url.pathname === '/api/build/status' && request.method === 'GET') {
       try {
         const edition = url.searchParams.get('edition') || '';
-        const cfToken = env.CLOUDFLARE_API_TOKEN;
-        const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+        const cfToken = env.SPICY_SAUCE;
+        const cfAccount = env.TACO_BELL;
         if (!cfToken || !cfAccount) {
           return new Response(JSON.stringify({ error: 'R2 not configured', builds: {} }), {
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2003,96 +1962,6 @@ export default {
       }
     }
 
-    // Audio transcription via OpenRouter Whisper (free)
-    // POST /api/transcribe  — body: { audio: <base64 opus/webm>, mimeType: string }
-    if (request.method === 'POST' && url.pathname === '/api/transcribe') {
-      if (checkRateLimit(getClientIP(request))) {
-        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
-          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
-        });
-      }
-      try {
-        const body = await request.json();
-        if (!body.audio) {
-          return new Response(JSON.stringify({ error: 'audio data required' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        const apiKey = env.OPENROUTER_API_KEY;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'Transcription not configured' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        // Derive format from MIME type
-        const mime = body.mimeType || 'audio/webm';
-        const fmt = mime.includes('ogg') ? 'ogg' : mime.includes('mp4') ? 'mp4' : 'webm';
-
-        const whisperRes = await fetch(WHISPER_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AIDEN Whisper (AcreetionOS Voice Input)'
-          },
-          body: JSON.stringify({
-            model: WHISPER_MODEL,
-            input_audio: {
-              data: body.audio,
-              format: fmt
-            }
-          })
-        });
-
-        // OpenRouter may return 200 with empty body on format issues; check for that too
-        const whisperText = await whisperRes.text();
-        if (!whisperText || whisperText.trim().length === 0) {
-          return new Response(JSON.stringify({ error: 'Empty transcription response' }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        let whisperData;
-        try {
-          whisperData = JSON.parse(whisperText);
-        } catch (e) {
-          return new Response(JSON.stringify({ error: 'Invalid transcription response', raw: whisperText.slice(0, 200) }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        if (!whisperRes.ok) {
-          return new Response(JSON.stringify({
-            error: whisperData.error?.message || 'Transcription failed',
-            status: whisperRes.status
-          }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        return new Response(JSON.stringify({
-          text: whisperData.text || '',
-          model: WHISPER_MODEL
-        }), {
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-
-      } catch (err) {
-        return new Response(JSON.stringify({ error: 'Transcription error: ' + err.message }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      }
-    }
-
     // Load persisted count on first request
     if (visitorCount === 0) {
       ctx.waitUntil(loadCount());
@@ -2107,7 +1976,7 @@ export default {
       }
       try {
         const body = await request.json();
-        const apiKey = env.OPENROUTER_API_KEY;
+        const apiKey = env.BRAIN_JUICE;
         if (!apiKey) {
           return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
             status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2129,11 +1998,8 @@ export default {
         });
         const data = await openRouterRes.json();
         if (!openRouterRes.ok) {
-          const errDetail = JSON.stringify(data).slice(0, 500);
           return new Response(JSON.stringify({
-            error: data.error?.message || data.error || 'AI generation failed',
-            detail: errDetail,
-            status: openRouterRes.status
+            error: typeof data.error === 'string' ? data.error : (data.error?.message || 'AI generation failed')
           }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2145,64 +2011,6 @@ export default {
       } catch (err) {
         return new Response(JSON.stringify({ error: 'AI generation failed: ' + err.message }), {
           status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      }
-    }
-
-    // Text-to-Speech via OpenRouter (Cartesia TTS — natural human voice)
-    if (request.method === 'POST' && url.pathname === '/api/tts') {
-      if (checkRateLimit(getClientIP(request))) {
-        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
-          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
-        });
-      }
-      try {
-        const body = await request.json();
-        if (!body.input) {
-          return new Response(JSON.stringify({ error: 'input text required' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const apiKey = env.OPENROUTER_API_KEY;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'TTS not configured' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        const ttsRes = await fetch(TTS_URL, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AIDEN TTS (AcreetionOS Voice Output)'
-          },
-          body: JSON.stringify({
-            model: TTS_MODEL,
-            input: body.input,
-            voice: body.voice || 'nova',
-            response_format: 'mp3'
-          })
-        });
-        if (!ttsRes.ok) {
-          const errText = await ttsRes.text();
-          return new Response(JSON.stringify({ error: 'TTS failed', detail: errText.slice(0, 300) }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        return new Response(ttsRes.body, {
-          headers: {
-            'Content-Type': ttsRes.headers.get('Content-Type') || 'audio/mpeg',
-            ...corsHeaders(request)
-          }
-        });
-      } catch (err) {
-        return new Response(JSON.stringify({ error: 'TTS error: ' + err.message }), {
-          status: 500,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
     }
@@ -2231,7 +2039,7 @@ export default {
     }
     if (url.pathname === '/api/hosting/admin/pending' && request.method === 'GET') {
       const adminKey = request.headers.get('X-Admin-Key');
-      if (!adminKey || !(await timingSafeCompare(adminKey, env.ADMIN_KEY))) {
+      if (!adminKey || !(await timingSafeCompare(adminKey, env.SECRET_SAUCE))) {
         return new Response(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
@@ -2267,6 +2075,10 @@ export default {
 
     // ─── Site Health Check (runs periodically via cron) ──────
     if (url.pathname === '/api/health/check' && request.method === 'GET') {
+      const adminKey = request.headers.get('x-admin-key') || '';
+      if (!adminKey || !(await timingSafeCompare(adminKey, env.SECRET_SAUCE || ''))) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) } });
+      }
       return handleHealthCheck(env);
     }
 
@@ -2292,7 +2104,7 @@ export default {
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
       const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://openrouter.ai https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
-      return new Response('AcreetionOS Worker — POST /api/chat | POST /api/transcribe | POST /api/news/ai | /flash.html', {
+      return new Response('AcreetionOS Worker — POST /api/chat | POST /api/news/ai | /flash.html', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }
       });
@@ -2315,7 +2127,7 @@ export default {
 
       // Server-side OpenRouter key must be configured in env (Cloudflare Worker secrets
       // or origin server environment). This keeps keys off the client.
-      const apiKey = env.OPENROUTER_API_KEY;
+      const apiKey = env.BRAIN_JUICE;
       if (!apiKey) {
         return new Response(JSON.stringify({ error: 'Backup AI is not configured' }), {
           status: 503,
@@ -2337,7 +2149,7 @@ export default {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
           'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': 'AIDEN (AcreetionOS Assistant)'
+          'X-Title': 'AcreetionOS Chat Proxy'
         },
         body: JSON.stringify(isStream ? {
           model: model,
@@ -2365,11 +2177,8 @@ export default {
       const data = await openRouterRes.json();
 
       if (!openRouterRes.ok) {
-        const errDetail = JSON.stringify(data).slice(0, 500);
         return new Response(JSON.stringify({
-          error: data.error?.message || data.error || 'OpenRouter request failed',
-          detail: errDetail,
-          status: openRouterRes.status
+          error: typeof data.error === 'string' ? data.error : (data.error?.message || 'AI service request failed')
         }), {
           status: 502,
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2378,11 +2187,8 @@ export default {
 
       const content = data.choices?.[0]?.message?.content;
       if (!content) {
-        const errDetail = JSON.stringify(data).slice(0, 500);
         return new Response(JSON.stringify({
-          error: 'AI model returned empty response',
-          detail: errDetail,
-          model: data.model || FREE_MODEL
+          error: 'AI model returned empty response'
         }), {
           status: 502,
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }

@@ -5,7 +5,6 @@ compatibility_date = "2026-04-26"
 routes = [
   { pattern = "acreetionos.org/api/*", zone_name = "acreetionos.org" },
   { pattern = "acreetionos.org/flash.html", zone_name = "acreetionos.org" },
-  { pattern = "darren.acreetionos.org", zone_name = "acreetionos.org" }
 ]
 
 [triggers]
@@ -13,8 +12,7 @@ routes = [
 crons = ["*/30 * * * *"]
 
 [vars]
-DISCORD_WEBHOOK_URL = ""
-ADMIN_KEY = ""
-HOSTING_BUCKET = "acreetionos-hosting"
-EMAIL_FROM = "developers@acreetionos.org"
-VIRUSTOTAL_API_KEY = ""
+ALERT_SIREN = ""
+SECRET_SAUCE = ""
+RETURN_ADDRESS = "developers@acreetionos.org"
+SCAN_MASTER = ""

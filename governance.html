@@ -1,73 +1,121 @@
 <!DOCTYPE html><html lang="en"><head>
-<meta http-equiv="Cache-Control" content="max-age=3600"><meta charset="UTF-8" >
-<meta name="robots" content="index, follow" >
-<meta name="viewport" content="width=device-width, initial-scale=1.0" ><meta name="referrer" content="strict-origin-when-cross-origin" ><title>AcreetionOS Project Governance - Transparency &amp; Integrity</title>
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://acreetionos.org/governance.html">
-    <meta property="og:title" content="Governance - AcreetionOS">
-    <meta property="og:description" content="AcreetionOS project governance and leadership.">
-    <meta property="og:image" content="https://acreetionos.org/logo.webp">
-    <meta property="og:site_name" content="AcreetionOS">
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://acreetionos.org/governance.html">
-    <meta property="twitter:title" content="Governance - AcreetionOS">
-    <meta property="twitter:description" content="AcreetionOS project governance and leadership.">
-    <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-    <meta name="description" content="Learn about AcreetionOS governance, decision-making processes, repository sovereignty, and our commitment to transparency and integrity." ><meta name="keywords" content="AcreetionOS governance, open source governance, Linux project structure, repository sovereignty, community governance" ><link rel="canonical" href="https://acreetionos.org/governance.html" ><link rel="icon" type="image/webp" href="acreetionoslogo.webp"><link rel="dns-prefetch" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="preload" href="contact.css" as="style"><link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="contact.css"><style>::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212)}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71)} .btn{transition:all 0.3s ease}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px)}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5)} .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1);will-change:opacity,transform}.reveal.active{opacity:1;transform:translateY(0)} html{scroll-behavior:smooth} ::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff)} :focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px} a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px} .skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0} .skip-link:focus{top:0} @media (prefers-reduced-motion:reduce) {html{scroll-behavior:auto} *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}} /* removed pageLoadFade keyframes */ /* removed pageLoadFade body animation */ @media (prefers-reduced-motion:reduce){body{animation:none;opacity:1}} a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative} a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px} #back-to-top{position:fixed;bottom:30px;right:30px;background:var(--acreetion-green,#2ecc71);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px} #back-to-top.visible{opacity:1;visibility:visible} #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)} body{background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px} .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem} .gov-section{margin-bottom:2rem} .gov-section h2{color:var(--acreetion-green);margin-bottom:1rem;font-size:1.5rem;border-bottom:2px solid var(--acreetion-box-border);padding-bottom:0.5rem} .gov-section h3{color:var(--acreetion-text-bright);margin-top:1.5rem;margin-bottom:0.5rem;font-size:1.1rem} .gov-section ul{margin-left:1.5rem;margin-top:0.5rem} .gov-section ol{margin-left:1.5rem;margin-top:0.5rem} .gov-section li{margin-bottom:0.5rem;color:var(--acreetion-text);line-height:1.6} .gov-section p{color:var(--acreetion-text);line-height:1.7;margin-bottom:1rem} .gov-section strong{color:var(--acreetion-text-bright)} .team-member{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem;margin-bottom:1rem} .team-member h4{color:var(--acreetion-green);margin-bottom:0.25rem;font-size:1.1rem} .team-member p{margin-bottom:0;color:var(--acreetion-text)}.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;overflow-y:auto;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}.modal-overlay.visible{display:flex;opacity:1;visibility:visible;transition:opacity 0.3s ease,visibility 0.3s ease}.modal-box{position:relative;cursor:default;background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);padding:2rem 3rem;max-width:700px}.modal-close-btn{position:absolute;top:1rem;right:1rem;background-color:var(--acreetion-green);color:black;font-family:var(--font-sans);font-size:1.5rem;font-weight:700;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;line-height:40px;text-align:center;z-index:1001}.modal-close-btn:hover{background-color:#d15c64;transform:scale(1.05)}.modal-box h2{color:var(--acreetion-green)}.page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem}.page-footer p{color:#777;margin-bottom:0.5rem;text-align:center}.page-footer a{color:var(--acreetion-green);text-decoration:none}.page-footer a:hover{text-decoration:underline}</style><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous"><link rel="stylesheet" href="sidebar.css">
-</head><body><a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap"><div id="background-grid"></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="build.html">ISO Builder</a><a href="git-tracker.html">Git Tracker</a><a href="/acreetionos-news-tracker/">News Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a><a href="unofficial.html">Unofficial</a></nav></div></header><div class="page-wrapper"><main id="main-content" class="main-column"><article class="content-box"><div class="box-header"><h1>AcreetionOS Project Governance</h1></div><div class="box-body">
+<meta charset="UTF-8">
+<meta name="robots" content="index, follow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" ><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Project Governance - AcreetionOS</title>
+<meta name="description" content="AcreetionOS governance model, decision-making process, repository sovereignty, and commitment to transparency and integrity.">
+<link rel="canonical" href="https://acreetionos.org/governance.html">
+<link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://acreetionos.org/governance.html">
+<meta property="og:title" content="Governance - AcreetionOS">
+<meta property="og:description" content="AcreetionOS project governance and leadership.">
+<meta property="og:image" content="https://acreetionos.org/logo.webp">
+<meta property="og:site_name" content="AcreetionOS">
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://acreetionos.org/governance.html">
+<meta property="twitter:title" content="Governance - AcreetionOS">
+<meta property="twitter:description" content="AcreetionOS project governance and leadership.">
+<meta property="twitter:image" content="https://acreetionos.org/logo.webp">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"AcreetionOS Project Governance","description":"Governance model, decision-making, and transparency for the AcreetionOS Linux distribution.","url":"https://acreetionos.org/governance.html","provider":{"@type":"Organization","name":"AcreetionOS"}}</script>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="sidebar.css">
+<link rel="stylesheet" href="contact.css">
+</head><body><a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap"><div id="page-scale"><div id="background-grid"></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="git-tracker.html">Git Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a></nav></div></header><div class="page-wrapper"><main id="main-content" class="main-column">
 
-<div class="gov-section">
-<p>AcreetionOS is an independent, community-focused Linux distribution project. This document outlines our governance model, decision-making process, and commitment to transparency.</p>
+<article class="content-box">
+<div class="box-header"><h2>AcreetionOS Project Governance</h2></div>
+<div class="box-body">
+<p>AcreetionOS is an independent, community-focused Linux distribution project. This document outlines our governance model, decision-making process, financial transparency, and commitment to integrity. We believe that how a project is governed is just as important as the code it produces.</p>
 </div>
+</article>
 
-<div class="gov-section">
-<h2>Project Structure</h2>
-<p>AcreetionOS is led by its founding Co-Lead Developers—a father-daughter team:</p>
-<div class="team-member">
-<h3>Darren (@cobra3282000)</h3>
-<p>Co-Lead Developer — Father</p>
+<article class="content-box">
+<div class="box-header"><h2>Project Structure</h2></div>
+<div class="box-body">
+<p>AcreetionOS is led by its founding Co-Lead Developers&mdash;a father-daughter team:</p>
+<ul class="styled-list">
+<li><span class="list-item-title">Darren (@cobra3282000)</span><span class="list-item-desc">Co-Lead Developer &mdash; Father</span></li>
+<li><span class="list-item-title">Natalie Cole-Clift Spiva (@spivanatalie64)</span><span class="list-item-desc">Co-Lead Developer &mdash; Daughter</span></li>
+</ul>
+<p>We currently operate as a small, efficient team to ensure that our technical vision and commitment to user sovereignty remain consistent. As the project grows, additional contributors and maintainers will be onboarded through a transparent merit-based process.</p>
 </div>
-<div class="team-member">
-<h4>Natalie Cole-Clift Spiva (@spivanatalie64)</h4>
-<p>Co-Lead Developer — Daughter</p>
-</div>
-<p>We currently operate as a small, efficient team to ensure that our technical vision and commitment to user sovereignty remain consistent.</p>
-</div>
+</article>
 
-<div class="gov-section">
-<h2>Decision-Making Process</h2>
-<ul>
-<li><strong>Technical Direction:</strong> Decisions regarding core architecture (e.g., XLibre/X11, kernel configs, repository structure) are made by the lead developers.</li>
-<li><strong>Community Input:</strong> We actively solicit feedback from our community on <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">Discord</a> and <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Root</a>. Major user-facing changes are discussed with the community before implementation.</li>
-<li><strong>Forking and Downstream:</strong> As a free and open-source project, anyone is welcome to fork our code. However, the name "AcreetionOS" and its official repositories are managed exclusively by the core team.</li>
+<article class="content-box">
+<div class="box-header"><h2>Decision-Making Process</h2></div>
+<div class="box-body">
+<ul class="styled-list">
+<li><span class="list-item-title">Technical Direction</span><span class="list-item-desc">Decisions regarding core architecture (e.g., XLibre/X11, kernel configs, repository structure, default package selection) are made by the lead developers. This ensures consistency and prevents scope creep from diluting the project's vision.</span></li>
+<li><span class="list-item-title">Community Input</span><span class="list-item-desc">We actively solicit feedback from our community on <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">Discord</a>, <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Root</a>, and via GitHub <a href="https://github.com/acreetionos-code/" target="_blank" rel="noopener noreferrer">Issues and Pull Requests</a>. Major user-facing changes are discussed with the community before implementation, and bug reports and feature requests are reviewed regularly.</span></li>
+<li><span class="list-item-title">Forking and Downstream</span><span class="list-item-desc">As a free and open-source project, anyone is welcome to fork our code. However, the name "AcreetionOS" and its official repositories are managed exclusively by the core team to protect project identity and trust.</span></li>
 </ul>
 </div>
+</article>
 
-<div class="gov-section">
-<h2>Repository Sovereignty</h2>
+<article class="content-box">
+<div class="box-header"><h2>Community Documentation</h2></div>
+<div class="box-body">
+<p>Our <a href="wiki.html">Wiki</a> and the <code>docs/</code> folder in each repository serve as the authoritative source for project documentation. Community members are encouraged to contribute improvements, corrections, and translations. All documentation is version-controlled alongside source code to ensure it stays accurate and up-to-date.</p>
+<p>We maintain a style guide for contributors to ensure consistency across documentation. Review and merge of documentation changes follow the same process as code changes, with lead developers providing final approval.</p>
+</div>
+</article>
+
+<article class="content-box">
+<div class="box-header"><h2>Hosting Provider Program</h2></div>
+<div class="box-body">
+<p>Our <a href="hosting.html">ISO Hosting Provider Program</a> allows trusted third parties to host and distribute AcreetionOS ISOs. Governance of this program includes:</p>
+<ul class="styled-list">
+<li><span class="list-item-title">Application and Vetting</span><span class="list-item-desc">Prospective hosting providers must apply and be reviewed by the core team to ensure they meet reliability and security standards.</span></li>
+<li><span class="list-item-title">Service Level Expectations</span><span class="list-item-desc">Hosting providers are expected to keep mirrors up-to-date and accessible. Providers that fail to maintain acceptable service may be removed from the program.</span></li>
+<li><span class="list-item-title">Revocation</span><span class="list-item-desc">The core team reserves the right to revoke hosting provider status at any time if a provider acts against the project's interests or fails to meet obligations.</span></li>
+</ul>
+<p>This program is designed to expand distribution reach while maintaining trust and quality for end users.</p>
+</div>
+</article>
+
+<article class="content-box">
+<div class="box-header"><h2>Repository Sovereignty</h2></div>
+<div class="box-body">
 <p>We maintain our own set of repositories. This is not just a technical choice; it is a governance philosophy. By controlling our repositories, we ensure:</p>
-<ol>
-<li><strong>Stability:</strong> We decide when packages are updated, preventing "bleeding edge" breakages.</li>
-<li><strong>Security:</strong> We can quickly patch vulnerabilities independently of upstream Arch.</li>
-<li><strong>Control:</strong> We prioritize software that aligns with our users' needs, not just upstream defaults.</li>
-</ol>
-</div>
-
-<div class="gov-section">
-<h2>Transparency and Integrity</h2>
-<ul>
-<li><strong>Open Development:</strong> All core OS build scripts and custom tools are developed in the open on GitHub.</li>
-<li><strong>Financial Independence:</strong> We currently fund AcreetionOS out of our own pockets to maintain absolute independence from corporate influence.</li>
-<li><strong>No Hidden Agenda:</strong> Our politics are separate from our code. We are here to build a better operating system for everyone, regardless of their background.</li>
+<ul class="styled-list">
+<li><span class="list-item-title">Stability</span><span class="list-item-desc">We decide when packages are updated, preventing "bleeding edge" breakages.</span></li>
+<li><span class="list-item-title">Security</span><span class="list-item-desc">We can quickly patch vulnerabilities independently of upstream Arch.</span></li>
+<li><span class="list-item-title">Control</span><span class="list-item-desc">We prioritize software that aligns with our users' needs, not just upstream defaults.</span></li>
 </ul>
 </div>
+</article>
 
-<div class="gov-section">
-<h2>Future Evolution</h2>
-<p>As the project grows, we aim to transition to a more formalized community governance model. Our long-term goal is to establish a sustainable, independent organization that can maintain AcreetionOS for decades.</p>
+<article class="content-box">
+<div class="box-header"><h2>Transparency and Integrity</h2></div>
+<div class="box-body">
+<ul class="styled-list">
+<li><span class="list-item-title">Open Development</span><span class="list-item-desc">All core OS build scripts and custom tools are developed in the open on <a href="https://github.com/acreetionos-code/" target="_blank" rel="noopener noreferrer">GitHub</a> and <a href="https://gitlab.acreetionos.org" target="_blank" rel="noopener noreferrer">GitLab</a>. Anyone can review, audit, or contribute to our codebase.</span></li>
+<li><span class="list-item-title">Financial Independence</span><span class="list-item-desc">We currently fund AcreetionOS entirely out of our own pockets&mdash;domain registration, server costs, build infrastructure, and tooling. This financial independence guarantees that no outside entity can exert influence over the project's direction or priorities. We do not accept corporate sponsorships or advertising revenue.</span></li>
+<li><span class="list-item-title">No Hidden Agenda</span><span class="list-item-desc">Our politics are separate from our code. We are here to build a better operating system for everyone, regardless of their background. We do not collect telemetry, serve ads, or bundle unnecessary software.</span></li>
+</ul>
 </div>
+</article>
 
-<button type="button" id="back-to-top" title="Back to top">↑</button><script src="back-to-top.js" defer></script><script src="social-icons.js" defer></script><script src="sidebar.js" defer></script>
+<article class="content-box">
+<div class="box-header"><h2>Long-Term Plan</h2></div>
+<div class="box-body">
+<p>Our long-term vision is to transition AcreetionOS to a formal community governance model as the project matures and attracts a broader contributor base. This transition may include:</p>
+<ul class="styled-list">
+<li><span class="list-item-title">Community Election</span><span class="list-item-desc">Establishing a community-elected steering committee to oversee project direction.</span></li>
+<li><span class="list-item-title">Governance Charter</span><span class="list-item-desc">Drafting a formal governance charter that defines roles, responsibilities, and decision-making processes.</span></li>
+<li><span class="list-item-title">Sustainable Funding</span><span class="list-item-desc">Exploring community-driven funding models such as donations or a non-profit foundation to ensure long-term financial sustainability without compromising independence.</span></li>
+</ul>
+<p>Our goal is to build a project that outlasts any single contributor and remains a trusted, independent operating system for decades to come.</p>
 </div>
-<script src="sw-register.js"></script>
-</body></html>
+</article>
+
+<button type="button" id="back-to-top" title="Back to top">&uarr;</button>
+<script src="back-to-top.js" defer></script>
+</main>
+<script src="scale-page.js" defer></script>
+<script src="sidebar.js" defer></script>
+</div></div>
+<script src="animate.js"></script>
+<script src="footer.js" defer></script></body></html>

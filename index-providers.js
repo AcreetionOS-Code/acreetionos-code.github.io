@@ -15,14 +15,14 @@ async function loadHostingProviders() {
       html += '<label for="fastest-mirror" style="display:block;margin-bottom:0.5rem;font-weight:600;color:var(--acreetion-text-bright)">Fastest Provider</label>';
       html += '<select id="fastest-mirror" style="width:100%;padding:0.6rem;background:var(--acreetion-panel-bg,#1a1a1a);color:var(--acreetion-text-bright);border:1px solid var(--acreetion-box-border);border-radius:8px;font-size:0.9rem;margin-bottom:0.75rem" >';
       html += '<option value="">Select a mirror...</option>';
-      active.forEach(p => { html += '<option value="' + escAttr(p.mirror_url) + '">' + escAttr(p.org) + ' — ' + escAttr(p.location) + '</option>'; });
+      active.forEach(p => { html += '<option value="' + safeUrl(p.mirror_url) + '">' + escAttr(p.org) + ' — ' + escAttr(p.location) + '</option>'; });
       html += '</select>';
     } else {
       html += '<div style="display:flex;flex-direction:column;gap:0.5rem">';
       active.forEach(p => {
         html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--acreetion-box-border)">';
         html += '<span><strong>' + escAttr(p.org) + '</strong> <span style="color:#888;font-size:0.85rem">' + escAttr(p.location) + '</span></span>';
-        html += '<a href="' + escAttr(p.mirror_url) + '" target="_blank" rel="noopener" class="btn" style="background:#2ecc71;color:#000;padding:0.3rem 0.8rem;font-size:0.8rem;border-radius:6px">ISO</a>';
+        html += '<a href="' + safeUrl(p.mirror_url) + '" target="_blank" rel="noopener" class="btn" style="background:#2ecc71;color:#000;padding:0.3rem 0.8rem;font-size:0.8rem;border-radius:6px">ISO</a>';
         html += '</div>';
       });
       html += '</div>';
@@ -41,4 +41,5 @@ async function loadHostingProviders() {
   } catch(e) { c.style.display = 'none'; }
 }
 function escAttr(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function safeUrl(s) { if (!s||typeof s!=='string'||s.indexOf('javascript:')===0||s.indexOf('data:')===0||s.indexOf('vbscript:')===0) return ''; return s; }
 window.addEventListener('DOMContentLoaded', loadHostingProviders);

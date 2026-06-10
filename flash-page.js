@@ -90,7 +90,7 @@ function renderEditionCard(e, isCommunity = false) {
     }
 
     const maintainerBtn = isCommunity
-        ? `<a href="https://tally.so/r/rjvgKL" class="btn" style="background:linear-gradient(135deg,var(--acreetion-purple),#8e44ad);color:#fff;padding:0.55rem 1rem;font-size:0.8rem;box-shadow:0 4px 14px rgba(155,89,182,0.3);margin-left:4px" target="_blank" rel="noopener" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(155,89,182,0.45)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 14px rgba(155,89,182,0.3)'"><i class="bi bi-person-plus"></i> Apply for Maintainership</a>`
+        ? `<a href="https://tally.so/r/rjvgKL" class="btn btn-maintainer" target="_blank" rel="noopener"><i class="bi bi-person-plus"></i> Apply for Maintainership</a>`
         : '';
 
     return `

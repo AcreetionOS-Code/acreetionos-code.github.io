@@ -52,7 +52,7 @@ jobs:
           docker run --privileged --rm \
             -v $PWD/src:/workspace \
             -v $PWD/patches:/patches \
-            archlinux:latest \
+            archlinux@sha256:fb47d15e0fd28369c700edcfa46dd44e234d8ab6fee9627ee5f1ead5f1fc6c21 \
             bash -c "
               pacman -Syu --noconfirm archiso grub && \
               cd /workspace && \
