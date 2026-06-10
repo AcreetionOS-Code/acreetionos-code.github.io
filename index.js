@@ -554,7 +554,7 @@ async function handleHostingRegister(request, env) {
 
     // Notify Discord
     sendDiscordWebhook(env,
-      `${statusEmoji} **New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**Vetting Score:** ${vetResult.score}\n**Status:** ${statusLabel}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "ADMIN_SECRET" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
+      `${statusEmoji} **New Hosting Provider Registration**\n**Organization:** ${body.org}\n**Email:** ${body.email}\n**Location:** ${body.location}\n**Mirror:** ${body.mirror_url}\n**Website:** ${body.website || 'N/A'}\n**Discord User ID:** ${body.discord_user_id || 'N/A'}\n**Subscribed:** ${body.subscribe ? 'Yes' : 'No'}\n**Vetting Score:** ${vetResult.score}\n**Status:** ${statusLabel}\n**ID:** ${id}\n\nTo approve: POST to /api/hosting/admin/approve-removal with { provider_id: "${id}", admin_key: "ADMIN_SECRET" }\nTo reject: POST to /api/hosting/admin/reject-removal with same\nTo approve removal: add "action": "approve-removal" to the body\nAdmin page: https://acreetionos.org/api/hosting/admin/pending`
     );
 
     if (vetResult.flags.length > 0) {
@@ -847,10 +847,19 @@ async function scanISOSuspicious(env) {
   const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
   const flagged = [];
   const errors = [];
-  const vtQuarantined = [];
   const vtDisabled = [];
 
   let quota = await getScanQuota(env);
+
+  // Reset VT quota if the daily window has expired
+  if (quota.vt_reset && Date.now() > quota.vt_reset) {
+    quota.vt_remaining = 500;
+    quota.vt_reset = Date.now() + 86400000;
+    quota.vt_disabled = false;
+    delete quota.vt_disabled_at;
+    await saveScanQuota(env, quota);
+  }
+
   let useVt = !quota.vt_disabled && env.SCAN_MASTER;
 
   for (const obj of objects) {
@@ -971,11 +980,12 @@ async function scanISOSuspicious(env) {
     }
   }
 
-  return { flagged, errors, vt_disabled: quota.vt_disabled, vt_quarantined: vtDisabled };
+  return { flagged, errors, vt_disabled: quota.vt_disabled, vt_quota_exhausted_for: vtDisabled };
 }
 
 async function checkStaleProviders(env) {
   const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  const warned = [];
   const expired = [];
   const now = Date.now();
   const twoWeeks = 14 * 24 * 60 * 60 * 1000;
@@ -997,9 +1007,7 @@ async function checkStaleProviders(env) {
         const emailBody = `Hi ${data.org},\n\nYour AcreetionOS hosting provider listing has been flagged as inactive.\n\nYour ISO mirror (${data.mirror_url}) has not been reachable for 14 days. Per our requirements, providers must maintain an active mirror.\n\nIf you believe this is an error, please contact us at developers@acreetionos.org or re-register at https://acreetionos.org/hosting.html\n\nIf we don't hear from you within 7 days, your listing will be automatically removed.\n\n- AcreetionOS Team`;
         await sendHostingEmail(env, data.email, 'AcreetionOS Hosting — Inactivity Warning', emailBody);
 
-        sendDiscordWebhook(env,
-          `**⚠️ Provider Inactivity Warning**\n**Provider:** ${data.org}\n**Email:** ${data.email}\n**ISO:** ${data.mirror_url}\n**Last seen:** ${data.last_seen || 'Never'}\n**Grace period:** 7 days before removal\n\nWarning email sent to provider.`
-        );
+        warned.push({ org: data.org, email: data.email, last_seen: data.last_seen });
       }
 
       // Remove after 21 days (14 days + 7 day grace)
@@ -1015,7 +1023,7 @@ async function checkStaleProviders(env) {
     // This is a safety net for providers not scanned recently
   }
 
-  return expired;
+  return { warned, expired };
 }
 
 async function handleHostingScan(request, env) {
@@ -1029,9 +1037,9 @@ async function handleHostingScan(request, env) {
 
   let needsClamav = false;
 
-  // Auto-deregister flagged providers (VT-confirmed only)
+  // Auto-deregister flagged providers (VT-confirmed only — local_quick cannot confirm malware)
   for (const flagged of result.flagged) {
-    if (flagged.scan_method === 'virustotal' || (flagged.scan_method === 'local_quick' && flagged.malicious)) {
+    if (flagged.scan_method === 'virustotal') {
       await deleteR2(env, 'acreetionos-hosting', 'provider-' + flagged.id);
       sendDiscordWebhook(env,
         `**🚨 MALWARE DETECTED — Provider Auto-Deregistered**\n**Provider:** ${flagged.org}\n**Email:** ${flagged.email}\n**ISO:** ${flagged.mirror_url}\n**Method:** ${flagged.scan_method}\n**Malicious detections:** ${flagged.malicious || 0}\n**Issues:** ${(flagged.issues || []).join(', ')}\n\nProvider has been immediately removed from the website.`
@@ -1057,10 +1065,15 @@ async function handleHostingScan(request, env) {
   }
 
   // Check for stale/expired providers (not seen in 14+ days)
-  const expired = await checkStaleProviders(env);
-  if (expired.length > 0) {
+  const staleResult = await checkStaleProviders(env);
+  if (staleResult.warned.length > 0) {
     sendDiscordWebhook(env,
-      `**⏰ Providers Expired (Inactive 14+ Days)**\n${expired.map(e => `- ${e.org} (${e.email}) — Last seen: ${e.last_seen || 'never'}`).join('\n')}\n\nThey have been removed and notified.`
+      `**⚠️ Providers Warned (Inactive 14+ Days)**\n${staleResult.warned.map(e => `- ${e.org} (${e.email}) — Last seen: ${e.last_seen || 'never'}`).join('\n')}\n\nWarning email sent. 7-day grace period started.`
+    );
+  }
+  if (staleResult.expired.length > 0) {
+    sendDiscordWebhook(env,
+      `**⏰ Providers Removed (Inactive 21+ Days)**\n${staleResult.expired.map(e => `- ${e.org} (${e.email}) — Last seen: ${e.last_seen || 'never'}`).join('\n')}\n\nThey have been removed and notified.`
     );
   }
 
@@ -1669,7 +1682,7 @@ async function handleCVEFeed(env, ctx) {
   return new Response(JSON.stringify({ error: 'No CVE data available', cves: [], count: 0 }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
-async function handleCVEStatus(env) {
+async function handleCVEStatus(env, ctx) {
   const cached = await getR2(env, 'acreetionos-hosting', 'cve-cache.json');
   if (cached && cached.cves) {
     const critical = cached.cves.filter(c =>
@@ -1695,7 +1708,7 @@ async function handleCVEStatus(env) {
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=600', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   }
-  return handleCVEFeed(env);
+  return handleCVEFeed(env, ctx);
 }
 
 async function handleCVEEmbed() {
@@ -2092,7 +2105,7 @@ export default {
       return handleCVEFeed(env, ctx);
     }
     if (url.pathname === '/api/cve/status' && request.method === 'GET') {
-      return handleCVEStatus(env);
+      return handleCVEStatus(env, ctx);
     }
     if (url.pathname === '/api/cve/fix' && request.method === 'POST') {
       return handleCVEFix(request, env);
