@@ -1827,7 +1827,13 @@ export default {
       const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/darren/gh-pages';
       // Root serves /darren/index.html (the hand-crafted full page),
       // not the empty Vite SPA at /index.html
-      let rawPath = url.pathname === '/' ? '/darren/index.html' : url.pathname;
+      // Also rewrite darren.css, darren.js to the /darren/ subdirectory
+      let rawPath = url.pathname;
+      if (rawPath === '/') {
+        rawPath = '/darren/index.html';
+      } else if (rawPath === '/darren.css' || rawPath === '/darren.js') {
+        rawPath = '/darren' + rawPath;
+      }
       const rawUrl = RAW_BASE + rawPath;
       const rawRes = await fetch(rawUrl, {
         headers: { 'User-Agent': CHROME_UA }
