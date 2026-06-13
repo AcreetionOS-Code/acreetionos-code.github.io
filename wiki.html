@@ -1,30 +1,38 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8" >
-<meta name="robots" content="index, follow" >
-<meta name="viewport" content="width=device-width, initial-scale=1.0" >
-<meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Wiki, Search, Documentation" >
-<meta name="referrer" content="strict-origin-when-cross-origin" >
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://wiki.archlinux.org; base-uri 'self'" >
-<title>AcreetionOS - Wiki Hub</title>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://acreetionos.org/wiki.html">
-<meta property="og:title" content="Wiki Hub - AcreetionOS">
-<meta property="og:description" content="Search the Arch Linux Wiki through AcreetionOS.">
-<meta property="og:image" content="https://acreetionos.org/logo.webp">
-<meta property="og:site_name" content="AcreetionOS">
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://acreetionos.org/wiki.html">
-<meta property="twitter:title" content="Wiki Hub - AcreetionOS">
-<meta property="twitter:description" content="Search the Arch Linux Wiki through AcreetionOS.">
-<meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-<meta name="description" content="Search the Arch Linux Wiki through AcreetionOS. Get beginner-friendly guides and AI-powered explanations for Linux topics." >
-<link rel="canonical" href="https://acreetionos.org/wiki.html" >
-<link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-<link rel="stylesheet" href="fonts.css">
-<link rel="stylesheet" href="sidebar.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
-<script src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous"></script>
-<style>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="/coi-serviceworker.js">
+    </script>
+    <meta charset="UTF-8" >
+    <meta name="robots" content="index, follow" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Wiki, Search, Documentation" >
+    <meta name="referrer" content="strict-origin-when-cross-origin" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://wiki.archlinux.org; base-uri 'self'" >
+    <title>
+    AcreetionOS - Wiki Hub
+  </title>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/wiki.html">
+  <meta property="og:title" content="Wiki Hub - AcreetionOS">
+  <meta property="og:description" content="Search the Arch Linux Wiki through AcreetionOS.">
+  <meta property="og:image" content="https://acreetionos.org/logo.webp">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://acreetionos.org/wiki.html">
+  <meta property="twitter:title" content="Wiki Hub - AcreetionOS">
+  <meta property="twitter:description" content="Search the Arch Linux Wiki through AcreetionOS.">
+  <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
+  <meta name="description" content="Search the Arch Linux Wiki through AcreetionOS. Get beginner-friendly guides and AI-powered explanations for Linux topics." >
+  <link rel="canonical" href="https://acreetionos.org/wiki.html" >
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
+  </script>
+  <style>
+
 :root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
@@ -69,54 +77,169 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 #progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem}
 .page-footer a{color:var(--acreetion-green);text-decoration:none}
 .page-footer a:hover{text-decoration:underline}
-</style>
-</head><body>
-<a href="#main-content" class="skip-link">Skip to main content</a>
-<div id="page-wrap"><div id="page-scale">
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="git-tracker.html">Git Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a></nav></div></header>
-<div id="main-content" class="wrap">
-<h1>Documentation Engine</h1>
-<p class="sub">Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.</p>
-<div class="search-card">
-<div class="bar">
-<input type="text" id="search-input" placeholder="e.g. Software Updates, WiFi, Bluetooth, GRUB..." autofocus>
-<button type="button" id="search-btn">Search</button>
-</div>
-<div id="results" class="results"></div>
-<div class="quick">
-<span>Popular:</span>
-<a href="#" data-q="System maintenance">System maintenance</a>
-<a href="#" data-q="Installing software">Installing software</a>
-<a href="#" data-q="WiFi">WiFi</a>
-<a href="#" data-q="Bluetooth">Bluetooth</a>
-<a href="#" data-q="Printer setup">Printer setup</a>
-<a href="#" data-q="NVIDIA drivers">NVIDIA drivers</a>
-<a href="#" data-q="Firewall">Firewall</a>
-</div>
-</div>
-</div>
-<div id="wiki-modal" class="modal-overlay">
-<div class="modal-box">
-<button type="button" class="modal-close" id="modal-close">&times;</button>
-<div id="progress-area">
-<div id="progress-track" style="height:4px;background:var(--acreetion-box-border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden"><div id="progress-bar" style="height:100%;width:0%;background:var(--acreetion-green);border-radius:2px;transition:width.4s ease"></div></div>
-<div id="progress-steps"></div>
-<div id="preview-area" style="display:none;margin-bottom:1rem;padding:.8rem;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:8px;max-height:200px;overflow-y:auto;font-size:.8rem;color:var(--acreetion-text);white-space:pre-wrap;font-family:var(--font-mono)"></div>
-</div>
-<div id="content-area" style="display:none">
-<h2 id="modal-title-result">&#8203;</h2>
-<div id="modal-body" class="ai-content"></div>
-<div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border);display:flex;gap:.5rem;flex-wrap:wrap">
-<a id="modal-link" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:.6rem 1.2rem;background:var(--acreetion-green);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:.85rem">View on Arch Wiki &rarr;</a>
-<button id="show-raw-btn" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--acreetion-box-border);color:var(--acreetion-text);border-radius:8px;cursor:pointer;font-size:.85rem">Show raw source</button>
-</div>
-</div>
-</div>
-</div>
-<footer class="page-footer"><p>AcreetionOS is an independent project built on <a href="https://archlinux.org" target="_blank" rel="noopener">Arch Linux</a>. Grateful to the Arch community for their incredible work.</p><p><a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener"><i class="bi bi-github"></i> GitHub</a> &middot; <a href="https://gitlab.acreetionos.org"><i class="bi bi-gitlab"></i> GitLab</a></p></footer>
-</div>
-<script src="scale-page.js" defer></script>
-<script src="sidebar.js" defer></script>
 
-<script src="wiki-page.js"></script>
-<script src="footer.js" defer></script></body></html>
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">
+              Home
+            </a>
+            <a href="flash.html">
+              Downloads
+            </a>
+            <a href="wiki.html">
+              Wiki
+            </a>
+            <a href="contact.html">
+              Contact
+            </a>
+            <a href="newsletter.html">
+              Newsletter
+            </a>
+            <a href="https://security.archlinux.org">
+              Security
+            </a>
+            <a href="https://natalie.acreetionos.org">
+              Developers
+            </a>
+            <a href="hosting.html">
+              ISO Hosting
+            </a>
+            <a href="git-tracker.html">
+              Git Tracker
+            </a>
+            <a href="https://github.com/acreetionos-code/">
+              GitHub
+            </a>
+            <a href="https://gitlab.acreetionos.org">
+              GitLab
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div id="main-content" class="wrap">
+        <h1>
+        Documentation Engine
+      </h1>
+      <p class="sub">
+        Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.
+      </p>
+      <div class="search-card">
+        <div class="bar">
+          <input type="text" id="search-input" placeholder="e.g. Software Updates, WiFi, Bluetooth, GRUB..." autofocus>
+          <button type="button" id="search-btn">
+          Search
+        </button>
+      </div>
+      <div id="results" class="results">
+      </div>
+      <div class="quick">
+        <span>
+          Popular:
+        </span>
+        <a href="#" data-q="System maintenance">
+          System maintenance
+        </a>
+        <a href="#" data-q="Installing software">
+          Installing software
+        </a>
+        <a href="#" data-q="WiFi">
+          WiFi
+        </a>
+        <a href="#" data-q="Bluetooth">
+          Bluetooth
+        </a>
+        <a href="#" data-q="Printer setup">
+          Printer setup
+        </a>
+        <a href="#" data-q="NVIDIA drivers">
+          NVIDIA drivers
+        </a>
+        <a href="#" data-q="Firewall">
+          Firewall
+        </a>
+      </div>
+    </div>
+  </div>
+  <div id="wiki-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="modal-close">
+      &times;
+    </button>
+    <div id="progress-area">
+      <div id="progress-track" style="height:4px;background:var(--acreetion-box-border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden">
+        <div id="progress-bar" style="height:100%;width:0%;background:var(--acreetion-green);border-radius:2px;transition:width.4s ease">
+        </div>
+      </div>
+      <div id="progress-steps">
+      </div>
+      <div id="preview-area" style="display:none;margin-bottom:1rem;padding:.8rem;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:8px;max-height:200px;overflow-y:auto;font-size:.8rem;color:var(--acreetion-text);white-space:pre-wrap;font-family:var(--font-mono)">
+      </div>
+    </div>
+    <div id="content-area" style="display:none">
+      <h2 id="modal-title-result">
+      &#8203;
+    </h2>
+    <div id="modal-body" class="ai-content">
+    </div>
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border);display:flex;gap:.5rem;flex-wrap:wrap">
+      <a id="modal-link" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:.6rem 1.2rem;background:var(--acreetion-green);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:.85rem">
+        View on Arch Wiki &rarr;
+      </a>
+      <button id="show-raw-btn" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--acreetion-box-border);color:var(--acreetion-text);border-radius:8px;cursor:pointer;font-size:.85rem">
+      Show raw source
+    </button>
+  </div>
+</div>
+</div>
+</div>
+<footer class="page-footer">
+  <p>
+    AcreetionOS is an independent project built on
+    <a href="https://archlinux.org" target="_blank" rel="noopener">
+      Arch Linux
+    </a>
+    . Grateful to the Arch community for their incredible work.
+  </p>
+  <p>
+    <a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener">
+      <i class="bi bi-github">
+    </i>
+    GitHub
+  </a>
+  &middot;
+  <a href="https://gitlab.acreetionos.org">
+    <i class="bi bi-gitlab">
+  </i>
+  GitLab
+</a>
+</p>
+</footer>
+</div>
+<script src="scale-page.js" defer>
+</script>
+<script src="sidebar.js" defer>
+</script>
+<script src="wiki-page.js">
+</script>
+<script src="footer.js" defer>
+</script>
+</body>
+</html>

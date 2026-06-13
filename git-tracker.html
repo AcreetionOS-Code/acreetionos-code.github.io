@@ -1,19 +1,31 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta http-equiv="Cache-Control" content="max-age=3600"><meta charset="UTF-8">
-<meta name="robots" content="index, follow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" ><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Git Tracker - Live Development of AcreetionOS</title>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://acreetionos.org/git-tracker.html">
-<meta property="og:title" content="Git Tracker - AcreetionOS">
-<meta property="og:description" content="Track AcreetionOS Git repositories - commits and activity.">
-<meta property="og:image" content="https://acreetionos.org/logo.webp">
-<meta property="og:site_name" content="AcreetionOS">
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://acreetionos.org/git-tracker.html">
-<meta property="twitter:title" content="Git Tracker - AcreetionOS">
-<meta property="twitter:description" content="Track AcreetionOS Git repositories - commits and activity.">
-<meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-<meta name="description" content="Track the real-time development of AcreetionOS. Monitor our repositories, latest commits, and community contributions to the best Arch-based Linux OS."><link rel="canonical" href="https://acreetionos.org/git-tracker.html"><script type="application/ld+json">
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="/coi-serviceworker.js">
+    </script>
+    <meta http-equiv="Cache-Control" content="max-age=3600">
+    <meta charset="UTF-8">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+    Git Tracker - Live Development of AcreetionOS
+  </title>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/git-tracker.html">
+  <meta property="og:title" content="Git Tracker - AcreetionOS">
+  <meta property="og:description" content="Track AcreetionOS Git repositories - commits and activity.">
+  <meta property="og:image" content="https://acreetionos.org/logo.webp">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://acreetionos.org/git-tracker.html">
+  <meta property="twitter:title" content="Git Tracker - AcreetionOS">
+  <meta property="twitter:description" content="Track AcreetionOS Git repositories - commits and activity.">
+  <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
+  <meta name="description" content="Track the real-time development of AcreetionOS. Monitor our repositories, latest commits, and community contributions to the best Arch-based Linux OS.">
+  <link rel="canonical" href="https://acreetionos.org/git-tracker.html">
+  <script type="application/ld+json">
+
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -23,7 +35,16 @@
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "Web"
 }
-</script><link rel="dns-prefetch" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="sidebar.css"><link rel="stylesheet" href="contact.css"><style>
+
+  </script>
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="contact.css">
+  <style>
+
 :root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--storm-color:#61afef;--flasher-color:#f39c12;--font-sans:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px}
@@ -108,8 +129,228 @@ html{scroll-behavior:smooth}
 @media(max-width:1024px){.page-wrapper{grid-template-columns:1fr}.aside-column{order:-1}}
 @media(max-width:768px){.tracker-title{font-size:1.8rem}.tracker-subtitle{font-size:1rem}.repo-grid{grid-template-columns:1fr;gap:1rem}.page-wrapper{padding:0 1rem;margin:0}.repo-card{padding:1rem}.modal-content-wrapper{padding:1.25rem}}
 @media(max-width:480px){.tracker-title{font-size:1.4rem}.tracker-hero{padding:2rem 0.75rem 1.5rem}#repo-search{width:100%;font-size:0.95rem}.tracker-btn{padding:0.5rem 0.9rem;font-size:0.85rem}.repo-card-title{font-size:1rem}}
-</style>
-</head><body><a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap"><div id="page-scale"><div class="announcement-bar"><div class="announcement-content"><span style="font-weight:bold;color:var(--acreetion-green);">Development Update:</span> Explore our source code below.<span class="separator">|</span><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">Join Developer Discord</a><a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Join Developer Root</a></div></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="git-tracker.html">Git Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a></nav></div></header><div class="page-wrapper"><main id="main-content" class="content-feed"><section class="tracker-hero"><div class="glow"></div><h1 class="tracker-title">Git Tracker</h1><p class="tracker-subtitle">The pulse of AcreetionOS. Monitor repositories, commits, and the evolution of the best Arch-based distribution in real-time.</p><div class="tracker-controls"><input type="text" id="repo-search" placeholder="Search repositories by name or description..." autocomplete="off"><div class="filter-group"><button type="button" id="show-all" class="tracker-btn active">All Repos</button><button type="button" id="show-active" class="tracker-btn">Recently Active</button><button type="button" id="show-inactive" class="tracker-btn">Inactive</button></div></div></section><div class="loading-status" id="loading-status">Loading repository data...</div><div class="repo-grid" id="repo-grid"></div><div class="modal" id="repo-modal"><div class="modal-content-wrapper"><button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">&times;</button><div id="modal-content"><h2 id="modal-title"></h2><p class="repo-desc" id="modal-desc"></p><div class="modal-actions" id="modal-actions"></div><h3>Recent Commits</h3><ul class="modal-commit-list" id="modal-commits"><li class="modal-loading">Loading commits...</li></ul></div></div></div><button type="button" id="back-to-top" title="Back to top">↑</button></main><aside class="aside-column"><div class="aside-card"><h3>Repository Stats</h3><div class="aside-stats"><div class="stat-box"><div class="stat-number" id="total-repos">0</div><div class="stat-label">Total Repos</div></div><div class="stat-box"><div class="stat-number" id="active-repos">0</div><div class="stat-label">Active</div></div><div class="stat-box"><div class="stat-number" id="github-repos">0</div><div class="stat-label">GitHub</div></div><div class="stat-box"><div class="stat-number" id="gitlab-repos">0</div><div class="stat-label">GitLab</div></div></div></div><div class="aside-card"><h3>About This Tracker</h3><p>This dashboard fetches live data from the <a href="https://github.com/acreetionos-code/" target="_blank">GitHub</a> and <a href="https://gitlab.acreetionos.org" target="_blank">GitLab</a> APIs to display the current status of all AcreetionOS repositories.</p><p>Click any repository card to view its recent commits and activity.</p></div><div class="aside-card"><h3>Resources</h3><p><a href="https://github.com/acreetionos-code/" target="_blank">GitHub Organization</a></p><p><a href="https://gitlab.acreetionos.org" target="_blank">GitLab Organization</a></p><p><a href="index.html">Back to Home</a></p></div></aside></div>
-<script src="sidebar.js" defer></script></div></div><script src="git-tracker-all.js"></script>
-<script src="animate.js"></script>
-<script src="footer.js" defer></script></body></html>
+
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <div class="announcement-bar">
+        <div class="announcement-content">
+          <span style="font-weight:bold;color:var(--acreetion-green);">
+            Development Update:
+          </span>
+          Explore our source code below.
+          <span class="separator">
+            |
+          </span>
+          <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">
+            Join Developer Discord
+          </a>
+          <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">
+            Join Developer Root
+          </a>
+        </div>
+      </div>
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">
+              Home
+            </a>
+            <a href="flash.html">
+              Downloads
+            </a>
+            <a href="wiki.html">
+              Wiki
+            </a>
+            <a href="contact.html">
+              Contact
+            </a>
+            <a href="newsletter.html">
+              Newsletter
+            </a>
+            <a href="https://security.archlinux.org">
+              Security
+            </a>
+            <a href="https://natalie.acreetionos.org">
+              Developers
+            </a>
+            <a href="hosting.html">
+              ISO Hosting
+            </a>
+            <a href="git-tracker.html">
+              Git Tracker
+            </a>
+            <a href="https://github.com/acreetionos-code/">
+              GitHub
+            </a>
+            <a href="https://gitlab.acreetionos.org">
+              GitLab
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div class="page-wrapper">
+        <main id="main-content" class="content-feed">
+          <section class="tracker-hero">
+            <div class="glow">
+            </div>
+            <h1 class="tracker-title">
+            Git Tracker
+          </h1>
+          <p class="tracker-subtitle">
+            The pulse of AcreetionOS. Monitor repositories, commits, and the evolution of the best Arch-based distribution in real-time.
+          </p>
+          <div class="tracker-controls">
+            <input type="text" id="repo-search" placeholder="Search repositories by name or description..." autocomplete="off">
+            <div class="filter-group">
+              <button type="button" id="show-all" class="tracker-btn active">
+              All Repos
+            </button>
+            <button type="button" id="show-active" class="tracker-btn">
+            Recently Active
+          </button>
+          <button type="button" id="show-inactive" class="tracker-btn">
+          Inactive
+        </button>
+      </div>
+    </div>
+  </section>
+  <div class="loading-status" id="loading-status">
+    Loading repository data...
+  </div>
+  <div class="repo-grid" id="repo-grid">
+  </div>
+  <div class="modal" id="repo-modal">
+    <div class="modal-content-wrapper">
+      <button class="modal-close-btn" id="modal-close-btn" aria-label="Close modal">
+      &times;
+    </button>
+    <div id="modal-content">
+      <h2 id="modal-title">
+    </h2>
+    <p class="repo-desc" id="modal-desc">
+    </p>
+    <div class="modal-actions" id="modal-actions">
+    </div>
+    <h3>
+    Recent Commits
+  </h3>
+  <ul class="modal-commit-list" id="modal-commits">
+    <li class="modal-loading">
+      Loading commits...
+    </li>
+  </ul>
+</div>
+</div>
+</div>
+<button type="button" id="back-to-top" title="Back to top">
+↑
+</button>
+</main>
+<aside class="aside-column">
+  <div class="aside-card">
+    <h3>
+    Repository Stats
+  </h3>
+  <div class="aside-stats">
+    <div class="stat-box">
+      <div class="stat-number" id="total-repos">
+        0
+      </div>
+      <div class="stat-label">
+        Total Repos
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="active-repos">
+        0
+      </div>
+      <div class="stat-label">
+        Active
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="github-repos">
+        0
+      </div>
+      <div class="stat-label">
+        GitHub
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-number" id="gitlab-repos">
+        0
+      </div>
+      <div class="stat-label">
+        GitLab
+      </div>
+    </div>
+  </div>
+</div>
+<div class="aside-card">
+  <h3>
+  About This Tracker
+</h3>
+<p>
+  This dashboard fetches live data from the
+  <a href="https://github.com/acreetionos-code/" target="_blank">
+    GitHub
+  </a>
+  and
+  <a href="https://gitlab.acreetionos.org" target="_blank">
+    GitLab
+  </a>
+  APIs to display the current status of all AcreetionOS repositories.
+</p>
+<p>
+  Click any repository card to view its recent commits and activity.
+</p>
+</div>
+<div class="aside-card">
+  <h3>
+  Resources
+</h3>
+<p>
+  <a href="https://github.com/acreetionos-code/" target="_blank">
+    GitHub Organization
+  </a>
+</p>
+<p>
+  <a href="https://gitlab.acreetionos.org" target="_blank">
+    GitLab Organization
+  </a>
+</p>
+<p>
+  <a href="index.html">
+    Back to Home
+  </a>
+</p>
+</div>
+</aside>
+</div>
+<script src="sidebar.js" defer>
+</script>
+</div>
+</div>
+<script src="git-tracker-all.js">
+</script>
+<script src="animate.js">
+</script>
+<script src="footer.js" defer>
+</script>
+</body>
+</html>

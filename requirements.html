@@ -1,34 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta http-equiv="Cache-Control" content="max-age=3600">
-<meta charset="UTF-8" >
-<meta name="robots" content="index, follow" >
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" ><meta name="viewport" content="width=device-width, initial-scale=1.0" >
-<meta name="referrer" content="strict-origin-when-cross-origin" >
-<title>System Requirements - AcreetionOS Linux</title>
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://acreetionos.org/requirements.html">
-<meta property="og:title" content="System Requirements - AcreetionOS">
-<meta property="og:description" content="AcreetionOS system requirements - minimum and recommended specs.">
-<meta property="og:image" content="https://acreetionos.org/logo.webp">
-<meta property="og:site_name" content="AcreetionOS">
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://acreetionos.org/requirements.html">
-<meta property="twitter:title" content="System Requirements - AcreetionOS">
-<meta property="twitter:description" content="AcreetionOS system requirements - minimum and recommended specs.">
-<meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-<meta name="description" content="AcreetionOS Linux system requirements. Minimum and recommended hardware specifications for desktop, laptop, and server installations." >
-<meta name="keywords" content="AcreetionOS requirements, Linux system requirements, minimum specs Linux, Linux hardware requirements" >
-<link rel="canonical" href="https://acreetionos.org/requirements.html" >
-<link rel="stylesheet" href="contact.css" >
-<link rel="preconnect" href="https://fonts.googleapis.com" >
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin >
-<link rel="stylesheet" href="fonts.css">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
-<link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-<link rel="stylesheet" href="sidebar.css">
-<style>
+  <head>
+    <script src="/coi-serviceworker.js">
+    </script>
+    <meta http-equiv="Cache-Control" content="max-age=3600">
+    <meta charset="UTF-8" >
+    <meta name="robots" content="index, follow" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="referrer" content="strict-origin-when-cross-origin" >
+    <title>
+    System Requirements - AcreetionOS Linux
+  </title>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/requirements.html">
+  <meta property="og:title" content="System Requirements - AcreetionOS">
+  <meta property="og:description" content="AcreetionOS system requirements - minimum and recommended specs.">
+  <meta property="og:image" content="https://acreetionos.org/logo.webp">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://acreetionos.org/requirements.html">
+  <meta property="twitter:title" content="System Requirements - AcreetionOS">
+  <meta property="twitter:description" content="AcreetionOS system requirements - minimum and recommended specs.">
+  <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
+  <meta name="description" content="AcreetionOS Linux system requirements. Minimum and recommended hardware specifications for desktop, laptop, and server installations." >
+  <meta name="keywords" content="AcreetionOS requirements, Linux system requirements, minimum specs Linux, Linux hardware requirements" >
+  <link rel="canonical" href="https://acreetionos.org/requirements.html" >
+  <link rel="stylesheet" href="contact.css" >
+  <link rel="preconnect" href="https://fonts.googleapis.com" >
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin >
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="stylesheet" href="sidebar.css">
+  <style>
+
 .req-specs{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin:2rem 0}
 .req-specs .card{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem}
 .req-specs .card h2{color:var(--acreetion-green);font-family:var(--font-mono);font-size:1.1rem;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid var(--acreetion-box-border)}
@@ -51,83 +57,272 @@
 .details-toggle:hover{text-decoration:underline}
 .details-content{margin-top:.5rem;padding:.75rem 1rem;background:rgba(243,156,18,0.05);border:1px solid rgba(243,156,18,0.2);border-radius:8px;font-size:.82rem;color:var(--acreetion-text);line-height:1.6;display:none}
 @media(max-width:768px){.req-specs,.compat-grid{grid-template-columns:1fr;gap:1rem}.req-specs .card,.compat-group{padding:1rem}.req-table td{font-size:.85rem}}
-</style>
+
+  </style>
 </head>
 <body>
-<a href="#main-content" class="skip-link">Skip to main content</a>
-<div id="page-wrap"><div id="page-scale">
-<header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="git-tracker.html">Git Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a></nav></div></header>
-<div id="main-content" class="page-wrapper">
-<div class="main-column">
-<div class="content-box">
-<div class="box-header"><h1>System Requirements</h1></div>
-<div class="box-body">
-<p style="font-size:1rem;margin-bottom:2rem;color:var(--acreetion-text);line-height:1.7">AcreetionOS is designed to run on a broad range of hardware, from legacy machines to modern workstations. Review the specifications below to determine compatibility with your system.</p>
-
-<div class="req-specs">
-<div class="card">
-<h2>Minimum</h2>
-<table class="req-table">
-<tr><td>Processor</td><td>64-bit x86_64, 1.5 GHz+ <span class="tag tag-green">x86_64</span></td></tr>
-<tr><td>Memory</td><td>2 GB RAM</td></tr>
-<tr><td>Storage</td><td>20 GB free space</td></tr>
-<tr><td>Graphics</td><td>Any GPU, 256 MB VRAM<br>Integrated graphics supported</td></tr>
-<tr><td>Display</td><td>1024 x 768</td></tr>
-<tr><td>Boot Mode</td><td>UEFI or Legacy BIOS</td></tr>
-</table>
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">
+              Home
+            </a>
+            <a href="flash.html">
+              Downloads
+            </a>
+            <a href="wiki.html">
+              Wiki
+            </a>
+            <a href="contact.html">
+              Contact
+            </a>
+            <a href="newsletter.html">
+              Newsletter
+            </a>
+            <a href="https://security.archlinux.org">
+              Security
+            </a>
+            <a href="https://natalie.acreetionos.org">
+              Developers
+            </a>
+            <a href="hosting.html">
+              ISO Hosting
+            </a>
+            <a href="git-tracker.html">
+              Git Tracker
+            </a>
+            <a href="https://github.com/acreetionos-code/">
+              GitHub
+            </a>
+            <a href="https://gitlab.acreetionos.org">
+              GitLab
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div id="main-content" class="page-wrapper">
+        <div class="main-column">
+          <div class="content-box">
+            <div class="box-header">
+              <h1>
+              System Requirements
+            </h1>
+          </div>
+          <div class="box-body">
+            <p style="font-size:1rem;margin-bottom:2rem;color:var(--acreetion-text);line-height:1.7">
+              AcreetionOS is designed to run on a broad range of hardware, from legacy machines to modern workstations. Review the specifications below to determine compatibility with your system.
+            </p>
+            <div class="req-specs">
+              <div class="card">
+                <h2>
+                Minimum
+              </h2>
+              <table class="req-table">
+                <tr>
+                  <td>
+                    Processor
+                  </td>
+                  <td>
+                    64-bit x86_64, 1.5 GHz+
+                    <span class="tag tag-green">
+                      x86_64
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Memory
+                  </td>
+                  <td>
+                    2 GB RAM
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Storage
+                  </td>
+                  <td>
+                    20 GB free space
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Graphics
+                  </td>
+                  <td>
+                    Any GPU, 256 MB VRAM
+                    <br>
+                    Integrated graphics supported
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Display
+                  </td>
+                  <td>
+                    1024 x 768
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    Boot Mode
+                  </td>
+                  <td>
+                    UEFI or Legacy BIOS
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="card">
+              <h2>
+              Recommended
+            </h2>
+            <table class="req-table">
+              <tr>
+                <td>
+                  Processor
+                </td>
+                <td>
+                  Dual-core 64-bit, 2.0 GHz+
+                  <span class="tag tag-green">
+                    x86_64
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Memory
+                </td>
+                <td>
+                  4 GB RAM or more
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Storage
+                </td>
+                <td>
+                  40 GB+ SSD (NVMe preferred)
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Graphics
+                </td>
+                <td>
+                  Dedicated GPU, 512 MB+ VRAM
+                  <br>
+                  Intel, AMD, or NVIDIA
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Display
+                </td>
+                <td>
+                  1920 x 1080 or higher
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  Network
+                </td>
+                <td>
+                  Ethernet or Wi-Fi
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="compat-section">
+          <h2>
+          Hardware Compatibility
+        </h2>
+        <div class="compat-grid">
+          <div class="compat-group">
+            <h3>
+            Intel Processors
+          </h3>
+          <ul>
+            <li>
+              Core 2 Duo and newer
+            </li>
+            <li>
+              Pentium 4 and newer (64-bit)
+            </li>
+            <li>
+              Celeron, Atom (x86_64 only)
+            </li>
+          </ul>
+        </div>
+        <div class="compat-group">
+          <h3>
+          AMD Processors
+        </h3>
+        <ul>
+          <li>
+            Athlon 64 and newer
+          </li>
+          <li>
+            Ryzen series, EPYC, Threadripper
+          </li>
+        </ul>
+      </div>
+    </div>
+    <p style="color:var(--acreetion-text);font-size:.85rem;margin-top:1rem">
+      32-bit (i686) ISOs are built from the
+      <a href="https://archlinux32.org" target="_blank" rel="noopener" style="color:var(--acreetion-green)">
+        Arch Linux 32-bit repositories
+      </a>
+      but are provided as-is without QA testing.
+      <button type="button" class="details-toggle" id="bit32-toggle">
+      Details
+    </button>
+  </p>
+  <div id="bit32-details" class="details-content">
+    We compile 32-bit (i686) ISOs using the upstream Arch Linux 32-bit repositories. We do not maintain our own package repos for 32-bit. These builds are provided as-is for testing, education, and automated deployment. 32-bit hardware and software combinations vary widely and our testing capacity is limited. If you run into issues, community knowledge and the Arch32 repos are your best resources.
+  </div>
 </div>
-<div class="card">
-<h2>Recommended</h2>
-<table class="req-table">
-<tr><td>Processor</td><td>Dual-core 64-bit, 2.0 GHz+ <span class="tag tag-green">x86_64</span></td></tr>
-<tr><td>Memory</td><td>4 GB RAM or more</td></tr>
-<tr><td>Storage</td><td>40 GB+ SSD (NVMe preferred)</td></tr>
-<tr><td>Graphics</td><td>Dedicated GPU, 512 MB+ VRAM<br>Intel, AMD, or NVIDIA</td></tr>
-<tr><td>Display</td><td>1920 x 1080 or higher</td></tr>
-<tr><td>Network</td><td>Ethernet or Wi-Fi</td></tr>
-</table>
+<button type="button" id="back-to-top" title="Back to top">
+↑
+</button>
 </div>
 </div>
-
-<div class="compat-section">
-<h2>Hardware Compatibility</h2>
-<div class="compat-grid">
-<div class="compat-group">
-<h3>Intel Processors</h3>
-<ul>
-<li>Core 2 Duo and newer</li>
-<li>Pentium 4 and newer (64-bit)</li>
-<li>Celeron, Atom (x86_64 only)</li>
-</ul>
-</div>
-<div class="compat-group">
-<h3>AMD Processors</h3>
-<ul>
-<li>Athlon 64 and newer</li>
-<li>Ryzen series, EPYC, Threadripper</li>
-</ul>
 </div>
 </div>
-
-<p style="color:var(--acreetion-text);font-size:.85rem;margin-top:1rem">32-bit (i686) ISOs are built from the <a href="https://archlinux32.org" target="_blank" rel="noopener" style="color:var(--acreetion-green)">Arch Linux 32-bit repositories</a> but are provided as-is without QA testing. <button type="button" class="details-toggle" id="bit32-toggle">Details</button></p>
-<div id="bit32-details" class="details-content">
-We compile 32-bit (i686) ISOs using the upstream Arch Linux 32-bit repositories. We do not maintain our own package repos for 32-bit. These builds are provided as-is for testing, education, and automated deployment. 32-bit hardware and software combinations vary widely and our testing capacity is limited. If you run into issues, community knowledge and the Arch32 repos are your best resources.
-</div>
-</div>
-
-<button type="button" id="back-to-top" title="Back to top">↑</button>
-</div></div>
-</div></div>
-<script src="back-to-top.js" defer></script>
+<script src="back-to-top.js" defer>
+</script>
 <script>
+
 document.getElementById('bit32-toggle').addEventListener('click',function(){
 var el=document.getElementById('bit32-details');
 el.style.display=el.style.display==='none'?'block':'none';
 });
+
 </script>
-<script src="scale-page.js" defer></script>
-<script src="sidebar.js" defer></script>
-</div></div>
-<script src="sw-register.js"></script>
-<script src="footer.js" defer></script></body>
+<script src="scale-page.js" defer>
+</script>
+<script src="sidebar.js" defer>
+</script>
+</div>
+</div>
+<script src="sw-register.js">
+</script>
+<script src="footer.js" defer>
+</script>
+</body>
 </html>

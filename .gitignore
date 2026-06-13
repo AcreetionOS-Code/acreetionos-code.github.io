@@ -10,7 +10,8 @@ temp/
 *.tmp
 *.log
 
-# API keys and secrets
+# Dev tools
+format_html.py
 .env
 .env.local
 *.secret

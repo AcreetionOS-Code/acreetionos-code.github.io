@@ -1,121 +1,392 @@
-<!DOCTYPE html><html lang="en"><head>
-<meta charset="UTF-8">
-<meta name="robots" content="index, follow">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" ><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="referrer" content="strict-origin-when-cross-origin">
-<title>Project Governance - AcreetionOS</title>
-<meta name="description" content="AcreetionOS governance model, decision-making process, repository sovereignty, and commitment to transparency and integrity.">
-<link rel="canonical" href="https://acreetionos.org/governance.html">
-<link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://acreetionos.org/governance.html">
-<meta property="og:title" content="Governance - AcreetionOS">
-<meta property="og:description" content="AcreetionOS project governance and leadership.">
-<meta property="og:image" content="https://acreetionos.org/logo.webp">
-<meta property="og:site_name" content="AcreetionOS">
-<meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:url" content="https://acreetionos.org/governance.html">
-<meta property="twitter:title" content="Governance - AcreetionOS">
-<meta property="twitter:description" content="AcreetionOS project governance and leadership.">
-<meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"AcreetionOS Project Governance","description":"Governance model, decision-making, and transparency for the AcreetionOS Linux distribution.","url":"https://acreetionos.org/governance.html","provider":{"@type":"Organization","name":"AcreetionOS"}}</script>
-<link rel="stylesheet" href="fonts.css">
-<link rel="stylesheet" href="sidebar.css">
-<link rel="stylesheet" href="contact.css">
-</head><body><a href="#main-content" class="skip-link">Skip to main content</a><div id="page-wrap"><div id="page-scale"><div id="background-grid"></div><header class="page-header"><div class="header-content"><a href="index.html" class="logo"><img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager"><span class="logo-text">Acreetion<span>OS</span></span></a><nav class="main-nav"><a href="index.html">Home</a><a href="flash.html">Downloads</a><a href="wiki.html">Wiki</a><a href="contact.html">Contact</a><a href="newsletter.html">Newsletter</a><a href="https://security.archlinux.org">Security</a><a href="https://natalie.acreetionos.org">Developers</a><a href="hosting.html">ISO Hosting</a><a href="git-tracker.html">Git Tracker</a><a href="https://github.com/acreetionos-code/">GitHub</a><a href="https://gitlab.acreetionos.org">GitLab</a></nav></div></header><div class="page-wrapper"><main id="main-content" class="main-column">
-
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="/coi-serviceworker.js">
+    </script>
+    <meta charset="UTF-8">
+    <meta name="robots" content="index, follow">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>
+    Project Governance - AcreetionOS
+  </title>
+  <meta name="description" content="AcreetionOS governance model, decision-making process, repository sovereignty, and commitment to transparency and integrity.">
+  <link rel="canonical" href="https://acreetionos.org/governance.html">
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/governance.html">
+  <meta property="og:title" content="Governance - AcreetionOS">
+  <meta property="og:description" content="AcreetionOS project governance and leadership.">
+  <meta property="og:image" content="https://acreetionos.org/logo.webp">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://acreetionos.org/governance.html">
+  <meta property="twitter:title" content="Governance - AcreetionOS">
+  <meta property="twitter:description" content="AcreetionOS project governance and leadership.">
+  <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
+  <script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebPage","name":"AcreetionOS Project Governance","description":"Governance model, decision-making, and transparency for the AcreetionOS Linux distribution.","url":"https://acreetionos.org/governance.html","provider":{"@type":"Organization","name":"AcreetionOS"}}
+  </script>
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="contact.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <div id="background-grid">
+      </div>
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="acreetionoslogo.webp" alt="Official AcreetionOS Logo" class="logo-img" width="40" height="40" decoding="auto" loading="eager">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">
+              Home
+            </a>
+            <a href="flash.html">
+              Downloads
+            </a>
+            <a href="wiki.html">
+              Wiki
+            </a>
+            <a href="contact.html">
+              Contact
+            </a>
+            <a href="newsletter.html">
+              Newsletter
+            </a>
+            <a href="https://security.archlinux.org">
+              Security
+            </a>
+            <a href="https://natalie.acreetionos.org">
+              Developers
+            </a>
+            <a href="hosting.html">
+              ISO Hosting
+            </a>
+            <a href="git-tracker.html">
+              Git Tracker
+            </a>
+            <a href="https://github.com/acreetionos-code/">
+              GitHub
+            </a>
+            <a href="https://gitlab.acreetionos.org">
+              GitLab
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div class="page-wrapper">
+        <main id="main-content" class="main-column">
+          <article class="content-box">
+            <div class="box-header">
+              <h2>
+              AcreetionOS Project Governance
+            </h2>
+          </div>
+          <div class="box-body">
+            <p>
+              AcreetionOS is an independent, community-focused Linux distribution project. This document outlines our governance model, decision-making process, financial transparency, and commitment to integrity. We believe that how a project is governed is just as important as the code it produces.
+            </p>
+          </div>
+        </article>
+        <article class="content-box">
+          <div class="box-header">
+            <h2>
+            Project Structure
+          </h2>
+        </div>
+        <div class="box-body">
+          <p>
+            AcreetionOS is led by its founding Co-Lead Developers&mdash;a father-daughter team:
+          </p>
+          <ul class="styled-list">
+            <li>
+              <span class="list-item-title">
+                Darren (@cobra3282000)
+              </span>
+              <span class="list-item-desc">
+                Co-Lead Developer &mdash; Father
+              </span>
+            </li>
+            <li>
+              <span class="list-item-title">
+                Natalie Cole-Clift Spiva (@spivanatalie64)
+              </span>
+              <span class="list-item-desc">
+                Co-Lead Developer &mdash; Daughter
+              </span>
+            </li>
+          </ul>
+          <p>
+            We currently operate as a small, efficient team to ensure that our technical vision and commitment to user sovereignty remain consistent. As the project grows, additional contributors and maintainers will be onboarded through a transparent merit-based process.
+          </p>
+        </div>
+      </article>
+      <article class="content-box">
+        <div class="box-header">
+          <h2>
+          Decision-Making Process
+        </h2>
+      </div>
+      <div class="box-body">
+        <ul class="styled-list">
+          <li>
+            <span class="list-item-title">
+              Technical Direction
+            </span>
+            <span class="list-item-desc">
+              Decisions regarding core architecture (e.g., XLibre/X11, kernel configs, repository structure, default package selection) are made by the lead developers. This ensures consistency and prevents scope creep from diluting the project's vision.
+            </span>
+          </li>
+          <li>
+            <span class="list-item-title">
+              Community Input
+            </span>
+            <span class="list-item-desc">
+              We actively solicit feedback from our community on
+              <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">
+                Discord
+              </a>
+              ,
+              <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">
+                Root
+              </a>
+              , and via GitHub
+              <a href="https://github.com/acreetionos-code/" target="_blank" rel="noopener noreferrer">
+                Issues and Pull Requests
+              </a>
+              . Major user-facing changes are discussed with the community before implementation, and bug reports and feature requests are reviewed regularly.
+            </span>
+          </li>
+          <li>
+            <span class="list-item-title">
+              Forking and Downstream
+            </span>
+            <span class="list-item-desc">
+              As a free and open-source project, anyone is welcome to fork our code. However, the name "AcreetionOS" and its official repositories are managed exclusively by the core team to protect project identity and trust.
+            </span>
+          </li>
+        </ul>
+      </div>
+    </article>
+    <article class="content-box">
+      <div class="box-header">
+        <h2>
+        Community Documentation
+      </h2>
+    </div>
+    <div class="box-body">
+      <p>
+        Our
+        <a href="wiki.html">
+          Wiki
+        </a>
+        and the
+        <code>
+        docs/
+      </code>
+      folder in each repository serve as the authoritative source for project documentation. Community members are encouraged to contribute improvements, corrections, and translations. All documentation is version-controlled alongside source code to ensure it stays accurate and up-to-date.
+    </p>
+    <p>
+      We maintain a style guide for contributors to ensure consistency across documentation. Review and merge of documentation changes follow the same process as code changes, with lead developers providing final approval.
+    </p>
+  </div>
+</article>
 <article class="content-box">
-<div class="box-header"><h2>AcreetionOS Project Governance</h2></div>
+  <div class="box-header">
+    <h2>
+    Hosting Provider Program
+  </h2>
+</div>
 <div class="box-body">
-<p>AcreetionOS is an independent, community-focused Linux distribution project. This document outlines our governance model, decision-making process, financial transparency, and commitment to integrity. We believe that how a project is governed is just as important as the code it produces.</p>
+  <p>
+    Our
+    <a href="hosting.html">
+      ISO Hosting Provider Program
+    </a>
+    allows trusted third parties to host and distribute AcreetionOS ISOs. Governance of this program includes:
+  </p>
+  <ul class="styled-list">
+    <li>
+      <span class="list-item-title">
+        Application and Vetting
+      </span>
+      <span class="list-item-desc">
+        Prospective hosting providers must apply and be reviewed by the core team to ensure they meet reliability and security standards.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Service Level Expectations
+      </span>
+      <span class="list-item-desc">
+        Hosting providers are expected to keep mirrors up-to-date and accessible. Providers that fail to maintain acceptable service may be removed from the program.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Revocation
+      </span>
+      <span class="list-item-desc">
+        The core team reserves the right to revoke hosting provider status at any time if a provider acts against the project's interests or fails to meet obligations.
+      </span>
+    </li>
+  </ul>
+  <p>
+    This program is designed to expand distribution reach while maintaining trust and quality for end users.
+  </p>
 </div>
 </article>
-
 <article class="content-box">
-<div class="box-header"><h2>Project Structure</h2></div>
+  <div class="box-header">
+    <h2>
+    Repository Sovereignty
+  </h2>
+</div>
 <div class="box-body">
-<p>AcreetionOS is led by its founding Co-Lead Developers&mdash;a father-daughter team:</p>
-<ul class="styled-list">
-<li><span class="list-item-title">Darren (@cobra3282000)</span><span class="list-item-desc">Co-Lead Developer &mdash; Father</span></li>
-<li><span class="list-item-title">Natalie Cole-Clift Spiva (@spivanatalie64)</span><span class="list-item-desc">Co-Lead Developer &mdash; Daughter</span></li>
-</ul>
-<p>We currently operate as a small, efficient team to ensure that our technical vision and commitment to user sovereignty remain consistent. As the project grows, additional contributors and maintainers will be onboarded through a transparent merit-based process.</p>
+  <p>
+    We maintain our own set of repositories. This is not just a technical choice; it is a governance philosophy. By controlling our repositories, we ensure:
+  </p>
+  <ul class="styled-list">
+    <li>
+      <span class="list-item-title">
+        Stability
+      </span>
+      <span class="list-item-desc">
+        We decide when packages are updated, preventing "bleeding edge" breakages.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Security
+      </span>
+      <span class="list-item-desc">
+        We can quickly patch vulnerabilities independently of upstream Arch.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Control
+      </span>
+      <span class="list-item-desc">
+        We prioritize software that aligns with our users' needs, not just upstream defaults.
+      </span>
+    </li>
+  </ul>
 </div>
 </article>
-
 <article class="content-box">
-<div class="box-header"><h2>Decision-Making Process</h2></div>
+  <div class="box-header">
+    <h2>
+    Transparency and Integrity
+  </h2>
+</div>
 <div class="box-body">
-<ul class="styled-list">
-<li><span class="list-item-title">Technical Direction</span><span class="list-item-desc">Decisions regarding core architecture (e.g., XLibre/X11, kernel configs, repository structure, default package selection) are made by the lead developers. This ensures consistency and prevents scope creep from diluting the project's vision.</span></li>
-<li><span class="list-item-title">Community Input</span><span class="list-item-desc">We actively solicit feedback from our community on <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">Discord</a>, <a href="https://rootapp.gg/AC0V5bagggqKtuj_B_MzFA" target="_blank" rel="noopener noreferrer">Root</a>, and via GitHub <a href="https://github.com/acreetionos-code/" target="_blank" rel="noopener noreferrer">Issues and Pull Requests</a>. Major user-facing changes are discussed with the community before implementation, and bug reports and feature requests are reviewed regularly.</span></li>
-<li><span class="list-item-title">Forking and Downstream</span><span class="list-item-desc">As a free and open-source project, anyone is welcome to fork our code. However, the name "AcreetionOS" and its official repositories are managed exclusively by the core team to protect project identity and trust.</span></li>
-</ul>
+  <ul class="styled-list">
+    <li>
+      <span class="list-item-title">
+        Open Development
+      </span>
+      <span class="list-item-desc">
+        All core OS build scripts and custom tools are developed in the open on
+        <a href="https://github.com/acreetionos-code/" target="_blank" rel="noopener noreferrer">
+          GitHub
+        </a>
+        and
+        <a href="https://gitlab.acreetionos.org" target="_blank" rel="noopener noreferrer">
+          GitLab
+        </a>
+        . Anyone can review, audit, or contribute to our codebase.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Financial Independence
+      </span>
+      <span class="list-item-desc">
+        We currently fund AcreetionOS entirely out of our own pockets&mdash;domain registration, server costs, build infrastructure, and tooling. This financial independence guarantees that no outside entity can exert influence over the project's direction or priorities. We do not accept corporate sponsorships or advertising revenue.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        No Hidden Agenda
+      </span>
+      <span class="list-item-desc">
+        Our politics are separate from our code. We are here to build a better operating system for everyone, regardless of their background. We do not collect telemetry, serve ads, or bundle unnecessary software.
+      </span>
+    </li>
+  </ul>
 </div>
 </article>
-
 <article class="content-box">
-<div class="box-header"><h2>Community Documentation</h2></div>
+  <div class="box-header">
+    <h2>
+    Long-Term Plan
+  </h2>
+</div>
 <div class="box-body">
-<p>Our <a href="wiki.html">Wiki</a> and the <code>docs/</code> folder in each repository serve as the authoritative source for project documentation. Community members are encouraged to contribute improvements, corrections, and translations. All documentation is version-controlled alongside source code to ensure it stays accurate and up-to-date.</p>
-<p>We maintain a style guide for contributors to ensure consistency across documentation. Review and merge of documentation changes follow the same process as code changes, with lead developers providing final approval.</p>
+  <p>
+    Our long-term vision is to transition AcreetionOS to a formal community governance model as the project matures and attracts a broader contributor base. This transition may include:
+  </p>
+  <ul class="styled-list">
+    <li>
+      <span class="list-item-title">
+        Community Election
+      </span>
+      <span class="list-item-desc">
+        Establishing a community-elected steering committee to oversee project direction.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Governance Charter
+      </span>
+      <span class="list-item-desc">
+        Drafting a formal governance charter that defines roles, responsibilities, and decision-making processes.
+      </span>
+    </li>
+    <li>
+      <span class="list-item-title">
+        Sustainable Funding
+      </span>
+      <span class="list-item-desc">
+        Exploring community-driven funding models such as donations or a non-profit foundation to ensure long-term financial sustainability without compromising independence.
+      </span>
+    </li>
+  </ul>
+  <p>
+    Our goal is to build a project that outlasts any single contributor and remains a trusted, independent operating system for decades to come.
+  </p>
 </div>
 </article>
-
-<article class="content-box">
-<div class="box-header"><h2>Hosting Provider Program</h2></div>
-<div class="box-body">
-<p>Our <a href="hosting.html">ISO Hosting Provider Program</a> allows trusted third parties to host and distribute AcreetionOS ISOs. Governance of this program includes:</p>
-<ul class="styled-list">
-<li><span class="list-item-title">Application and Vetting</span><span class="list-item-desc">Prospective hosting providers must apply and be reviewed by the core team to ensure they meet reliability and security standards.</span></li>
-<li><span class="list-item-title">Service Level Expectations</span><span class="list-item-desc">Hosting providers are expected to keep mirrors up-to-date and accessible. Providers that fail to maintain acceptable service may be removed from the program.</span></li>
-<li><span class="list-item-title">Revocation</span><span class="list-item-desc">The core team reserves the right to revoke hosting provider status at any time if a provider acts against the project's interests or fails to meet obligations.</span></li>
-</ul>
-<p>This program is designed to expand distribution reach while maintaining trust and quality for end users.</p>
-</div>
-</article>
-
-<article class="content-box">
-<div class="box-header"><h2>Repository Sovereignty</h2></div>
-<div class="box-body">
-<p>We maintain our own set of repositories. This is not just a technical choice; it is a governance philosophy. By controlling our repositories, we ensure:</p>
-<ul class="styled-list">
-<li><span class="list-item-title">Stability</span><span class="list-item-desc">We decide when packages are updated, preventing "bleeding edge" breakages.</span></li>
-<li><span class="list-item-title">Security</span><span class="list-item-desc">We can quickly patch vulnerabilities independently of upstream Arch.</span></li>
-<li><span class="list-item-title">Control</span><span class="list-item-desc">We prioritize software that aligns with our users' needs, not just upstream defaults.</span></li>
-</ul>
-</div>
-</article>
-
-<article class="content-box">
-<div class="box-header"><h2>Transparency and Integrity</h2></div>
-<div class="box-body">
-<ul class="styled-list">
-<li><span class="list-item-title">Open Development</span><span class="list-item-desc">All core OS build scripts and custom tools are developed in the open on <a href="https://github.com/acreetionos-code/" target="_blank" rel="noopener noreferrer">GitHub</a> and <a href="https://gitlab.acreetionos.org" target="_blank" rel="noopener noreferrer">GitLab</a>. Anyone can review, audit, or contribute to our codebase.</span></li>
-<li><span class="list-item-title">Financial Independence</span><span class="list-item-desc">We currently fund AcreetionOS entirely out of our own pockets&mdash;domain registration, server costs, build infrastructure, and tooling. This financial independence guarantees that no outside entity can exert influence over the project's direction or priorities. We do not accept corporate sponsorships or advertising revenue.</span></li>
-<li><span class="list-item-title">No Hidden Agenda</span><span class="list-item-desc">Our politics are separate from our code. We are here to build a better operating system for everyone, regardless of their background. We do not collect telemetry, serve ads, or bundle unnecessary software.</span></li>
-</ul>
-</div>
-</article>
-
-<article class="content-box">
-<div class="box-header"><h2>Long-Term Plan</h2></div>
-<div class="box-body">
-<p>Our long-term vision is to transition AcreetionOS to a formal community governance model as the project matures and attracts a broader contributor base. This transition may include:</p>
-<ul class="styled-list">
-<li><span class="list-item-title">Community Election</span><span class="list-item-desc">Establishing a community-elected steering committee to oversee project direction.</span></li>
-<li><span class="list-item-title">Governance Charter</span><span class="list-item-desc">Drafting a formal governance charter that defines roles, responsibilities, and decision-making processes.</span></li>
-<li><span class="list-item-title">Sustainable Funding</span><span class="list-item-desc">Exploring community-driven funding models such as donations or a non-profit foundation to ensure long-term financial sustainability without compromising independence.</span></li>
-</ul>
-<p>Our goal is to build a project that outlasts any single contributor and remains a trusted, independent operating system for decades to come.</p>
-</div>
-</article>
-
-<button type="button" id="back-to-top" title="Back to top">&uarr;</button>
-<script src="back-to-top.js" defer></script>
+<button type="button" id="back-to-top" title="Back to top">
+&uarr;
+</button>
+<script src="back-to-top.js" defer>
+</script>
 </main>
-<script src="scale-page.js" defer></script>
-<script src="sidebar.js" defer></script>
-</div></div>
-<script src="animate.js"></script>
-<script src="footer.js" defer></script></body></html>
+<script src="scale-page.js" defer>
+</script>
+<script src="sidebar.js" defer>
+</script>
+</div>
+</div>
+<script src="animate.js">
+</script>
+<script src="footer.js" defer>
+</script>
+</body>
+</html>
