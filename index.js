@@ -1851,7 +1851,51 @@ export default {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     }
 
-    // ─── darren.acreetionos.org proxying removed. Fuck it. ─────
+    // ─── darren.acreetionos.org — serve from GitHub Pages (AI removed) ─────
+    if (url.hostname === 'darren.acreetionos.org') {
+      if (url.pathname.startsWith('/api/')) {
+        // Pass through to normal routing
+      } else {
+        const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/darren/gh-pages';
+        let rawPath = url.pathname;
+        if (rawPath === '/') {
+          rawPath = '/darren/index.html';
+        } else if (rawPath === '/darren.css' || rawPath === '/darren.js') {
+          rawPath = '/darren' + rawPath;
+        }
+        const rawUrl = RAW_BASE + rawPath;
+        const rawRes = await fetch(rawUrl, {
+          headers: { 'User-Agent': CHROME_UA }
+        }).catch(() => null);
+        if (rawRes && rawRes.ok) {
+          const extMap = {
+            '.html': 'text/html; charset=utf-8',
+            '.css': 'text/css; charset=utf-8',
+            '.js': 'application/javascript; charset=utf-8',
+            '.png': 'image/png',
+            '.jpg': 'image/jpeg',
+            '.jpeg': 'image/jpeg',
+            '.gif': 'image/gif',
+            '.svg': 'image/svg+xml',
+            '.webp': 'image/webp',
+            '.ico': 'image/x-icon',
+          };
+          const ext = Object.keys(extMap).find(e => rawUrl.endsWith(e)) || '';
+          const contentType = ext ? extMap[ext] : 'application/octet-stream';
+          const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'";
+          return new Response(rawRes.body, {
+            status: rawRes.status,
+            headers: {
+              'Content-Type': contentType,
+              'Cache-Control': 'public, max-age=3600',
+              ...securityHeaders(),
+              'Content-Security-Policy': csp,
+            }
+          });
+        }
+        return Response.redirect('https://acreetionos.org', 302);
+      }
+    }
 
     // Serve flash.html directly from worker
     if (url.pathname === '/flash.html' && request.method === 'GET') {
