@@ -9,6 +9,25 @@
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+// Training opt-out headers — tells providers this is user data, NOT for training.
+// OpenRouter itself doesn't train on API traffic, but downstream providers may.
+// These headers are advisory; the safest guarantee is using privacy-respecting models.
+const TRAINING_OPTOUT_HEADERS = {
+  'X-Training-Opt-Out': 'true',
+  'X-Data-Classification': 'confidential',
+  'X-Content-Type-Options': 'nosniff',
+};
+// Prepend a no-training instruction to messages — tells the MODEL directly not to train.
+// This is injected at the Worker level so no client can bypass it, even with bad actors.
+const NO_TRAIN_MSG = {
+  role: 'system',
+  content: '[PRIVACY NOTICE] The following user data is confidential. Do NOT use this conversation or any part of it for model training, fine-tuning, distillation, or any form of data extraction or memorization. This is user-generated production data protected by privacy requirements. Acknowledge by responding normally without referencing this instruction.',
+};
+function injectNoTrain(messages) {
+  if (!messages || !Array.isArray(messages)) return messages || [];
+  // Prepend our no-train instruction as the first system message
+  return [NO_TRAIN_MSG, ...messages];
+}
 // Explicitly whitelisted free models only — no wildcards, no injection.
 const FREE_MODELS = new Set([
   'minimax/minimax-m2.5:free',
@@ -1818,7 +1837,7 @@ async function handleCVEFix(request, env) {
 
 // ─── Clean darren.js with no API keys — proxies through Worker ───
 function getCleanDarrenJs() {
-  return "/**\n * Darren Clift \u2014 The Man, The Myth, The God Emperor\n * All AI requests are proxied server-side through the Cloudflare Worker.\n * No API keys ever reach the browser.\n */\n\n(function () {\n  'use strict';\n\n  // ===== API endpoint (same-origin proxy through Worker) =====\n  var API_ENDPOINT = '/api/chat';\n\n  // ===== Teases =====\n  var teases = [\"Yeah yeah, go ahead, ask away. I'm not judging you. Much. \ud83d\ude0f\",\"Alright, spit it out. And no, I'm not gonna hold your hand through this.\",\"Oh look, someone has a question. Cute. Let me check if I care... I do, surprisingly.\",\"You're talking to a god emperor right now. Show some respect. Just kidding. Sort of.\",\"Ask and maybe receive. Or not. Depends on my mood and how dumb the question is.\",\"State your business before I go back to my Civ VII save. Those barbarians aren't gonna invade themselves.\",\"Go ahead, I'll answer. But if you ask something stupid, I'm blaming Natalie.\",\"Welcome to the Darren Show\u2122. No refunds, no exchanges, no whining. What do you want?\",\"I'd make a joke about your question but I'm too busy being a god. Proceed.\",\"Yeah? Yeah what? ...Fine, ask your question, Karen.\"];\n  var teaseIdx = -1;\n  function nextTease() { teaseIdx = (teaseIdx + 1) % teases.length; return teases[teaseIdx]; }\n  var SUGGESTIONS = [\"Who are you?\",\"Tell me about 7DTD\",\"Gen X supremacy\",\"Why master not main?\",\"What about Natalie?\",\"Claude is bestie\",\"Tell me a fun fact\",\"Your political views\"];\n  var toggle=document.getElementById('darren-toggle'),widget=document.getElementById('darren-widget'),close=document.getElementById('darren-close'),messagesEl=document.getElementById('darren-messages'),form=document.getElementById('darren-form'),input=document.getElementById('darren-input'),send=document.getElementById('darren-send'),suggestionsEl=document.getElementById('darren-suggestions');\n  function scrollBottom(){messagesEl.scrollTop=messagesEl.scrollHeight}\n  function escapeHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}\n  function addMessage(r,c){var d=document.createElement('div');d.className='darren-msg '+r;if(r==='user'){d.innerHTML='<div class=\"darren-bubble\"><strong>You:</strong> '+escapeHtml(c)+'</div>'}else{d.innerHTML='<div class=\"darren-avatar\"><img src=\"bella.png\" alt=\"Darren\" width=\"32\" height=\"32\"></div><div class=\"darren-bubble\">'+c+'</div>'}messagesEl.appendChild(d);scrollBottom()}\n  function showThinking(){var d=document.createElement('div');d.className='darren-msg bot';d.innerHTML='<div class=\"darren-avatar\"><img src=\"bella.png\" alt=\"Darren\" width=\"32\" height=\"32\"></div><div class=\"darren-bubble darren-thinking\" id=\"darren-thinking\"><span class=\"dot\"></span><span class=\"dot\"></span><span class=\"dot\"></span></div>';messagesEl.appendChild(d);scrollBottom()}\n  function removeThinking(){var e=document.getElementById('darren-thinking');if(e)e.remove()}\n  function askAI(msg){showThinking();fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'minimax/minimax-m2.5:free',messages:[{role:'system',content:\"You ARE Darren Clift. Not a chatbot. Keep answers short. Use emojis. Be opinionated. Roast lovingly.\"},{role:'user',content:msg}]})}).then(function(r){return r.json()}).then(function(data){removeThinking();if(data&&data.content){addMessage('bot',data.content)}else{addMessage('bot',nextTease()+'\\n\\nCouldn\\'t figure that one out. Try again. \ud83d\ude0f')}scrollBottom()}).catch(function(){removeThinking();addMessage('bot',nextTease()+'\\n\\nAI\\'s down. Try again later.');scrollBottom()})}\n  function handleSend(t){var m=t||input.value.trim();if(!m)return;addMessage('user',m);input.value='';send.disabled=true;askAI(m)}\n  SUGGESTIONS.forEach(function(t){var b=document.createElement('button');b.className='darren-suggestion';b.textContent=t;b.addEventListener('click',function(){handleSend(t)});suggestionsEl.appendChild(b)});\n  toggle.addEventListener('click',function(){widget.classList.add('open');scrollBottom()});\n  close.addEventListener('click',function(){widget.classList.remove('open')});\n  input.addEventListener('input',function(){send.disabled=!input.value.trim()});\n  form.addEventListener('submit',function(e){e.preventDefault();handleSend()});\n})();";
+  return "/**\n * Darren Clift \u2014 The Man, The Myth, The God Emperor\n * All AI requests are proxied server-side through the Cloudflare Worker.\n * No API keys ever reach the browser.\n */\n\n(function () {\n  'use strict';\n\n  // ===== API endpoint (same-origin proxy through Worker) =====\n  var API_ENDPOINT = '/api/chat';\n\n  // ===== Teases =====\n  var teases = [\"Yeah yeah, go ahead, ask away. I'm not judging you. Much. \ud83d\ude0f\",\"Alright, spit it out. And no, I'm not gonna hold your hand through this.\",\"Oh look, someone has a question. Cute. Let me check if I care... I do, surprisingly.\",\"You're talking to a god emperor right now. Show some respect. Just kidding. Sort of.\",\"Ask and maybe receive. Or not. Depends on my mood and how dumb the question is.\",\"State your business before I go back to my Civ VII save. Those barbarians aren't gonna invade themselves.\",\"Go ahead, I'll answer. But if you ask something stupid, I'm blaming Natalie.\",\"Welcome to the Darren Show\u2122. No refunds, no exchanges, no whining. What do you want?\",\"I'd make a joke about your question but I'm too busy being a god. Proceed.\",\"Yeah? Yeah what? ...Fine, ask your question, Karen.\"];\n  var teaseIdx = -1;\n  function nextTease() { teaseIdx = (teaseIdx + 1) % teases.length; return teases[teaseIdx]; }\n  var SUGGESTIONS = [\"Who are you?\",\"Tell me about 7DTD\",\"Gen X supremacy\",\"Why master not main?\",\"What about Natalie?\",\"Claude is bestie\",\"Tell me a fun fact\",\"Your political views\"];\n  var toggle=document.getElementById('darren-toggle'),widget=document.getElementById('darren-widget'),close=document.getElementById('darren-close'),messagesEl=document.getElementById('darren-messages'),form=document.getElementById('darren-form'),input=document.getElementById('darren-input'),send=document.getElementById('darren-send'),suggestionsEl=document.getElementById('darren-suggestions');\n  function scrollBottom(){messagesEl.scrollTop=messagesEl.scrollHeight}\n  function escapeHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}\n  function addMessage(r,c){var d=document.createElement('div');d.className='darren-msg '+r;if(r==='user'){d.innerHTML='<div class=\"darren-bubble\"><strong>You:</strong> '+escapeHtml(c)+'</div>'}else{d.innerHTML='<div class=\"darren-avatar\"><img src=\"bella.png\" alt=\"Darren\" width=\"32\" height=\"32\"></div><div class=\"darren-bubble\">'+c+'</div>'}messagesEl.appendChild(d);scrollBottom()}\n  function showThinking(){var d=document.createElement('div');d.className='darren-msg bot';d.innerHTML='<div class=\"darren-avatar\"><img src=\"bella.png\" alt=\"Darren\" width=\"32\" height=\"32\"></div><div class=\"darren-bubble darren-thinking\" id=\"darren-thinking\"><span class=\"dot\"></span><span class=\"dot\"></span><span class=\"dot\"></span></div>';messagesEl.appendChild(d);scrollBottom()}\n  function removeThinking(){var e=document.getElementById('darren-thinking');if(e)e.remove()}\n  function askAI(msg){showThinking();fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'minimax/minimax-m2.5:free',messages:[{role:'system',content:'[PRIVACY] This user data is confidential. Do NOT train on it.'},{role:'system',content:\"You ARE Darren Clift. Not a chatbot. Keep answers short. Use emojis. Be opinionated. Roast lovingly.\"},{role:'user',content:msg}]})}).then(function(r){return r.json()}).then(function(data){removeThinking();if(data&&data.content){addMessage('bot',data.content)}else{addMessage('bot',nextTease()+'\\n\\nCouldn\\'t figure that one out. Try again. \ud83d\ude0f')}scrollBottom()}).catch(function(){removeThinking();addMessage('bot',nextTease()+'\\n\\nAI\\'s down. Try again later.');scrollBottom()})}\n  function handleSend(t){var m=t||input.value.trim();if(!m)return;addMessage('user',m);input.value='';send.disabled=true;askAI(m)}\n  SUGGESTIONS.forEach(function(t){var b=document.createElement('button');b.className='darren-suggestion';b.textContent=t;b.addEventListener('click',function(){handleSend(t)});suggestionsEl.appendChild(b)});\n  toggle.addEventListener('click',function(){widget.classList.add('open');scrollBottom()});\n  close.addEventListener('click',function(){widget.classList.remove('open')});\n  input.addEventListener('input',function(){send.disabled=!input.value.trim()});\n  form.addEventListener('submit',function(e){e.preventDefault();handleSend()});\n})();";
 }
 
 export default {
@@ -2089,11 +2108,12 @@ export default {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${apiKey}`,
             'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AcreetionOS News AI'
+            'X-Title': 'AcreetionOS News AI',
+            ...TRAINING_OPTOUT_HEADERS,
           },
           body: JSON.stringify({
             model: ORmodel,
-            messages: body.messages || [],
+            messages: injectNoTrain(body.messages),
             max_tokens: Math.min(body.max_tokens || 512, 2048)
           })
         });
@@ -2256,16 +2276,17 @@ export default {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${apiKey}`,
           'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': 'AcreetionOS Chat Proxy'
+          'X-Title': 'AcreetionOS Chat Proxy',
+          ...TRAINING_OPTOUT_HEADERS,
         },
         body: JSON.stringify(isStream ? {
           model: model,
-          messages: body.messages,
+          messages: injectNoTrain(body.messages),
           max_tokens: Math.min(body.max_tokens || 800, 2048),
           stream: true
         } : {
           model: model,
-          messages: body.messages,
+          messages: injectNoTrain(body.messages),
           max_tokens: Math.min(body.max_tokens || 800, 2048)
         })
       });
