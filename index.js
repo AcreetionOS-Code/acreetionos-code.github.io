@@ -1825,7 +1825,9 @@ export default {
     // ─── darren.acreetionos.org — proxy from GitHub raw ─────
     if (url.hostname === 'darren.acreetionos.org') {
       const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/darren/gh-pages';
-      let rawPath = url.pathname === '/' ? '/index.html' : url.pathname;
+      // Root serves /darren/index.html (the hand-crafted full page),
+      // not the empty Vite SPA at /index.html
+      let rawPath = url.pathname === '/' ? '/darren/index.html' : url.pathname;
       const rawUrl = RAW_BASE + rawPath;
       const rawRes = await fetch(rawUrl, {
         headers: { 'User-Agent': CHROME_UA }
