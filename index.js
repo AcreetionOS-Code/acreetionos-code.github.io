@@ -14,6 +14,7 @@ let allowedOrigins = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
   'https://acreetionos-code.github.io',
+  'https://darren.acreetionos.org',
 ];
 const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
@@ -43,7 +44,7 @@ function securityHeaders(nonce) {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Embedder-Policy': 'require-corp',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'nonce-" + nonce + "' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
   };
 }
 
@@ -1819,6 +1820,33 @@ export default {
     // CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(request) });
+    }
+
+    // ─── darren.acreetionos.org — proxy from GitHub raw ─────
+    if (url.hostname === 'darren.acreetionos.org') {
+      const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/darren/gh-pages';
+      let rawPath = url.pathname === '/' ? '/index.html' : url.pathname;
+      const rawUrl = RAW_BASE + rawPath;
+      const rawRes = await fetch(rawUrl, {
+        headers: { 'User-Agent': CHROME_UA }
+      }).catch(() => null);
+      if (rawRes && rawRes.ok) {
+        const contentType = rawRes.headers.get('Content-Type') || 'application/octet-stream';
+        // Fix CSP to allow assets
+        const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'";
+        // Stream binary and text content properly
+        return new Response(rawRes.body, {
+          status: rawRes.status,
+          headers: {
+            'Content-Type': contentType,
+            'Cache-Control': 'public, max-age=3600',
+            'Content-Security-Policy': csp,
+            ...securityHeaders()
+          }
+        });
+      }
+      // Fallback: redirect to main site
+      return Response.redirect('https://acreetionos.org', 302);
     }
 
     // Serve flash.html directly from worker
