@@ -9,7 +9,14 @@
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const FREE_MODEL = 'meta-llama/llama-3.1-8b-instruct';
+// Explicitly whitelisted free models only — no wildcards, no injection.
+const FREE_MODELS = new Set([
+  'minimax/minimax-m2.5:free',
+  'meta-llama/llama-3.1-8b-instruct:free',
+  'qwen/qwen-2.5-7b-instruct:free',
+  'google/gemma-2-9b-it:free',
+]);
+const DEFAULT_MODEL = 'minimax/minimax-m2.5:free';
 let allowedOrigins = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -44,7 +51,7 @@ function securityHeaders(nonce) {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Embedder-Policy': 'require-corp',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://openrouter.ai; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
   };
 }
 
@@ -1809,6 +1816,11 @@ async function handleCVEFix(request, env) {
   }
 }
 
+// ─── Clean darren.js with no API keys — proxies through Worker ───
+function getCleanDarrenJs() {
+  return "/**\n * Darren Clift \u2014 The Man, The Myth, The God Emperor\n * All AI requests are proxied server-side through the Cloudflare Worker.\n * No API keys ever reach the browser.\n */\n\n(function () {\n  'use strict';\n\n  // ===== API endpoint (same-origin proxy through Worker) =====\n  var API_ENDPOINT = '/api/chat';\n\n  // ===== Teases =====\n  var teases = [\"Yeah yeah, go ahead, ask away. I'm not judging you. Much. \ud83d\ude0f\",\"Alright, spit it out. And no, I'm not gonna hold your hand through this.\",\"Oh look, someone has a question. Cute. Let me check if I care... I do, surprisingly.\",\"You're talking to a god emperor right now. Show some respect. Just kidding. Sort of.\",\"Ask and maybe receive. Or not. Depends on my mood and how dumb the question is.\",\"State your business before I go back to my Civ VII save. Those barbarians aren't gonna invade themselves.\",\"Go ahead, I'll answer. But if you ask something stupid, I'm blaming Natalie.\",\"Welcome to the Darren Show\u2122. No refunds, no exchanges, no whining. What do you want?\",\"I'd make a joke about your question but I'm too busy being a god. Proceed.\",\"Yeah? Yeah what? ...Fine, ask your question, Karen.\"];\n  var teaseIdx = -1;\n  function nextTease() { teaseIdx = (teaseIdx + 1) % teases.length; return teases[teaseIdx]; }\n  var SUGGESTIONS = [\"Who are you?\",\"Tell me about 7DTD\",\"Gen X supremacy\",\"Why master not main?\",\"What about Natalie?\",\"Claude is bestie\",\"Tell me a fun fact\",\"Your political views\"];\n  var toggle=document.getElementById('darren-toggle'),widget=document.getElementById('darren-widget'),close=document.getElementById('darren-close'),messagesEl=document.getElementById('darren-messages'),form=document.getElementById('darren-form'),input=document.getElementById('darren-input'),send=document.getElementById('darren-send'),suggestionsEl=document.getElementById('darren-suggestions');\n  function scrollBottom(){messagesEl.scrollTop=messagesEl.scrollHeight}\n  function escapeHtml(s){var d=document.createElement('div');d.textContent=s;return d.innerHTML}\n  function addMessage(r,c){var d=document.createElement('div');d.className='darren-msg '+r;if(r==='user'){d.innerHTML='<div class=\"darren-bubble\"><strong>You:</strong> '+escapeHtml(c)+'</div>'}else{d.innerHTML='<div class=\"darren-avatar\"><img src=\"bella.png\" alt=\"Darren\" width=\"32\" height=\"32\"></div><div class=\"darren-bubble\">'+c+'</div>'}messagesEl.appendChild(d);scrollBottom()}\n  function showThinking(){var d=document.createElement('div');d.className='darren-msg bot';d.innerHTML='<div class=\"darren-avatar\"><img src=\"bella.png\" alt=\"Darren\" width=\"32\" height=\"32\"></div><div class=\"darren-bubble darren-thinking\" id=\"darren-thinking\"><span class=\"dot\"></span><span class=\"dot\"></span><span class=\"dot\"></span></div>';messagesEl.appendChild(d);scrollBottom()}\n  function removeThinking(){var e=document.getElementById('darren-thinking');if(e)e.remove()}\n  function askAI(msg){showThinking();fetch(API_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'minimax/minimax-m2.5:free',messages:[{role:'system',content:\"You ARE Darren Clift. Not a chatbot. Keep answers short. Use emojis. Be opinionated. Roast lovingly.\"},{role:'user',content:msg}]})}).then(function(r){return r.json()}).then(function(data){removeThinking();if(data&&data.content){addMessage('bot',data.content)}else{addMessage('bot',nextTease()+'\\n\\nCouldn\\'t figure that one out. Try again. \ud83d\ude0f')}scrollBottom()}).catch(function(){removeThinking();addMessage('bot',nextTease()+'\\n\\nAI\\'s down. Try again later.');scrollBottom()})}\n  function handleSend(t){var m=t||input.value.trim();if(!m)return;addMessage('user',m);input.value='';send.disabled=true;askAI(m)}\n  SUGGESTIONS.forEach(function(t){var b=document.createElement('button');b.className='darren-suggestion';b.textContent=t;b.addEventListener('click',function(){handleSend(t)});suggestionsEl.appendChild(b)});\n  toggle.addEventListener('click',function(){widget.classList.add('open');scrollBottom()});\n  close.addEventListener('click',function(){widget.classList.remove('open')});\n  input.addEventListener('input',function(){send.disabled=!input.value.trim()});\n  form.addEventListener('submit',function(e){e.preventDefault();handleSend()});\n})();";
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -1824,6 +1836,11 @@ export default {
 
     // ─── darren.acreetionos.org — proxy from GitHub raw ─────
     if (url.hostname === 'darren.acreetionos.org') {
+      // Pass through API requests to the normal Worker routing
+      if (url.pathname.startsWith('/api/')) {
+        // Fall through to the standard handler logic below
+        // (do nothing, let it route normally)
+      } else {
       const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/darren/gh-pages';
       // Root serves /darren/index.html (the hand-crafted full page),
       // not the empty Vite SPA at /index.html
@@ -1833,6 +1850,19 @@ export default {
         rawPath = '/darren/index.html';
       } else if (rawPath === '/darren.css' || rawPath === '/darren.js') {
         rawPath = '/darren' + rawPath;
+      }
+      // SECURITY: serve a clean darren.js that has no API keys and
+      // proxies through the Worker instead of calling OpenRouter directly
+      if (rawPath === '/darren/darren.js') {
+        const cleanJs = await getCleanDarrenJs();
+        return new Response(cleanJs, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/javascript; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600',
+            ...securityHeaders(),
+          }
+        });
       }
       const rawUrl = RAW_BASE + rawPath;
       const rawRes = await fetch(rawUrl, {
@@ -1875,6 +1905,7 @@ export default {
       }
       // Fallback: redirect to main site
       return Response.redirect('https://acreetionos.org', 302);
+      }
     }
 
     // Serve flash.html directly from worker
@@ -2051,6 +2082,7 @@ export default {
             status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
+        const ORmodel = DEFAULT_MODEL;
         const openRouterRes = await fetch(OPENROUTER_URL, {
           method: 'POST',
           headers: {
@@ -2060,25 +2092,31 @@ export default {
             'X-Title': 'AcreetionOS News AI'
           },
           body: JSON.stringify({
-            model: FREE_MODEL,
+            model: ORmodel,
             messages: body.messages || [],
-            max_tokens: body.max_tokens || 512
+            max_tokens: Math.min(body.max_tokens || 512, 2048)
           })
         });
         const data = await openRouterRes.json();
         if (!openRouterRes.ok) {
-          return new Response(JSON.stringify({
-            error: typeof data.error === 'string' ? data.error : (data.error?.message || 'AI generation failed')
-          }), {
+          return new Response(JSON.stringify({ error: 'AI generation unavailable' }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        return new Response(JSON.stringify(data), {
+        // Only return sanitized content — never forward raw API data
+        const content = data.choices?.[0]?.message?.content;
+        if (!content) {
+          return new Response(JSON.stringify({ error: 'AI generation unavailable' }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        return new Response(JSON.stringify({ content, model: ORmodel }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       } catch (err) {
-        return new Response(JSON.stringify({ error: 'AI generation failed: ' + err.message }), {
+        return new Response(JSON.stringify({ error: 'AI generation unavailable' }), {
           status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
@@ -2172,7 +2210,7 @@ export default {
 
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
-      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://openrouter.ai https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
+      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
       return new Response('AcreetionOS Worker — POST /api/chat | POST /api/news/ai | /flash.html', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }
@@ -2204,10 +2242,10 @@ export default {
         });
       }
 
-      // Only allow explicitly whitelisted free models to be used
-      let model = body.model || FREE_MODEL;
-      if (model !== FREE_MODEL && !model.endsWith(':free')) {
-        model = FREE_MODEL;
+      // Only allow explicitly whitelisted free models — no wildcard matching
+      let model = body.model || DEFAULT_MODEL;
+      if (!FREE_MODELS.has(model)) {
+        model = DEFAULT_MODEL;
       }
 
       const isStream = body.stream === true;
@@ -2223,56 +2261,71 @@ export default {
         body: JSON.stringify(isStream ? {
           model: model,
           messages: body.messages,
-          max_tokens: body.max_tokens || 800,
+          max_tokens: Math.min(body.max_tokens || 800, 2048),
           stream: true
         } : {
           model: model,
           messages: body.messages,
-          max_tokens: body.max_tokens || 800
+          max_tokens: Math.min(body.max_tokens || 800, 2048)
         })
       });
 
+      if (!openRouterRes.ok) {
+        // Drain error body silently — never leak upstream error details
+        try { await openRouterRes.text(); } catch (e) {}
+        return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
+          status: 502,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+
       if (isStream) {
-        // Forward SSE stream directly to client
+        // Rewrite streaming SSE to strip any non-content fields
+        const { readable, writable } = new TransformStream();
+        const writer = writable.getWriter();
+        const encoder = new TextEncoder();
+        const decoder = new TextDecoder();
+
+        openRouterRes.body.pipeTo(new WritableStream({
+          async write(chunk) {
+            const text = decoder.decode(chunk, { stream: true });
+            // Only forward data: lines (SSE event stream) — strip everything else
+            const lines = text.split('\n').filter(l => l.startsWith('data: '));
+            if (lines.length > 0) {
+              await writer.write(encoder.encode(lines.join('\n') + '\n'));
+            }
+          },
+          async close() { await writer.close(); },
+          async abort(e) { await writer.abort(e); }
+        })).catch(() => {});
+
         const headers = {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
           'Connection': 'keep-alive',
           ...corsHeaders(request)
         };
-        return new Response(openRouterRes.body, { headers });
+        return new Response(readable, { headers });
       }
 
       const data = await openRouterRes.json();
 
-      if (!openRouterRes.ok) {
-        return new Response(JSON.stringify({
-          error: typeof data.error === 'string' ? data.error : (data.error?.message || 'AI service request failed')
-        }), {
-          status: 502,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      }
-
       const content = data.choices?.[0]?.message?.content;
       if (!content) {
-        return new Response(JSON.stringify({
-          error: 'AI model returned empty response'
-        }), {
+        return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
           status: 502,
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
       return new Response(JSON.stringify({
         content: content,
-        model: data.model || FREE_MODEL,
-        backend: 'openrouter'
+        model: model,
       }), {
         headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
       });
 
     } catch (err) {
-      return new Response(JSON.stringify({ error: 'Proxy error: ' + err.message }), {
+      return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
       });
