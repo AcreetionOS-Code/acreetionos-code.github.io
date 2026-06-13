@@ -18,8 +18,14 @@ SECRET_SAUCE = ""
 RETURN_ADDRESS = "developers@acreetionos.org"
 SCAN_MASTER = ""
 
-# Secrets (set via `wrangler secret put` — NOT in this file):
-#   BRAIN_JUICE  — OpenRouter API key for AI chat + newsletter generation
-#   SPICY_SAUCE  — Cloudflare API token for R2 access
-#   TACO_BELL    — Cloudflare Account ID
-#   WATCH_LIST   — JSON threat intel keywords list
+# Secrets already deployed (check with `wrangler secret list`):
+#   OPENROUTER_API_KEY    — OpenRouter API key for AI chat + newsletter generation
+#   CLOUDFLARE_API_TOKEN  — Cloudflare API token for R2 access (ISO hosting)
+#   CLOUDFLARE_ACCOUNT_ID — Cloudflare Account ID
+#   GH_TOKEN              — GitHub API token (for API rate limits)
+#
+# Required secrets (set if not present: `wrangler secret put <NAME>`):
+#   SECRET_SAUCE  — Admin key for hosting provider approval/rejection
+#   ALERT_SIREN   — Discord webhook URL for alerts
+#   SCAN_MASTER   — VirusTotal API key for ISO malware scanning
+#   WATCH_LIST    — JSON array of threat intel keywords

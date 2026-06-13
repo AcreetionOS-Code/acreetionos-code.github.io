@@ -288,11 +288,11 @@ async function vetProvider(env, body) {
   try {
     domain = new URL(mirror_url || website || '').hostname.replace(/^www\./, '').toLowerCase();
   } catch (e) {}
-  if (domain && env.SPICY_SAUCE && env.TACO_BELL) {
+  if (domain && env.CLOUDFLARE_API_TOKEN && env.CLOUDFLARE_ACCOUNT_ID) {
     const blockedDomains = [];
     try {
-      const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`, {
-        headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` }
+      const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`, {
+        headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` }
       });
       if (res.ok) {
         const text = await res.text();
@@ -334,36 +334,36 @@ async function vetProvider(env, body) {
 // ─── ISO Hosting Provider Management ───────────────────────────────
 
 async function getR2(env, bucket, key) {
-  if (!env.SPICY_SAUCE || !env.TACO_BELL) return null;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects/${key}`;
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
+  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return null;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
+  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
   if (!res.ok) return null;
   // R2 GET returns the raw object body directly (not wrapped in { result: ... })
   return await res.json();
 }
 
 async function putR2(env, bucket, key, body) {
-  if (!env.SPICY_SAUCE || !env.TACO_BELL) return false;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects/${key}`;
+  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return false;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
   const res = await fetch(url, {
     method: 'PUT',
-    headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}`, 'Content-Type': 'application/json' },
+    headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}`, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
   return res.ok;
 }
 
 async function deleteR2(env, bucket, key) {
-  if (!env.SPICY_SAUCE || !env.TACO_BELL) return false;
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects/${key}`;
-  const res = await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
+  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return false;
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects/${key}`;
+  const res = await fetch(url, { method: 'DELETE', headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
   return res.ok;
 }
 
 async function listR2(env, bucket, prefix) {
-  if (!env.SPICY_SAUCE || !env.TACO_BELL) return [];
-  const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/${bucket}/objects?prefix=${prefix}`;
-  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
+  if (!env.CLOUDFLARE_API_TOKEN || !env.CLOUDFLARE_ACCOUNT_ID) return [];
+  const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${bucket}/objects?prefix=${prefix}`;
+  const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
   if (!res.ok) return [];
   const data = await res.json();
   return data?.result?.objects || [];
@@ -766,8 +766,8 @@ async function getThreatIntel(env) {
       return data.body.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
     }
     // raw text stored differently - try fetching directly
-    const url = `https://api.cloudflare.com/client/v4/accounts/${env.TACO_BELL}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`;
-    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.SPICY_SAUCE}` } });
+    const url = `https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/acreetionos-hosting/objects/threat-intel%2Fall-blocked-domains.txt`;
+    const res = await fetch(url, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
     if (res.ok) {
       const text = await res.text();
       return text.split('\n').map(s => s.trim().toLowerCase()).filter(Boolean);
@@ -1942,8 +1942,8 @@ export default {
 
     // R2 ISO listing for AcreetionOS Immutable downloads
     if (url.pathname === '/api/r2/list') {
-      const cfToken = env.SPICY_SAUCE;
-      const cfAccount = env.TACO_BELL;
+      const cfToken = env.CLOUDFLARE_API_TOKEN;
+      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
       if (!cfToken || !cfAccount) {
         return new Response(JSON.stringify({ error: 'R2 not configured', isos: [] }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -1976,8 +1976,8 @@ export default {
       if (!filename || !filename.endsWith('.iso')) {
         return new Response('Not found', { status: 404 });
       }
-      const cfToken = env.SPICY_SAUCE;
-      const cfAccount = env.TACO_BELL;
+      const cfToken = env.CLOUDFLARE_API_TOKEN;
+      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
       if (!cfToken || !cfAccount) {
         return new Response('R2 not configured', { status: 503 });
 }
@@ -2013,8 +2013,8 @@ export default {
     if (url.pathname === '/api/build/status' && request.method === 'GET') {
       try {
         const edition = url.searchParams.get('edition') || '';
-        const cfToken = env.SPICY_SAUCE;
-        const cfAccount = env.TACO_BELL;
+        const cfToken = env.CLOUDFLARE_API_TOKEN;
+        const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
         if (!cfToken || !cfAccount) {
           return new Response(JSON.stringify({ error: 'R2 not configured', builds: {} }), {
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2076,7 +2076,7 @@ export default {
       }
       try {
         const body = await request.json();
-        const apiKey = env.BRAIN_JUICE;
+        const apiKey = env.OPENROUTER_API_KEY;
         if (!apiKey) {
           return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
             status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2234,7 +2234,7 @@ export default {
 
       // Server-side OpenRouter key must be configured in env (Cloudflare Worker secrets
       // or origin server environment). This keeps keys off the client.
-      const apiKey = env.BRAIN_JUICE;
+      const apiKey = env.OPENROUTER_API_KEY;
       if (!apiKey) {
         return new Response(JSON.stringify({ error: 'Backup AI is not configured' }), {
           status: 503,
