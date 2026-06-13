@@ -1839,17 +1839,37 @@ export default {
         headers: { 'User-Agent': CHROME_UA }
       }).catch(() => null);
       if (rawRes && rawRes.ok) {
-        const contentType = rawRes.headers.get('Content-Type') || 'application/octet-stream';
-        // Fix CSP to allow assets
+        // raw.githubusercontent.com serves everything as text/plain,
+        // so map Content-Type from file extension
+        const extMap = {
+          '.html': 'text/html; charset=utf-8',
+          '.css': 'text/css; charset=utf-8',
+          '.js': 'application/javascript; charset=utf-8',
+          '.json': 'application/json',
+          '.png': 'image/png',
+          '.jpg': 'image/jpeg',
+          '.jpeg': 'image/jpeg',
+          '.gif': 'image/gif',
+          '.svg': 'image/svg+xml',
+          '.webp': 'image/webp',
+          '.ico': 'image/x-icon',
+          '.pdf': 'application/pdf',
+          '.woff': 'font/woff',
+          '.woff2': 'font/woff2',
+        };
+        const ext = Object.keys(extMap).find(e => rawUrl.endsWith(e)) || '';
+        const contentType = ext ? extMap[ext] : 'application/octet-stream';
+        // Fix CSP to allow CDN assets
         const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; object-src 'none'; base-uri 'self'; form-action 'self'";
-        // Stream binary and text content properly
+        // Stream binary and text content properly.
+        // securityHeaders() must come BEFORE custom Content-CSP so custom wins.
         return new Response(rawRes.body, {
           status: rawRes.status,
           headers: {
             'Content-Type': contentType,
             'Cache-Control': 'public, max-age=3600',
+            ...securityHeaders(),
             'Content-Security-Policy': csp,
-            ...securityHeaders()
           }
         });
       }
