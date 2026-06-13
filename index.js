@@ -9,7 +9,7 @@
 //   POST /api/counter — increments and returns new count
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
-const FREE_MODEL = 'openrouter/auto';
+const FREE_MODEL = 'meta-llama/llama-3.1-8b-instruct';
 let allowedOrigins = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
