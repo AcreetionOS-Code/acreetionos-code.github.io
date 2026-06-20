@@ -9,29 +9,29 @@ jobs:
   fix-ssl:
     runs-on: ubuntu-latest
     steps:
-      - name: Diagnose API Token
+      - name: Check & Fix SSL Mode
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          echo "=== Token Permissions ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/user/tokens/verify" | jq .
-          
-          echo "=== Zones I can see ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones" | jq '.result[] | {name, id, status}'
-          
+          set -x
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
-          echo "Zone ID: $ZONE_ID"
-          
-          echo "=== Check zone name ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq .
-          
-          echo "=== DNS Records ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" | jq '.result[] | {name, type, content}'
           
           echo "=== SSL setting ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" | jq .
+          
+          echo "=== Always Use HTTPS ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/always_use_https" | jq .
+          
+          echo "=== Min TLS Version ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/min_tls_version" | jq .
+          
+          echo "=== Automatic HTTPS Rewrites ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/automatic_https_rewrites" | jq .
+          
+          echo "=== Opportunistic Encryption ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/opportunistic_encryption" | jq .
