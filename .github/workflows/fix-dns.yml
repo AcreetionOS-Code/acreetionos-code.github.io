@@ -9,33 +9,36 @@ jobs:
   fix-dns:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Add DNS Record
+      - name: Check token permissions and try DNS fix
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           
-          echo "=== Test auth first ==="
-          TOKEN_TEST=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+          echo "=== Check token permissions ==="
+          PERMS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/user/tokens/verify")
-          echo "$TOKEN_TEST" | jq .
+          echo "$PERMS" | jq .
           
-          echo "=== Try to add A record for natalie ==="
-          ADD_RESULT=$(curl -s -X POST \
+          echo "=== Try different DNS API endpoints ==="
+          
+          # Try listing DNS records
+          echo "--- List DNS records ---"
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=A&name=natalie" | jq .
+          
+          echo "--- Try to add CNAME instead of A (maybe CNAME is allowed) ---"
+          curl -s -X POST \
             "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{
-              "type": "A",
+              "type": "CNAME",
               "name": "natalie",
-              "content": "185.199.108.153",
-              "ttl": 120,
+              "content": "spivanatalie64.github.io",
+              "ttl": 1,
               "proxied": true
-            }' 2>&1) || true
-          echo "Add A result: $ADD_RESULT"
-          echo "$ADD_RESULT" | jq . || echo "Not JSON"
+            }' | jq .
           
           echo "=== Done ==="
