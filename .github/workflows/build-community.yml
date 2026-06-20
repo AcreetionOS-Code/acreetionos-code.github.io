@@ -63,6 +63,11 @@ jobs:
             desktop: Cinnamon
             display: XLibre
             arch: i686
+          - slug: immutable
+            repo: spivanatalie64/immutable
+            desktop: Immutable
+            display: Read-only
+            arch: x86_64
 
     runs-on: ubuntu-latest
     steps:
