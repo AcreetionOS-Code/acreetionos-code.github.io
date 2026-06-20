@@ -9,31 +9,29 @@ jobs:
   fix-ssl:
     runs-on: ubuntu-latest
     steps:
-      - name: Fix SSL Mode for natalie.acreetionos.org
+      - name: Diagnose API Token
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          # First, get the zone ID
-          ZONES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones?name=acreetionos.org")
-          ZONE_ID=$(echo "$ZONES" | jq -r '.result[0].id')
+          echo "=== Token Permissions ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/user/tokens/verify" | jq .
+          
+          echo "=== Zones I can see ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones" | jq '.result[] | {name, id, status}'
+          
+          ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           echo "Zone ID: $ZONE_ID"
           
-          # Check current SSL setting
-          echo "=== Current SSL setting ==="
+          echo "=== Check zone name ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" | jq .
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq .
           
-          # Change SSL mode to Full (Strict)
-          echo "=== Changing SSL mode to Full (Strict) ==="
-          RESULT=$(curl -s -X PATCH \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" \
-            -H "Authorization: Bearer $CF_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{"value": "strict"}')
-          echo "$RESULT" | jq .
+          echo "=== DNS Records ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" | jq '.result[] | {name, type, content}'
           
-          # Verify the change
-          echo "=== Verified SSL setting ==="
+          echo "=== SSL setting ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" | jq .
