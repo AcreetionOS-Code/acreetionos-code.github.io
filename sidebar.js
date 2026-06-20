@@ -19,18 +19,32 @@ function init(){
   sidebar.id='sidebar';
   sidebar.setAttribute('role','dialog');
   sidebar.setAttribute('aria-label','Site navigation');
-  var nav=document.querySelector('.main-nav');
+
+  var sidebarLinks=[
+    {href:'index.html',label:'Home',icon:'bi-house'},
+    {href:'flash.html',label:'Downloads',icon:'bi-download'},
+    {href:'wiki.html',label:'Wiki',icon:'bi-book'},
+    {href:'about.html',label:'About',icon:'bi-info-circle'},
+    {href:'status.html',label:'Status',icon:'bi-activity'},
+    {href:'newsletter.html',label:'Newsletter',icon:'bi-envelope'},
+    {href:'contact.html',label:'Contact',icon:'bi-envelope-paper'},
+    {href:'hosting.html',label:'ISO Hosting',icon:'bi-hdd-stack'},
+    {href:'unofficial.html',label:'Community Editions',icon:'bi-grid'},
+    {href:'git-tracker.html',label:'Git Tracker',icon:'bi-git'},
+    {href:'https://github.com/AcreetionOS-Code',label:'GitHub',icon:'bi-github'},
+    {href:'https://gitlab.acreetionos.org',label:'GitLab',icon:'bi-gitlab'},
+    {href:'https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues',label:'Issues',icon:'bi-bug'},
+    {href:'https://security.archlinux.org',label:'Security',icon:'bi-shield-check'},
+  ];
+
   var links='';
-  if(nav){
-    var items=nav.querySelectorAll('a');
-    for(var i=0;i<items.length;i++){
-      var h=items[i].getAttribute('href')||'#';
-      var t=items[i].textContent||'';
-      if(t.trim()==='Developers')continue;
-      links+='<li><a href="'+h.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">'+t.replace(/</g,'&lt;')+'</a></li>';
-    }
+  for(var i=0;i<sidebarLinks.length;i++){
+    var l=sidebarLinks[i];
+    links+='<li><a href="'+l.href.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"><i class="bi '+l.icon+'" style="width:1.3rem;text-align:center"></i> '+l.label+'</a></li>';
   }
-  var externalSection='<div class="sidebar-section-title">External Projects</div><div class="sidebar-external"><a href="https://flatfree.pages.dev" target="_blank" rel="noopener" class="sidebar-external-btn"><i class="bi bi-box"></i> FlatFree</a> <a href="https://flatfree.acreetionos.org" target="_blank" rel="noopener" class="sidebar-external-btn" style="font-size:0.75em;opacity:0.7;"><i class="bi bi-globe2"></i> flatfree.acreetionos.org</a></div>';
+
+  var externalSection='<div class="sidebar-section-title">External</div><div class="sidebar-external"><a href="https://flatfree.acreetionos.org" target="_blank" rel="noopener" class="sidebar-external-btn"><i class="bi bi-box"></i> FlatFree</a></div>';
+
   sidebar.innerHTML='<div class="sidebar-body"><ul>'+links+'</ul>'+externalSection+'</div><div class="sidebar-authors"><a href="https://darren.acreetionos.org" target="_blank" rel="noopener" class="sidebar-author-link"><img src="darren_avatar_new.png" alt="Darren Clift" class="sidebar-author-avatar"> Darren</a><a href="https://natalie.acreetionos.org" target="_blank" rel="noopener" class="sidebar-author-link"><img src="natalie_avatar_new.png" alt="Natalie Cole-Clift Spiva" class="sidebar-author-avatar"> Natalie</a></div><div class="sidebar-footer"><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener">Discord</a><a href="contact.html">Contact</a></div>';
   document.body.appendChild(sidebar);
 }

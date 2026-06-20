@@ -83,18 +83,15 @@ async function produceGuide(title){
   BAR.style.width='70%';
   var finalBody=null;
   var prompt='You are a patient Linux teacher for beginners on AcreetionOS (Cinnamon Desktop, Arch-based). Write clear step-by-step guides in plain English. GUI first, terminal as "(Advanced)".\n\n## Topic: '+title+'\n\n## Technical Context\n'+rawText+'\n\n## Format\n1. **What is this?**\n2. **What you need**\n3. **Step-by-step**\n4. **Troubleshooting**\n\nMarkdown only.';
-  var attempts=[{url:'/api/chat',body:function(){return JSON.stringify({messages:[{role:'user',content:prompt}],max_tokens:1024});}},{url:'https://text.pollinations.ai/',body:function(){return JSON.stringify({messages:[{role:'user',content:prompt}],model:'openai',private:true});}}];
-  for(var a=0;a<attempts.length;a++){
-    try{
-      var aiRes=await fetch(attempts[a].url,{method:'POST',headers:{'Content-Type':'application/json'},body:attempts[a].body()});
-      var text=await aiRes.text();
-      if(aiRes.ok){
-        try{var j=JSON.parse(text);text=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||text;}catch(e){}
-        text=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
-        if(text&&text.length>30){finalBody=text;break;}
-      }
-    }catch(e){}
-  }
+  try{
+    var aiRes=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],max_tokens:1024,provider:'opencode-go'})});
+    var text=await aiRes.text();
+    if(aiRes.ok){
+      try{var j=JSON.parse(text);text=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||text;}catch(e){}
+      text=text.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+      if(text&&text.length>30){finalBody=text;}
+    }
+  }catch(e){}
   setStep('Generating guide','done');
   BAR.style.width='100%';
 

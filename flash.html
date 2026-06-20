@@ -262,29 +262,8 @@
             <a href="wiki.html">
               Wiki
             </a>
-            <a href="contact.html">
-              Contact
-            </a>
-            <a href="newsletter.html">
-              Newsletter
-            </a>
-            <a href="https://security.archlinux.org">
-              Security
-            </a>
-            <a href="https://natalie.acreetionos.org">
-              Developers
-            </a>
-            <a href="hosting.html">
-              ISO Hosting
-            </a>
-            <a href="git-tracker.html">
-              Git Tracker
-            </a>
-            <a href="https://github.com/acreetionos-code/">
-              GitHub
-            </a>
-            <a href="https://gitlab.acreetionos.org">
-              GitLab
+            <a href="status.html">
+              Status
             </a>
           </nav>
         </div>
@@ -299,26 +278,48 @@
           </div>
           <div class="box-body">
             <p>
-              Choose your edition and download the ISO or use our built-in tools to flash your USB drive.
+              Download the AcreetionOS ISO directly, or use our tools to flash to a USB drive.
             </p>
-            <!-- This is where JavaScript injects the Cinnamon and other editions -->
-            <div id="editions-container">
-              <p class="loading-text">
-                Loading editions...
-              </p>
+
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;margin:1.5rem 0">
+              <a href="https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso" style="flex:1;min-width:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:var(--acreetion-green);color:#000;border-radius:12px;text-decoration:none;font-weight:700;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(46,204,113,0.3)">
+                <span style="font-size:0.7rem;opacity:0.8;letter-spacing:0.5px">STANDARD</span>
+                <span style="font-size:1.2rem;margin:0.25rem 0">Cinnamon Edition</span>
+                <span style="font-size:0.8rem;opacity:0.8"><i class="bi bi-download"></i> Download ISO</span>
+              </a>
+              <a href="https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso" style="flex:1;min-width:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:transparent;color:var(--acreetion-green);border:2px solid var(--acreetion-green);border-radius:12px;text-decoration:none;font-weight:700;transition:transform 0.15s,box-shadow 0.15s">
+                <span style="font-size:0.7rem;opacity:0.8;letter-spacing:0.5px">XLIBRE</span>
+                <span style="font-size:1.2rem;margin:0.25rem 0">XL (XLibre) Edition</span>
+                <span style="font-size:0.8rem;opacity:0.8"><i class="bi bi-download"></i> Download ISO</span>
+              </a>
             </div>
-            <hr class="divider">
-            <h3 class="h3-accent">
-            Option 1: Desktop App for make USB Drive
-          </h3>
-          <div class="info-box">
-            <p>
-              The easiest way. A cross-platform app to select an edition and flash directly.
+
+            <p style="margin:1rem 0;text-align:center">
+              <a href="unofficial.html" style="color:var(--acreetion-text);font-size:0.9rem">Looking for community editions (MATE, LXQT, Plasma, GNOME, etc.)? &rarr;</a>
             </p>
-            <a id="flasher-download-btn" href="https://github.com/spivanatalie64/AcreetionMediaWriter/releases" class="btn btn-flasher btn-download-flasher">
-              Download USB Maker
-            </a>
+
+            <hr class="divider">
+
+            <h3 class="h3-accent">
+            Option 1: Desktop App &mdash; Acreetion Media Writer
+          </h3>
+          <div class="info-box" style="border:2px solid var(--acreetion-green)">
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem">
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:rgba(46,204,113,0.15);border:1px solid var(--acreetion-green);border-radius:6px;font-size:0.75rem;color:var(--acreetion-green)"><i class="bi bi-windows"></i> Windows</span>
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:rgba(46,204,113,0.15);border:1px solid var(--acreetion-green);border-radius:6px;font-size:0.75rem;color:var(--acreetion-green)"><i class="bi bi-apple"></i> macOS</span>
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:rgba(46,204,113,0.15);border:1px solid var(--acreetion-green);border-radius:6px;font-size:0.75rem;color:var(--acreetion-green)"><i class="bi bi-linux"></i> Linux</span>
+            </div>
+            <p style="font-size:0.95rem">
+              <strong style="color:var(--acreetion-text-bright)">The easiest way.</strong> A cross-platform desktop app that automatically detects your operating system and downloads the correct version. Select your edition, pick your USB drive, and flash with one click.
+            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:1rem">
+              <a id="flasher-download-btn" href="https://github.com/spivanatalie64/AcreetionMediaWriter/releases" class="btn btn-flasher btn-download-flasher" style="font-size:1.1rem;padding:0.8rem 1.6rem">
+                <i class="bi bi-download"></i> Download Media Writer
+              </a>
+              <span style="font-size:0.8rem;color:var(--acreetion-text)">Auto-detected for your OS &mdash; <a href="https://github.com/spivanatalie64/AcreetionMediaWriter/releases" style="color:var(--acreetion-green)">all releases</a></span>
+            </div>
           </div>
+
           <h3 class="h3-accent mt-2">
           Option 2: Terminal
           <code>
@@ -342,6 +343,10 @@
       <pre id="dd-output" class="dd-output">
 <code id="dd-code"></code>
       </pre>
+    </div>
+
+    <!-- JS-loaded editions (enhancement) -->
+    <div id="editions-container" style="display:none">
     </div>
   </div>
 </article>

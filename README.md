@@ -42,7 +42,7 @@ To run the website locally for testing or development:
 
 ```bash
 # Clone the repository
-git clone https://github.com/AcreetionOS-Code/acreetionos.github.io.git
+git clone https://github.com/AcreetionOS-Code/acreetionos-code.github.io.git
 cd acreetionos.github.io
 
 # Start a local server

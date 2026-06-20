@@ -4,7 +4,7 @@
 // Website: https://acreetionos.org
 // This worker provides:
 //   GET  /api/news    — aggregates AcreetionOS news from GitHub, GitLab, and RSS, generates articles with AI
-//   POST /api/chat    — server-side OpenRouter chat (free model)
+//   POST /api/chat    — server-side AI chat (supports OpenRouter and opencode-go models)
 //   GET  /api/counter — returns current active user count
 //   POST /api/counter — increments and returns new count
 //
@@ -12,6 +12,9 @@
 // The Darren bot, its frontend JS/CSS/HTML, and the Worker proxying are all gone.
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+// opencode-go API — set OPENCODE_GO_API_KEY and OPENCODE_GO_BASE_URL in worker secrets
+// OPENCODE_GO_BASE_URL defaults to https://opencode-go.ai/api/v1 if not set
+const OPENCODE_GO_BASE_URL = 'https://api.opencode.ai';
 // Training opt-out headers — tells providers this is user data, NOT for training.
 // OpenRouter itself doesn't train on API traffic, but downstream providers may.
 // These headers are advisory; the safest guarantee is using privacy-respecting models.
@@ -2222,52 +2225,98 @@ export default {
         });
       }
 
-      // Server-side OpenRouter key must be configured in env (Cloudflare Worker secrets
-      // or origin server environment). This keeps keys off the client.
-      const apiKey = env.OPENROUTER_API_KEY;
-      if (!apiKey) {
-        return new Response(JSON.stringify({ error: 'Backup AI is not configured' }), {
-          status: 503,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
-      }
-
-      // Only allow explicitly whitelisted free models — no wildcard matching
-      let model = body.model || DEFAULT_MODEL;
-      if (!FREE_MODELS.has(model)) {
-        model = DEFAULT_MODEL;
-      }
-
+      // Server-side API keys must be configured in env (Cloudflare Worker secrets).
+      // This keeps keys off the client. Priority: opencode-go → OpenRouter.
       const isStream = body.stream === true;
+      const useOpencodeGo = body.provider === 'opencode-go' || !env.OPENROUTER_API_KEY;
 
-      const openRouterRes = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-          'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': 'AcreetionOS Chat Proxy',
-          ...TRAINING_OPTOUT_HEADERS,
-        },
-        body: JSON.stringify(isStream ? {
-          model: model,
-          messages: injectNoTrain(body.messages),
-          max_tokens: Math.min(body.max_tokens || 800, 2048),
-          stream: true
-        } : {
-          model: model,
-          messages: injectNoTrain(body.messages),
-          max_tokens: Math.min(body.max_tokens || 800, 2048)
-        })
-      });
+      let aiResponse = null;
+      let aiOk = false;
 
-      if (!openRouterRes.ok) {
-        // Drain error body silently — never leak upstream error details
-        try { await openRouterRes.text(); } catch (e) {}
-        return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
-          status: 502,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      // Try opencode-go first if API key is configured
+      const opencodeGoKey = env.OPENCODE_GO_API_KEY;
+      if (opencodeGoKey && useOpencodeGo) {
+        const opencodeGoUrl = (env.OPENCODE_GO_BASE_URL || OPENCODE_GO_BASE_URL) + '/chat/completions';
+        const opencodeGoRes = await fetch(opencodeGoUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${opencodeGoKey}`,
+          },
+          body: JSON.stringify(isStream ? {
+            model: body.model || 'deepseek-v4-pro',
+            messages: body.messages,
+            max_tokens: Math.min(body.max_tokens || 1024, 4096),
+            stream: true
+          } : {
+            model: body.model || 'deepseek-v4-pro',
+            messages: body.messages,
+            max_tokens: Math.min(body.max_tokens || 1024, 4096)
+          })
         });
+        if (opencodeGoRes.ok) {
+          aiResponse = opencodeGoRes;
+          aiOk = true;
+        }
+      }
+
+      // Fall back to OpenRouter
+      if (!aiOk) {
+        const apiKey = env.OPENROUTER_API_KEY;
+        if (!apiKey) {
+          return new Response(JSON.stringify({ error: 'AI service not configured' }), {
+            status: 503,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+
+        // Allow Claude models when routing through opencode-go provider
+        let model = body.model || DEFAULT_MODEL;
+        const isClaudeModel = model.startsWith('claude-') || model.startsWith('anthropic/');
+        if (body.provider === 'opencode-go' && isClaudeModel) {
+          // Map Claude model names to OpenRouter model IDs
+          const modelMap = {
+            'claude-opus-4-8': 'anthropic/claude-opus-4-8',
+            'claude-sonnet-4-20250514': 'anthropic/claude-sonnet-4-20250514',
+            'claude-3-5-sonnet-20241022': 'anthropic/claude-3.5-sonnet',
+            'claude-3-haiku-20240307': 'anthropic/claude-3-haiku',
+            'claude-haiku-4-5-20251001': 'anthropic/claude-haiku-4-5-20251001',
+          };
+          model = modelMap[model] || `anthropic/${model}`;
+        } else if (!FREE_MODELS.has(model)) {
+          model = DEFAULT_MODEL;
+        }
+
+        const openRouterRes = await fetch(OPENROUTER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`,
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AcreetionOS Chat Proxy',
+            ...TRAINING_OPTOUT_HEADERS,
+          },
+          body: JSON.stringify(isStream ? {
+            model: model,
+            messages: injectNoTrain(body.messages),
+            max_tokens: Math.min(body.max_tokens || 1024, isClaudeModel ? 8192 : 2048),
+            stream: true
+          } : {
+            model: model,
+            messages: injectNoTrain(body.messages),
+            max_tokens: Math.min(body.max_tokens || 1024, isClaudeModel ? 8192 : 2048)
+          })
+        });
+
+        if (!openRouterRes.ok) {
+          try { await openRouterRes.text(); } catch (e) {}
+          return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
+            status: 502,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        aiResponse = openRouterRes;
+        aiOk = true;
       }
 
       if (isStream) {

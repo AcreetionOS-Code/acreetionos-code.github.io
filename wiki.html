@@ -107,29 +107,8 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
             <a href="wiki.html">
               Wiki
             </a>
-            <a href="contact.html">
-              Contact
-            </a>
-            <a href="newsletter.html">
-              Newsletter
-            </a>
-            <a href="https://security.archlinux.org">
-              Security
-            </a>
-            <a href="https://natalie.acreetionos.org">
-              Developers
-            </a>
-            <a href="hosting.html">
-              ISO Hosting
-            </a>
-            <a href="git-tracker.html">
-              Git Tracker
-            </a>
-            <a href="https://github.com/acreetionos-code/">
-              GitHub
-            </a>
-            <a href="https://gitlab.acreetionos.org">
-              GitLab
+            <a href="status.html">
+              Status
             </a>
           </nav>
         </div>
@@ -141,6 +120,14 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
       <p class="sub">
         Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.
       </p>
+      <div style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+        <h3 style="color:var(--acreetion-green);font-family:var(--font-mono);font-size:1rem;margin-bottom:0.5rem">
+          <i class="bi bi-robot" style="margin-right:0.4rem"></i>AI-Powered Search
+        </h3>
+        <p style="color:var(--acreetion-text);font-size:0.9rem;line-height:1.7;margin:0">
+          This tool searches the entire <a href="https://wiki.archlinux.org" style="color:var(--acreetion-green)">Arch Linux Wiki</a> and uses AI (powered by opencode-go) to generate beginner-friendly summaries of the results. Instead of reading dense technical documentation, you get clear, concise answers tailored for AcreetionOS users. The AI explains complex topics in plain language, with links back to the original Arch Wiki pages for advanced details.
+        </p>
+      </div>
       <div class="search-card">
         <div class="bar">
           <input type="text" id="search-input" placeholder="e.g. Software Updates, WiFi, Bluetooth, GRUB..." autofocus>
@@ -210,6 +197,47 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 </div>
 </div>
 </div>
+<div id="wiki-vote" style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem;margin:2rem auto;max-width:600px;text-align:center">
+  <h3 style="color:var(--acreetion-text-bright);font-size:1rem;margin-bottom:0.75rem">
+    Would you like AI-generated AcreetionOS-specific documentation?
+  </h3>
+  <div id="vote-buttons" style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+    <button class="vote-btn" data-vote="yes" style="padding:0.6rem 1.4rem;background:var(--acreetion-green);color:#000;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;transition:transform 0.15s">Yes, I'd use that</button>
+    <button class="vote-btn" data-vote="no" style="padding:0.6rem 1.4rem;background:transparent;color:var(--acreetion-text);border:1px solid var(--acreetion-box-border);border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:transform 0.15s">No, the Arch Wiki is enough</button>
+  </div>
+  <div id="vote-results" style="margin-top:1rem;font-size:0.85rem;color:var(--acreetion-text);display:none">
+  </div>
+</div>
+<script>
+(function(){
+  var votes = JSON.parse(localStorage.getItem('wikiVotes') || '{"yes":0,"no":0}');
+  function updateResults() {
+    var total = votes.yes + votes.no;
+    var el = document.getElementById('vote-results');
+    if (total === 0) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.innerHTML = '<strong style="color:var(--acreetion-green)">' + votes.yes + '</strong> Yes &middot; <strong style="color:var(--acreetion-text)">' + votes.no + '</strong> No &middot; <span style="color:#555">(' + total + ' total votes)</span>';
+  }
+  function hasVoted() {
+    return localStorage.getItem('wikiVoted') === 'true';
+  }
+  if (hasVoted()) {
+    document.getElementById('vote-buttons').innerHTML = '<span style="color:var(--acreetion-text);font-size:0.9rem">Thanks for your feedback!</span>';
+    updateResults();
+  }
+  document.querySelectorAll('.vote-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (hasVoted()) return;
+      var v = btn.getAttribute('data-vote');
+      votes[v]++;
+      localStorage.setItem('wikiVotes', JSON.stringify(votes));
+      localStorage.setItem('wikiVoted', 'true');
+      document.getElementById('vote-buttons').innerHTML = '<span style="color:var(--acreetion-green);font-size:0.9rem;font-weight:600">Thanks for your feedback!</span>';
+      updateResults();
+    });
+  });
+})();
+</script>
 <footer class="page-footer">
   <p>
     AcreetionOS is an independent project built on
