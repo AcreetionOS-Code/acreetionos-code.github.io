@@ -1,0 +1,23 @@
+name: List R2 Objects
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  list:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List Objects
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -x
+          AID="6a46b418508c26278ae2d3373f41da81"
+          
+          for bucket in "acreetionos-32bit" "acreetionos-builds" "build-status"; do
+            echo "=== $bucket ==="
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+              "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets/$bucket/objects" | jq '.result.objects[] | {key, size, uploaded}' 2>/dev/null || echo "No access or doesn't exist"
+          done
