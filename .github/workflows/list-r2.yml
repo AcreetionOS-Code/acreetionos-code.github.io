@@ -16,19 +16,22 @@ jobs:
           set -x
           ACCOUNT_ID="6a46b418508c26278ae2d3373f41da81"
           
-          # List all R2 buckets
+          # List all R2 buckets - raw response
           echo "=== R2 Buckets ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets" | jq '.result[] | {name, creation_date}'
+          BUCKETS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets")
+          echo "$BUCKETS" | jq .
           
           # List objects in acreetionos-builds
           echo "=== Objects in acreetionos-builds ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/acreetionos-builds/objects" | jq '.result.objects[] | {key, size, uploaded}'
+          OBJECTS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/acreetionos-builds/objects")
+          echo "$OBJECTS" | jq .
           
           # List objects in build-status
           echo "=== Objects in build-status ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/build-status/objects" | jq '.result.objects[] | {key, size, uploaded}'
+          OBJ2=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/r2/buckets/build-status/objects")
+          echo "$OBJ2" | jq .
           
           echo "=== Done ==="
