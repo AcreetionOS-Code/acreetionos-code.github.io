@@ -29,64 +29,100 @@ jobs:
               const url = new URL(request.url);
               const path = url.pathname + url.search;
               
-              // Simple fetch from GH Pages, keep the host header the same
-              const originUrl = 'https://spivanatalie64.github.io' + path;
+              // Debug: capture request info
+              let debugInfo = {
+                path: path,
+                headers: Object.fromEntries(request.headers),
+              };
               
-              const response = await fetch(originUrl, {
+              // Try fetch with the GH Pages domain
+              const ghUrl = 'https://spivanatalie64.github.io' + path;
+              
+              // Set the host header to the GH Pages domain to avoid custom domain redirect
+              const reqHeaders = new Headers(request.headers);
+              reqHeaders.set('Host', 'spivanatalie64.github.io');
+              
+              let response = await fetch(ghUrl, {
                 method: request.method,
-                headers: request.headers,
+                headers: reqHeaders,
                 body: request.body,
                 redirect: 'manual',
               });
               
-              // If 301/302/307/308 to the custom domain, follow it but 
-              // replace the domain with the GH Pages domain
+              debugInfo.firstStatus = response.status;
+              debugInfo.firstLocation = response.headers.get('Location');
+              
+              // If we got a redirect, try following it with the custom domain host
               if (response.status >= 300 && response.status < 400) {
                 const location = response.headers.get('Location');
-                if (location) {
+                if (location && location.includes('natalie.acreetionos.org')) {
+                  // Replace our domain with gh pages domain to avoid loop
                   const locUrl = new URL(location);
-                  if (locUrl.hostname === 'natalie.acreetionos.org') {
-                    locUrl.hostname = 'spivanatalie64.github.io';
-                    
-                    const followResponse = await fetch(locUrl.toString(), {
-                      method: 'GET',
-                      headers: request.headers,
-                      redirect: 'manual',
-                    });
-                    
-                    // If STILL a redirect, just return it (shouldn't happen)
-                    if (followResponse.status >= 300 && followResponse.status < 400) {
-                      const newHeaders = new Headers(followResponse.headers);
-                      newHeaders.set('X-Proxied-By', 'natalie-worker');
-                      newHeaders.set('X-Followed-Redirect', 'true');
-                      return new Response(followResponse.body, {
-                        status: followResponse.status,
-                        statusText: followResponse.statusText,
-                        headers: newHeaders,
-                      });
-                    }
-                    
+                  locUrl.hostname = 'spivanatalie64.github.io';
+                  
+                  const followHeaders = new Headers(request.headers);
+                  followHeaders.set('Host', 'natalie.acreetionos.org');
+                  followHeaders.set('Accept', request.headers.get('Accept') || 'text/html');
+                  
+                  const followResponse = await fetch(locUrl.toString(), {
+                    method: 'GET',
+                    headers: followHeaders,
+                    redirect: 'manual',
+                  });
+                  
+                  debugInfo.secondStatus = followResponse.status;
+                  debugInfo.secondLocation = followResponse.headers.get('Location');
+                  debugInfo.secondContentType = followResponse.headers.get('Content-Type');
+                  
+                  // If the follow succeeded, return its content
+                  if (followResponse.status === 200 || followResponse.status === 404 || followResponse.status === 304) {
                     const newHeaders = new Headers(followResponse.headers);
                     newHeaders.set('X-Proxied-By', 'natalie-worker');
-                    newHeaders.set('X-Followed-Redirect', 'true');
+                    newHeaders.set('X-Debug', JSON.stringify(debugInfo));
                     return new Response(followResponse.body, {
                       status: followResponse.status,
                       statusText: followResponse.statusText,
                       headers: newHeaders,
                     });
                   }
+                  
+                  // If still a redirect and it's back to natalie, give up and return the content-type info
+                  // Try one more time with raw.githubusercontent.com
+                  const rawUrl = 'https://raw.githubusercontent.com/spivanatalie64/spivanatalie64.github.io/gh-pages' + path;
+                  const rawResponse = await fetch(rawUrl, {
+                    headers: { 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' },
+                    redirect: 'manual',
+                  });
+                  
+                  debugInfo.rawStatus = rawResponse.status;
+                  debugInfo.rawContentType = rawResponse.headers.get('Content-Type');
+                  
+                  if (rawResponse.status === 200) {
+                    // Force the content type to text/html for HTML files
+                    const newHeaders = new Headers(rawResponse.headers);
+                    newHeaders.set('Content-Type', 'text/html; charset=utf-8');
+                    newHeaders.set('X-Proxied-By', 'natalie-worker');
+                    newHeaders.set('X-Debug', JSON.stringify(debugInfo));
+                    return new Response(rawResponse.body, {
+                      status: 200,
+                      statusText: 'OK',
+                      headers: newHeaders,
+                    });
+                  }
                 }
               }
               
+              // Return the response as-is with debug info
               const newHeaders = new Headers(response.headers);
               newHeaders.set('X-Proxied-By', 'natalie-worker');
+              newHeaders.set('X-Debug', JSON.stringify(debugInfo));
               return new Response(response.body, {
                 status: response.status,
                 statusText: response.statusText,
                 headers: newHeaders,
               });
             } catch (err) {
-              return new Response('Worker Error: ' + err.message + '\\nStack: ' + err.stack, {
+              return new Response('Worker Error: ' + err.message + '\nStack: ' + (err.stack || ''), {
                 status: 500,
                 headers: { 'Content-Type': 'text/plain' },
               });
