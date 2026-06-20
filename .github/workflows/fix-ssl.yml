@@ -20,15 +20,6 @@ jobs:
           WORKER_NAME="natalie-proxy"
           
           cat > /tmp/worker.js << 'WORKEREOF'
-          // GitHub Pages IPs
-          const GH_IPS = [
-            '185.199.108.153',
-            '185.199.109.153',
-            '185.199.110.153',
-            '185.199.111.153'
-          ];
-          const GH_PAGES_DOMAIN = 'spivanatalie64.github.io';
-          
           addEventListener('fetch', event => {
             event.respondWith(handleRequest(event.request));
           });
@@ -37,56 +28,52 @@ jobs:
             try {
               const url = new URL(request.url);
               
-              // Use a random GitHub Pages IP
-              const ip = GH_IPS[Math.floor(Math.random() * GH_IPS.length)];
-              const originUrl = 'https://' + ip + url.pathname + url.search;
+              // First, try fetching from GH Pages directly with the custom domain host header
+              const ghUrl = 'https://spivanatalie64.github.io' + url.pathname + url.search;
               
-              const modifiedHeaders = new Headers(request.headers);
-              modifiedHeaders.set('Host', 'natalie.acreetionos.org');
-              // Remove headers that might cause issues
-              modifiedHeaders.delete('CF-Connecting-IP');
-              modifiedHeaders.delete('CF-IPCountry');
-              modifiedHeaders.delete('CF-Ray');
-              modifiedHeaders.delete('CF-Visitor');
-              modifiedHeaders.delete('CDN-Loop');
-              modifiedHeaders.delete('X-Forwarded-For');
+              const headers = new Headers(request.headers);
+              headers.set('Host', 'natalie.acreetionos.org');
+              headers.delete('CF-Connecting-IP');
+              headers.delete('CF-IPCountry');
+              headers.delete('CF-Ray');
+              headers.delete('CDN-Loop');
               
-              const response = await fetch(originUrl, {
+              let response = await fetch(ghUrl, {
                 method: request.method,
-                headers: modifiedHeaders,
+                headers: headers,
                 body: request.body,
                 redirect: 'manual',
               });
               
-              // Handle redirects - follow them manually up to 5 times
-              let currentResponse = response;
-              let redirectCount = 0;
-              const maxRedirects = 5;
-              
-              while (currentResponse.status >= 300 && currentResponse.status < 400 && redirectCount < maxRedirects) {
-                const location = currentResponse.headers.get('Location');
-                if (!location) break;
+              // If we get a redirect to the custom domain, follow the redirect
+              // but skip back to ourselves - fetch the redirect URL directly
+              // from GitHub Pages IP
+              if (response.status >= 300 && response.status < 400) {
+                const location = response.headers.get('Location');
                 
-                // If redirecting back to our domain, skip - we already have the right content
-                if (location.includes('natalie.acreetionos.org')) {
-                  break;
+                if (location) {
+                  const locUrl = new URL(location);
+                  
+                  // Use GH Pages domain instead of our domain to avoid loops
+                  locUrl.hostname = 'spivanatalie64.github.io';
+                  
+                  const followHeaders = new Headers(headers);
+                  followHeaders.set('Host', 'natalie.acreetionos.org');
+                  
+                  response = await fetch(locUrl.toString(), {
+                    method: 'GET',
+                    headers: followHeaders,
+                    redirect: 'manual',
+                  });
                 }
-                
-                const redirectUrl = new URL(location, originUrl);
-                currentResponse = await fetch(redirectUrl.toString(), {
-                  method: 'GET',
-                  headers: modifiedHeaders,
-                  redirect: 'manual',
-                });
-                redirectCount++;
               }
               
-              const newHeaders = new Headers(currentResponse.headers);
+              const newHeaders = new Headers(response.headers);
               newHeaders.set('X-Proxied-By', 'natalie-worker');
               
-              return new Response(currentResponse.body, {
-                status: currentResponse.status,
-                statusText: currentResponse.statusText,
+              return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
                 headers: newHeaders,
               });
             } catch (err) {
@@ -107,14 +94,12 @@ jobs:
           }
           METADATAEOF
           
-          echo "=== Uploading worker ==="
           curl -s -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/$WORKER_NAME" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -F "metadata=@/tmp/metadata.json;type=application/json" \
             -F "script=@/tmp/worker.js;type=application/javascript" | jq .
           
-          echo "=== Updating route ==="
           EXISTING_ROUTES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes")
           NATALIE_ROUTE_ID=$(echo "$EXISTING_ROUTES" | jq -r '.result[] | select(.pattern == "natalie.acreetionos.org/*") | .id')
