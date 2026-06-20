@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Create & Deploy Natali Proxy Worker
+      - name: Deploy Natali Proxy Worker
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
@@ -19,8 +19,16 @@ jobs:
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           WORKER_NAME="natalie-proxy"
           
-          # Create the Worker script  
           cat > /tmp/worker.js << 'WORKEREOF'
+          // GitHub Pages IPs
+          const GH_IPS = [
+            '185.199.108.153',
+            '185.199.109.153',
+            '185.199.110.153',
+            '185.199.111.153'
+          ];
+          const GH_PAGES_DOMAIN = 'spivanatalie64.github.io';
+          
           addEventListener('fetch', event => {
             event.respondWith(handleRequest(event.request));
           });
@@ -29,20 +37,19 @@ jobs:
             try {
               const url = new URL(request.url);
               
-              // GitHub Pages IPs
-              const GH_IPS = [
-                '185.199.108.153',
-                '185.199.109.153',
-                '185.199.110.153',
-                '185.199.111.153'
-              ];
-              
-              // Try each IP
-              const originUrl = 'https://spivanatalie64.github.io' + url.pathname + url.search;
+              // Use a random GitHub Pages IP
+              const ip = GH_IPS[Math.floor(Math.random() * GH_IPS.length)];
+              const originUrl = 'https://' + ip + url.pathname + url.search;
               
               const modifiedHeaders = new Headers(request.headers);
               modifiedHeaders.set('Host', 'natalie.acreetionos.org');
-              modifiedHeaders.set('Accept', request.headers.get('Accept') || 'text/html,*/*');
+              // Remove headers that might cause issues
+              modifiedHeaders.delete('CF-Connecting-IP');
+              modifiedHeaders.delete('CF-IPCountry');
+              modifiedHeaders.delete('CF-Ray');
+              modifiedHeaders.delete('CF-Visitor');
+              modifiedHeaders.delete('CDN-Loop');
+              modifiedHeaders.delete('X-Forwarded-For');
               
               const response = await fetch(originUrl, {
                 method: request.method,
@@ -51,34 +58,35 @@ jobs:
                 redirect: 'manual',
               });
               
-              // If we get a redirect, try to follow it manually but skip the custom domain redirect
-              if (response.status >= 300 && response.status < 400) {
-                const location = response.headers.get('Location');
-                // If it's trying to redirect to natalie.acreetionos.org, just return the content from the original URL
-                if (location && location.includes('natalie.acreetionos.org')) {
-                  // Return 200 with a note, or try to handle the redirect
-                  const secondResponse = await fetch(originUrl, {
-                    method: request.method,
-                    headers: modifiedHeaders,
-                    redirect: 'manual',
-                  });
-                  const newHeaders = new Headers(secondResponse.headers);
-                  newHeaders.set('X-Proxied-By', 'natalie-worker');
-                  newHeaders.set('X-Cache-Status', 'bypassed-redirect');
-                  return new Response(secondResponse.body, {
-                    status: secondResponse.status,
-                    statusText: secondResponse.statusText,
-                    headers: newHeaders,
-                  });
+              // Handle redirects - follow them manually up to 5 times
+              let currentResponse = response;
+              let redirectCount = 0;
+              const maxRedirects = 5;
+              
+              while (currentResponse.status >= 300 && currentResponse.status < 400 && redirectCount < maxRedirects) {
+                const location = currentResponse.headers.get('Location');
+                if (!location) break;
+                
+                // If redirecting back to our domain, skip - we already have the right content
+                if (location.includes('natalie.acreetionos.org')) {
+                  break;
                 }
+                
+                const redirectUrl = new URL(location, originUrl);
+                currentResponse = await fetch(redirectUrl.toString(), {
+                  method: 'GET',
+                  headers: modifiedHeaders,
+                  redirect: 'manual',
+                });
+                redirectCount++;
               }
               
-              const newHeaders = new Headers(response.headers);
+              const newHeaders = new Headers(currentResponse.headers);
               newHeaders.set('X-Proxied-By', 'natalie-worker');
               
-              return new Response(response.body, {
-                status: response.status,
-                statusText: response.statusText,
+              return new Response(currentResponse.body, {
+                status: currentResponse.status,
+                statusText: currentResponse.statusText,
                 headers: newHeaders,
               });
             } catch (err) {
@@ -90,7 +98,6 @@ jobs:
           }
           WORKEREOF
           
-          # Upload worker
           cat > /tmp/metadata.json << 'METADATAEOF'
           {
             "body_part": "script",
