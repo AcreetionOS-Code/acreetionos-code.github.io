@@ -176,10 +176,10 @@ jobs:
           # Also try S3-compatible upload as fallback
           echo "Also trying S3-compatible upload..."
           pip3 install -q boto3 2>/dev/null || true
-          python3 -c "
+          cat > /tmp/s3upload.py << 'ENDOFPYTHON'
 import boto3, os
 s3 = boto3.client('s3',
-  endpoint_url=f'https://{os.environ[\"CF_ACCOUNT\"]}.r2.cloudflarestorage.com',
+  endpoint_url=f'https://{os.environ["CF_ACCOUNT"]}.r2.cloudflarestorage.com',
   aws_access_key_id=os.environ['CF_ACCOUNT'],
   aws_secret_access_key=os.environ['CF_TOKEN'],
   region_name='auto')
@@ -190,7 +190,8 @@ try:
   print('Latest copy OK')
 except Exception as e:
   print(f'S3 upload failed: {e}')
-" 2>&1 || echo "S3 upload skipped"
+ENDOFPYTHON
+          python3 /tmp/s3upload.py 2>&1 || echo "S3 upload skipped"
 
       - name: Update build status
         if: always()
