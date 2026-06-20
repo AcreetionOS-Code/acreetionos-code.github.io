@@ -2313,8 +2313,10 @@ export default {
         });
 
         if (!openRouterRes.ok) {
-          try { await openRouterRes.text(); } catch (e) {}
-          return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
+          let errText = '';
+          try { errText = await openRouterRes.text(); } catch (e) {}
+          console.error(`OpenRouter error: ${openRouterRes.status} ${errText.substring(0, 200)}`);
+          return new Response(JSON.stringify({ error: 'AI service unavailable', detail: `${openRouterRes.status}: ${errText.substring(0, 100)}` }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
