@@ -11,46 +11,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Fix DNS Record
+      - name: Add DNS Record
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           
-          echo "=== List all DNS records ==="
-          DNS_RESULT=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?per_page=100")
-          echo "$DNS_RESULT" | jq '.result[] | {name, type, content, id}'
+          echo "=== Test auth first ==="
+          TOKEN_TEST=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/user/tokens/verify")
+          echo "$TOKEN_TEST" | jq .
           
-          echo "=== Check for natalie record ==="
-          NATALIE_RECORD=$(echo "$DNS_RESULT" | jq '.result[] | select(.name == "natalie.acreonetionos.org" or .name == "natalie")')
-          if [ -z "$NATALIE_RECORD" ] || [ "$NATALIE_RECORD" = "null" ]; then
-            echo "No natalie DNS record found!"
-          else
-            echo "Found natalie record:"
-            echo "$NATALIE_RECORD" | jq .
-          fi
-          
-          echo "=== All zone names ==="
-          echo "$DNS_RESULT" | jq '.result[] | .name' | sort -u
-          
-          echo "=== Try to add CNAME ==="
+          echo "=== Try to add A record for natalie ==="
           ADD_RESULT=$(curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
-            -H "Authorization: Bearer $CF_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "type": "CNAME",
-              "name": "natalie",
-              "content": "spivanatalie64.github.io",
-              "ttl": 1,
-              "proxied": true
-            }')
-          echo "$ADD_RESULT" | jq .
-          
-          echo "=== Also add A record fallback ==="
-          ADD_A_RESULT=$(curl -s -X POST \
             "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
@@ -60,7 +34,8 @@ jobs:
               "content": "185.199.108.153",
               "ttl": 120,
               "proxied": true
-            }')
-          echo "$ADD_A_RESULT" | jq .
+            }' 2>&1) || true
+          echo "Add A result: $ADD_RESULT"
+          echo "$ADD_RESULT" | jq . || echo "Not JSON"
           
           echo "=== Done ==="
