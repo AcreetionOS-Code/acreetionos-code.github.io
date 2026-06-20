@@ -18,39 +18,79 @@ jobs:
           set -x
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           WORKER_NAME="natalie-proxy"
-          GH_PAGES_DOMAIN="spivanatalie64.github.io"
           
-          # Create the Worker script using Service Worker format
+          # Create the Worker script  
           cat > /tmp/worker.js << 'WORKEREOF'
           addEventListener('fetch', event => {
             event.respondWith(handleRequest(event.request));
           });
           
           async function handleRequest(request) {
-            const url = new URL(request.url);
-            const originUrl = 'https://spivanatalie64.github.io' + url.pathname + url.search;
-            
-            const modifiedHeaders = new Headers(request.headers);
-            modifiedHeaders.set('Host', 'spivanatalie64.github.io');
-            
-            const response = await fetch(originUrl, {
-              method: request.method,
-              headers: modifiedHeaders,
-              body: request.body,
-            });
-            
-            const newHeaders = new Headers(response.headers);
-            newHeaders.set('X-Proxied-By', 'natalie-worker');
-            
-            return new Response(response.body, {
-              status: response.status,
-              statusText: response.statusText,
-              headers: newHeaders,
-            });
+            try {
+              const url = new URL(request.url);
+              
+              // GitHub Pages IPs
+              const GH_IPS = [
+                '185.199.108.153',
+                '185.199.109.153',
+                '185.199.110.153',
+                '185.199.111.153'
+              ];
+              
+              // Try each IP
+              const originUrl = 'https://spivanatalie64.github.io' + url.pathname + url.search;
+              
+              const modifiedHeaders = new Headers(request.headers);
+              modifiedHeaders.set('Host', 'natalie.acreetionos.org');
+              modifiedHeaders.set('Accept', request.headers.get('Accept') || 'text/html,*/*');
+              
+              const response = await fetch(originUrl, {
+                method: request.method,
+                headers: modifiedHeaders,
+                body: request.body,
+                redirect: 'manual',
+              });
+              
+              // If we get a redirect, try to follow it manually but skip the custom domain redirect
+              if (response.status >= 300 && response.status < 400) {
+                const location = response.headers.get('Location');
+                // If it's trying to redirect to natalie.acreetionos.org, just return the content from the original URL
+                if (location && location.includes('natalie.acreetionos.org')) {
+                  // Return 200 with a note, or try to handle the redirect
+                  const secondResponse = await fetch(originUrl, {
+                    method: request.method,
+                    headers: modifiedHeaders,
+                    redirect: 'manual',
+                  });
+                  const newHeaders = new Headers(secondResponse.headers);
+                  newHeaders.set('X-Proxied-By', 'natalie-worker');
+                  newHeaders.set('X-Cache-Status', 'bypassed-redirect');
+                  return new Response(secondResponse.body, {
+                    status: secondResponse.status,
+                    statusText: secondResponse.statusText,
+                    headers: newHeaders,
+                  });
+                }
+              }
+              
+              const newHeaders = new Headers(response.headers);
+              newHeaders.set('X-Proxied-By', 'natalie-worker');
+              
+              return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: newHeaders,
+              });
+            } catch (err) {
+              return new Response('Worker Error: ' + err.message, {
+                status: 500,
+                headers: { 'Content-Type': 'text/plain' },
+              });
+            }
           }
           WORKEREOF
           
-          # Also create metadata for ES module
+          # Upload worker
           cat > /tmp/metadata.json << 'METADATAEOF'
           {
             "body_part": "script",
@@ -60,7 +100,6 @@ jobs:
           }
           METADATAEOF
           
-          # Upload worker as multipart
           echo "=== Uploading worker ==="
           curl -s -X PUT \
             "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/$WORKER_NAME" \
@@ -68,33 +107,18 @@ jobs:
             -F "metadata=@/tmp/metadata.json;type=application/json" \
             -F "script=@/tmp/worker.js;type=application/javascript" | jq .
           
-          # Update the route (in case it already exists from previous attempt)
           echo "=== Updating route ==="
-          # List routes to check
           EXISTING_ROUTES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes")
           NATALIE_ROUTE_ID=$(echo "$EXISTING_ROUTES" | jq -r '.result[] | select(.pattern == "natalie.acreetionos.org/*") | .id')
           
-          if [ -n "$NATALIE_ROUTE_ID" ] && [ "$NATALIE_ROUTE_ID" != "null" ]; then
-            echo "Updating existing route: $NATALIE_ROUTE_ID"
-            curl -s -X PUT \
-              "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes/$NATALIE_ROUTE_ID" \
-              -H "Authorization: Bearer $CF_API_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{
-                \"pattern\": \"natalie.acreetionos.org/*\",
-                \"script\": \"$WORKER_NAME\"
-              }" | jq .
-          else
-            echo "Creating new route"
-            curl -s -X POST \
-              "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" \
-              -H "Authorization: Bearer $CF_API_TOKEN" \
-              -H "Content-Type: application/json" \
-              -d "{
-                \"pattern\": \"natalie.acreetionos.org/*\",
-                \"script\": \"$WORKER_NAME\"
-              }" | jq .
-          fi
+          curl -s -X PUT \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes/$NATALIE_ROUTE_ID" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"pattern\": \"natalie.acreetionos.org/*\",
+              \"script\": \"$WORKER_NAME\"
+            }" | jq .
           
           echo "=== Done ==="
