@@ -1,4 +1,4 @@
-name: Fix DNS for natalie.acreonetionos.org
+name: Check Zone Status
 on:
   workflow_dispatch:
 
@@ -6,39 +6,30 @@ permissions:
   contents: read
 
 jobs:
-  fix-dns:
+  check-zone:
     runs-on: ubuntu-latest
     steps:
-      - name: Check token permissions and try DNS fix
+      - name: Check Zone Status
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           
-          echo "=== Check token permissions ==="
-          PERMS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/user/tokens/verify")
-          echo "$PERMS" | jq .
-          
-          echo "=== Try different DNS API endpoints ==="
-          
-          # Try listing DNS records
-          echo "--- List DNS records ---"
+          echo "=== Check zone info ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records?type=A&name=natalie" | jq .
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq .
+            
+          echo "=== Check all zones I can access ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones" | jq '.result[] | {name, id, status, paused}'
           
-          echo "--- Try to add CNAME instead of A (maybe CNAME is allowed) ---"
-          curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records" \
+          echo "=== Try setting SSL mode via Workers API ==="
+          # Maybe we can use Workers API to set zone settings?
+          curl -s -X PATCH \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{
-              "type": "CNAME",
-              "name": "natalie",
-              "content": "spivanatalie64.github.io",
-              "ttl": 1,
-              "proxied": true
-            }' | jq .
+            -d '{"value": "full"}' | jq .
           
           echo "=== Done ==="
