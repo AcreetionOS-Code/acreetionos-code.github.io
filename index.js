@@ -2068,7 +2068,7 @@ export default {
       }
       try {
         const body = await request.json();
-        const apiKey = env.OPENROUTER_API_KEY;
+        const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
         if (!apiKey) {
           return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
             status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2227,8 +2227,12 @@ export default {
 
       // Server-side API keys must be configured in env (Cloudflare Worker secrets).
       // This keeps keys off the client. Priority: opencode-go → OpenRouter.
+      // Note: secrets are deployed with obfuscated names (see deploy-worker.yml):
+      //   BRAIN_JUICE = OPENROUTER_API_KEY
+      //   SPICY_SAUCE = CLOUDFLARE_API_TOKEN
       const isStream = body.stream === true;
-      const useOpencodeGo = body.provider === 'opencode-go' || !env.OPENROUTER_API_KEY;
+      const openRouterKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
+      const useOpencodeGo = body.provider === 'opencode-go' || !openRouterKey;
 
       let aiResponse = null;
       let aiOk = false;
@@ -2262,7 +2266,7 @@ export default {
 
       // Fall back to OpenRouter
       if (!aiOk) {
-        const apiKey = env.OPENROUTER_API_KEY;
+        const apiKey = openRouterKey;
         if (!apiKey) {
           return new Response(JSON.stringify({ error: 'AI service not configured' }), {
             status: 503,
