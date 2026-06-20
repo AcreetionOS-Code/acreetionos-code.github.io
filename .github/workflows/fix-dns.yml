@@ -1,4 +1,4 @@
-name: Check Zone & DNS
+name: Add workers.dev Route
 on:
   workflow_dispatch:
 
@@ -6,36 +6,24 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  add-route:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Zone & Try DNS Fix
+      - name: Add workers.dev Route for natalie-proxy
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
           
-          echo "=== List all zones I can see ==="
-          ZONES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones")
-          echo "$ZONES" | jq '.result[] | {name, id, status, paused}'
-          
-          ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
-          
-          echo "=== Zone info ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq '.result | {name, status, paused, type}'
-          
-          echo "=== Try DNS read via workers subdomain ==="
-          # Check existing worker routes
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" | jq '.result[] | {pattern, script}'
-          
-          echo "=== Try adding workers.dev route for natalie-proxy ==="
+          echo "=== Enable workers.dev route ==="
+          # Add a route for the workers.dev subdomain
           curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/natalie-proxy/subdomain" \
+            "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/natalie-proxy/routes" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"enabled": true}' | jq .
+            -d '{
+              "pattern": "natalie-proxy.natalie.workers.dev/*",
+              "script": "natalie-proxy"
+            }' | jq .
           
           echo "=== Done ==="
