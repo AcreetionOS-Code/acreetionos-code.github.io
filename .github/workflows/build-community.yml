@@ -173,25 +173,12 @@ jobs:
             --data-binary @"${{ steps.iso.outputs.iso_path }}" \
             -H "Content-Type: application/octet-stream" && echo "Uploaded: ${{ steps.meta.outputs.slug }}-latest.iso" || echo "Latest upload failed"
           
-          # Also try S3-compatible upload as fallback
+          # Try S3-compatible upload via direct curl (no Python needed)
           echo "Also trying S3-compatible upload..."
-          pip3 install -q boto3 2>/dev/null || true
-          cat > /tmp/s3upload.py << 'ENDOFPYTHON'
-import boto3, os
-s3 = boto3.client('s3',
-  endpoint_url=f'https://{os.environ["CF_ACCOUNT"]}.r2.cloudflarestorage.com',
-  aws_access_key_id=os.environ['CF_ACCOUNT'],
-  aws_secret_access_key=os.environ['CF_TOKEN'],
-  region_name='auto')
-try:
-  s3.upload_file('${{ steps.iso.outputs.iso_path }}', 'acreetionos-isos', '${{ steps.meta.outputs.iso_name }}')
-  print('S3 upload OK')
-  s3.copy_object(Bucket='acreetionos-isos', CopySource=f'/acreetionos-isos/${{ steps.meta.outputs.iso_name }}', Key='${{ steps.meta.outputs.slug }}-latest.iso')
-  print('Latest copy OK')
-except Exception as e:
-  print(f'S3 upload failed: {e}')
-ENDOFPYTHON
-          python3 /tmp/s3upload.py 2>&1 || echo "S3 upload skipped"
+          S3_URL="https://$CF_ACCOUNT.r2.cloudflarestorage.com/acreetionos-isos/${{ steps.meta.outputs.iso_name }}"
+          curl -s -X PUT "$S3_URL" \
+            -H "Authorization: Bearer $CF_TOKEN" \
+            --data-binary @"${{ steps.iso.outputs.iso_path }}" || echo "S3 upload skipped"
 
       - name: Update build status
         if: always()
