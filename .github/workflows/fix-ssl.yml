@@ -27,57 +27,66 @@ jobs:
           async function handleRequest(request) {
             try {
               const url = new URL(request.url);
+              const path = url.pathname + url.search;
               
-              // First, try fetching from GH Pages directly with the custom domain host header
-              const ghUrl = 'https://spivanatalie64.github.io' + url.pathname + url.search;
+              // Simple fetch from GH Pages, keep the host header the same
+              const originUrl = 'https://spivanatalie64.github.io' + path;
               
-              const headers = new Headers(request.headers);
-              headers.set('Host', 'natalie.acreetionos.org');
-              headers.delete('CF-Connecting-IP');
-              headers.delete('CF-IPCountry');
-              headers.delete('CF-Ray');
-              headers.delete('CDN-Loop');
-              
-              let response = await fetch(ghUrl, {
+              const response = await fetch(originUrl, {
                 method: request.method,
-                headers: headers,
+                headers: request.headers,
                 body: request.body,
                 redirect: 'manual',
               });
               
-              // If we get a redirect to the custom domain, follow the redirect
-              // but skip back to ourselves - fetch the redirect URL directly
-              // from GitHub Pages IP
+              // If 301/302/307/308 to the custom domain, follow it but 
+              // replace the domain with the GH Pages domain
               if (response.status >= 300 && response.status < 400) {
                 const location = response.headers.get('Location');
-                
                 if (location) {
                   const locUrl = new URL(location);
-                  
-                  // Use GH Pages domain instead of our domain to avoid loops
-                  locUrl.hostname = 'spivanatalie64.github.io';
-                  
-                  const followHeaders = new Headers(headers);
-                  followHeaders.set('Host', 'natalie.acreetionos.org');
-                  
-                  response = await fetch(locUrl.toString(), {
-                    method: 'GET',
-                    headers: followHeaders,
-                    redirect: 'manual',
-                  });
+                  if (locUrl.hostname === 'natalie.acreetionos.org') {
+                    locUrl.hostname = 'spivanatalie64.github.io';
+                    
+                    const followResponse = await fetch(locUrl.toString(), {
+                      method: 'GET',
+                      headers: request.headers,
+                      redirect: 'manual',
+                    });
+                    
+                    // If STILL a redirect, just return it (shouldn't happen)
+                    if (followResponse.status >= 300 && followResponse.status < 400) {
+                      const newHeaders = new Headers(followResponse.headers);
+                      newHeaders.set('X-Proxied-By', 'natalie-worker');
+                      newHeaders.set('X-Followed-Redirect', 'true');
+                      return new Response(followResponse.body, {
+                        status: followResponse.status,
+                        statusText: followResponse.statusText,
+                        headers: newHeaders,
+                      });
+                    }
+                    
+                    const newHeaders = new Headers(followResponse.headers);
+                    newHeaders.set('X-Proxied-By', 'natalie-worker');
+                    newHeaders.set('X-Followed-Redirect', 'true');
+                    return new Response(followResponse.body, {
+                      status: followResponse.status,
+                      statusText: followResponse.statusText,
+                      headers: newHeaders,
+                    });
+                  }
                 }
               }
               
               const newHeaders = new Headers(response.headers);
               newHeaders.set('X-Proxied-By', 'natalie-worker');
-              
               return new Response(response.body, {
                 status: response.status,
                 statusText: response.statusText,
                 headers: newHeaders,
               });
             } catch (err) {
-              return new Response('Worker Error: ' + err.message, {
+              return new Response('Worker Error: ' + err.message + '\\nStack: ' + err.stack, {
                 status: 500,
                 headers: { 'Content-Type': 'text/plain' },
               });
