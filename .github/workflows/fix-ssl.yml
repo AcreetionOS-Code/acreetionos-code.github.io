@@ -1,4 +1,4 @@
-name: Fix Cloudflare SSL Mode
+name: Deploy Natali Proxy Worker
 on:
   workflow_dispatch:
 
@@ -6,32 +6,71 @@ permissions:
   contents: read
 
 jobs:
-  fix-ssl:
+  deploy-proxy:
     runs-on: ubuntu-latest
     steps:
-      - name: Check & Fix SSL Mode
+      - uses: actions/checkout@v4
+      
+      - name: Create & Deploy Natali Proxy Worker
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
+          WORKER_NAME="natalie-proxy"
+          GH_PAGES_DOMAIN="spivanatalie64.github.io"
           
-          echo "=== SSL setting ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" | jq .
+          # Create the Worker script
+          cat > /tmp/worker.js << 'WORKEREOF'
+          export default {
+            async fetch(request) {
+              const url = new URL(request.url);
+              const originUrl = 'https://spivanatalie64.github.io' + url.pathname + url.search;
+              
+              const modifiedHeaders = new Headers(request.headers);
+              modifiedHeaders.set('Host', 'spivanatalie64.github.io');
+              
+              const response = await fetch(originUrl, {
+                method: request.method,
+                headers: modifiedHeaders,
+                body: request.body,
+              });
+              
+              const newHeaders = new Headers(response.headers);
+              newHeaders.set('X-Proxied-By', 'natalie-worker');
+              
+              return new Response(response.body, {
+                status: response.status,
+                statusText: response.statusText,
+                headers: newHeaders,
+              });
+            }
+          };
+          WORKEREOF
           
-          echo "=== Always Use HTTPS ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/always_use_https" | jq .
+          # Upload the worker
+          echo "=== Uploading worker ==="
+          curl -s -X PUT \
+            "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/$WORKER_NAME" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/javascript" \
+            --data-binary @/tmp/worker.js | jq .
           
-          echo "=== Min TLS Version ==="
+          # Get account info for routes
+          echo "=== Getting routes ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/min_tls_version" | jq .
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" | jq .
           
-          echo "=== Automatic HTTPS Rewrites ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/automatic_https_rewrites" | jq .
+          # Try to add a route for natalie.acreetionos.org
+          echo "=== Adding route ==="
+          ROUTE_RESULT=$(curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"pattern\": \"natalie.acreetionos.org/*\",
+              \"script\": \"$WORKER_NAME\"
+            }")
+          echo "$ROUTE_RESULT" | jq .
           
-          echo "=== Opportunistic Encryption ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/opportunistic_encryption" | jq .
+          echo "=== Done ==="
