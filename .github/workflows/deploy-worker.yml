@@ -28,6 +28,7 @@ jobs:
           GUEST_LIST: ${{ secrets.ALLOWED_ORIGINS }}
           WATCH_LIST: ${{ secrets.CRED_I }}
         run: |
+          set +e
           CF_ACCOUNT=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[0].id')
           SCRIPT_NAME="acreetionos-worker"
@@ -37,7 +38,7 @@ jobs:
               curl -s -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/$SCRIPT_NAME/secrets" \
                 -H "Authorization: Bearer $CF_API_TOKEN" \
                 -H "Content-Type: application/json" \
-                -d "{\"name\":\"$name\",\"text\":\"$val\"}"
+                -d "{\"name\":\"$name\",\"text\":\"$val\",\"type\":\"secret_text\"}"
             fi
           done
 
