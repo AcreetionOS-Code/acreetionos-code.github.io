@@ -1,0 +1,147 @@
+name: Deploy dl-proxy Worker
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy dl-proxy Worker
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -x
+          AID="6a46b418508c26278ae2d3373f41da81"
+          ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
+          
+          cat > /tmp/worker.js << 'JSEOF'
+          // dl.acreetionos.org — serves community edition ISOs from R2
+          const R2_PUBLIC = 'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/acreetionos-isos';
+          const R2_API = 'https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/r2/buckets/acreetionos-isos/objects';
+          
+          const EDITIONS = {
+            '32bit':      { name: '32-bit',      desktop: 'Cinnamon',  display: 'XLibre', arch: 'i686' },
+            'gnome':      { name: 'GNOME',        desktop: 'GNOME',     display: 'Wayland', arch: 'x86_64' },
+            'plasma':     { name: 'KDE Plasma',   desktop: 'KDE Plasma', display: 'Wayland', arch: 'x86_64' },
+            'xfce':       { name: 'XFCE',         desktop: 'XFCE',      display: 'XLibre',  arch: 'x86_64' },
+            'i3':         { name: 'i3',           desktop: 'i3',        display: 'X11',     arch: 'x86_64' },
+            'sway':       { name: 'Sway',         desktop: 'Sway',      display: 'Wayland', arch: 'x86_64' },
+            'mate':       { name: 'MATE',         desktop: 'MATE',      display: 'XLibre',  arch: 'x86_64' },
+            'openbox':    { name: 'Openbox',      desktop: 'Openbox',   display: 'XLibre',  arch: 'x86_64' },
+            'hyprland':   { name: 'Hyprland',     desktop: 'Hyprland',  display: 'Wayland', arch: 'x86_64' },
+            'immutable':  { name: 'Immutable',    desktop: 'Immutable', display: 'Read-only', arch: 'x86_64' },
+          };
+          
+          addEventListener('fetch', event => {
+            event.respondWith(handleRequest(event.request));
+          });
+          
+          async function handleRequest(request) {
+            const url = new URL(request.url);
+            const path = url.pathname.replace(/^\//, '');
+            
+            // Root: show listing
+            if (!path || path === '' || path === '/') {
+              return serveListing();
+            }
+            
+            // /{slug}-latest.iso → redirect to latest ISO
+            const isoMatch = path.match(/^([a-z0-9]+)-latest\.iso$/);
+            if (isoMatch && EDITIONS[isoMatch[1]]) {
+              return serveRedirect(`${isoMatch[1]}-latest.iso`);
+            }
+            
+            // /{slug}-{date}.iso → try to serve
+            const datedMatch = path.match(/^([a-z0-9]+)-\d{8}\.iso$/);
+            if (datedMatch && EDITIONS[datedMatch[1]]) {
+              return serveRedirect(path);
+            }
+            
+            // /{slug} → show edition info
+            if (EDITIONS[path]) {
+              return serveEditionPage(path);
+            }
+            
+            return new Response('Not Found', { status: 404 });
+          }
+          
+          async function serveRedirect(key) {
+            const r2url = `${R2_PUBLIC}/${key}`;
+            const response = await fetch(r2url);
+            if (response.ok || response.status === 200) {
+              return new Response(response.body, {
+                headers: {
+                  'Content-Type': 'application/octet-stream',
+                  'Content-Disposition': `attachment; filename="${key}"`,
+                  'Cache-Control': 'public, max-age=86400',
+                }
+              });
+            }
+            // Fallback: try the Cloudflare Workers API
+            const apiResp = await fetch(`${R2_API}/${key}`, {
+              headers: { 'Authorization': request.headers.get('Authorization') || '' }
+            });
+            if (apiResp.ok) {
+              return new Response(apiResp.body, {
+                headers: {
+                  'Content-Type': 'application/octet-stream',
+                  'Content-Disposition': `attachment; filename="${key}"`,
+                  'Cache-Control': 'public, max-age=86400',
+                }
+              });
+            }
+            return new Response('ISO not available yet. Build may still be in progress.', { status: 404 });
+          }
+          
+          function serveListing() {
+            let html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>AcreetionOS Community ISOs</title><style>body{font-family:system-ui,sans-serif;background:#121212;color:#e5e5e5;max-width:800px;margin:2rem auto;padding:0 1rem}a{color:#2ecc71;text-decoration:none}.edition{border:1px solid #333;border-radius:8px;padding:1rem;margin:.75rem 0}code{background:#1a1a1a;padding:2px 6px;border-radius:4px}</style></head><body>';
+            html += '<h1>AcreetionOS Community ISOs</h1><p>Unofficial community editions. Download at your own risk.</p>';
+            for (const [slug, info] of Object.entries(EDITIONS)) {
+              html += `<div class="edition">`;
+              html += `<h2>${info.name}</h2>`;
+              html += `<p>${info.desktop} • ${info.display} • ${info.arch}</p>`;
+              html += `<p><a href="/${slug}-latest.iso">📥 Download ${slug}-latest.iso</a></p>`;
+              html += `<p><code>dl.acreetionos.org/${slug}-latest.iso</code></p>`;
+              html += `</div>`;
+            }
+            html += '<p style="margin-top:2rem;color:#888">Built by the AcreetionOS community. <a href="https://acreetionos.org">acreetionos.org</a></p>';
+            html += '</body></html>';
+            return new Response(html, { headers: { 'Content-Type': 'text/html' } });
+          }
+          
+          function serveEditionPage(slug) {
+            const info = EDITIONS[slug];
+            return new Response(`<html><body><h1>${info.name}</h1><p>${info.desktop} • ${info.display} • ${info.arch}</p><p><a href="/${slug}-latest.iso">Download ${slug}-latest.iso</a></p></body></html>`, {
+              headers: { 'Content-Type': 'text/html' }
+            });
+          }
+          JSEOF
+          
+          # Upload worker
+          cat > /tmp/meta.json << 'JSONEOF'
+          {"body_part":"script","bindings":[],"compatibility_date":"2026-06-20","compatibility_flags":[]}
+          JSONEOF
+          
+          curl -s -X PUT "https://api.cloudflare.com/client/v4/accounts/$AID/workers/scripts/dl-proxy" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -F "metadata=@/tmp/meta.json;type=application/json" \
+            -F "script=@/tmp/worker.js;type=application/javascript" | jq .
+          
+          # Delete old dl routes
+          ROUTES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes")
+          for rid in $(echo "$ROUTES" | jq -r '.result[] | select(.pattern | test("dl\\.")) | .id'); do
+            curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes/$rid" \
+              -H "Authorization: Bearer $CF_API_TOKEN" | jq .
+          done
+          
+          # Add dl route
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"pattern":"dl.acreetionos.org/*","script":"dl-proxy"}' | jq .
+          
+          echo "=== Done ==="
