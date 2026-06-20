@@ -210,20 +210,16 @@ jobs:
           echo "Cleaning up old ISOs..."
           OBJECTS=$(curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/acreetionos-isos/objects" \
             -H "Authorization: Bearer $CF_TOKEN")
-          echo "$OBJECTS" | python3 -c "
-import sys, json, os
-from datetime import datetime, timezone
-cutoff = datetime.now(timezone.utc).timestamp() - (30 * 86400)
-data = json.load(sys.stdin)
-objects = data.get('result', {}).get('objects', [])
-for obj in objects:
-    key = obj.get('key', '')
-    if 'latest' in key or 'status' in key or 'build.log' in key:
-        continue  # keep latest/status/log files
-    uploaded = obj.get('uploaded', '')
-    try:
-        ts = datetime.fromisoformat(uploaded.replace('Z', '+00:00')).timestamp()
-        if ts < cutoff:
-            os.system(f'curl -s -X DELETE \"https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/acreetionos-isos/objects/{key}\" -H \"Authorization: Bearer $CF_TOKEN\" && echo \"Deleted {key}\"')
-    except: pass
-" 2>/dev/null || echo "Cleanup skipped"
+          # Delete old ISOs (keep latest, status, logs)
+          # Use piped curl + jq instead of Python
+          curl -s "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/acreetionos-isos/objects" \
+            -H "Authorization: Bearer $CF_TOKEN" | \
+            jq -r '.result.objects[] | select(.key | test("latest|status|build\\.log") | not) | .key + "|" + .uploaded' 2>/dev/null | \
+            while IFS='|' read -r key uploaded; do
+              TS=$(date -d "$uploaded" +%s 2>/dev/null)
+              CUTOFF=$(date -d "30 days ago" +%s)
+              if [ -n "$TS" ] && [ "$TS" -lt "$CUTOFF" ] 2>/dev/null; then
+                curl -s -X DELETE "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/acreetionos-isos/objects/$key" \
+                  -H "Authorization: Bearer $CF_TOKEN" && echo "Deleted $key"
+              fi
+            done || echo "Cleanup skipped"
