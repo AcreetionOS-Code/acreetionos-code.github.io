@@ -1,4 +1,4 @@
-name: Add workers.dev Route
+name: Fix workers.dev Route  
 on:
   workflow_dispatch:
 
@@ -6,19 +6,33 @@ permissions:
   contents: read
 
 jobs:
-  add-route:
+  fix-route:
     runs-on: ubuntu-latest
     steps:
-      - name: Add workers.dev Route for natalie-proxy
+      - name: Find and Fix workers.dev Route
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
+          ACCOUNT_ID="6a46b418508c26278ae2d3373f41da81"
+          WORKER_NAME="natalie-proxy"
           
-          echo "=== Enable workers.dev route ==="
-          # Add a route for the workers.dev subdomain
+          echo "=== Check worker status ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/workers/scripts/$WORKER_NAME" | jq .
+          
+          echo "=== List all workers routes for account ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/accounts/$ACCOUNT_ID/workers/routes" | jq .
+          
+          echo "=== List zone routes ==="
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/5b3f8237bfa2518bff375eb8163623a5/workers/routes" | jq '.result[] | select(.script == "natalie-proxy")'
+          
+          echo "=== Try to add workers.dev route different format ==="
+          # Try adding route through zone instead
           curl -s -X POST \
-            "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/natalie-proxy/routes" \
+            "https://api.cloudflare.com/client/v4/zones/5b3f8237bfa2518bff375eb8163623a5/workers/routes" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
             -d '{
