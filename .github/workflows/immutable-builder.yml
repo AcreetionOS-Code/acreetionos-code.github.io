@@ -29,15 +29,8 @@ jobs:
           path: src
           submodules: false
 
-      - uses: actions/checkout@v4
-        with:
-          repository: spivanatalie64/immutable
-          path: patches
-
-      - name: Prepare build environment
+      - name: Apply AcreetionOS branding and build fixes
         run: |
-          cp patches/configs/immutable-patch.sh src/
-          [ -d src/airootfs ] && cp patches/configs/immutable-patch.sh src/airootfs/root/
           # Fix build.sh — remove sudo (not needed in Docker)
           sed -i 's/sudo //g' src/build.sh
           # Fix mkarchiso.sh — output to mounted volume so ISO persists
@@ -51,7 +44,6 @@ jobs:
         run: |
           docker run --privileged --rm \
             -v $PWD/src:/workspace \
-            -v $PWD/patches:/patches \
             archlinux@sha256:fb47d15e0fd28369c700edcfa46dd44e234d8ab6fee9627ee5f1ead5f1fc6c21 \
             bash -c "
               pacman -Syu --noconfirm archiso grub && \
@@ -64,7 +56,6 @@ jobs:
           cp -r $PWD/src /tmp/src 2>/dev/null || true
           # After build, copy ISO from the mounted volume
           cp $PWD/src/out/*.iso /tmp/iso/ 2>/dev/null
-          ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
           ls -la /tmp/iso/ 2>/dev/null || echo "No ISO found"
 
       - name: Upload ISO to R2
