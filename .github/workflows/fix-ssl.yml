@@ -21,9 +21,7 @@ jobs:
           
           cat > /tmp/worker.js << 'WORKEREOF'
           const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/spivanatalie64.github.io/gh-pages';
-          const GH_BASE = 'https://spivanatalie64.github.io';
           
-          // Map file extensions to content types
           const MIME_TYPES = {
             '.html': 'text/html; charset=utf-8',
             '.css': 'text/css; charset=utf-8',
@@ -40,26 +38,44 @@ jobs:
             '.woff': 'font/woff',
             '.woff2': 'font/woff2',
             '.ttf': 'font/ttf',
+            '.otf': 'font/otf',
           };
           
           addEventListener('fetch', event => {
             event.respondWith(handleRequest(event.request));
           });
           
+          async function fetchWithRetry(url, retries = 2) {
+            for (let i = 0; i <= retries; i++) {
+              try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeout);
+                if (response.ok) return response;
+              } catch (e) {
+                if (i === retries) throw e;
+              }
+            }
+            return null;
+          }
+          
           async function handleRequest(request) {
             try {
               const url = new URL(request.url);
               let path = url.pathname;
               
-              // For root or any non-file path, serve index.html (SPA)
-              const isAsset = path.match(/\.\w+$/);
+              // Normalize path
+              if (path.endsWith('/') && path.length > 1) {
+                path = path.slice(0, -1);
+              }
+              
+              // Determine if this is a static asset
+              const extMatch = path.match(/\.(\w+)$/);
+              const isAsset = extMatch && extMatch[0] !== '.html' && extMatch[0] !== '.htm';
               
               if (!isAsset) {
-                // Remove trailing slash
-                if (path.endsWith('/') && path.length > 1) {
-                  path = path.slice(0, -1);
-                }
-                // SPA fallback - serve index.html for all non-asset routes
+                // SPA: serve index.html for all non-asset routes
                 const indexUrl = RAW_BASE + '/index.html';
                 const response = await fetch(indexUrl);
                 
@@ -74,52 +90,37 @@ jobs:
                     headers: newHeaders,
                   });
                 }
-                
-                return new Response('Not Found', { status: 404 });
               }
               
-              // For assets, fetch from raw.githubusercontent.com
-              const assetUrl = RAW_BASE + path;
-              const response = await fetch(assetUrl);
+              // Try to fetch the asset from raw.githubusercontent.com
+              if (isAsset) {
+                const assetUrl = RAW_BASE + path;
+                const response = await fetchWithRetry(assetUrl);
+                
+                if (response && response.ok) {
+                  const ext = extMatch[0];
+                  const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+                  
+                  const newHeaders = new Headers(response.headers);
+                  newHeaders.set('Content-Type', contentType);
+                  newHeaders.set('X-Proxied-By', 'natalie-worker');
+                  newHeaders.set('Cache-Control', 'public, max-age=86400, s-maxage=604800');
+                  return new Response(response.body, {
+                    status: 200,
+                    statusText: 'OK',
+                    headers: newHeaders,
+                  });
+                }
+              }
               
+              // Fallback: serve index.html
+              const indexUrl = RAW_BASE + '/index.html';
+              const response = await fetch(indexUrl);
               if (response.ok) {
-                const ext = path.match(/\.(\w+)$/)[0];
-                const contentType = MIME_TYPES[ext] || response.headers.get('Content-Type') || 'application/octet-stream';
-                
                 const newHeaders = new Headers(response.headers);
-                newHeaders.set('Content-Type', contentType);
-                newHeaders.set('X-Proxied-By', 'natalie-worker');
-                newHeaders.set('Cache-Control', 'public, max-age=86400, s-maxage=604800');
-                return new Response(response.body, {
-                  status: 200,
-                  statusText: 'OK',
-                  headers: newHeaders,
-                });
-              }
-              
-              // Fallback: try GH Pages (might redirect, but worth a shot)
-              const ghResponse = await fetch(GH_BASE + path, {
-                headers: { 'Host': 'natalie.acreonetionos.org' },
-                redirect: 'manual',
-              });
-              
-              if (ghResponse.status === 200) {
-                const newHeaders = new Headers(ghResponse.headers);
-                newHeaders.set('X-Proxied-By', 'natalie-worker');
-                return new Response(ghResponse.body, {
-                  status: 200,
-                  statusText: 'OK',
-                  headers: newHeaders,
-                });
-              }
-              
-              // Last resort: serve index.html for SPA
-              const indexResponse = await fetch(RAW_BASE + '/index.html');
-              if (indexResponse.ok) {
-                const newHeaders = new Headers(indexResponse.headers);
                 newHeaders.set('Content-Type', 'text/html; charset=utf-8');
                 newHeaders.set('X-Proxied-By', 'natalie-worker');
-                return new Response(indexResponse.body, {
+                return new Response(response.body, {
                   status: 200,
                   statusText: 'OK',
                   headers: newHeaders,
