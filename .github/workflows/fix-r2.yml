@@ -9,40 +9,24 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup R2 Bucket Public Access
+      - name: Enable R2 Public Access
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
           AID="6a46b418508c26278ae2d3373f41da81"
           
-          # List all buckets
-          echo "=== All buckets ==="
-          BUCKETS=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets")
-          echo "$BUCKETS" | jq '.result.buckets[] | {name, creation_date}'
-          
-          # Create the ISO bucket if it doesn't exist
-          echo "=== Creating/checking acreetionos-isos bucket ==="
-          curl -s -X POST -H "Authorization: Bearer $CF_API_TOKEN" \
+          # Try to enable public access on the bucket
+          echo "=== Enable public access on acreetionos-isos ==="
+          curl -s -X POST \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
-            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets" \
-            -d '{"name":"acreetionos-isos"}' | jq .
+            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets/acreetionos-isos/public-access" \
+            -d '{"enabled":true}' | jq .
           
-          # List objects in the bucket
-          echo "=== Objects in acreetionos-isos ==="
+          # List the existing acreetionos-32bit bucket to see if there are ISOs
+          echo "=== Check existing 32bit bucket objects ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets/acreetionos-isos/objects" | jq .
-          
-          # Enable public access via a custom domain
-          # First check existing custom domains
-          echo "=== Custom domains ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets/acreetionos-isos/domains/custom" | jq .
-          
-          # Check the R2.dev subdomain
-          echo "=== R2.dev subdomain ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets/acreetionos-isos/domains/r2" | jq .
+            "https://api.cloudflare.com/client/v4/accounts/$AID/r2/buckets/acreetionos-32bit/objects" | jq '.result.objects[:5] | .[]? | {key, size, uploaded}' 2>/dev/null || echo "No access"
           
           echo "=== Done ==="
