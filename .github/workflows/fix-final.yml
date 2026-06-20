@@ -1,0 +1,37 @@
+name: Fix Route Final
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Correct Worker Route
+        env:
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -x
+          ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
+          
+          # List all routes
+          ROUTES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes")
+          
+          # Delete ALL natalie routes
+          for rid in $(echo "$ROUTES" | jq -r '.result[] | select(.pattern | test("natalie")) | .id'); do
+            echo "Deleting route: $rid"
+            curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes/$rid" \
+              -H "Authorization: Bearer $CF_API_TOKEN" | jq .
+          done
+          
+          # Add the correct route with EXACT correct spelling
+          echo "Adding correct route..."
+          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"pattern":"natalie.acreetionos.org/*","script":"natalie-proxy"}' | jq .
+          
+          echo "=== Done ==="
