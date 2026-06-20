@@ -1,4 +1,4 @@
-name: Check Zone Status
+name: Check Zone & DNS
 on:
   workflow_dispatch:
 
@@ -6,30 +6,36 @@ permissions:
   contents: read
 
 jobs:
-  check-zone:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Zone Status
+      - name: Check Zone & Try DNS Fix
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -x
+          
+          echo "=== List all zones I can see ==="
+          ZONES=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones")
+          echo "$ZONES" | jq '.result[] | {name, id, status, paused}'
+          
           ZONE_ID="5b3f8237bfa2518bff375eb8163623a5"
           
-          echo "=== Check zone info ==="
+          echo "=== Zone info ==="
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq .
-            
-          echo "=== Check all zones I can access ==="
-          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
-            "https://api.cloudflare.com/client/v4/zones" | jq '.result[] | {name, id, status, paused}'
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID" | jq '.result | {name, status, paused, type}'
           
-          echo "=== Try setting SSL mode via Workers API ==="
-          # Maybe we can use Workers API to set zone settings?
-          curl -s -X PATCH \
-            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings/ssl" \
+          echo "=== Try DNS read via workers subdomain ==="
+          # Check existing worker routes
+          curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
+            "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/workers/routes" | jq '.result[] | {pattern, script}'
+          
+          echo "=== Try adding workers.dev route for natalie-proxy ==="
+          curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/natalie-proxy/subdomain" \
             -H "Authorization: Bearer $CF_API_TOKEN" \
             -H "Content-Type: application/json" \
-            -d '{"value": "full"}' | jq .
+            -d '{"enabled": true}' | jq .
           
           echo "=== Done ==="
