@@ -1,13 +1,13 @@
 const EDITIONS = [
   {id:'cinnamon', label:'Cinnamon Edition', desc:'The main AcreetionOS flagship desktop. Stable and feature-rich.', official:true,
-   iso_url:'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso',
+   iso_url:'https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso',
    mirrors:[{url:'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso',name:'Internet Archive'},
              {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download',name:'SourceForge'},
              {url:'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso',name:'OSUOSL'},
              {url:'https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS-1.0-x86_64.iso',name:'RWTH Aachen'}]},
 
   {id:'xl', label:'XL (XLibre) Edition', desc:'Featuring the XLibre display server, the successor to Xorg.', official:true,
-   iso_url:'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
+   iso_url:'https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
     mirrors:[{url:'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso',name:'Internet Archive'},
              {url:'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS_XL-1.0-x86_64.iso/download',name:'SourceForge'},
              {url:'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso',name:'OSUOSL'},

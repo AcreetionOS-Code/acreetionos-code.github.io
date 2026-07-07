@@ -1179,14 +1179,14 @@ async function handleHostingReactivate(request, env) {
 
 const ISO_MIRRORS = {
   cinnamon: [
-    'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso',
+    'https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso',
     'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-latest.iso',
     'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso',
     'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso',
     'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download',
   ],
   xl: [
-    'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
+    'https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso',
     'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS_XL-latest.iso',
     'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso',
     'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso',
@@ -1600,14 +1600,14 @@ function generateFixScript(cve, pkg, arch) {
 
 const MIRRORS = {
   cinnamon: [
-    { url: 'https://iso.acreetionos.org:8448/acreetion/AcreetionOS-1.0-x86_64.iso', name: 'Direct Server', priority: 1 },
+    { url: 'https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso', name: 'Direct Server', priority: 1 },
     { url: 'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS-latest.iso', name: 'Cloudflare R2', priority: 2 },
     { url: 'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso', name: 'OSUOSL Mirror', priority: 3 },
     { url: 'https://archive.org/download/AcreetionOS-1.0-x86_64/AcreetionOS-1.0-x86_64.iso', name: 'Internet Archive', priority: 4 },
     { url: 'https://sourceforge.net/projects/acreetionos-iso-image/files/AcreetionOS-1.0-x86_64.iso/download', name: 'SourceForge', priority: 5 },
   ],
   xl: [
-    { url: 'https://iso.acreetionos.org:8448/acreetion/AcreetionOS_XL-1.0-x86_64.iso', name: 'Direct Server', priority: 1 },
+    { url: 'https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso', name: 'Direct Server', priority: 1 },
     { url: 'https://pub-173a1f638a3b4c95b5f58b09c0b968aa.r2.dev/AcreetionOS_XL-latest.iso', name: 'Cloudflare R2', priority: 2 },
     { url: 'https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso', name: 'OSUOSL Mirror', priority: 3 },
     { url: 'https://archive.org/download/AcreetionOS_XL-1.0-x86_64/AcreetionOS_XL-1.0-x86_64.iso', name: 'Internet Archive', priority: 4 },
