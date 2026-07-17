@@ -1,0 +1,41 @@
+name: AcreetionOS Intelligence Sync
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  gather-and-analyze:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate newsletter
+        run: python3 scripts/generate-newsletter.py
+        env:
+          WORKER_URL: "https://acreetionos.org/api"
+          NEWSLETTER_DIR: "newsletters"
+          REQUEST_TIMEOUT: "180"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No new newsletter to commit."
+          else
+            git commit -m "newsletter: intelligence sync $(date +%Y-%m-%d-%H%M)"
+            git push
+          fi
