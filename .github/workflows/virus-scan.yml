@@ -1,0 +1,53 @@
+name: VirusTotal ISO Scan
+
+on:
+  schedule:
+    # Weekly Wednesday scan — keeps us at ~40-50 VT requests/month
+    # Free tier: 500/day, ~15k/month — this uses <1% of monthly quota
+    - cron: "0 6 * * 3"
+  workflow_dispatch:
+    inputs:
+      max_scans:
+        description: Max ISOs to scan (free tier = 500/day, ~15k/month)
+        required: true
+        default: "10"
+        type: choice
+        options:
+          - "5"
+          - "10"
+          - "25"
+          - "50"
+          - "100"
+
+permissions:
+  contents: read
+
+jobs:
+  vt-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run VirusTotal URL scan
+        id: scan
+        env:
+          VIRUSTOTAL_API_KEY: ${{ secrets.VIRUSTOTAL_API_KEY }}
+          MAX_VT_SCANS: ${{ inputs.max_scans || '10' }}
+          WORKER_URL: "https://acreetionos.org/api"
+        run: |
+          echo "::group::VirusTotal Scan"
+          python3 scripts/scan-isos.py
+          echo "::endgroup::"
+        continue-on-error: false
+
+      - name: Upload scan report
+        if: always()
+        run: |
+          echo "Scan completed. See job logs for detailed results."
+          echo "Quota reminder: VirusTotal free tier = 500 req/day, ~15k/month"
