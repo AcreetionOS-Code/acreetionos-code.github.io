@@ -35,13 +35,23 @@ function injectNoTrain(messages) {
   return [NO_TRAIN_MSG, ...messages];
 }
 // Explicitly whitelisted free models only — no wildcards, no injection.
+// Uses openrouter/free as default which auto-routes to the best free model available.
 const FREE_MODELS = new Set([
-  'minimax/minimax-m2.5:free',
-  'meta-llama/llama-3.1-8b-instruct:free',
-  'qwen/qwen-2.5-7b-instruct:free',
-  'google/gemma-2-9b-it:free',
+  'openrouter/free',
+  'google/gemma-4-26b-a4b-it:free',
+  'google/gemma-4-31b-it:free',
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'meta-llama/llama-3.2-3b-instruct:free',
+  'qwen/qwen3-coder:free',
+  'qwen/qwen3-next-80b-a3b-instruct:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
+  'openai/gpt-oss-20b:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'nvidia/nemotron-3-nano-30b-a3b:free',
+  'nvidia/nemotron-3-ultra-550b-a55b:free',
+  'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
 ]);
-const DEFAULT_MODEL = 'minimax/minimax-m2.5:free';
+const DEFAULT_MODEL = 'openrouter/free';
 let allowedOrigins = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -2378,13 +2388,139 @@ export default {
     }
   },
 
-  // Cron: runs every 30 min — verifies all ISOs downloadable, auto-fixes broken
+  // Cron: runs every 30 min — verifies all ISOs downloadable, auto-fixes broken, checks AI health
   async scheduled(event, env, ctx) {
     console.log('Running scheduled health check...');
-    const req = new Request('https://acreetionos.org/api/health/check');
     const resp = await handleHealthCheck(env);
     const result = await resp.json();
     console.log(`Health check complete: ${result.issues} issues, healthy: ${result.healthy}`);
+
+    // AI health check (at most twice a day)
+    ctx.waitUntil(checkAIHealth(env).catch(e => {
+      console.error('AI health check failed:', e.message);
+    }));
   }
 };
+
+// ─── AI Health Check ────────────────────────────────────────
+
+async function checkAIHealth(env) {
+  // Makes a minimal test call to OpenRouter free model router,
+  // persists status to R2, and sends an alert email on failure.
+  const AI_STATUS_KEY = 'ai-health-status.json';
+  const TWELVE_HOURS = 12 * 60 * 60 * 1000;
+
+  // Load previous status
+  let lastStatus = await getR2(env, 'acreetionos-hosting', AI_STATUS_KEY).catch(() => null) || {};
+  const now = Date.now();
+
+  // Only actually test on cron runs that qualify as "twice a day" checks
+  // (roughly every 12 hours, but we use the 30-min cron as a sampling clock).
+  // If we last checked less than 10 hours ago, skip.
+  if (lastStatus.last_checked && (now - new Date(lastStatus.last_checked).getTime()) < 10 * 60 * 60 * 1000) {
+    return { skipped: true, reason: 'Too soon since last check' };
+  }
+
+  console.log('Running AI health check...');
+  const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
+  if (!apiKey) {
+    console.log('AI health check: no API key configured');
+    return { skipped: true, reason: 'No API key' };
+  }
+
+  let healthy = false;
+  let errorMsg = '';
+  let responseTime = 0;
+
+  try {
+    const start = Date.now();
+    const res = await fetch(OPENROUTER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://acreetionos.org',
+        'X-Title': 'AcreetionOS AI Health Check',
+      },
+      body: JSON.stringify({
+        model: 'openrouter/free',
+        messages: [
+          { role: 'system', content: 'Reply with exactly one word: OK' },
+          { role: 'user', content: 'Say OK' }
+        ],
+        max_tokens: 10
+      }),
+      signal: AbortSignal.timeout(15000)
+    });
+    responseTime = Date.now() - start;
+
+    if (res.ok) {
+      const data = await res.json();
+      const content = data?.choices?.[0]?.message?.content || '';
+      healthy = content.trim().length > 0;
+      if (!healthy) errorMsg = 'Empty response from model';
+    } else {
+      let errText = '';
+      try { errText = await res.text(); } catch (e) {}
+      errorMsg = `HTTP ${res.status}: ${errText.substring(0, 200)}`;
+    }
+  } catch (e) {
+    errorMsg = e.message;
+  }
+
+  console.log(`AI health check: ${healthy ? 'OK' : 'FAIL'} (${responseTime}ms)`);
+
+    // Persist status
+    const status = {
+      healthy,
+      last_checked: new Date().toISOString(),
+      checked_at: new Date().toISOString(),
+    response_time_ms: responseTime,
+    error: errorMsg || null,
+    last_healthy: healthy ? new Date().toISOString() : (lastStatus.last_healthy || null),
+    last_failure: healthy ? (lastStatus.last_failure || null) : new Date().toISOString(),
+  };
+  await putR2(env, 'acreetionos-hosting', AI_STATUS_KEY, status);
+
+  // Send alert if unhealthy and no alert sent in the last 12 hours
+  if (!healthy) {
+    const lastAlert = lastStatus.last_alert_sent ? new Date(lastStatus.last_alert_sent).getTime() : 0;
+    if (now - lastAlert > TWELVE_HOURS) {
+      console.log('AI health check FAILED — sending alert email');
+      status.last_alert_sent = new Date().toISOString();
+      await putR2(env, 'acreetionos-hosting', AI_STATUS_KEY, status);
+
+      const alertBody = [
+        'The AcreetionOS wiki AI guide generation has stopped working.',
+        '',
+        `Time: ${new Date().toISOString()}`,
+        `Error: ${errorMsg || 'Unknown'}`,
+        `Response time: ${responseTime}ms`,
+        '',
+        'The OpenRouter free model router (openrouter/free) failed to return a valid response.',
+        '',
+        'To fix:',
+        '  1. Check https://openrouter.ai/models for free model availability',
+        '  2. If models are available, verify OPENROUTER_API_KEY secret is valid',
+        '  3. Redeploy worker: npx wrangler deploy',
+        '',
+        '- AcreetionOS Bot',
+      ].join('\n');
+
+      await sendHostingEmail(env, 'natalie@acreetionos.org',
+        '[AcreetionOS] ⚠️ Wiki AI Guide Generation is DOWN',
+        alertBody
+      );
+
+      // Also alert Discord if configured
+      if (env.ALERT_SIREN) {
+        await sendDiscordWebhook(env,
+          `**⚠️ Wiki AI Guide Generation is DOWN**\n**Error:** ${errorMsg || 'Unknown'}\n**Response time:** ${responseTime}ms\n**Time:** ${new Date().toISOString()}\n\nEmail alert sent to natalie@acreetionos.org.`
+        );
+      }
+    }
+  }
+
+  return { healthy, response_time_ms: responseTime, error: errorMsg || null };
+}
 

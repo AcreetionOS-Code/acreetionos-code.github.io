@@ -84,7 +84,7 @@ async function produceGuide(title){
   var finalBody=null;
   var prompt='You are a patient Linux teacher for beginners on AcreetionOS (Cinnamon Desktop, Arch-based). Write clear step-by-step guides in plain English. GUI first, terminal as "(Advanced)".\n\n## Topic: '+title+'\n\n## Technical Context\n'+rawText+'\n\n## Format\n1. **What is this?**\n2. **What you need**\n3. **Step-by-step**\n4. **Troubleshooting**\n\nMarkdown only.';
   try{
-    var aiRes=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],max_tokens:1024,provider:'opencode-go'})});
+    var aiRes=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:[{role:'user',content:prompt}],max_tokens:1024})});
     var text=await aiRes.text();
     if(aiRes.ok){
       try{var j=JSON.parse(text);text=j.choices?.[0]?.message?.content||j.content||j.reasoning_content||text;}catch(e){}

@@ -125,8 +125,12 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
           <i class="bi bi-robot" style="margin-right:0.4rem"></i>AI-Powered Search
         </h3>
         <p style="color:var(--acreetion-text);font-size:0.9rem;line-height:1.7;margin:0">
-          This tool searches the entire <a href="https://wiki.archlinux.org" style="color:var(--acreetion-green)">Arch Linux Wiki</a> and uses AI (powered by opencode-go) to generate beginner-friendly summaries of the results. Instead of reading dense technical documentation, you get clear, concise answers tailored for AcreetionOS users. The AI explains complex topics in plain language, with links back to the original Arch Wiki pages for advanced details.
+          This tool searches the entire <a href="https://wiki.archlinux.org" style="color:var(--acreetion-green)">Arch Linux Wiki</a> and uses AI to generate beginner-friendly summaries of the results. Instead of reading dense technical documentation, you get clear, concise answers tailored for AcreetionOS users. The AI explains complex topics in plain language, with links back to the original Arch Wiki pages for advanced details.
         </p>
+      </div>
+      <div id="ai-status-notice" style="display:none;margin-bottom:1.5rem;padding:1rem 1.25rem;border:1px solid #f39c12;border-radius:10px;background:rgba(243,156,18,0.08);font-size:0.85rem;line-height:1.6;color:var(--acreetion-text);position:relative">
+        <span style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;color:#666;font-size:1.1rem;line-height:1" id="dismiss-notice" title="Dismiss">&times;</span>
+        <strong style="color:#f39c12">&#9888;&#65039; Notice:</strong> AI guide generation was temporarily unavailable but has been fixed. We now use an <strong>auto-updating free model router</strong> from OpenRouter that automatically keeps the AI working even as free models come and go. If you still encounter issues, the raw wiki content is shown as a fallback.
       </div>
       <div class="search-card">
         <div class="bar">
@@ -225,7 +229,17 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
     document.getElementById('vote-buttons').innerHTML = '<span style="color:var(--acreetion-text);font-size:0.9rem">Thanks for your feedback!</span>';
     updateResults();
   }
-  document.querySelectorAll('.vote-btn').forEach(function(btn) {
+  (function(){
+  var notice = document.getElementById('ai-status-notice');
+  if (notice && !localStorage.getItem('aiNoticeDismissed')) {
+    notice.style.display = 'block';
+  }
+  document.getElementById('dismiss-notice').addEventListener('click', function() {
+    notice.style.display = 'none';
+    localStorage.setItem('aiNoticeDismissed', 'true');
+  });
+})();
+document.querySelectorAll('.vote-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       if (hasVoted()) return;
       var v = btn.getAttribute('data-vote');
