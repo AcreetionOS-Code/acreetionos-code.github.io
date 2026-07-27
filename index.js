@@ -798,6 +798,120 @@ async function handleNewsletterSubscribers(env) {
   }
 }
 
+// ─── Community Stats ───────────────────────────────────────────────
+
+const GH_ORG = 'AcreetionOS-Code';
+
+async function handleCommunityStats(env) {
+  try {
+    const [reposRes, membersRes] = await Promise.all([
+      fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=50&sort=pushed', {
+        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        signal: AbortSignal.timeout(10000)
+      }).catch(() => null),
+      fetch('https://api.github.com/orgs/' + GH_ORG + '/members?per_page=10', {
+        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        signal: AbortSignal.timeout(10000)
+      }).catch(() => null),
+    ]);
+
+    let repos = [];
+    let members = [];
+    if (reposRes && reposRes.ok) repos = await reposRes.json();
+    if (membersRes && membersRes.ok) members = await membersRes.json();
+
+    let totalStars = 0;
+    let totalForks = 0;
+    let totalIssues = 0;
+    const repoList = repos.map(r => {
+      totalStars += r.stargazers_count || 0;
+      totalForks += r.forks_count || 0;
+      totalIssues += r.open_issues_count || 0;
+      return {
+        name: r.name,
+        stars: r.stargazers_count || 0,
+        forks: r.forks_count || 0,
+        issues: r.open_issues_count || 0,
+        description: (r.description || '').slice(0, 80),
+        pushed: r.pushed_at,
+        url: r.html_url,
+        language: r.language || '',
+      };
+    });
+
+    // Get the latest release across all repos
+    let latestRelease = null;
+    try {
+      const releaseRes = await fetch('https://api.github.com/repos/' + GH_ORG + '/acreetionos/releases?per_page=1', {
+        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        signal: AbortSignal.timeout(5000)
+      });
+      if (releaseRes.ok) {
+        const releases = await releaseRes.json();
+        if (releases.length > 0) {
+          latestRelease = { tag: releases[0].tag_name, name: releases[0].name, date: releases[0].published_at, url: releases[0].html_url };
+        }
+      }
+    } catch (e) {}
+
+    // Try to get recent commits for activity
+    let recentCommits = 0;
+    try {
+      const eventsRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/events?per_page=30', {
+        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        signal: AbortSignal.timeout(5000)
+      });
+      if (eventsRes.ok) {
+        const events = await eventsRes.json();
+        recentCommits = events.filter(e => e.type === 'PushEvent').length;
+      }
+    } catch (e) {}
+
+    // Fetch build status from R2 if available
+    let builds = {};
+    try {
+      const cfToken = env.CLOUDFLARE_API_TOKEN;
+      const cfAccount = env.CLOUDFLARE_ACCOUNT_ID;
+      if (cfToken && cfAccount) {
+        const listRes = await fetch('https://api.cloudflare.com/client/v4/accounts/' + cfAccount + '/r2/buckets/build-status/objects', {
+          headers: { 'Authorization': 'Bearer ' + cfToken }
+        });
+        if (listRes.ok) {
+          const listData = await listRes.json();
+          const objects = listData?.result?.objects || [];
+          for (const obj of objects) {
+            if (obj.key.endsWith('-status.json')) {
+              const slug = obj.key.replace('-status.json', '');
+              const itemRes = await fetch('https://api.cloudflare.com/client/v4/accounts/' + cfAccount + '/r2/buckets/build-status/objects/' + obj.key, {
+                headers: { 'Authorization': 'Bearer ' + cfToken }
+              });
+              if (itemRes.ok) {
+                const itemData = await itemRes.json();
+                builds[slug] = itemData;
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {}
+
+    return new Response(JSON.stringify({
+      repos: repoList,
+      members: members.map(m => ({ login: m.login, avatar: m.avatar_url, url: m.html_url })),
+      totals: { repos: repoList.length, stars: totalStars, forks: totalForks, open_issues: totalIssues, members: members.length, recent_commits: recentCommits },
+      latest_release: latestRelease,
+      builds,
+      updated: new Date().toISOString(),
+    }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  }
+}
+
 // ─── Malware Scanning ──────────────────────────────────────────
 
 const SUSPICIOUS_FILENAME_PATTERNS = /\.(exe|bat|cmd|scr|ps1|vbs|jar|dll|zip|rar|7z)$/i;
@@ -2143,6 +2257,11 @@ export default {
           status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
+    }
+
+    // Community stats (contributors, repos, build status)
+    if (url.pathname === '/api/community/stats' && request.method === 'GET') {
+      return handleCommunityStats(env);
     }
 
     // ISO Hosting Provider management
