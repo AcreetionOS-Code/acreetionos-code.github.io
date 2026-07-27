@@ -122,7 +122,7 @@ async function initTracker() {
     }
   }
   if (!repos) {
-    loadingEl.innerHTML = 'Scanning: FlatFree, gitlab.acreetionos.org/darren, gitlab.acreetionos.org/natalie, github.com/spivanatalie64, github.com/cobra3282000, github.com/AcreetionOS-Code...';
+    loadingEl.innerHTML = 'Scanning: gitlab.acreetionos.org/darren, gitlab.acreetionos.org/natalie, github.com/spivanatalie64, github.com/cobra3282000, github.com/AcreetionOS-Code...';
     try {
       repos = await fetchAllSources();
       localStorage.setItem(CACHE_KEY, JSON.stringify({timestamp: Date.now(), data: repos}));
