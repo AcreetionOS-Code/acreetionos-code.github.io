@@ -164,12 +164,41 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
           </div>
         </div>
 
+        <!-- FastFetch Config -->
+        <div style="margin:3rem 0;padding:1.5rem;background:var(--panel);border:1px solid var(--border);border-radius:12px">
+          <h2 style="color:var(--green);font-size:1.1rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem"><i class="bi bi-terminal"></i> Show Off Your AcreetionOS Setup</h2>
+          <p style="color:var(--text);font-size:.88rem;margin-bottom:1rem;line-height:1.6">Download the official FastFetch config to display your system info with the AcreetionOS logo and green accent theme. Take a screenshot and share it on <a href="https://reddit.com/r/unixporn" style="color:var(--green)">r/unixporn</a> or <a href="https://reddit.com/r/linux" style="color:var(--green)">r/linux</a>!</p>
+
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:1rem;font-family:var(--font-mono);font-size:.82rem;color:var(--text);line-height:1.7;overflow-x:auto;margin-bottom:1rem">
+            <span style="color:#777"># One command to download, install, and run:</span><br>
+            <span style="color:var(--green)">curl -sL</span> https://acreetionos.org/acreetionos-fastfetch.jsonc <span style="color:var(--green)">-o</span> ~/.config/fastfetch/config.jsonc <span style="color:#777">&&</span><br>
+            sudo pacman -S --noconfirm fastfetch <span style="color:#777">&&</span><br>
+            <span style="color:var(--green)">fastfetch</span>
+          </div>
+
+          <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
+            <a href="acreetionos-fastfetch.jsonc" download class="btn" style="background:var(--green);color:#000;padding:.6rem 1.2rem;border-radius:8px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem"><i class="bi bi-download"></i> Download Config</a>
+            <button class="copy-cmd-btn" onclick="copyFastFetchCmd()" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--green);color:var(--green);border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;font-family:var(--font-sans)"><i class="bi bi-clipboard"></i> Copy Install Command</button>
+            <span style="color:#777;font-size:.78rem">Requires <code style="background:rgba(46,204,113,.1);padding:.15em .4em;border-radius:4px;font-family:var(--font-mono);font-size:.8rem">fastfetch</code> (install via pacman)</span>
+          </div>
+        </div>
+
         <div style="text-align:center;padding:2rem 0;margin-top:2rem">
           <h2 style="color:var(--green);font-size:1.2rem;margin-bottom:.75rem">Ready to Try It?</h2>
           <p style="color:var(--text);margin-bottom:1.5rem;max-width:500px;margin:0 auto 1.5rem">Download the Cinnamon Edition ISO and experience Arch Linux the way it should be — powerful, private, and approachable.</p>
           <a href="flash.html" class="btn" style="background:var(--green);color:#000;padding:.9rem 2rem;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem"><i class="bi bi-download"></i> Download AcreetionOS</a>
         </div>
       </div>
+      <script>
+        function copyFastFetchCmd() {
+          var text = 'curl -sL https://acreetionos.org/acreetionos-fastfetch.jsonc -o ~/.config/fastfetch/config.jsonc && sudo pacman -S --noconfirm fastfetch && fastfetch';
+          navigator.clipboard.writeText(text).then(function() {
+            var btn = document.querySelector('.copy-cmd-btn');
+            btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy Install Command'; }, 2500);
+          });
+        }
+      </script>
       <script src="scale-page.js" defer></script>
       <script src="sidebar.js" defer></script>
     </div>
