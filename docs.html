@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>
-    Documentation - AcreetionOS
+    AcreetionOS Documentation – Getting Started, Maintenance, Troubleshooting
   </title>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://acreetionos.org/docs.html">
@@ -23,7 +23,7 @@
   <meta property="twitter:title" content="Documentation - AcreetionOS">
   <meta property="twitter:description" content="AcreetionOS documentation — guides for getting started, system maintenance, networking, software management, troubleshooting, contributing, and governance.">
   <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-  <meta name="description" content="AcreetionOS documentation — guides for getting started, system maintenance, networking, software management, troubleshooting, contributing, and governance.">
+  <meta name="description" content="Official AcreetionOS documentation: getting started guide, system maintenance, network setup, software management, troubleshooting, and contributing to the project.">
   <meta name="keywords" content="AcreetionOS, documentation, guide, Arch Linux, getting started, system maintenance, network setup, software management, troubleshooting, contributing, governance">
   <link rel="canonical" href="https://acreetionos.org/docs.html">
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
@@ -37,7 +37,7 @@
   </script>
   <style>
 
-:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
 .header-content{display:flex;align-items:center;justify-content:flex-start;gap:.75rem;max-width:1400px;margin:0 auto;padding:0.5rem 1rem}
@@ -102,6 +102,12 @@ body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(
 @media(max-width:480px){.docs-wrapper{padding:0 .5rem}}
 
   </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://acreetionos.org/"},
+  {"@type":"ListItem","position":2,"name":"Documentation","item":"https://acreetionos.org/docs.html"}
+]}
+</script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">
@@ -344,7 +350,7 @@ loadDoc(initialDoc,true);
 })();
 
 </script>
-<script src="sw-register.js">
+<script src="sw-register.js" defer>
 </script>
 <script src="footer.js" defer>
 </script>

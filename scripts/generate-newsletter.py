@@ -1,22 +1,36 @@
 #!/usr/bin/env python3
-"""Generate the daily AcreetionOS newsletter using AI.
+"""Generate the daily AcreetionOS newsletter using AI and send via Gmail SMTP.
 
 Scrapes ecosystem pages + news activity, sends to Worker API for AI analysis,
-saves structured JSON to newsletters/ directory for rendering on newsletter.html.
+saves structured JSON to newsletters/ directory, and emails all subscribers.
+
+Environment variables:
+  EMAIL_ADDRESS      — Gmail address to send FROM (e.g. developers@acreetionos.org)
+  EMAIL_APP_PASSWORD — Gmail App Password for the above account
+  ADMIN_KEY          — SECRET_SAUCE admin key for Worker API
+  WORKER_URL         — Base URL for Worker API (default: https://acreetionos.org/api)
+  NEWSLETTER_DIR     — Directory for newsletter JSON files (default: newsletters)
 """
 
 import json
 import os
 import re
+import smtplib
+import ssl
 import sys
 import time
 from datetime import date
+from email.mime.text import MIMEText
+from email.utils import formataddr, formatdate
 from urllib.request import Request, urlopen
 from urllib.error import URLError
 
 WORKER_URL = os.environ.get("WORKER_URL", "https://acreetionos.org/api")
 NEWSLETTER_DIR = os.environ.get("NEWSLETTER_DIR", "newsletters")
 REQUEST_TIMEOUT = int(os.environ.get("REQUEST_TIMEOUT", "90"))
+EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS", "")
+EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "")
+ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 
 # Sources to scrape for ecosystem context
 ECOSYSTEM_PAGES = [
@@ -32,12 +46,10 @@ ECOSYSTEM_PAGES = [
 
 
 def fetch_text(url, timeout=None):
-    """Fetch a URL and return the text content, or None on failure."""
     req = Request(url, headers={"User-Agent": "AcreetionOS-Newsletter-Bot/1.0"})
     try:
         with urlopen(req, timeout=timeout or REQUEST_TIMEOUT) as resp:
             raw = resp.read()
-            # Try to decode as UTF-8, fall back to latin-1
             try:
                 return raw.decode("utf-8", errors="replace")
             except Exception:
@@ -63,12 +75,10 @@ def fetch_json(url, data=None, timeout=None):
 
 
 def strip_html(html):
-    """Strip HTML tags, collapse whitespace, truncate to reasonable length."""
     if not html:
         return ""
     text = re.sub(r"<[^>]+>", " ", html)
     text = re.sub(r"\s+", " ", text).strip()
-    # Truncate to avoid blowing token limits
     if len(text) > 3000:
         text = text[:3000] + "..."
     return text
@@ -84,7 +94,6 @@ def load_existing_list(newsletter_dir):
 
 def save_list(newsletter_dir, entries):
     list_path = os.path.join(newsletter_dir, "list.json")
-    # Deduplicate by filename, keeping the last occurrence
     seen = {}
     for e in entries:
         seen[e.get("filename", "")] = e
@@ -96,7 +105,6 @@ def save_list(newsletter_dir, entries):
 
 
 def scrape_ecosystem():
-    """Scrape ecosystem pages and return a summary."""
     print("Scraping AcreetionOS ecosystem pages...")
     parts = []
     for name, url in ECOSYSTEM_PAGES:
@@ -111,13 +119,68 @@ def scrape_ecosystem():
 
 
 def fetch_news_activity():
-    """Fetch structured news/activity from the Worker API."""
     print("Fetching news activity from Worker API...")
     try:
         return fetch_json(f"{WORKER_URL}/news")
     except Exception as e:
         print(f"Failed to fetch news: {e}", file=sys.stderr)
         return {"articles": [], "activity": []}
+
+
+def fetch_subscribers():
+    """Fetch subscriber list from Worker API using admin key."""
+    if not ADMIN_KEY:
+        print("No ADMIN_KEY set — skipping subscriber fetch", file=sys.stderr)
+        return []
+    try:
+        req = Request(f"{WORKER_URL}/newsletter/subscribers")
+        req.add_header("X-Admin-Key", ADMIN_KEY)
+        req.add_header("User-Agent", "AcreetionOS-Newsletter-Bot/1.0")
+        with urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read())
+            return data.get("subscribers", [])
+    except Exception as e:
+        print(f"Failed to fetch subscribers: {e}", file=sys.stderr)
+        return []
+
+
+def send_email_smtp(to_email, subject, body_text, unsubscribe_url=""):
+    """Send an email via Gmail SMTP using App Password."""
+    if not EMAIL_ADDRESS or not EMAIL_PASSWORD:
+        print("EMAIL_ADDRESS or EMAIL_APP_PASSWORD not set — skipping email send", file=sys.stderr)
+        return False
+
+    html_parts = []
+    for paragraph in body_text.strip().split("\n\n"):
+        p = paragraph.strip()
+        if p:
+            html_parts.append(f"<p>{p.replace(chr(10), '<br>')}</p>")
+
+    html_body = "<html><body style='font-family:Roboto,sans-serif;color:#e5e5e5;background:#121212;padding:20px;max-width:600px;margin:0 auto'>"
+    html_body += "<div style='text-align:center;margin-bottom:20px'>"
+    html_body += "<img src='https://acreetionos.org/acreetionoslogo.webp' alt='AcreetionOS' width='60' height='60' style='border-radius:12px'>"
+    html_body += "</div>"
+    html_body += "".join(html_parts)
+    if unsubscribe_url:
+        html_body += f"<p style='margin-top:30px;font-size:12px;color:#777'><a href='{unsubscribe_url}' style='color:#2ecc71'>Unsubscribe</a> from these emails.</p>"
+    html_body += "</body></html>"
+
+    msg = MIMEText(html_body, "html")
+    msg["Subject"] = subject
+    msg["From"] = formataddr(("AcreetionOS Newsletter", EMAIL_ADDRESS))
+    msg["To"] = to_email
+    msg["Date"] = formatdate(localtime=True)
+    msg["List-Unsubscribe"] = f"<{unsubscribe_url}>" if unsubscribe_url else ""
+
+    try:
+        context = ssl.create_default_context()
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+            server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
+            server.sendmail(EMAIL_ADDRESS, [to_email], msg.as_string())
+        return True
+    except Exception as e:
+        print(f"  Failed to send email to {to_email}: {e}", file=sys.stderr)
+        return False
 
 
 def main():
@@ -132,10 +195,7 @@ def main():
         print(f"Newsletter already exists: {filename}")
         return
 
-    # --- Scrape ecosystem pages for rich context ---
     ecosystem_text = scrape_ecosystem()
-
-    # --- Fetch structured news activity ---
     news = fetch_news_activity()
     articles = news.get("articles", [])
     activity = news.get("activity", [])
@@ -180,7 +240,6 @@ def main():
                 }).encode(),
                 timeout=180,
             )
-            # Worker /api/news/ai returns { content, model }, NOT OpenRouter format
             content = (
                 ai_response.get("content", "")
                 .strip()
@@ -218,6 +277,29 @@ def main():
         "date_display": date_display,
     })
     save_list(NEWSLETTER_DIR, entries)
+
+    # Send emails to subscribers
+    if EMAIL_ADDRESS and EMAIL_PASSWORD:
+        print("Fetching subscribers...")
+        subscribers = fetch_subscribers()
+        if subscribers:
+            print(f"Sending newsletter to {len(subscribers)} subscribers via Gmail SMTP...")
+            success_count = 0
+            for sub in subscribers:
+                email = sub.get("email", "")
+                token = sub.get("unsubscribe_token", "")
+                unsubscribe_url = f"https://acreetionos.org/api/newsletter/unsubscribe?email={email}&token={token}" if email and token else ""
+                if email:
+                    ok = send_email_smtp(email, newsletter["subject"], content, unsubscribe_url)
+                    if ok:
+                        success_count += 1
+                    print(f"  {'OK' if ok else 'FAIL'} {email}")
+                time.sleep(0.5)
+            print(f"Sent {success_count}/{len(subscribers)} emails successfully")
+        else:
+            print("No subscribers to email")
+    else:
+        print("EMAIL_ADDRESS/EMAIL_APP_PASSWORD not set — skipping email delivery. Set these in environment to send.")
 
 
 if __name__ == "__main__":

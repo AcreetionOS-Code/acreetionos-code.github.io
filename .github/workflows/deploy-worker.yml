@@ -27,12 +27,14 @@ jobs:
           SCAN_MASTER: ${{ secrets.VIRUSTOTAL_API_KEY }}
           GUEST_LIST: ${{ secrets.ALLOWED_ORIGINS }}
           WATCH_LIST: ${{ secrets.CRED_I }}
+          EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+          EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
         run: |
           set +e
           CF_ACCOUNT=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[0].id')
           SCRIPT_NAME="acreetionos-worker"
-          for name in SPICY_SAUCE TACO_BELL BRAIN_JUICE SECRET_SAUCE ALERT_SIREN SCAN_MASTER GUEST_LIST WATCH_LIST; do
+          for name in SPICY_SAUCE TACO_BELL BRAIN_JUICE SECRET_SAUCE ALERT_SIREN SCAN_MASTER GUEST_LIST WATCH_LIST EMAIL_ADDRESS EMAIL_APP_PASSWORD; do
             val="${!name}"
             if [ -n "$val" ]; then
               curl -s -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/$SCRIPT_NAME/secrets" \

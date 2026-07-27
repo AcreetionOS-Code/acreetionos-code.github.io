@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <script src="/coi-serviceworker.js">
+    <script src="/coi-serviceworker.js" defer>
     </script>
     <meta charset="UTF-8" >
     <meta name="robots" content="index, follow" >
@@ -10,7 +10,7 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" >
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://wiki.archlinux.org; base-uri 'self'" >
     <title>
-    AcreetionOS - Wiki Hub
+    AcreetionOS Wiki – Arch Linux Guides with AI-Powered Search
   </title>
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://acreetionos.org/wiki.html">
@@ -23,7 +23,7 @@
   <meta property="twitter:title" content="Wiki Hub - AcreetionOS">
   <meta property="twitter:description" content="Search the Arch Linux Wiki through AcreetionOS.">
   <meta property="twitter:image" content="https://acreetionos.org/logo.webp">
-  <meta name="description" content="Search the Arch Linux Wiki through AcreetionOS. Get beginner-friendly guides and AI-powered explanations for Linux topics." >
+  <meta name="description" content="Search the Arch Linux Wiki through AcreetionOS. Get beginner-friendly, AI-generated guides for system maintenance, software installation, WiFi, NVIDIA drivers, and more." >
   <link rel="canonical" href="https://acreetionos.org/wiki.html" >
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
   <link rel="stylesheet" href="fonts.css">
@@ -33,7 +33,7 @@
   </script>
   <style>
 
-:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
 .wrap{max-width:860px;margin:2rem auto;padding:0 1.5rem}
@@ -79,6 +79,12 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .page-footer a:hover{text-decoration:underline}
 
   </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://acreetionos.org/"},
+  {"@type":"ListItem","position":2,"name":"Wiki","item":"https://acreetionos.org/wiki.html"}
+]}
+</script>
 </head>
 <body>
   <a href="#main-content" class="skip-link">
@@ -119,6 +125,9 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
       </h1>
       <p class="sub">
         Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.
+      </p>
+      <p style="font-size:0.78rem;color:#555;margin-top:-0.5rem;margin-bottom:1.5rem">
+        AI guides powered by <a href="https://openrouter.ai" target="_blank" rel="noopener" style="color:#2ecc71">OpenRouter</a> free model routing — thank you for supporting open AI!
       </p>
       <div style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem">
         <h3 style="color:var(--acreetion-green);font-family:var(--font-mono);font-size:1rem;margin-bottom:0.5rem">
@@ -279,7 +288,7 @@ document.querySelectorAll('.vote-btn').forEach(function(btn) {
 </script>
 <script src="sidebar.js" defer>
 </script>
-<script src="wiki-page.js">
+<script src="wiki-page.js" defer>
 </script>
 <script src="footer.js" defer>
 </script>

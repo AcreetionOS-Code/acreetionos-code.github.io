@@ -778,6 +778,26 @@ async function handleNewsletterUnsubscribe(request, env) {
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed from newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
+async function handleNewsletterSubscribers(env) {
+  try {
+    const objects = await listR2(env, 'acreetionos-hosting', 'nl-subscriber-');
+    const subscribers = [];
+    for (const obj of objects) {
+      const data = await getR2(env, 'acreetionos-hosting', obj.key);
+      if (data && data.email) {
+        subscribers.push({ email: data.email, subscribed: data.subscribed, unsubscribe_token: data.unsubscribe_token || '' });
+      }
+    }
+    return new Response(JSON.stringify({ subscribers, count: subscribers.length }), {
+      headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message, subscribers: [], count: 0 }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  }
+}
+
 // ─── Malware Scanning ──────────────────────────────────────────
 
 const SUSPICIOUS_FILENAME_PATTERNS = /\.(exe|bat|cmd|scr|ps1|vbs|jar|dll|zip|rar|7z)$/i;
@@ -2164,6 +2184,13 @@ export default {
     }
     if (url.pathname === '/api/newsletter/unsubscribe' && request.method === 'GET') {
       return handleNewsletterUnsubscribe(request, env);
+    }
+    if (url.pathname === '/api/newsletter/subscribers' && request.method === 'GET') {
+      const adminKey = request.headers.get('X-Admin-Key');
+      if (!adminKey || !(await timingSafeCompare(adminKey, env.SECRET_SAUCE || ''))) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) } });
+      }
+      return handleNewsletterSubscribers(env);
     }
     if (url.pathname === '/api/hosting/unsubscribe' && request.method === 'GET') {
       return handleHostingUnsubscribe(request, env);

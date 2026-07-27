@@ -2,145 +2,163 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://acreetionos.org/</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/about.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/compare.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/contact.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/docs.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/faq.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/flash.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/git-tracker.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/governance.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/hosting.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/newsletter.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/requirements.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/status.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/wiki.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://acreetionos.org/lightweight.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://acreetionos.org/privacy.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://acreetionos.org/beginner.html</loc>
+    <lastmod>2026-07-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://acreetionos.org/unofficial/</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/32bit.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/gnome.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/hyprland.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/plasma.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/i3.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/sway.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/xfce.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/openbox.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://acreetionos.org/unofficial/mate.html</loc>
-    <lastmod>2026-07-06</lastmod>
+    <lastmod>2026-07-27</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
