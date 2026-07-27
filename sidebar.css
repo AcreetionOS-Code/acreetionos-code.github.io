@@ -36,8 +36,8 @@ body.sidebar-open{overflow-x:hidden}
 @media(max-width:768px){#sidebar{width:300px;left:-300px}body.sidebar-open #page-wrap{margin-left:300px;max-width:calc(100vw - 300px)}#sidebar.open{left:0}}
 @media(max-width:480px){#sidebar{width:85vw;left:-85vw}body.sidebar-open #page-wrap{margin-left:85vw;max-width:calc(100vw - 85vw)}#sidebar.open{left:0}}
 
-.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border,#333);color:#777;font-size:0.85rem}
-.page-footer p{color:#777;margin-bottom:0.5rem;line-height:1.6}
+.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border,#333);color:#999;font-size:0.85rem}
+.page-footer p{color:#999;margin-bottom:0.5rem;line-height:1.6}
 .page-footer a{color:var(--acreetion-green,#2ecc71);text-decoration:none}
 .page-footer a:hover{text-decoration:underline}
-.page-footer strong{color:#999}
+.page-footer strong{color:#bbb}
