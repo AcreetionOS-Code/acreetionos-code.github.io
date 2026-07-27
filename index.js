@@ -804,13 +804,14 @@ const GH_ORG = 'AcreetionOS-Code';
 
 async function handleCommunityStats(env) {
   try {
+    const ghHeaders = { 'User-Agent': 'AcreetionOS-Stats/1.0', ...(env.GH_TOKEN ? { 'Authorization': 'Bearer ' + env.GH_TOKEN } : {}) };
     const [reposRes, membersRes] = await Promise.all([
       fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=50&sort=pushed', {
-        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        headers: ghHeaders,
         signal: AbortSignal.timeout(10000)
       }).catch(() => null),
       fetch('https://api.github.com/orgs/' + GH_ORG + '/members?per_page=10', {
-        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        headers: ghHeaders,
         signal: AbortSignal.timeout(10000)
       }).catch(() => null),
     ]);
@@ -843,7 +844,7 @@ async function handleCommunityStats(env) {
     let latestRelease = null;
     try {
       const releaseRes = await fetch('https://api.github.com/repos/' + GH_ORG + '/acreetionos/releases?per_page=1', {
-        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        headers: ghHeaders,
         signal: AbortSignal.timeout(5000)
       });
       if (releaseRes.ok) {
@@ -858,7 +859,7 @@ async function handleCommunityStats(env) {
     let recentCommits = 0;
     try {
       const eventsRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/events?per_page=30', {
-        headers: { 'User-Agent': 'AcreetionOS-Stats/1.0' },
+        headers: ghHeaders,
         signal: AbortSignal.timeout(5000)
       });
       if (eventsRes.ok) {
@@ -926,8 +927,9 @@ function categorizeCommit(message) {
 
 async function handleChangelog(env) {
   try {
+    const ghHeaders = { 'User-Agent': 'AcreetionOS-Changelog/1.0', ...(env.GH_TOKEN ? { 'Authorization': 'Bearer ' + env.GH_TOKEN } : {}) };
     const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=20&sort=pushed', {
-      headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+      headers: ghHeaders,
       signal: AbortSignal.timeout(8000)
     });
     if (!reposRes.ok) throw new Error('GitHub API error');
@@ -939,7 +941,7 @@ async function handleChangelog(env) {
       .slice(0, 8)
       .map(r =>
         fetch('https://api.github.com/repos/' + GH_ORG + '/' + r.name + '/commits?per_page=10', {
-          headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+          headers: ghHeaders,
           signal: AbortSignal.timeout(5000)
         }).then(res => res.ok ? res.json() : []).catch(() => [])
       );
