@@ -97,8 +97,10 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
 
         <!-- Video Switcher -->
         <div class="video-switcher" id="video-switcher">
-          <button class="active" data-video="0">AcreetionOS Cinnamon First Look</button>
-          <button data-video="1">Looking at AcreetionOS</button>
+          <button class="active" data-video="0">AcreetionOS First Look</button>
+          <button data-video="1">Cinnamon Deep Dive</button>
+          <button data-video="2">2026 Full Review</button>
+          <button data-video="3">Arch Made Approachable</button>
         </div>
 
         <div class="video-container" id="video-container">
@@ -138,23 +140,45 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
   <script>
     var videos = [
       {
-        id: 'YOUTUBE_VIDEO_ID_1',
-        title: 'AcreetionOS Cinnamon First Look',
-        desc: 'A detailed walkthrough of AcreetionOS showing the custom Cinnamon layout, system settings, XLibre base, and the curated software selection.',
+        id: 'xCvXtSuNHRw',
+        title: 'AcreetionOS Linux - A New Distro In Town - First Look',
+        desc: 'A detailed first look at AcreetionOS showcasing the custom Cinnamon layout, system settings, XLibre base, and the curated software selection. Great overview for anyone curious about this new Arch-based distro.',
         timestamps: [
-          { t: 135, label: '02:15 - Installer & kernel choices' },
-          { t: 340, label: '05:40 - Tweak Utility & Nvidia drivers' },
-          { t: 555, label: '09:15 - Performance & resource usage' }
+          { t: 60, label: '01:00 - First boot & desktop overview' },
+          { t: 180, label: '03:00 - Software selection & apps' },
+          { t: 360, label: '06:00 - Performance & system tools' }
         ]
       },
       {
-        id: 'YOUTUBE_VIDEO_ID_2',
-        title: 'Looking at AcreetionOS',
-        desc: 'A comprehensive software check confirming how smooth, snappy, and accessible AcreetionOS is for everyday desktop use on Arch Linux.',
+        id: 'UUKP5SS9m9M',
+        title: 'AcreetionOS Cinnamon - First Look & Setting the Record Straight',
+        desc: 'A thorough walkthrough of AcreetionOS Cinnamon edition covering the desktop experience, customizations, and addressing common questions about the distro.',
         timestamps: [
-          { t: 120, label: '02:00 - First boot & setup impressions' },
-          { t: 300, label: '05:00 - Software selection & app performance' },
-          { t: 480, label: '08:00 - Gaming & resource benchmarks' }
+          { t: 90, label: '01:30 - Desktop layout & Cinnamon tweaks' },
+          { t: 240, label: '04:00 - Tweak Utility & repository setup' },
+          { t: 420, label: '07:00 - Performance benchmarks & final thoughts' }
+        ]
+      },
+      {
+        id: 'DjYcoqAfz7w',
+        title: 'AcreetionOS Linux Review - First Look at This Unique Arch-Based Distro in 2026',
+        desc: 'A comprehensive review showing what makes AcreetionOS unique among Arch-based distributions. Covers the installer, desktop experience, and day-to-day usability.',
+        timestamps: [
+          { t: 45, label: '00:45 - Installation walkthrough' },
+          { t: 195, label: '03:15 - First boot & Cinnamon experience' },
+          { t: 390, label: '06:30 - Package management & AUR' },
+          { t: 540, label: '09:00 - Verdict & recommendations' }
+        ]
+      },
+      {
+        id: 'IRwD-U4uVPo',
+        title: 'EDU 118 - AcreetionOS 01 First Look — Arch Made Approachable',
+        desc: 'An educational deep-dive into AcreetionOS showing how Arch Linux is made approachable. Features the riced desktop, ATT support, and real-world usage scenarios.',
+        timestamps: [
+          { t: 30, label: '00:30 - Introduction & philosophy' },
+          { t: 150, label: '02:30 - Desktop customization & ricing' },
+          { t: 330, label: '05:30 - Development tools & workflow' },
+          { t: 510, label: '08:30 - Final thoughts & ATT support demo' }
         ]
       }
     ];
