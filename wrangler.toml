@@ -3,8 +3,11 @@ main = "index.js"
 compatibility_date = "2026-04-26"
 account_id = "6a46b418508c26278ae2d3373f41da81"
 
-# Routes are managed directly on the Cloudflare dashboard.
-# `wrangler deploy` without routes will update the script only.
+routes = [
+  { pattern = "acreetionos.org/api/*", zone_name = "acreetionos.org" },
+  { pattern = "acreetionos.org/flash.html", zone_name = "acreetionos.org" },
+  { pattern = "darren.acreetionos.org/*", zone_name = "acreetionos.org" },
+]
 
 [triggers]
 # Check every 30 min: verify all ISOs downloadable, auto-fix broken
