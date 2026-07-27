@@ -26,7 +26,6 @@ function init(){
     {href:'wiki.html',label:'Wiki',icon:'bi-book'},
     {href:'about.html',label:'About',icon:'bi-info-circle'},
     {href:'status.html',label:'Status',icon:'bi-activity'},
-    {href:'newsletter.html',label:'Newsletter',icon:'bi-envelope'},
     {href:'contact.html',label:'Contact',icon:'bi-envelope-paper'},
     {href:'hosting.html',label:'ISO Hosting',icon:'bi-hdd-stack'},
     {href:'unofficial.html',label:'Community Editions',icon:'bi-grid'},
