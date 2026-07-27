@@ -1,0 +1,75 @@
+// AcreetionOS - Official FastFetch Configuration
+// Place in ~/.config/fastfetch/ or /etc/fastfetch/
+// Install fastfetch: sudo pacman -S fastfetch
+// Run: fastfetch --config acreetionos-fastfetch.jsonc
+
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "source": "/usr/share/fastfetch/logos/acreetionos.png",
+    "padding": {
+      "top": 2,
+      "left": 2
+    },
+    "width": 30
+  },
+  "display": {
+    "separator": " → ",
+    "color": "green"
+  },
+  "modules": [
+    {
+      "type": "custom",
+      "format": ""
+    },
+    { "type": "title", "format": "{1}  {3} ({5})" },
+    {
+      "type": "custom",
+      "format": ""
+    },
+    { "type": "os", "key": "OS", "keyColor": "green" },
+    { "type": "host", "key": "Host", "keyColor": "green" },
+    { "type": "kernel", "key": "Kernel", "keyColor": "green" },
+    { "type": "uptime", "key": "Uptime", "keyColor": "green" },
+    { "type": "packages", "key": "Packages", "keyColor": "green" },
+    { "type": "shell", "key": "Shell", "keyColor": "green" },
+    { "type": "display", "key": "Display", "keyColor": "green" },
+    { "type": "desktopEnvironment", "key": "DE", "keyColor": "green" },
+    { "type": "wm", "key": "WM", "keyColor": "green" },
+    { "type": "terminal", "key": "Terminal", "keyColor": "green" },
+    { "type": "terminalFont", "key": "Font", "keyColor": "green" },
+    { "type": "cpu", "key": "CPU", "keyColor": "green" },
+    { "type": "gpu", "key": "GPU", "keyColor": "green" },
+    { "type": "memory", "key": "Memory", "keyColor": "green" },
+    { "type": "disk", "key": "Disk", "keyColor": "green" },
+    { "type": "battery", "key": "Battery", "keyColor": "green" },
+    { "type": "localIp", "key": "Local IP", "keyColor": "green" },
+    { "type": "bluetooth", "key": "Bluetooth", "keyColor": "green" },
+    { "type": "wifi", "key": "WiFi", "keyColor": "green" },
+    { "type": "sound", "key": "Audio", "keyColor": "green" },
+    {
+      "type": "custom",
+      "format": ""
+    },
+    {
+      "type": "colors",
+      "symbol": "circle"
+    },
+    {
+      "type": "custom",
+      "format": ""
+    },
+    {
+      "type": "custom",
+      "format": "  Welcome to ${c2}AcreetionOS${c0} — Arch Linux made approachable."
+    },
+    {
+      "type": "custom",
+      "format": "  ${c2}https://acreetionos.org${c0}"
+    },
+    {
+      "type": "custom",
+      "format": ""
+    }
+  ]
+}

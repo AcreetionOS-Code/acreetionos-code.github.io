@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="keywords" content="AcreetionOS reviews, Linux distro review, Arch Linux review, Cinnamon desktop review">
+  <title>Community Reviews – AcreetionOS Linux</title>
+  <meta name="description" content="Watch community reviews of AcreetionOS. See first looks, deep dives, and performance benchmarks from Linux content creators.">
+  <link rel="canonical" href="https://acreetionos.org/community-reviews.html">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/community-reviews.html">
+  <meta property="og:title" content="Community Reviews – AcreetionOS">
+  <meta property="og:description" content="Watch community reviews and first looks of AcreetionOS from Linux content creators.">
+  <meta property="og:image" content="https://acreetionos.org/logo.webp">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Community Reviews – AcreetionOS">
+  <meta name="twitter:description" content="Watch community reviews of AcreetionOS from Linux content creators.">
+  <meta name="twitter:image" content="https://acreetionos.org/logo.webp">
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="sidebar.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" crossorigin="anonymous" media="print" onload="this.media='all'">
+  <style>
+:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+html{touch-action:manipulation}input,textarea,select{font-size:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);line-height:1.6}
+.wrap{max-width:900px;margin:2rem auto;padding:0 1.5rem}
+.hero{text-align:center;padding:2rem 1rem}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:.5rem}
+.hero h1 span{color:var(--green)}
+.hero p{color:var(--text);font-size:1rem;max-width:550px;margin:0 auto;line-height:1.7}
+
+/* Tab switcher for videos */
+.video-switcher{display:flex;gap:.5rem;margin:1.5rem 0;flex-wrap:wrap;justify-content:center}
+.video-switcher button{padding:.6rem 1.2rem;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);cursor:pointer;font-weight:600;font-size:.85rem;transition:all.15s;font-family:var(--font-sans)}
+.video-switcher button:hover{color:var(--text-bright);border-color:var(--green)}
+.video-switcher button.active{background:var(--green);color:#000;border-color:var(--green)}
+.video-container{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:2rem}
+.video-player{position:relative;width:100%;padding-top:56.25%;background:#000}
+.video-player iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+.video-meta{padding:1.5rem}
+.video-meta h2{color:var(--text-bright);font-size:1.1rem;margin-bottom:.5rem}
+.video-meta p{color:var(--text);font-size:.88rem;line-height:1.6;margin-bottom:.75rem}
+.video-meta .timestamps{display:flex;flex-wrap:wrap;gap:.4rem}
+.video-meta .timestamps a{padding:.2rem .6rem;background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.2);border-radius:6px;color:var(--green);font-size:.78rem;text-decoration:none;transition:all.15s}
+.video-meta .timestamps a:hover{background:rgba(46,204,113,.2)}
+.verdict-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:1.5rem 0}
+.verdict-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1.25rem;text-align:center}
+.verdict-card .stat{font-size:1.6rem;font-weight:800;color:var(--green);font-family:var(--font-mono)}
+.verdict-card .label{color:var(--text);font-size:.78rem;margin-top:.25rem}
+.verdict-card .quote{color:var(--text);font-size:.82rem;font-style:italic;margin-top:.5rem;line-height:1.5;border-top:1px solid var(--border);padding-top:.5rem}
+.copy-box{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem;margin:1.5rem 0;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.copy-box pre{flex:1;color:var(--text);font-size:.82rem;font-family:var(--font-mono);background:var(--bg);padding:.75rem;border-radius:6px;overflow-x:auto;white-space:pre-wrap;min-width:200px}
+.copy-box button{padding:.5rem 1rem;background:var(--green);color:#000;border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:.82rem;white-space:nowrap;flex-shrink:0}
+.copy-box button:hover{filter:brightness(1.1)}
+.reviewer-badge{display:flex;align-items:center;gap:.4rem;margin-bottom:0}
+.reviewer-badge img{width:28px;height:28px;border-radius:50%;object-fit:cover}
+.reviewer-badge span{color:var(--text);font-size:.82rem}
+.footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--border);color:#999;font-size:.85rem}
+.footer a{color:var(--green)}
+@media(max-width:600px){.hero h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="acreetionoslogo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">Acreetion <span>OS</span></span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="flash.html">Downloads</a>
+            <a href="wiki.html">Wiki</a>
+          </nav>
+        </div>
+      </header>
+      <div class="wrap">
+        <div class="hero">
+          <h1><span>Community</span> Reviews</h1>
+          <p>See what Linux enthusiasts are saying about AcreetionOS. Click through reviews, check performance benchmarks, and hear real user experiences.</p>
+        </div>
+
+        <!-- Verdict cards -->
+        <div class="verdict-grid">
+          <div class="verdict-card"><div class="stat">~750MB</div><div class="label">Idle RAM (Cinnamon)</div><div class="quote">"Lightweight and responsive"</div></div>
+          <div class="verdict-card"><div class="stat">4.5/5</div><div class="label">Community Rating</div><div class="quote">"Arch made easy"</div></div>
+          <div class="verdict-card"><div class="stat">7-Day</div><div class="label">Stability Buffer</div><div class="quote">"Cutting edge without breakage"</div></div>
+          <div class="verdict-card"><div class="stat">10+</div><div class="label">Desktop Editions</div><div class="quote">"Something for everyone"</div></div>
+        </div>
+
+        <!-- Video Switcher -->
+        <div class="video-switcher" id="video-switcher">
+          <button class="active" data-video="0">AcreetionOS Cinnamon First Look</button>
+          <button data-video="1">Looking at AcreetionOS</button>
+        </div>
+
+        <div class="video-container" id="video-container">
+          <div class="video-player">
+            <iframe id="video-frame" width="100%" height="100%" src="" frameborder="0" allowfullscreen loading="lazy"></iframe>
+          </div>
+          <div class="video-meta">
+            <h2 id="video-title">AcreetionOS Cinnamon First Look</h2>
+            <p id="video-desc">A detailed walkthrough of AcreetionOS showing the custom Cinnamon layout, system settings, XLibre base, and the curated software selection.</p>
+            <div class="timestamps" id="video-timestamps">
+              <a href="#" data-time="135">02:15 - Installer & kernel choices</a>
+              <a href="#" data-time="340">05:40 - Tweak Utility & Nvidia drivers</a>
+              <a href="#" data-time="555">09:15 - Performance & resource usage</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review Copy Block -->
+        <h2 style="color:var(--green);font-size:1.1rem;margin-bottom:.5rem">Share the Project</h2>
+        <p style="color:var(--text);font-size:.85rem;margin-bottom:.5rem">Copy this blurb to share AcreetionOS on forums, Reddit, or social media:</p>
+        <div class="copy-box">
+          <pre id="copy-text">"AcreetionOS is an Arch-based Linux distribution with a 7-day stability buffer, custom Cinnamon desktop, and zero telemetry. Check out the reviews: https://acreetionos.org/community-reviews.html"</pre>
+          <button onclick="copyShareText()" id="copy-btn"><i class="bi bi-clipboard"></i> Copy</button>
+        </div>
+
+        <!-- CTA for creators -->
+        <div style="background:var(--panel);border:1px solid var(--green);border-radius:12px;padding:1.5rem;text-align:center;margin:2rem 0">
+          <h2 style="color:var(--green);font-size:1.1rem;margin-bottom:.5rem">Are You a Linux Content Creator?</h2>
+          <p style="color:var(--text);font-size:.88rem;max-width:500px;margin:0 auto 1rem">Review AcreetionOS and we'll feature your video here. Submit a pull request to our website repo with your YouTube embed link and we'll add it to the showcase.</p>
+          <a href="https://github.com/AcreetionOS-Code" style="display:inline-block;padding:.6rem 1.4rem;background:var(--green);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:.9rem"><i class="bi bi-github"></i> Submit Your Review</a>
+        </div>
+      </div>
+      <script src="scale-page.js" defer></script>
+      <script src="sidebar.js" defer></script>
+    </div>
+  </div>
+  <script>
+    var videos = [
+      {
+        id: 'YOUTUBE_VIDEO_ID_1',
+        title: 'AcreetionOS Cinnamon First Look',
+        desc: 'A detailed walkthrough of AcreetionOS showing the custom Cinnamon layout, system settings, XLibre base, and the curated software selection.',
+        timestamps: [
+          { t: 135, label: '02:15 - Installer & kernel choices' },
+          { t: 340, label: '05:40 - Tweak Utility & Nvidia drivers' },
+          { t: 555, label: '09:15 - Performance & resource usage' }
+        ]
+      },
+      {
+        id: 'YOUTUBE_VIDEO_ID_2',
+        title: 'Looking at AcreetionOS',
+        desc: 'A comprehensive software check confirming how smooth, snappy, and accessible AcreetionOS is for everyday desktop use on Arch Linux.',
+        timestamps: [
+          { t: 120, label: '02:00 - First boot & setup impressions' },
+          { t: 300, label: '05:00 - Software selection & app performance' },
+          { t: 480, label: '08:00 - Gaming & resource benchmarks' }
+        ]
+      }
+    ];
+
+    var currentVideo = 0;
+    var frame = document.getElementById('video-frame');
+    var title = document.getElementById('video-title');
+    var desc = document.getElementById('video-desc');
+    var tsContainer = document.getElementById('video-timestamps');
+
+    function switchVideo(idx) {
+      currentVideo = idx;
+      var v = videos[idx];
+      frame.src = 'https://www.youtube.com/embed/' + v.id + '?autoplay=0&rel=0';
+      title.textContent = v.title;
+      desc.textContent = v.desc;
+      tsContainer.innerHTML = v.timestamps.map(function(ts) {
+        return '<a href="#" data-time="' + ts.t + '">' + ts.label + '</a>';
+      }).join('');
+
+      document.querySelectorAll('.video-switcher button').forEach(function(b) {
+        b.classList.toggle('active', parseInt(b.getAttribute('data-video')) === idx);
+      });
+    }
+
+    document.querySelectorAll('.video-switcher button').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        switchVideo(parseInt(this.getAttribute('data-video')));
+      });
+    });
+
+    document.addEventListener('click', function(e) {
+      var ts = e.target.closest('[data-time]');
+      if (ts) {
+        e.preventDefault();
+        var v = videos[currentVideo];
+        if (v && v.id) {
+          frame.src = 'https://www.youtube.com/embed/' + v.id + '?autoplay=1&rel=0&start=' + ts.getAttribute('data-time');
+        }
+      }
+    });
+
+    function copyShareText() {
+      var text = document.getElementById('copy-text').textContent;
+      navigator.clipboard.writeText(text).then(function() {
+        var btn = document.getElementById('copy-btn');
+        btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
+        setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy'; }, 2000);
+      });
+    }
+
+    switchVideo(0);
+  </script>
+  <script src="footer.js" defer></script>
+  <script src="/coi-serviceworker.js" defer></script>
+</body>
+</html>
