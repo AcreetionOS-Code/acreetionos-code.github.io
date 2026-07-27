@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Set Worker Secrets
+        shell: bash
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           SPICY_SAUCE: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -30,11 +31,21 @@ jobs:
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
         run: |
-          set +e
+          set -e
           CF_ACCOUNT=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" \
             "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[0].id')
           SCRIPT_NAME="acreetionos-worker"
-          for name in SPICY_SAUCE TACO_BELL BRAIN_JUICE SECRET_SAUCE ALERT_SIREN SCAN_MASTER GUEST_LIST WATCH_LIST EMAIL_ADDRESS EMAIL_APP_PASSWORD; do
+          for name in SPICY_SAUCE TACO_BELL BRAIN_JUICE SECRET_SAUCE ALERT_SIREN SCAN_MASTER GUEST_LIST WATCH_LIST; do
+            val="${!name}"
+            if [ -n "$val" ]; then
+              curl -s -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/$SCRIPT_NAME/secrets" \
+                -H "Authorization: Bearer $CF_API_TOKEN" \
+                -H "Content-Type: application/json" \
+                -d "{\"name\":\"$name\",\"text\":\"$val\",\"type\":\"secret_text\"}"
+            fi
+          done
+          # Optional secrets — skip if not set
+          for name in EMAIL_ADDRESS EMAIL_APP_PASSWORD; do
             val="${!name}"
             if [ -n "$val" ]; then
               curl -s -X PUT "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/$SCRIPT_NAME/secrets" \

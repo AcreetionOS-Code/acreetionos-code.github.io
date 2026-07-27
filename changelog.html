@@ -100,6 +100,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
         </div>
 
         <div class="timeline" id="timeline">
+          <div class="loading" id="loading-indicator" style="text-align:center;padding:2rem;color:var(--text);font-family:var(--font-mono);font-size:.9rem"><div class="spin" style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin.7s linear infinite;margin-bottom:.5rem"></div><br>Loading live changelog from GitHub & GitLab...</div>
           <!-- Populated by JS -->
         </div>
       </div>
@@ -108,55 +109,61 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
     </div>
   </div>
   <script>
-    var changelogData = [
-      { tag: '1.0.1', date: '2026-07-20', category: 'desktop', title: 'Cinnamon Desktop Refresh', items: ['Updated Cinnamon to 6.4 with new panel animations', 'New default theme with refined accent colors', 'Fixed window snapping on multi-monitor setups', 'Improved workspace switcher previews'] },
-      { tag: '1.0.1', date: '2026-07-20', category: 'kernel', title: 'Linux Kernel 6.12 LTS', items: ['Updated to Linux 6.12 LTS kernel', 'Improved AMD GPU scheduling', 'Better support for Intel Arrow Lake CPUs', 'Updated firmware for Wi-Fi 7 adapters'] },
-      { tag: '1.0.0', date: '2026-07-13', category: 'package', title: 'Package Refresh', items: ['Firefox updated to 128.0 ESR', 'PipeWire updated to 1.2.x with improved Bluetooth audio', 'Mesa updated to 24.2', 'Pamac updated with AUR improvements'] },
-      { tag: '1.0.0', date: '2026-07-10', category: 'system', title: 'System Tool Updates', items: ['Added AcreetionOS Tweak Utility v1.2', 'New mirror selection tool for faster downloads', 'Improved Calamares installer partitioning UI', 'Default firewall rules updated'] },
-      { tag: '1.0.0', date: '2026-07-06', category: 'security', title: 'Security Patches', items: ['Patched systemd vulnerability CVE-2026-xxxxx', 'Updated OpenSSL to 3.3.x', 'LibreSSL hardened configuration', 'Kernel mitigations for new CPU vulnerabilities'] },
-      { tag: '0.9.5', date: '2026-06-28', category: 'edition', title: 'New Community Editions', items: ['Added GNOME 46 community edition', 'Added Sway (Wayland compositor) edition', 'Hyprland edition updated to v0.40', 'All editions now ship with updated Calamares'] },
-      { tag: '0.9.4', date: '2026-06-15', category: 'kernel', title: 'Kernel & GPU Updates', items: ['Linux kernel updated to 6.11', 'NVIDIA 560 series driver included', 'Intel Arc graphics enabled by default', 'AMD ROCm support for compute workloads'] },
-      { tag: '0.9.3', date: '2026-06-01', category: 'desktop', title: 'Cinnamon & Theme Updates', items: ['Cinnamon 6.2 with improved accessibility', 'New dark theme variant (Acreetion-Dark-Alt)', 'Custom accent color picker in settings', 'Fixed fractional scaling on HiDPI displays'] },
-      { tag: '0.9.2', date: '2026-05-15', category: 'package', title: 'Core App Refresh', items: ['LibreOffice updated to 25.2', 'GIMP updated to 3.0', 'Thunderbird converted to native package', 'Removed deprecated Snap integration'] },
-      { tag: '0.9.1', date: '2026-05-01', category: 'security', title: 'Security Hardening', items: ['Default firewall enabled on fresh installs', 'Hardened kernel parameters in sysctl', 'AppArmor profiles for all pre-installed apps', 'Full disk encryption highlighted in installer'] },
-      { tag: '0.9.0', date: '2026-04-15', category: 'edition', title: 'Initial Release: Cinnamon & XLibre', items: ['AcreetionOS 0.9.0 initial public release', 'Cinnamon Edition with customized desktop layout', 'XLibre Edition with fully free software stack', 'Calamares graphical installer with AcreetionOS defaults', 'AcreetionOS Tweak Utility for system configuration'] },
-    ];
+    var changelogData = [];
     var currentFilter = 'all';
-    var filtered = changelogData;
+
+    async function loadChangelog() {
+      try {
+        document.getElementById('loading-indicator').style.display = 'block';
+        var res = await fetch('/api/changelog');
+        var data = await res.json();
+        document.getElementById('loading-indicator').style.display = 'none';
+        if (data.error) throw new Error(data.error);
+        if (!data.entries || data.entries.length === 0) {
+          document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#777">No commits yet. Check back after the next push.</p>';
+          return;
+        }
+        changelogData = data.entries;
+        render();
+      } catch (e) {
+        document.getElementById('loading-indicator').style.display = 'none';
+        document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#e74c3c">Failed to load changelog. The data should be available after the worker deploys.</p>';
+      }
+    }
 
     function render() {
       var q = document.getElementById('search-input').value.toLowerCase().trim();
       var entries = changelogData.filter(function(e) {
         if (currentFilter !== 'all' && e.category !== currentFilter) return false;
         if (q) {
-          var matches = e.items.some(function(i) { return i.toLowerCase().indexOf(q) !== -1; });
-          if (e.tag.toLowerCase().indexOf(q) === -1 && !matches) return false;
+          if (e.message.toLowerCase().indexOf(q) === -1 && e.repo.toLowerCase().indexOf(q) === -1 && (e.author || '').toLowerCase().indexOf(q) === -1) return false;
         }
         return true;
       });
 
       var html = '';
-      var currentTag = '';
       entries.forEach(function(e) {
-        var tagLabel = currentTag !== e.tag ? '<div style="font-family:var(--font-mono);font-size:.78rem;color:#555;margin-bottom:.5rem;padding-left:0">Version ' + e.tag + '</div>' : '';
-        currentTag = e.tag;
+        var sourceBadge = e.source === 'GitLab' ? '<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span>' : '<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(97,175,239,.15);color:#61afef;margin-left:.4rem">GitHub</span>';
         html += '<div class="release">' +
           '<div class="release-dot"></div>' +
           '<div class="release-card">' +
-          tagLabel +
           '<div class="release-header">' +
-          '<span class="tag">' + e.tag + '</span>' +
+          '<span class="tag">' + esc(e.repo || '') + sourceBadge + '</span>' +
           '<div style="display:flex;gap:.4rem;align-items:center">' +
           '<span class="category cat-' + e.category + '">' + e.category + '</span>' +
-          '<span class="date">' + e.date + '</span>' +
+          '<span class="date">' + (e.date || '') + '</span>' +
           '</div></div>' +
-          '<div class="release-body"><ul>' +
-          e.items.map(function(i) { return '<li>' + i + '</li>'; }).join('') +
-          '</ul></div></div></div>';
+          '<div class="release-body">' +
+          '<p style="margin-bottom:.25rem">' + esc(e.message || '') + '</p>' +
+          (e.author ? '<p style="font-size:.75rem;color:#777;margin:0">by ' + esc(e.author) + '</p>' : '') +
+          (e.url ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>' : '') +
+          '</div></div></div>';
       });
 
       document.getElementById('timeline').innerHTML = html || '<p style="text-align:center;padding:2rem;color:#777">No entries match your filter.</p>';
     }
+
+    function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
     document.querySelectorAll('.filter-btn').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -169,7 +176,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
 
     document.getElementById('search-input').addEventListener('input', render);
 
-    render();
+    loadChangelog();
   </script>
   <script src="footer.js" defer></script>
   <script src="/coi-serviceworker.js" defer></script>

@@ -912,6 +912,114 @@ async function handleCommunityStats(env) {
   }
 }
 
+// ─── Changelog ──────────────────────────────────────────────────────
+
+function categorizeCommit(message) {
+  const msg = message.toLowerCase();
+  if (msg.includes('cve-') || msg.includes('security') || msg.includes('vuln') || msg.includes('patch')) return 'security';
+  if (msg.includes('kernel') || msg.includes('linux-') || msg.includes('nvidia') || msg.includes('mesa') || msg.includes('gpu')) return 'kernel';
+  if (msg.includes('cinnamon') || msg.includes('theme') || msg.includes('desktop') || msg.includes('panel') || msg.includes('layout')) return 'desktop';
+  if (msg.includes('package') || msg.includes('aur') || msg.includes('pamac') || msg.includes('firefox') || msg.includes('libreoffice')) return 'package';
+  if (msg.includes('iso') || msg.includes('edition') || msg.includes('build') || msg.includes('release') || msg.includes('version')) return 'edition';
+  return 'system';
+}
+
+async function handleChangelog(env) {
+  try {
+    const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=20&sort=pushed', {
+      headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+      signal: AbortSignal.timeout(8000)
+    });
+    if (!reposRes.ok) throw new Error('GitHub API error');
+    const repos = await reposRes.json();
+    const targetRepos = ['acreetionos', 'acreetionos-code.github.io', 'AcreetionOS-Xlibre', 'AcreetionOS-Mate', 'AcreetionOS-Cinnamon-X11', 'AcreetionOS-Cinnamon-XLibre', 'acreetionos-server'];
+
+    const commitFetches = repos
+      .filter(r => targetRepos.includes(r.name))
+      .slice(0, 8)
+      .map(r =>
+        fetch('https://api.github.com/repos/' + GH_ORG + '/' + r.name + '/commits?per_page=10', {
+          headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+          signal: AbortSignal.timeout(5000)
+        }).then(res => res.ok ? res.json() : []).catch(() => [])
+      );
+
+    const repoCommits = await Promise.all(commitFetches);
+    const entries = [];
+    const seen = new Set();
+
+    for (let ri = 0; ri < repoCommits.length; ri++) {
+      const repo = repos.filter(r => targetRepos.includes(r.name))[ri];
+      if (!repo) continue;
+      for (const c of repoCommits[ri]) {
+        const sha = c.sha ? c.sha.slice(0, 12) : '';
+        if (seen.has(sha)) continue;
+        seen.add(sha);
+        const msg = (c.commit?.message || '').split('\n')[0].trim();
+        if (!msg || msg.startsWith('Merge')) continue;
+        entries.push({
+          sha,
+          repo: repo.name,
+          message: msg,
+          date: (c.commit?.author?.date || '').slice(0, 10),
+          author: c.commit?.author?.name || '',
+          url: c.html_url || '',
+          category: categorizeCommit(msg),
+        });
+      }
+    }
+
+    // Try GitLab too
+    try {
+      const glRes = await fetch('https://gitlab.acreetionos.org/api/v4/projects?per_page=10&order_by=last_activity_at', {
+        headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+        signal: AbortSignal.timeout(5000)
+      });
+      if (glRes.ok) {
+        const glProjects = await glRes.json();
+        const glFetches = glProjects.slice(0, 5).map(p =>
+          fetch('https://gitlab.acreetionos.org/api/v4/projects/' + p.id + '/repository/commits?per_page=5', {
+            headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+            signal: AbortSignal.timeout(5000)
+          }).then(res => res.ok ? res.json() : []).catch(() => [])
+        );
+        const glResults = await Promise.all(glFetches);
+        for (let gi = 0; gi < glResults.length; gi++) {
+          const repo = glProjects[gi];
+          for (const c of glResults[gi]) {
+            const id = (c.id || '').slice(0, 12);
+            if (seen.has(id)) continue;
+            seen.add(id);
+            const msg = (c.title || c.message || '').split('\n')[0].trim();
+            if (!msg || msg.startsWith('Merge')) continue;
+            entries.push({
+              sha: id,
+              repo: (repo.path_with_namespace || repo.name || '').replace(GH_ORG + '/', ''),
+              message: msg,
+              date: (c.created_at || '').slice(0, 10),
+              author: c.author_name || '',
+              url: c.web_url || '',
+              category: categorizeCommit(msg),
+              source: 'GitLab',
+            });
+          }
+        }
+      }
+    } catch (e) {}
+
+    entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+    const top = entries.slice(0, 50);
+
+    return new Response(JSON.stringify({ entries: top, count: top.length, updated: new Date().toISOString() }), {
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=600', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message, entries: [], count: 0 }), {
+      status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
+    });
+  }
+}
+
 // ─── Malware Scanning ──────────────────────────────────────────
 
 const SUSPICIOUS_FILENAME_PATTERNS = /\.(exe|bat|cmd|scr|ps1|vbs|jar|dll|zip|rar|7z)$/i;
@@ -2262,6 +2370,11 @@ export default {
     // Community stats (contributors, repos, build status)
     if (url.pathname === '/api/community/stats' && request.method === 'GET') {
       return handleCommunityStats(env);
+    }
+
+    // Changelog from GitHub + GitLab commits
+    if (url.pathname === '/api/changelog' && request.method === 'GET') {
+      return handleChangelog(env);
     }
 
     // ISO Hosting Provider management
