@@ -3,12 +3,9 @@ main = "index.js"
 compatibility_date = "2026-04-26"
 account_id = "6a46b418508c26278ae2d3373f41da81"
 
-routes = [
-	{ pattern = "acreetionos.org/api/*", zone_name = "acreetionos.org" },
-	{ pattern = "acreetionos.org/flash.html", zone_name = "acreetionos.org" }
-]
-
-# Routes are now managed here so GitHub Actions deploys the correct worker binding.
+# Routes are managed via Cloudflare Dashboard → Workers & Pages → acreetionos-worker → Triggers → Routes
+# Route: acreetionos.org/api/*
+# Route: acreetionos.org/flash.html
 
 [triggers]
 # Check every 30 min: verify all ISOs downloadable, auto-fix broken
