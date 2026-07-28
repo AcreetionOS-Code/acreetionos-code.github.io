@@ -926,7 +926,10 @@ function categorizeCommit(message) {
 
 async function handleChangelog(env) {
   try {
-    const reposRes = await fetch('https://api.github.com/orgs/' + GH_ORG + '/repos?per_page=20&sort=pushed', {
+    const githubOrg = 'AcreetionOS-Code';
+    const gitlabUsers = ['cobra3282000', 'natalie'];
+
+    const reposRes = await fetch('https://api.github.com/orgs/' + githubOrg + '/repos?per_page=20&sort=pushed', {
       headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
       signal: AbortSignal.timeout(8000)
     });
@@ -969,15 +972,30 @@ async function handleChangelog(env) {
       }
     }
 
-    // Try GitLab too
-    try {
-      const glRes = await fetch('https://gitlab.acreetionos.org/api/v4/projects?per_page=10&order_by=last_activity_at', {
+    async function fetchGitLabUserProjects(username) {
+      const userRes = await fetch('https://gitlab.acreetionos.org/api/v4/users?username=' + encodeURIComponent(username), {
         headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
         signal: AbortSignal.timeout(5000)
       });
-      if (glRes.ok) {
-        const glProjects = await glRes.json();
-        const glFetches = glProjects.slice(0, 5).map(p =>
+      if (!userRes.ok) return [];
+      const users = await userRes.json();
+      const user = Array.isArray(users) ? users[0] : null;
+      if (!user || !user.id) return [];
+      const projectsRes = await fetch('https://gitlab.acreetionos.org/api/v4/users/' + user.id + '/projects?per_page=100&order_by=last_activity_at', {
+        headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+        signal: AbortSignal.timeout(5000)
+      });
+      if (!projectsRes.ok) return [];
+      return await projectsRes.json();
+    }
+
+    // Try GitLab too
+    try {
+      const glProjectGroups = await Promise.all(gitlabUsers.map(fetchGitLabUserProjects));
+      for (let ui = 0; ui < glProjectGroups.length; ui++) {
+        const username = gitlabUsers[ui];
+        const glProjects = glProjectGroups[ui] || [];
+        const glFetches = glProjects.slice(0, 8).map(p =>
           fetch('https://gitlab.acreetionos.org/api/v4/projects/' + p.id + '/repository/commits?per_page=5', {
             headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
             signal: AbortSignal.timeout(5000)
@@ -994,7 +1012,7 @@ async function handleChangelog(env) {
             if (!msg || msg.startsWith('Merge')) continue;
             entries.push({
               sha: id,
-              repo: (repo.path_with_namespace || repo.name || '').replace(GH_ORG + '/', ''),
+              repo: (repo.path_with_namespace || repo.name || '').replace(username + '/', ''),
               message: msg,
               date: (c.created_at || '').slice(0, 10),
               author: c.author_name || '',
