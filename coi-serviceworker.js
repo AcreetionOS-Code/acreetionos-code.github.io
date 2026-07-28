@@ -13,12 +13,14 @@ if(typeof window==='undefined'){
   self.addEventListener('fetch',function(e){
     var req=e.request;
     if(req.cache==='only-if-cached'&&req.mode!=='same-origin')return;
+    // Clone once so fallback fetch can safely retry without reusing a consumed body.
+    var retryReq=req.clone();
     e.respondWith(fetch(req).then(function(r){
       var h=new Headers(r.headers);
       h.set('Cross-Origin-Embedder-Policy','require-corp');
       h.set('Cross-Origin-Opener-Policy','same-origin');
       return new Response(r.body,{status:r.status,statusText:r.statusText,headers:h});
-    }).catch(function(){return fetch(req)}));
+    }).catch(function(){return fetch(retryReq)}));
   });
 }else{
   var coiQueued=[],coiCallback=[];
