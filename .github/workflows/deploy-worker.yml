@@ -6,6 +6,7 @@ on:
     paths:
       - 'index.js'
       - 'wrangler.toml'
+  workflow_dispatch:
 
 permissions:
   contents: read
