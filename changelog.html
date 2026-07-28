@@ -127,7 +127,8 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
         render();
       } catch (e) {
         document.getElementById('loading-indicator').style.display = 'none';
-        document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#e74c3c">Failed to load changelog. The data should be available after the worker deploys.</p>';
+        document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#e74c3c">Changelog is coming soon!.</p>'
+        document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#e74c3c">Head to our Github or Gitlab!</p>'
       }
     }
 
