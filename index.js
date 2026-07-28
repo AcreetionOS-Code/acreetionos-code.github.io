@@ -926,51 +926,8 @@ function categorizeCommit(message) {
 
 async function handleChangelog(env) {
   try {
-    const githubOrg = 'AcreetionOS-Code';
-    const gitlabUsers = ['cobra3282000', 'natalie'];
-
-    const reposRes = await fetch('https://api.github.com/orgs/' + githubOrg + '/repos?per_page=20&sort=pushed', {
-      headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
-      signal: AbortSignal.timeout(8000)
-    });
-    if (!reposRes.ok) throw new Error('GitHub API error');
-    const repos = await reposRes.json();
-    const targetRepos = ['acreetionos', 'acreetionos-code.github.io', 'AcreetionOS-Xlibre', 'AcreetionOS-Mate', 'AcreetionOS-Cinnamon-X11', 'AcreetionOS-Cinnamon-XLibre', 'acreetionos-server'];
-
-    const commitFetches = repos
-      .filter(r => targetRepos.includes(r.name))
-      .slice(0, 8)
-      .map(r =>
-        fetch('https://api.github.com/repos/' + GH_ORG + '/' + r.name + '/commits?per_page=10', {
-          headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
-          signal: AbortSignal.timeout(5000)
-        }).then(res => res.ok ? res.json() : []).catch(() => [])
-      );
-
-    const repoCommits = await Promise.all(commitFetches);
     const entries = [];
     const seen = new Set();
-
-    for (let ri = 0; ri < repoCommits.length; ri++) {
-      const repo = repos.filter(r => targetRepos.includes(r.name))[ri];
-      if (!repo) continue;
-      for (const c of repoCommits[ri]) {
-        const sha = c.sha ? c.sha.slice(0, 12) : '';
-        if (seen.has(sha)) continue;
-        seen.add(sha);
-        const msg = (c.commit?.message || '').split('\n')[0].trim();
-        if (!msg || msg.startsWith('Merge')) continue;
-        entries.push({
-          sha,
-          repo: repo.name,
-          message: msg,
-          date: (c.commit?.author?.date || '').slice(0, 10),
-          author: c.commit?.author?.name || '',
-          url: c.html_url || '',
-          category: categorizeCommit(msg),
-        });
-      }
-    }
 
     async function fetchGitLabUserProjects(username) {
       const userRes = await fetch('https://gitlab.acreetionos.org/api/v4/users?username=' + encodeURIComponent(username), {
@@ -981,7 +938,8 @@ async function handleChangelog(env) {
       const users = await userRes.json();
       const user = Array.isArray(users) ? users[0] : null;
       if (!user || !user.id) return [];
-      const projectsRes = await fetch('https://gitlab.acreetionos.org/api/v4/users/' + user.id + '/projects?per_page=100&order_by=last_activity_at', {
+
+      const projectsRes = await fetch('https://gitlab.acreetionos.org/api/v4/users/' + user.id + '/projects?per_page=100&order_by=last_activity_at&sort=desc', {
         headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
         signal: AbortSignal.timeout(5000)
       });
@@ -989,41 +947,44 @@ async function handleChangelog(env) {
       return await projectsRes.json();
     }
 
-    // Try GitLab too
-    try {
-      const glProjectGroups = await Promise.all(gitlabUsers.map(fetchGitLabUserProjects));
-      for (let ui = 0; ui < glProjectGroups.length; ui++) {
-        const username = gitlabUsers[ui];
-        const glProjects = glProjectGroups[ui] || [];
-        const glFetches = glProjects.slice(0, 8).map(p =>
-          fetch('https://gitlab.acreetionos.org/api/v4/projects/' + p.id + '/repository/commits?per_page=5', {
-            headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
-            signal: AbortSignal.timeout(5000)
-          }).then(res => res.ok ? res.json() : []).catch(() => [])
-        );
-        const glResults = await Promise.all(glFetches);
-        for (let gi = 0; gi < glResults.length; gi++) {
-          const repo = glProjects[gi];
-          for (const c of glResults[gi]) {
-            const id = (c.id || '').slice(0, 12);
-            if (seen.has(id)) continue;
-            seen.add(id);
-            const msg = (c.title || c.message || '').split('\n')[0].trim();
-            if (!msg || msg.startsWith('Merge')) continue;
-            entries.push({
-              sha: id,
-              repo: (repo.path_with_namespace || repo.name || '').replace(username + '/', ''),
-              message: msg,
-              date: (c.created_at || '').slice(0, 10),
-              author: c.author_name || '',
-              url: c.web_url || '',
-              category: categorizeCommit(msg),
-              source: 'GitLab',
-            });
-          }
+    async function fetchGitLabCommits(project) {
+      const commitsRes = await fetch('https://gitlab.acreetionos.org/api/v4/projects/' + project.id + '/repository/commits?per_page=10', {
+        headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
+        signal: AbortSignal.timeout(5000)
+      });
+      if (!commitsRes.ok) return [];
+      return await commitsRes.json();
+    }
+
+    const gitlabUsers = ['cobra3282000', 'natalie'];
+    const projectGroups = await Promise.all(gitlabUsers.map(fetchGitLabUserProjects));
+
+    for (let ui = 0; ui < projectGroups.length; ui++) {
+      const username = gitlabUsers[ui];
+      const projects = (projectGroups[ui] || []).slice(0, 10);
+      const commitGroups = await Promise.all(projects.map(fetchGitLabCommits));
+
+      for (let pi = 0; pi < commitGroups.length; pi++) {
+        const project = projects[pi];
+        for (const c of commitGroups[pi]) {
+          const sha = (c.id || '').slice(0, 12);
+          if (!sha || seen.has(sha)) continue;
+          seen.add(sha);
+          const msg = (c.title || c.message || '').split('\n')[0].trim();
+          if (!msg || msg.startsWith('Merge')) continue;
+          entries.push({
+            sha,
+            repo: (project.path_with_namespace || project.name || '').replace(username + '/', ''),
+            message: msg,
+            date: (c.created_at || c.committed_date || '').slice(0, 10),
+            author: c.author_name || '',
+            url: c.web_url || '',
+            category: categorizeCommit(msg),
+            source: 'GitLab',
+          });
         }
       }
-    } catch (e) {}
+    }
 
     entries.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
     const top = entries.slice(0, 50);
