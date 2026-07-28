@@ -19,8 +19,8 @@ jobs:
       - name: Set Worker Secrets
         shell: bash
         env:
-          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          SPICY_SAUCE: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN_GITHUB }}
+          SPICY_SAUCE: ${{ secrets.CLOUDFLARE_TOKEN_GITHUB }}
           TACO_BELL: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           BRAIN_JUICE: ${{ secrets.OPENROUTER_API_KEY }}
           SECRET_SAUCE: ${{ secrets.ADMIN_KEY }}
@@ -58,4 +58,4 @@ jobs:
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFLARE_TOKEN_GITHUB }}
