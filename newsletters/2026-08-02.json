@@ -1,0 +1,5 @@
+{
+  "subject": "Daily AcreetionOS Update -- August 02, 2026",
+  "date_display": "August 02, 2026",
+  "body": "Daily AcreetionOS Update - August 02, 2026  \nWelcome to today's newsletter, where we share the latest development wins, community happenings, and handy tips for our users. We appreciate your continued support and feedback as we keep building a privacy\u2011first Arch\u2011based experience.\n\nThe CI pipeline now publishes our ISO directly to the public server via SSH, cutting out extra checkout steps. Using GIT_STRATEGY:"
+}
