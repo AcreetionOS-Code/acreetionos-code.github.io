@@ -2574,98 +2574,104 @@ async function generateGuide(env, messages, maxTokens, opts = {}) {
 
   const attempts = [];
 
-  // 1. Workers AI — first-party, free 10k neurons/day
+  // Provider order — OpenRouter Free Models Router leads (as designed),
+  // Workers AI and others are free safety nets if the router is unavailable.
+  const providers = [];
+
+  // 1. OpenRouter Free Models Router (openrouter/free) — free, auto-routes to an available free model
+  const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
+  if (apiKey) {
+    providers.push({
+      name: 'openrouter',
+      run: async () => {
+        const res = await fetch(OPENROUTER_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + apiKey,
+            'HTTP-Referer': 'https://acreetionos.org',
+            'X-Title': 'AcreetionOS Chat Proxy',
+            ...TRAINING_OPTOUT_HEADERS,
+          },
+          body: JSON.stringify({ model: DEFAULT_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens }),
+          signal: AbortSignal.timeout(30000),
+        });
+        const content = res.ok ? extractContent(await res.json()) : null;
+        return { content, note: res.ok ? '' : 'HTTP ' + res.status };
+      },
+    });
+  } else {
+    attempts.push('openrouter: no key');
+  }
+
+  // 2. Workers AI — first-party, free 10k neurons/day
   if (env.AI) {
-    try {
-      const out = await env.AI.run(WORKERS_AI_MODEL, {
-        messages: injectNoTrain(messages),
-        max_tokens: maxTokens,
-        temperature: 0.3,
-      });
-      const content = (out && typeof out.response === 'string' && out.response.trim().length > 10) ? out.response : null;
-      if (content) {
-        if (useCache) await cacheGuide(env, cacheKey, content, WORKERS_AI_MODEL);
-        return { ok: true, content, model: WORKERS_AI_MODEL };
-      }
-      attempts.push('workers-ai: empty response');
-    } catch (e) {
-      attempts.push('workers-ai: ' + (e && e.message ? e.message : 'error'));
-    }
+    providers.push({
+      name: 'workers-ai',
+      run: async () => {
+        const out = await env.AI.run(WORKERS_AI_MODEL, {
+          messages: injectNoTrain(messages),
+          max_tokens: maxTokens,
+          temperature: 0.3,
+        });
+        const content = (out && typeof out.response === 'string' && out.response.trim().length > 10) ? out.response : null;
+        return { content, note: content ? '' : 'empty response' };
+      },
+    });
   } else {
     attempts.push('workers-ai: no binding');
   }
 
-  // 2. Groq free tier
+  // 3. Groq free tier
   if (env.GROQ_API_KEY) {
-    try {
-      const res = await fetch(GROQ_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + env.GROQ_API_KEY },
-        body: JSON.stringify({ model: GROQ_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens, temperature: 0.3 }),
-        signal: AbortSignal.timeout(30000),
-      });
-      const content = res.ok ? extractContent(await res.json()) : null;
-      if (content) {
-        if (useCache) await cacheGuide(env, cacheKey, content, GROQ_MODEL);
-        return { ok: true, content, model: GROQ_MODEL };
-      }
-      attempts.push('groq: ' + (res.ok ? 'empty content' : 'HTTP ' + res.status));
-    } catch (e) {
-      attempts.push('groq: ' + (e && e.message ? e.message : 'error'));
-    }
+    providers.push({
+      name: 'groq',
+      run: async () => {
+        const res = await fetch(GROQ_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + env.GROQ_API_KEY },
+          body: JSON.stringify({ model: GROQ_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens, temperature: 0.3 }),
+          signal: AbortSignal.timeout(30000),
+        });
+        const content = res.ok ? extractContent(await res.json()) : null;
+        return { content, note: res.ok ? '' : 'HTTP ' + res.status };
+      },
+    });
   } else {
     attempts.push('groq: no key');
   }
 
-  // 3. GitHub Models free tier (uses the existing GH_TOKEN secret)
+  // 4. GitHub Models free tier (uses the existing GH_TOKEN secret)
   if (env.GH_TOKEN) {
-    try {
-      const res = await fetch(GITHUB_MODELS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + env.GH_TOKEN },
-        body: JSON.stringify({ model: GITHUB_MODELS_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens, temperature: 0.3 }),
-        signal: AbortSignal.timeout(30000),
-      });
-      const content = res.ok ? extractContent(await res.json()) : null;
-      if (content) {
-        if (useCache) await cacheGuide(env, cacheKey, content, GITHUB_MODELS_MODEL);
-        return { ok: true, content, model: GITHUB_MODELS_MODEL };
-      }
-      attempts.push('github-models: ' + (res.ok ? 'empty content' : 'HTTP ' + res.status));
-    } catch (e) {
-      attempts.push('github-models: ' + (e && e.message ? e.message : 'error'));
-    }
+    providers.push({
+      name: 'github-models',
+      run: async () => {
+        const res = await fetch(GITHUB_MODELS_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + env.GH_TOKEN },
+          body: JSON.stringify({ model: GITHUB_MODELS_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens, temperature: 0.3 }),
+          signal: AbortSignal.timeout(30000),
+        });
+        const content = res.ok ? extractContent(await res.json()) : null;
+        return { content, note: res.ok ? '' : 'HTTP ' + res.status };
+      },
+    });
   } else {
     attempts.push('github-models: no token');
   }
 
-  // 4. OpenRouter free router — last resort
-  const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
-  if (apiKey) {
+  // Walk the chain in order until one returns usable content.
+  for (const p of providers) {
     try {
-      const res = await fetch(OPENROUTER_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey,
-          'HTTP-Referer': 'https://acreetionos.org',
-          'X-Title': 'AcreetionOS Chat Proxy',
-          ...TRAINING_OPTOUT_HEADERS,
-        },
-        body: JSON.stringify({ model: DEFAULT_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens }),
-        signal: AbortSignal.timeout(30000),
-      });
-      const content = res.ok ? extractContent(await res.json()) : null;
+      const { content, note } = await p.run();
       if (content) {
-        if (useCache) await cacheGuide(env, cacheKey, content, DEFAULT_MODEL);
-        return { ok: true, content, model: DEFAULT_MODEL };
+        if (useCache) await cacheGuide(env, cacheKey, content, p.name);
+        return { ok: true, content, model: p.name };
       }
-      attempts.push('openrouter: ' + (res.ok ? 'empty content' : 'HTTP ' + res.status));
+      attempts.push(p.name + ': ' + (note || 'empty content'));
     } catch (e) {
-      attempts.push('openrouter: ' + (e && e.message ? e.message : 'error'));
+      attempts.push(p.name + ': ' + (e && e.message ? e.message : 'error'));
     }
-  } else {
-    attempts.push('openrouter: no key');
   }
 
   return { ok: false, error: attempts.join(' | ') };
