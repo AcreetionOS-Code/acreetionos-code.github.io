@@ -2522,7 +2522,7 @@ export default {
 // and repeated queries are served from the R2 cache so the neuron budget lasts.
 // Privacy: every request is wrapped with the no-training notice via injectNoTrain().
 
-const WORKERS_AI_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const WORKERS_AI_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
 const GITHUB_MODELS_URL = 'https://models.inference.ai.azure.com/chat/completions';
