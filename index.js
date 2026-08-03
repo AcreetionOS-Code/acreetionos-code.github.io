@@ -2299,44 +2299,25 @@ export default {
       }
       try {
         const body = await request.json();
-        const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'AI generation not configured' }), {
-            status: 503, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        if (!body.messages || !Array.isArray(body.messages)) {
+          return new Response(JSON.stringify({ error: 'messages array required' }), {
+            status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        const ORmodel = DEFAULT_MODEL;
-        const openRouterRes = await fetch(OPENROUTER_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AcreetionOS News AI',
-            ...TRAINING_OPTOUT_HEADERS,
-          },
-          body: JSON.stringify({
-            model: ORmodel,
-            messages: injectNoTrain(body.messages),
-            max_tokens: Math.min(body.max_tokens || 512, 2048)
-          })
-        });
-        const data = await openRouterRes.json();
-        if (!openRouterRes.ok) {
-          return new Response(JSON.stringify({ error: 'AI generation unavailable' }), {
+        // Same free provider chain as /api/chat (Workers AI → Groq → GitHub Models → OpenRouter)
+        const result = await generateGuide(
+          env,
+          body.messages,
+          Math.min(body.max_tokens || 512, 2048),
+          { useCache: false }
+        );
+        if (!result.ok) {
+          return new Response(JSON.stringify({ error: 'AI generation unavailable', detail: result.error }), {
             status: 502,
             headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
-        // Only return sanitized content — never forward raw API data
-        const content = data.choices?.[0]?.message?.content;
-        if (!content) {
-          return new Response(JSON.stringify({ error: 'AI generation unavailable' }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        return new Response(JSON.stringify({ content, model: ORmodel }), {
+        return new Response(JSON.stringify({ content: result.content, model: result.model }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       } catch (err) {
@@ -2473,152 +2454,47 @@ export default {
         });
       }
 
-      // Server-side API keys must be configured in env (Cloudflare Worker secrets).
-      // This keeps keys off the client. Priority: opencode-go → OpenRouter.
+      // Server-side keys stay in env (Cloudflare Worker secrets), never on the client.
+      // Free provider chain: Workers AI → Groq → GitHub Models → OpenRouter free router.
       // Note: secrets are deployed with obfuscated names (see deploy-worker.yml):
       //   BRAIN_JUICE = OPENROUTER_API_KEY
       //   SPICY_SAUCE = CLOUDFLARE_API_TOKEN
       const isStream = body.stream === true;
-      const openRouterKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
-      const useOpencodeGo = body.provider === 'opencode-go' || !openRouterKey;
 
-      let aiResponse = null;
-      let aiOk = false;
+      const result = await generateGuide(
+        env,
+        body.messages,
+        Math.min(body.max_tokens || 1024, 2048),
+        { useCache: true }
+      );
 
-      // Try opencode-go first if API key is configured
-      const opencodeGoKey = env.OPENCODE_GO_API_KEY;
-      if (opencodeGoKey && useOpencodeGo) {
-        const opencodeGoUrl = (env.OPENCODE_GO_BASE_URL || OPENCODE_GO_BASE_URL) + '/chat/completions';
-        const opencodeGoRes = await fetch(opencodeGoUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${opencodeGoKey}`,
-          },
-          body: JSON.stringify(isStream ? {
-            model: body.model || 'deepseek-v4-pro',
-            messages: body.messages,
-            max_tokens: Math.min(body.max_tokens || 1024, 4096),
-            stream: true
-          } : {
-            model: body.model || 'deepseek-v4-pro',
-            messages: body.messages,
-            max_tokens: Math.min(body.max_tokens || 1024, 4096)
-          })
-        });
-        if (opencodeGoRes.ok) {
-          aiResponse = opencodeGoRes;
-          aiOk = true;
-        }
-      }
-
-      // Fall back to OpenRouter
-      if (!aiOk) {
-        const apiKey = openRouterKey;
-        if (!apiKey) {
-          return new Response(JSON.stringify({ error: 'AI service not configured' }), {
-            status: 503,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-
-        // Allow Claude models when routing through opencode-go provider
-        let model = body.model || DEFAULT_MODEL;
-        const isClaudeModel = model.startsWith('claude-') || model.startsWith('anthropic/');
-        if (body.provider === 'opencode-go' && isClaudeModel) {
-          // Map Claude model names to OpenRouter model IDs
-          const modelMap = {
-            'claude-opus-4-8': 'anthropic/claude-opus-4-8',
-            'claude-sonnet-4-20250514': 'anthropic/claude-sonnet-4-20250514',
-            'claude-3-5-sonnet-20241022': 'anthropic/claude-3.5-sonnet',
-            'claude-3-haiku-20240307': 'anthropic/claude-3-haiku',
-            'claude-haiku-4-5-20251001': 'anthropic/claude-haiku-4-5-20251001',
-          };
-          model = modelMap[model] || `anthropic/${model}`;
-        } else if (!FREE_MODELS.has(model)) {
-          model = DEFAULT_MODEL;
-        }
-
-        const openRouterRes = await fetch(OPENROUTER_URL, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`,
-            'HTTP-Referer': 'https://acreetionos.org',
-            'X-Title': 'AcreetionOS Chat Proxy',
-            ...TRAINING_OPTOUT_HEADERS,
-          },
-          body: JSON.stringify(isStream ? {
-            model: model,
-            messages: injectNoTrain(body.messages),
-            max_tokens: Math.min(body.max_tokens || 1024, isClaudeModel ? 8192 : 2048),
-            stream: true
-          } : {
-            model: model,
-            messages: injectNoTrain(body.messages),
-            max_tokens: Math.min(body.max_tokens || 1024, isClaudeModel ? 8192 : 2048)
-          })
-        });
-
-        if (!openRouterRes.ok) {
-          let errText = '';
-          try { errText = await openRouterRes.text(); } catch (e) {}
-          console.error(`OpenRouter error: ${openRouterRes.status} ${errText.substring(0, 200)}`);
-          return new Response(JSON.stringify({ error: 'AI service unavailable', detail: `${openRouterRes.status}: ${errText.substring(0, 100)}` }), {
-            status: 502,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-        aiResponse = openRouterRes;
-        aiOk = true;
-      }
-
-      if (isStream) {
-        // Rewrite streaming SSE to strip any non-content fields
-        const { readable, writable } = new TransformStream();
-        const writer = writable.getWriter();
-        const encoder = new TextEncoder();
-        const decoder = new TextDecoder();
-
-        openRouterRes.body.pipeTo(new WritableStream({
-          async write(chunk) {
-            const text = decoder.decode(chunk, { stream: true });
-            // Only forward data: lines (SSE event stream) — strip everything else
-            const lines = text.split('\n').filter(l => l.startsWith('data: '));
-            if (lines.length > 0) {
-              await writer.write(encoder.encode(lines.join('\n') + '\n'));
-            }
-          },
-          async close() { await writer.close(); },
-          async abort(e) { await writer.abort(e); }
-        })).catch(() => {});
-
-        const headers = {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
-          ...corsHeaders(request)
-        };
-        return new Response(readable, { headers });
-      }
-
-      const data = await openRouterRes.json();
-
-      const content = data.choices?.[0]?.message?.content;
-      if (!content) {
-        return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
+      if (!result.ok) {
+        return new Response(JSON.stringify({ error: 'AI service unavailable', detail: result.error }), {
           status: 502,
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });
       }
-      return new Response(JSON.stringify({
-        content: content,
-        model: model,
-      }), {
+
+      if (isStream) {
+        // Minimal SSE envelope for consumers that request streaming
+        const encoder = new TextEncoder();
+        const stream = new ReadableStream({
+          start(controller) {
+            controller.enqueue(encoder.encode('data: ' + JSON.stringify({ choices: [{ delta: { content: result.content } }] }) + '\n\n'));
+            controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+            controller.close();
+          }
+        });
+        return new Response(stream, {
+          headers: { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', ...corsHeaders(request) }
+        });
+      }
+
+      return new Response(JSON.stringify({ content: result.content, model: result.model }), {
         headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
       });
-
     } catch (err) {
+      console.error('Chat handler error:', err && err.message ? err.message : err);
       return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2640,10 +2516,165 @@ export default {
   }
 };
 
+// ─── AI Guide Generation (free provider chain) ─────────────
+// Order: Workers AI (env.AI) → Groq → GitHub Models → OpenRouter free router.
+// All tiers are FREE. Workers AI is first-party Cloudflare (no external dependency),
+// and repeated queries are served from the R2 cache so the neuron budget lasts.
+// Privacy: every request is wrapped with the no-training notice via injectNoTrain().
+
+const WORKERS_AI_MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GITHUB_MODELS_URL = 'https://models.inference.ai.azure.com/chat/completions';
+const GITHUB_MODELS_MODEL = 'meta-llama-3.3-70b-instruct';
+const GUIDE_CACHE_DAYS = 30;
+
+async function sha256Hex(str) {
+  const data = new TextEncoder().encode(str);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Try the R2 cache first; if a fresh guide exists, return it without calling any provider.
+async function tryGuideCache(env, cacheKey) {
+  try {
+    const cached = await getR2(env, 'acreetionos-hosting', cacheKey);
+    if (cached && cached.content) {
+      const ageMs = Date.now() - (new Date(cached.ts || 0).getTime() || 0);
+      if (ageMs < GUIDE_CACHE_DAYS * 24 * 60 * 60 * 1000) {
+        return { ok: true, content: cached.content, model: 'cache:' + (cached.model || 'unknown'), cached: true };
+      }
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function cacheGuide(env, cacheKey, content, model) {
+  try {
+    await putR2(env, 'acreetionos-hosting', cacheKey, { content, model, ts: new Date().toISOString() });
+  } catch (e) {}
+}
+
+// Extracts OpenAI-style content from a provider response.
+function extractContent(data) {
+  const content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+  return (content && typeof content === 'string' && content.trim().length > 10) ? content : null;
+}
+
+// Generates a guide by walking the free provider chain. Returns { ok, content?, model?, error? }.
+// When useCache is true, identical requests within the cache window are served from R2 (zero cost).
+async function generateGuide(env, messages, maxTokens, opts = {}) {
+  const useCache = opts.useCache !== false;
+  const cacheKey = 'wiki-cache/' + await sha256Hex(JSON.stringify({ messages, maxTokens })) + '.json';
+
+  if (useCache) {
+    const hit = await tryGuideCache(env, cacheKey);
+    if (hit) return hit;
+  }
+
+  const attempts = [];
+
+  // 1. Workers AI — first-party, free 10k neurons/day
+  if (env.AI) {
+    try {
+      const out = await env.AI.run(WORKERS_AI_MODEL, {
+        messages: injectNoTrain(messages),
+        max_tokens: maxTokens,
+        temperature: 0.3,
+      });
+      const content = (out && typeof out.response === 'string' && out.response.trim().length > 10) ? out.response : null;
+      if (content) {
+        if (useCache) await cacheGuide(env, cacheKey, content, WORKERS_AI_MODEL);
+        return { ok: true, content, model: WORKERS_AI_MODEL };
+      }
+      attempts.push('workers-ai: empty response');
+    } catch (e) {
+      attempts.push('workers-ai: ' + (e && e.message ? e.message : 'error'));
+    }
+  } else {
+    attempts.push('workers-ai: no binding');
+  }
+
+  // 2. Groq free tier
+  if (env.GROQ_API_KEY) {
+    try {
+      const res = await fetch(GROQ_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + env.GROQ_API_KEY },
+        body: JSON.stringify({ model: GROQ_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens, temperature: 0.3 }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const content = res.ok ? extractContent(await res.json()) : null;
+      if (content) {
+        if (useCache) await cacheGuide(env, cacheKey, content, GROQ_MODEL);
+        return { ok: true, content, model: GROQ_MODEL };
+      }
+      attempts.push('groq: ' + (res.ok ? 'empty content' : 'HTTP ' + res.status));
+    } catch (e) {
+      attempts.push('groq: ' + (e && e.message ? e.message : 'error'));
+    }
+  } else {
+    attempts.push('groq: no key');
+  }
+
+  // 3. GitHub Models free tier (uses the existing GH_TOKEN secret)
+  if (env.GH_TOKEN) {
+    try {
+      const res = await fetch(GITHUB_MODELS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + env.GH_TOKEN },
+        body: JSON.stringify({ model: GITHUB_MODELS_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens, temperature: 0.3 }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const content = res.ok ? extractContent(await res.json()) : null;
+      if (content) {
+        if (useCache) await cacheGuide(env, cacheKey, content, GITHUB_MODELS_MODEL);
+        return { ok: true, content, model: GITHUB_MODELS_MODEL };
+      }
+      attempts.push('github-models: ' + (res.ok ? 'empty content' : 'HTTP ' + res.status));
+    } catch (e) {
+      attempts.push('github-models: ' + (e && e.message ? e.message : 'error'));
+    }
+  } else {
+    attempts.push('github-models: no token');
+  }
+
+  // 4. OpenRouter free router — last resort
+  const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
+  if (apiKey) {
+    try {
+      const res = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + apiKey,
+          'HTTP-Referer': 'https://acreetionos.org',
+          'X-Title': 'AcreetionOS Chat Proxy',
+          ...TRAINING_OPTOUT_HEADERS,
+        },
+        body: JSON.stringify({ model: DEFAULT_MODEL, messages: injectNoTrain(messages), max_tokens: maxTokens }),
+        signal: AbortSignal.timeout(30000),
+      });
+      const content = res.ok ? extractContent(await res.json()) : null;
+      if (content) {
+        if (useCache) await cacheGuide(env, cacheKey, content, DEFAULT_MODEL);
+        return { ok: true, content, model: DEFAULT_MODEL };
+      }
+      attempts.push('openrouter: ' + (res.ok ? 'empty content' : 'HTTP ' + res.status));
+    } catch (e) {
+      attempts.push('openrouter: ' + (e && e.message ? e.message : 'error'));
+    }
+  } else {
+    attempts.push('openrouter: no key');
+  }
+
+  return { ok: false, error: attempts.join(' | ') };
+}
+
 // ─── AI Health Check ────────────────────────────────────────
 
 async function checkAIHealth(env) {
-  // Makes a minimal test call to OpenRouter free model router,
+  // Exercises the REAL /api/chat code path (generateGuide → provider chain),
   // persists status to R2, and sends an alert email on failure.
   const AI_STATUS_KEY = 'ai-health-status.json';
   const TWELVE_HOURS = 12 * 60 * 60 * 1000;
@@ -2659,12 +2690,14 @@ async function checkAIHealth(env) {
     return { skipped: true, reason: 'Too soon since last check' };
   }
 
-  console.log('Running AI health check...');
-  const apiKey = env.OPENROUTER_API_KEY || env.BRAIN_JUICE;
-  if (!apiKey) {
-    console.log('AI health check: no API key configured');
-    return { skipped: true, reason: 'No API key' };
+  // Skip only if NO free provider is configured at all.
+  const hasProvider = env.AI || env.GROQ_API_KEY || env.GH_TOKEN || (env.OPENROUTER_API_KEY || env.BRAIN_JUICE);
+  if (!hasProvider) {
+    console.log('AI health check: no provider configured');
+    return { skipped: true, reason: 'No provider configured' };
   }
+
+  console.log('Running AI health check...');
 
   let healthy = false;
   let errorMsg = '';
@@ -2672,38 +2705,20 @@ async function checkAIHealth(env) {
 
   try {
     const start = Date.now();
-    const res = await fetch(OPENROUTER_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://acreetionos.org',
-        'X-Title': 'AcreetionOS AI Health Check',
-      },
-      body: JSON.stringify({
-        model: 'openrouter/free',
-        messages: [
-          { role: 'system', content: 'Reply with exactly one word: OK' },
-          { role: 'user', content: 'Say OK' }
-        ],
-        max_tokens: 10
-      }),
-      signal: AbortSignal.timeout(15000)
-    });
+    const result = await generateGuide(
+      env,
+      [
+        { role: 'system', content: 'Reply with exactly one word: OK' },
+        { role: 'user', content: 'Say OK' }
+      ],
+      10,
+      { useCache: false }
+    );
     responseTime = Date.now() - start;
-
-    if (res.ok) {
-      const data = await res.json();
-      const content = data?.choices?.[0]?.message?.content || '';
-      healthy = content.trim().length > 0;
-      if (!healthy) errorMsg = 'Empty response from model';
-    } else {
-      let errText = '';
-      try { errText = await res.text(); } catch (e) {}
-      errorMsg = `HTTP ${res.status}: ${errText.substring(0, 200)}`;
-    }
+    healthy = result.ok && result.content.trim().length > 0;
+    if (!healthy) errorMsg = result.error || 'Empty response';
   } catch (e) {
-    errorMsg = e.message;
+    errorMsg = e.message || 'Unknown error';
   }
 
   console.log(`AI health check: ${healthy ? 'OK' : 'FAIL'} (${responseTime}ms)`);
@@ -2735,11 +2750,11 @@ async function checkAIHealth(env) {
         `Error: ${errorMsg || 'Unknown'}`,
         `Response time: ${responseTime}ms`,
         '',
-        'The OpenRouter free model router (openrouter/free) failed to return a valid response.',
+        'The free provider chain (Workers AI → Groq → GitHub Models → OpenRouter free) failed.',
         '',
         'To fix:',
-        '  1. Check https://openrouter.ai/models for free model availability',
-        '  2. If models are available, verify OPENROUTER_API_KEY secret is valid',
+        '  1. Check the provider list at developers.cloudflare.com/workers-ai/models',
+        '  2. Verify GROQ_API_KEY / GH_TOKEN / OPENROUTER_API_KEY secrets are valid',
         '  3. Redeploy worker: npx wrangler deploy',
         '',
         '- AcreetionOS Bot',
