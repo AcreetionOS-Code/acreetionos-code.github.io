@@ -8,6 +8,7 @@
 - [Beginner Guide](https://acreetionos.org/beginner.html) — Easiest Arch-based distro for newcomers
 - [Documentation](https://acreetionos.org/docs.html) — Getting started, maintenance, networking, troubleshooting
 - [Wiki](https://acreetionos.org/wiki.html) — Community technical documentation
+- [Wiki Guides](https://acreetionos.org/wiki-guides/index.html) — Pre-generated beginner guides (WiFi, NVIDIA, printers, Bluetooth, firewall)
 - [Compare](https://acreetionos.org/compare.html) — vs Arch, Ubuntu, Mint, Fedora, Manjaro
 - [Lightweight](https://acreetionos.org/lightweight.html) — Lightweight edition for old hardware
 - [Immutable](https://acreetionos.org/immutable.html) — Immutable Arch Linux edition

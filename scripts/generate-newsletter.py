@@ -305,6 +305,44 @@ def send_to_subscribers(newsletter):
     return True
 
 
+
+def post_to_discord(newsletter):
+    """Post a newsletter summary to the Discord webhook (no subscription needed).
+
+    Uses the same incoming webhook as the n8n Discord nodes — the community
+    channel people are already in. Never fails the run: Discord being down
+    must not block email delivery.
+    """
+    webhook = os.environ.get("DISCORD_WEBHOOK_URL", "")
+    if not webhook:
+        print("No DISCORD_WEBHOOK_URL — skipping Discord push", file=sys.stderr)
+        return
+    subject = newsletter.get("subject", "AcreetionOS Update")
+    body = newsletter.get("body", "")
+    # First 3 paragraphs as the Discord snippet
+    paras = [p.strip() for p in body.split("\n\n") if p.strip()]
+    snippet = "\n\n".join(paras[:3])
+    if len(snippet) > 1800:
+        snippet = snippet[:1800] + "…"
+    date_display = newsletter.get("date_display", "")
+    payload = {
+        "content": f"📬 **{subject}**\n\n{snippet}\n\n"
+                   f"Read the full newsletter: https://acreetionos.org/newsletter.html "
+                   f"| Archive: https://acreetionos.org/newsletter-archive/",
+        "username": "AcreetionOS Bot",
+    }
+    try:
+        req = Request(webhook, data=json.dumps(payload).encode(),
+                      headers={"Content-Type": "application/json"})
+        with urlopen(req, timeout=15) as resp:
+            if resp.status not in (200, 204):
+                print(f"Discord push: HTTP {resp.status}", file=sys.stderr)
+            else:
+                print(f"Discord push sent ({date_display})")
+    except Exception as e:
+        print(f"Discord push failed (non-fatal): {e}", file=sys.stderr)
+
+
 def main():
     today = date.today()
     date_str = today.strftime("%Y-%m-%d")
@@ -331,6 +369,12 @@ def main():
         if newsletter is None:
             # AI is down — fail the workflow so the next scheduled run retries.
             sys.exit(1)
+
+    # Push to Discord (#upland) — reaches the community without them
+    # subscribing to email. Runs whenever a newsletter was generated or
+    # already exists (guarded by DISCORD_WEBHOOK_URL being set).
+    if newsletter and os.environ.get("DISCORD_WEBHOOK_URL"):
+        post_to_discord(newsletter)
 
     if send_email:
         if newsletter:
