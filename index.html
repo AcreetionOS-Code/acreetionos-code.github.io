@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta http-equiv="Cache-Control" content="max-age=3600">
+    
     <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -11,7 +11,7 @@
       "@id": "https://acreetionos.org/#author",
       "name": "Natalie Cole-Clift Spiva",
       "jobTitle": "Co-Lead Developer",
-      "url": "https://acreetionos.org/developers.html",
+      "url": "https://acreetionos.org/about.html",
       "sameAs": [
         "https://github.com/AcreetionOS-Code"
       ]
@@ -116,6 +116,7 @@
     <meta charset="UTF-8" >
     <meta name="robots" content="index, follow" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#121212" >
     <meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Cinnamon desktop, lightweight Linux distro, open source OS, accredion, Linux for beginners" >
     <meta name="referrer" content="strict-origin-when-cross-origin" >
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
@@ -144,17 +145,9 @@
   <link rel="preload" href="acreetionoslogo.webp" as="image" type="image/webp">
   <link rel="preload" href="logo.webp" as="image" type="image/webp">
   <link rel="stylesheet" href="fonts.css">
-  <script src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous" defer>
-  </script>
-  <link rel="stylesheet" href="sidebar.css" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="ai-chat.css" media="print" onload="this.media='all'">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous" media="print" onload="this.media='all'">
-  <style>
-:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222222;--acreetion-box-border:#333333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--storm-color:#61afef;--flasher-color:#f39c12;--acreetion-purple:#9b59b6;--font-sans:'Roboto',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:'Fira Code',monospace} *,*::before,*::after{box-sizing:border-box;margin:0;padding:0} html{overflow-x:hidden;touch-action:manipulation} body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden;max-width:100vw} input,textarea,select{font-size:16px} .announcement-bar{background-color:var(--acreetion-panel-bg);border-bottom:1px solid var(--acreetion-box-border);padding:0.5rem 1rem;color:var(--acreetion-text-bright);display:flex;justify-content:center;align-items:center;overflow-x:hidden} .announcement-content{font-size:0.95rem;white-space:nowrap;overflow:hidden} .announcement-bar:hover .announcement-content{animation-play-state:paused} .announcement-content > span{padding-right:4rem;display:inline-block} .announcement-bar .separator{margin:0 1.5rem;color:var(--acreetion-box-border)} .announcement-bar a{color:var(--acreetion-green);font-weight:bold;text-decoration:none} .announcement-bar a:hover{text-decoration:underline} .social-link{padding:0.2rem 0.5rem;border-radius:0.75rem;transition:background-color 0.3s ease} .social-link:hover{background-color:rgba(255,255,255,0.1);animation:pulse 1s infinite} @media(max-width:600px){[style*="grid-template-columns: repeat(2"],[style*="grid-template-columns:repeat(2"]{grid-template-columns:1fr!important}} @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}} .page-header{background-color:rgba(24,26,27,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000} .header-content{display:flex;align-items:center;gap:.5rem;max-width:1400px;margin:0 auto;padding:0.75rem 2rem} .logo{display:flex;align-items:center;gap:1rem;font-family:var(--font-mono);font-size:1.8rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none} .logo-img{height:40px;width:auto;transform:translateZ(0);contain:layout} .logo-text span{color:var(--acreetion-green)} .main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500} .main-nav a:hover{color:var(--acreetion-text-bright)} .search-strip{background-color:var(--acreetion-panel-bg);border-bottom:1px solid var(--acreetion-box-border);padding:1rem 0} .search-container{max-width:1400px;margin:0 auto;padding:0 2rem} .search-form{display:flex;width:100%;border:1px solid var(--acreetion-box-border);background:var(--acreetion-body-bg)} .search-form:focus-within{border-color:var(--acreetion-green)} .search-input{flex-grow:1;background:transparent;border:none;padding:0.8rem 1.2rem;color:var(--acreetion-text-bright);font-family:var(--font-sans);font-size:1rem;outline:none} .search-btn{background:var(--acreetion-green);border:none;color:#000;padding:0 2rem;cursor:pointer;font-weight:700;font-family:var(--font-mono);text-transform:uppercase} .search-btn:hover{filter:brightness(1.1)} .page-wrapper{display:grid;grid-template-columns:1fr 350px;gap:2rem;max-width:1400px;margin:2rem auto;padding:0 2rem;width:100%;overflow-x:hidden;box-sizing:border-box} .content-feed{display:flex;flex-direction:column;gap:2rem;min-width:0;max-width:100%} .sidebar{min-width:0;max-width:100%} .content-box{background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;max-width:100%;overflow-x:hidden} .box-header{padding:0.8rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);background-color:#1a1a1a;max-width:100%;overflow-x:hidden} .box-header h2{font-family:var(--font-mono);font-size:1.3rem;color:var(--acreetion-text-bright);font-weight:700;word-wrap:break-word} .box-body{padding:1.5rem;max-width:100%;overflow-x:hidden;word-wrap:break-word} .box-body h3{font-family:var(--font-mono);font-size:1.1rem;margin-top:1.5rem;margin-bottom:0.5rem;border-bottom:1px solid var(--acreetion-box-border);padding-bottom:0.5rem} .article-content a:not(.btn),.sidebar-box p a{color:var(--acreetion-green);text-decoration:none;font-weight:500} .article-content a:not(.btn):hover,.sidebar-box p a:hover{text-decoration:underline} .article-content p,.article-content li{color:var(--acreetion-text);margin-bottom:1rem;word-wrap:break-word} .article-content ul{padding-left:20px;list-style-position:inside} .article-content{max-width:100%;overflow-x:hidden} .article-logo-cluster{float:left;margin-right:2rem;margin-bottom:1rem;width:150px} .article-logo-cluster .hero-logo-img{width:100%;max-width:150px;height:auto;margin-bottom:1.5rem} .article-content::after{content:"";display:table;clear:both} .sidebar{max-width:100%;min-width:0} .sidebar-box{max-width:100%;overflow-x:hidden} .sidebar-box .box-header h2{font-family:var(--font-mono);font-size:1.1rem;font-weight:700;color:var(--acreetion-text-bright)} .spec-list{list-style:none;padding:0} .spec-list li{margin-bottom:0.5rem;font-size:0.9rem;color:var(--acreetion-text)} .spec-list .spec-title{color:var(--acreetion-text-bright);font-weight:700;min-width:120px;display:inline-block} dl {margin-bottom:2rem;border-left:2px solid var(--acreetion-green);padding-left:1.5rem} dt {font-family:var(--font-mono);font-weight:700;color:var(--acreetion-text-bright);margin-top:0.5rem} dd {color:var(--acreetion-text);margin-bottom:0.5rem;margin-left:0} .sidebar-nav{list-style:none;padding:0} .sidebar-nav a{display:block;text-decoration:none;color:var(--acreetion-green);padding:0.5rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);cursor:pointer} .sidebar-nav a:hover{background-color:#3a3a3a} .sidebar-nav a.active{background-color:var(--acreetion-green);color:black;font-weight:700} .sidebar-box p{color:var(--acreetion-text);padding:0 1.2rem 1rem} code,pre{font-family:var(--font-mono);font-size:0.9rem} code{background-color:var(--acreetion-code-bg);border:1px solid rgba(46,204,113,0.2);padding:0.2em 0.4em;border-radius:12px;color:var(--acreetion-text-bright)} pre{background-color:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);padding:1em;overflow-x:auto;margin-top:0.5rem} .btn{display:inline-block;color:black;text-decoration:none;padding:0.7rem 1.5rem;border-radius:12px;font-weight:700;border:none;cursor:pointer} .btn:hover{filter:brightness(1.1)} .btn-cinnamon{background-color:var(--acreetion-green)}       .btn-storm{background-color:var(--storm-color)}
-      #hamburger{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;cursor:pointer;min-width:44px;min-height:44px;width:36px;height:36px;padding:4px;margin-right:.5rem;position:relative;z-index:1001;flex-shrink:0;order:-1}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px;transition:all.25s ease;transform-origin:center}#sidebar-overlay{display:none}#sidebar{position:fixed;top:0;left:-320px;width:300px;height:100%;background:var(--acreetion-body-bg,#121212);border-right:1px solid var(--acreetion-box-border,#333);z-index:9999;overflow-y:auto;transition:left.3s cubic-bezier(.22,1,.36,1);box-shadow:4px 0 24px rgba(0,0,0,.4)}#sidebar.open{left:0}#page-scale{width:100%}body.sidebar-open #page-wrap{transform:translateX(300px)}.sidebar-header img{border-radius:6px}.sidebar-header span{font-family:'Fira Code',monospace;font-size:1.2rem;font-weight:700;color:var(--acreetion-text-bright,#e5e5e5)}.sidebar-header span span{color:var(--acreetion-green,#2ecc71)}.sidebar-body{padding:.5rem 0}.sidebar-body ul{list-style:none;padding:0;margin:0}.sidebar-body ul li a{display:flex;align-items:center;gap:.5rem;padding:.8rem 1.2rem;color:var(--acreetion-text,#b2b2b2);text-decoration:none;font-size:.95rem;transition:all.15s;border-left:3px solid transparent;border-bottom:1px solid var(--acreetion-box-border,#222)}.sidebar-body ul li a:hover{background:var(--acreetion-panel-bg,#1a1a1a);color:var(--acreetion-green,#2ecc71);border-left-color:var(--acreetion-green,#2ecc71)}.sidebar-footer{display:flex;gap:.5rem;padding:.75rem 1rem;border-top:1px solid var(--acreetion-box-border,#333)}.sidebar-footer a{flex:1;text-align:center;padding:.5rem;border-radius:8px;font-size:.85rem;font-weight:600;text-decoration:none}.sidebar-footer a:first-child{background:var(--acreetion-green,#2ecc71);color:#000}.sidebar-footer a:last-child{border:1px solid var(--acreetion-box-border,#333);color:var(--acreetion-text,#b2b2b2)}.sidebar-footer a:last-child:hover{background:var(--acreetion-panel-bg,#1a1a1a)}@media(max-width:480px){#sidebar{width:100%;left:-100%}body.sidebar-open #page-wrap{transform:translateX(80vw)}#sidebar.open{left:0}}.main-nav{display:none}.main-nav a.btn-storm{color:#fff} .btn-flasher{background-color:var(--flasher-color)} .btn-chatgpt{background-color:var(--acreetion-green)} .btn-claude{background-color:var(--acreetion-purple)} #about .box-header h2,#about h3{color:var(--acreetion-green)}#philosophy .box-header h2,#philosophy h3{color:var(--storm-color)}#easy-install .box-header h2{color:var(--flasher-color)}#manual-downloads .box-header h2{color:var(--acreetion-green)} .tech-detail-heading{color:var(--acreetion-green);font-family:var(--font-mono);font-weight:700;margin-top:2rem;margin-bottom:0.5rem;padding-bottom:0.5rem;border-bottom:1px solid var(--acreetion-box-border)} .team-members{display:flex;flex-direction:column;gap:1rem;margin-top:1rem} .team-member{display:flex;justify-content:space-between;align-items:center} .team-member-name{font-weight:700;color:var(--acreetion-text-bright)} .mirror-logo a{display:block;text-align:center;font-size:1.2rem;font-weight:700;color:var(--acreetion-green);text-decoration:none;margin-top:1rem;margin-bottom:1rem;padding:1rem 0} .mirror-logo a:hover{text-decoration:underline} .page-footer{text-align:center;padding:2rem;margin-top:2rem;border-top:1px solid var(--acreetion-box-border);color:#777;font-size:0.9rem} .page-footer p{color:#777;margin-bottom:0.5rem;text-align:center} .page-footer a{color:var(--acreetion-green);text-decoration:none} .page-footer a:hover{text-decoration:underline} .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:1000;overflow-y:auto;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden} .modal-overlay.visible{display:flex;opacity:1;visibility:visible;transition:opacity 0.3s ease,visibility 0.3s ease} .modal-box{position:relative;cursor:default;background-color:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);padding:2rem 3rem;max-width:700px} .modal-close-btn{position:absolute;top:1rem;right:1rem;background-color:var(--acreetion-green);color:black;font-family:var(--font-sans);font-size:1.5rem;font-weight:700;border:none;border-radius:50%;width:40px;height:40px;cursor:pointer;line-height:40px;text-align:center;z-index:1001} .modal-close-btn:hover{background-color:#d15c64;transform:scale(1.05)} .modal-box h2{color:var(--acreetion-green)} @media (max-width:1024px){.page-wrapper{display:flex !important;flex-direction:column;gap:1.5rem;padding:0 1rem;max-width:100%;box-sizing:border-box}.sidebar{order:-1;max-width:100% !important;width:100% !important;min-width:0 !important}.content-feed{max-width:100% !important;min-width:0 !important;width:100% !important}} @media (max-width:768px){.header-content{flex-direction:column;gap:1rem;padding:0.75rem 1rem}.logo{font-size:1.5rem}.logo-img{height:35px}.main-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:0.5rem}.main-nav a{margin-left:0;padding:0.5rem 1rem;font-size:0.9rem}.page-wrapper{margin:1rem auto;gap:1rem;max-width:100vw;box-sizing:border-box}.content-feed{max-width:100%;min-width:0;width:100%}.sidebar{max-width:100%;width:100%}.article-logo-cluster{float:none;display:block;text-align:center;margin:0 auto 1.5rem}.article-logo-cluster .hero-logo-img{max-width:120px}h1,.box-header h2{font-size:1.3rem}h2{font-size:1.2rem}h3{font-size:1.05rem}.box-body{padding:1rem}.modal-box{padding:1.5rem;margin:0.5rem;max-width:calc(100vw - 1rem)}.announcement-content{font-size:0.85rem;text-align:center}.announcement-bar .separator{margin:0 0.5rem}.announcement-content > span{padding-right:2rem}} @media (max-width:480px){.header-content{padding:0.5rem}.logo{font-size:1.3rem}.logo-img{height:30px}.main-nav{gap:0.3rem}.main-nav a{font-size:0.85rem;padding:0.4rem 0.6rem}*{max-width:100vw !important;box-sizing:border-box !important}.page-wrapper,.content-feed,main,.sidebar,aside{width:100% !important;max-width:100vw !important;min-width:0 !important;box-sizing:border-box !important}.page-wrapper{padding:0 0.5rem !important;margin:0.5rem auto !important;display:flex !important;flex-direction:column !important}.content-feed{display:flex !important;flex-direction:column !important}.sidebar{display:block !important}.box-header{padding:0.6rem 1rem}.box-header h2{font-size:1rem}.box-body{padding:0.75rem;font-size:0.95rem}.btn{padding:0.5rem 1rem;font-size:0.9rem;display:block;width:100%;text-align:center;margin:0.25rem 0;box-sizing:border-box;max-width:100%}.modal-box{padding:1rem;max-width:calc(100vw - 1rem)}.modal-close-btn{width:35px;height:35px;font-size:1.2rem}.announcement-content{font-size:0.8rem;white-space:normal}.announcement-bar{padding:0.5rem 0.5rem}.announcement-bar .separator{display:none}.announcement-content > span{padding-right:0;display:block;margin-bottom:0.25rem}.article-logo-cluster .hero-logo-img{max-width:100px}.spec-list .spec-title{min-width:90px;font-size:0.85rem}.team-member{flex-direction:column;align-items:flex-start;gap:0.5rem}h1,.box-header h2{font-size:1.1rem}h2{font-size:1rem}h3{font-size:0.95rem}.tech-detail-heading{font-size:1rem}} #gnome-info-btn{position:fixed;bottom:24px;left:24px;background-color:var(--acreetion-purple);color:white;padding:10px 15px;border-radius:12px;border:none;cursor:pointer;font-family:var(--font-sans);font-weight:500;z-index:999;transition:all 0.3s ease;animation:gnomeWiggle 0.5s ease-in-out 3s,gnomePulse 2s ease-in-out 4s infinite}#gnome-info-btn:hover{background-color:#8e44ad;transform:translateY(-3px) scale(1.05);box-shadow:0 8px 25px rgba(155,89,182,0.5)}@keyframes gnomeWiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}75%{transform:rotate(-2deg)}}@keyframes gnomePulse{0%,100%{box-shadow:0 0 0 0 rgba(155,89,182,0.4)}50%{box-shadow:0 0 12px 4px rgba(155,89,182,0.3)}}   ::-webkit-scrollbar{width:10px}::-webkit-scrollbar-track{background:var(--acreetion-body-bg,#121212)}::-webkit-scrollbar-thumb{background:var(--acreetion-box-border,#333);border-radius:10px}.edition-pick:hover{transform:translateY(-2px)!important}::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green,#2ecc71)} .btn{transition:all 0.3s ease}.btn:hover{box-shadow:0 0 15px rgba(46,204,113,0.4);transform:translateY(-2px)}.content-box{transition:transform 0.3s ease,box-shadow 0.3s ease}.content-box:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,0.5)} .reveal{opacity:0;transform:translateY(30px);transition:all 0.8s cubic-bezier(0.2,0.8,0.2,1)}.reveal.active{opacity:1;transform:translateY(0)} html{scroll-behavior:smooth} ::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright,#fff)} :focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px;border-radius:4px} a:focus-visible,button:focus-visible{outline:2px solid var(--acreetion-green,#2ecc71);outline-offset:3px} .skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green,#2ecc71);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top 0.3s;border-radius:0 0 8px 0} .skip-link:focus{top:0} @media (prefers-reduced-motion:reduce) {html{scroll-behavior:auto} *,*::before,*::after{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}} @keyframes pageIn{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}.page-wrapper{animation:pageIn .35s ease-out backwards} @media (prefers-reduced-motion:reduce){body{animation:none}} a{color:var(--acreetion-green,#2ecc71);text-decoration:none;position:relative} a:not(.btn):not(.logo):not(.skip-link):not(.social-link):hover{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px} #back-to-top{position:fixed;bottom:90px;right:20px;background:var(--acreetion-green,#2ecc71);color:#000;border:none;border-radius:50%;width:48px;height:48px;cursor:pointer;z-index:999;font-size:1.2rem;font-weight:700;opacity:0;visibility:hidden;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;padding-bottom:4px} #back-to-top.visible{opacity:1;visibility:visible} #back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(46,204,113,0.4)} body{background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px} .main-nav a.active,.main-nav a[aria-current="page"]{background-color:var(--acreetion-green,#2ecc71);color:#000;font-weight:700;border-radius:12px;padding:0.5rem 1rem}@media(max-width:480px){#gnome-info-btn{bottom:80px;left:8px;font-size:0.8rem;padding:8px 12px}}
-  </style>
-  <link rel="stylesheet" href="ai-chat.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="sidebar.css">
+  
 </head>
 <body>
   <a href="#main-content" class="skip-link">
@@ -206,95 +199,95 @@
             <div class="article-content">
               
               <!-- 1. HERO SECTION -->
-              <div style="text-align:center;padding:2.5rem 1rem 1.5rem">
-                <img src="logo.webp" alt="AcreetionOS Logo" style="width:110px;height:110px;margin-bottom:1.25rem;object-fit:contain" loading="eager" fetchpriority="high">
-                <h1 style="font-size:2.8rem;font-weight:800;color:var(--acreetion-text-bright);margin:0 0 0.25rem;letter-spacing:-0.5px;line-height:1.1">AcreetionOS</h1>
-                <p style="font-size:1.2rem;color:var(--acreetion-green);margin:0 0 1.5rem;font-weight:500">Arch Linux, made approachable.</p>
-                <p style="color:var(--acreetion-text);max-width:620px;margin:0 auto 2rem;font-size:1.05rem;line-height:1.7">
-                  <strong style="color:var(--acreetion-text-bright)">AcreetionOS is a user-friendly, privacy-focused Linux distribution based on Arch Linux.</strong>
+              <div class="hero">
+                <img src="logo.webp" alt="AcreetionOS Logo" class="hero-logo" loading="eager" fetchpriority="high">
+                <h1 class="hero-title">AcreetionOS</h1>
+                <p class="hero-subtitle">Arch Linux, made approachable.</p>
+                <p class="hero-tagline">
+                  <strong>AcreetionOS is a user-friendly, privacy-focused Linux distribution based on Arch Linux.</strong>
                   It features the Cinnamon desktop environment, XLibre stability, and a curated selection of tools designed for performance and repository sovereignty.
                 </p>
-                
+
                 <!-- Download Buttons -->
-                <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem">
-                  <a href="https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso" class="btn" style="background:var(--acreetion-green);color:#000;padding:0.9rem 2rem;font-size:1.05rem;border-radius:10px;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none">
+                <div class="hero-cta">
+                  <a href="https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso" class="btn btn-download">
                     <i class="bi bi-download"></i> X11 (XOrg) Cinnamon Edition
                   </a>
-                  <a href="https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso" class="btn" style="background:transparent;color:var(--acreetion-green);border:2px solid var(--acreetion-green);padding:0.9rem 2rem;font-size:1.05rem;border-radius:10px;display:inline-flex;align-items:center;gap:0.5rem;text-decoration:none">
+                  <a href="https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso" class="btn btn-download btn-download--ghost">
                     <i class="bi bi-download"></i> XL (XLibre) Cinnamon Edition
                   </a>
                 </div>
-                
-                <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;font-size:0.9rem">
-                  <a href="flash.html" style="color:var(--acreetion-green);font-weight:500">For now, we are only offering the Cinnamon X11/XLibre Editions! Community Editions are coming soon!→</a>
-                  <a href="flash.html" style="color:var(--acreetion-text);font-weight:500">Need help flashing? Use the Media Writer →</a>
+
+                <div class="hero-links">
+                  <a href="flash.html" class="hero-note">For now, we are only offering the Cinnamon X11/XLibre Editions! Community Editions are coming soon!→</a>
+                  <a href="flash.html" class="hero-note--muted">Need help flashing? Use the Media Writer →</a>
                 </div>
               </div>
               
               <!-- 2. FEATURES SECTION -->
-              <h2 style="text-align:center;font-size:1.6rem;color:var(--acreetion-text-bright);margin:3rem 0 1.5rem;border:none">Why AcreetionOS?</h2>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2.5rem">
-                
-                <div style="background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem">
-                  <div style="font-size:1.6rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-cpu"></i></div>
-                  <h3 style="color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 0.4rem;border:none">Arch Linux Powered</h3>
-                  <p style="color:var(--acreetion-text);font-size:0.9rem;margin:0;line-height:1.5">Rolling release with curated packages for stability you can trust.</p>
+              <h2 class="section-title section-title--center-lg">Why AcreetionOS?</h2>
+              <div class="feature-grid">
+
+                <div class="feature-card">
+                  <i class="bi bi-cpu"></i>
+                  <h3>Arch Linux Powered</h3>
+                  <p>Rolling release with curated packages for stability you can trust.</p>
                 </div>
-                
-                <div style="background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem">
-                  <div style="font-size:1.6rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-box-seam"></i></div>
-                  <h3 style="color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 0.4rem;border:none">Cinnamon Desktop</h3>
-                  <p style="color:var(--acreetion-text);font-size:0.9rem;margin:0;line-height:1.5">Polished, traditional desktop experience that just works out of the box.</p>
+
+                <div class="feature-card">
+                  <i class="bi bi-box-seam"></i>
+                  <h3>Cinnamon Desktop</h3>
+                  <p>Polished, traditional desktop experience that just works out of the box.</p>
                 </div>
-                
-                <div style="background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem">
-                  <div style="font-size:1.6rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-shield-check"></i></div>
-                  <h3 style="color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 0.4rem;border:none">Privacy Focused</h3>
-                  <p style="color:var(--acreetion-text);font-size:0.9rem;margin:0;line-height:1.5">No telemetry, no tracking, no data collection. Ever.</p>
+
+                <div class="feature-card">
+                  <i class="bi bi-shield-check"></i>
+                  <h3>Privacy Focused</h3>
+                  <p>No telemetry, no tracking, no data collection. Ever.</p>
                 </div>
-                
-                <div style="background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem">
-                  <div style="font-size:1.6rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-layers"></i></div>
-                  <h3 style="color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 0.4rem;border:none">Repository Sovereignty</h3>
-                  <p style="color:var(--acreetion-text);font-size:0.9rem;margin:0;line-height:1.5">We curate every component carefully for your peace of mind.</p>
+
+                <div class="feature-card">
+                  <i class="bi bi-layers"></i>
+                  <h3>Repository Sovereignty</h3>
+                  <p>We curate every component carefully for your peace of mind.</p>
                 </div>
-                
-                <div style="background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem">
-                  <div style="font-size:1.6rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-people"></i></div>
-                  <h3 style="color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 0.4rem;border:none">Multiple Editions</h3>
-                  <p style="color:var(--acreetion-text);font-size:0.9rem;margin:0;line-height:1.5">10+ desktop environments to choose from.</p>
+
+                <div class="feature-card">
+                  <i class="bi bi-people"></i>
+                  <h3>Multiple Editions</h3>
+                  <p>10+ desktop environments to choose from.</p>
                 </div>
-                
-                <div style="background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem">
-                  <div style="font-size:1.6rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-download"></i></div>
-                  <h3 style="color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 0.4rem;border:none">Media Writer</h3>
-                  <p style="color:var(--acreetion-text);font-size:0.9rem;margin:0;line-height:1.5">Official USB flasher for Linux, Windows, and macOS.</p>
+
+                <div class="feature-card">
+                  <i class="bi bi-download"></i>
+                  <h3>Media Writer</h3>
+                  <p>Official USB flasher for Linux, Windows, and macOS.</p>
                 </div>
-                
+
               </div>
-              
+
               <!-- 3. GALLERY / SCREENSHOTS -->
-              <h2 style="text-align:center;font-size:1.6rem;color:var(--acreetion-text-bright);margin:3rem 0 1.5rem;border:none">AcreetionOS Benefits</h2>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2.5rem">
-                
-                <div style="background:linear-gradient(135deg,rgba(46,204,113,0.12) 0%,rgba(46,204,113,0.03) 100%);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:2rem 1rem;text-align:center;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                  <div style="font-size:2.5rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-display"></i></div>
-                  <p style="color:var(--acreetion-text-bright);font-weight:600;margin:0;font-size:0.95rem">Cinnamon Desktop</p>
-                  <p style="color:var(--acreetion-text);font-size:0.8rem;margin:0.25rem 0 0">Polished and familiar</p>
+              <h2 class="section-title section-title--center-lg">AcreetionOS Benefits</h2>
+              <div class="benefit-grid">
+
+                <div class="benefit-card">
+                  <i class="bi bi-display"></i>
+                  <p class="benefit-name">Cinnamon Desktop</p>
+                  <p class="benefit-desc">Polished and familiar</p>
                 </div>
-                
-                <div style="background:linear-gradient(135deg,rgba(46,204,113,0.12) 0%,rgba(46,204,113,0.03) 100%);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:2rem 1rem;text-align:center;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                  <div style="font-size:2.5rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-gear"></i></div>
-                  <p style="color:var(--acreetion-text-bright);font-weight:600;margin:0;font-size:0.95rem">System Settings</p>
-                  <p style="color:var(--acreetion-text);font-size:0.8rem;margin:0.25rem 0 0">Easy configuration</p>
+
+                <div class="benefit-card">
+                  <i class="bi bi-gear"></i>
+                  <p class="benefit-name">System Settings</p>
+                  <p class="benefit-desc">Easy configuration</p>
                 </div>
-                
-                <div style="background:linear-gradient(135deg,rgba(46,204,113,0.12) 0%,rgba(46,204,113,0.03) 100%);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:2rem 1rem;text-align:center;min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center">
-                  <div style="font-size:2.5rem;color:var(--acreetion-green);margin-bottom:0.75rem"><i class="bi bi-box"></i></div>
-                  <p style="color:var(--acreetion-text-bright);font-weight:600;margin:0;font-size:0.95rem">Software Manager</p>
-                  <p style="color:var(--acreetion-text);font-size:0.8rem;margin:0.25rem 0 0">Curated packages</p>
+
+                <div class="benefit-card">
+                  <i class="bi bi-box"></i>
+                  <p class="benefit-name">Software Manager</p>
+                  <p class="benefit-desc">Curated packages</p>
                 </div>
-                
+
               </div>
               
               <!-- 4. NEWSLETTER SIGNUP -->
@@ -311,38 +304,38 @@
               </div> -->
               
               <!-- 5. TECH SPECS TABLE -->
-              <h2 style="font-size:1.3rem;color:var(--acreetion-text-bright);margin:2.5rem 0 1rem;border:none">Technical Specifications</h2>
-              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-bottom:2rem">
-                
-                <div style="padding:0.75rem 1rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:8px">
-                  <span style="color:var(--acreetion-text);font-size:0.8rem;display:block;margin-bottom:0.15rem">Base Distribution</span>
-                  <span style="color:var(--acreetion-text-bright);font-weight:600;font-size:0.95rem">Arch Linux (Rolling with Control)</span>
+              <h2 class="section-title section-title--block section-title--mt-lg">Technical Specifications</h2>
+              <div class="spec-grid">
+
+                <div class="spec-item">
+                  <span class="spec-label">Base Distribution</span>
+                  <span class="spec-value">Arch Linux (Rolling with Control)</span>
                 </div>
-                
-                <div style="padding:0.75rem 1rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:8px">
-                  <span style="color:var(--acreetion-text);font-size:0.8rem;display:block;margin-bottom:0.15rem">Desktop Environment</span>
-                  <span style="color:var(--acreetion-text-bright);font-weight:600;font-size:0.95rem">Cinnamon</span>
+
+                <div class="spec-item">
+                  <span class="spec-label">Desktop Environment</span>
+                  <span class="spec-value">Cinnamon</span>
                 </div>
-                
-                <div style="padding:0.75rem 1rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:8px">
-                  <span style="color:var(--acreetion-text);font-size:0.8rem;display:block;margin-bottom:0.15rem">Display Protocol</span>
-                  <span style="color:var(--acreetion-text-bright);font-weight:600;font-size:0.95rem">X11 / XLibre</span>
+
+                <div class="spec-item">
+                  <span class="spec-label">Display Protocol</span>
+                  <span class="spec-value">X11 / XLibre</span>
                 </div>
-                
-                <div style="padding:0.75rem 1rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:8px">
-                  <span style="color:var(--acreetion-text);font-size:0.8rem;display:block;margin-bottom:0.15rem">Audio Server</span>
-                  <span style="color:var(--acreetion-text-bright);font-weight:600;font-size:0.95rem">Pipewire</span>
+
+                <div class="spec-item">
+                  <span class="spec-label">Audio Server</span>
+                  <span class="spec-value">Pipewire</span>
                 </div>
-                
-                <div style="padding:0.75rem 1rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:8px">
-                  <span style="color:var(--acreetion-text);font-size:0.8rem;display:block;margin-bottom:0.15rem">Primary Goal</span>
-                  <span style="color:var(--acreetion-text-bright);font-weight:600;font-size:0.95rem">Accessibility &amp; Ease of Use</span>
+
+                <div class="spec-item">
+                  <span class="spec-label">Primary Goal</span>
+                  <span class="spec-value">Accessibility &amp; Ease of Use</span>
                 </div>
-                
+
               </div>
-              
+
               <!-- 6. TEAM SECTION -->
-              <h2 style="font-size:1.3rem;color:var(--acreetion-text-bright);margin:1.5rem 0 1rem;border:none">Our Team</h2>
+              <h2 class="section-title section-title--block section-title--mt-sm">Our Team</h2>
               <div class="team-members">
                 <div class="team-member">
                   <span class="team-member-name"><a href="https://darren.acreetionos.org">Darren Clift</a></span>
@@ -357,12 +350,12 @@
                   <span class="team-member-role"><a href="https://discord.gg/VHqQkJASw7">Discord</a></span>
                 </div>
               </div>
-              <p style="margin-top:1rem">
+              <p class="mt-1">
                 <a href="about.html">Read more about our philosophy on our About page</a>
               </p>
               
               <!-- 7. MISSION -->
-              <h2 style="font-size:1.3rem;color:var(--acreetion-text-bright);margin:2rem 0 1rem;border:none">Our Mission</h2>
+              <h2 class="section-title section-title--block section-title--mt-md">Our Mission</h2>
               <p>
                 <strong>AcreetionOS</strong> bridges the gap between the power of
                 <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>
@@ -379,39 +372,39 @@
           </div>
         </article>
               <!-- 8. COMMUNITY SPOTLIGHT -->
-              <h2 style="font-size:1.3rem;color:var(--acreetion-text-bright);margin:2.5rem 0 1rem;border:none">Community & Reviews</h2>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem">
-                <a href="features.html" style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;text-decoration:none;transition:border-color.15s;text-align:center" onmouseover="this.style.borderColor='#2ecc71'" onmouseout="this.style.borderColor=''">
-                  <div style="font-size:1.5rem;color:var(--acreetion-green)"><i class="bi bi-palette"></i></div>
-                  <div style="color:var(--acreetion-text-bright);font-weight:600;font-size:.85rem">Feature Showcase</div>
-                  <div style="color:var(--acreetion-text);font-size:.78rem;line-height:1.4">Desktop tweaks, app alternatives & privacy tools</div>
+              <h2 class="section-title section-title--block section-title--mt-lg">Community &amp; Reviews</h2>
+              <div class="community-links">
+                <a href="features.html" class="community-link">
+                  <i class="bi bi-palette"></i>
+                  <div class="community-link-title">Feature Showcase</div>
+                  <div class="community-link-desc">Desktop tweaks, app alternatives &amp; privacy tools</div>
                 </a>
-                <a href="community-reviews.html" style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;text-decoration:none;transition:border-color.15s;text-align:center" onmouseover="this.style.borderColor='#2ecc71'" onmouseout="this.style.borderColor=''">
-                  <div style="font-size:1.5rem;color:var(--acreetion-green)"><i class="bi bi-play-btn"></i></div>
-                  <div style="color:var(--acreetion-text-bright);font-weight:600;font-size:.85rem">Video Reviews</div>
-                  <div style="color:var(--acreetion-text);font-size:.78rem;line-height:1.4">Watch community first looks and deep dives</div>
+                <a href="community-reviews.html" class="community-link">
+                  <i class="bi bi-play-btn"></i>
+                  <div class="community-link-title">Video Reviews</div>
+                  <div class="community-link-desc">Watch community first looks and deep dives</div>
                 </a>
-                <a href="changelog.html" style="display:flex;flex-direction:column;align-items:center;gap:.5rem;padding:1.25rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;text-decoration:none;transition:border-color.15s;text-align:center" onmouseover="this.style.borderColor='#2ecc71'" onmouseout="this.style.borderColor=''">
-                  <div style="font-size:1.5rem;color:var(--acreetion-green)"><i class="bi bi-clock-history"></i></div>
-                  <div style="color:var(--acreetion-text-bright);font-weight:600;font-size:.85rem">Changelog</div>
-                  <div style="color:var(--acreetion-text);font-size:.78rem;line-height:1.4">Track kernel, desktop & package updates</div>
+                <a href="changelog.html" class="community-link">
+                  <i class="bi bi-clock-history"></i>
+                  <div class="community-link-title">Changelog</div>
+                  <div class="community-link-desc">Track kernel, desktop &amp; package updates</div>
                 </a>
               </div>
 
-<div id="hosting-providers-container" style="margin-top:0">
+<div id="hosting-providers-container">
 </div>
-<div class="sidebar" style="margin-top:2rem">
+<div class="sidebar sidebar-spaced">
   <div class="sidebar-box content-box" id="community-box">
     <div class="box-header"><h2><i class="bi bi-people"></i> Community</h2></div>
-    <div class="box-body" id="community-body" style="padding:1rem;text-align:center">
-      <p style="color:#b2b2b2;font-size:.85rem;margin-bottom:.75rem;line-height:1.6">AcreetionOS is built by a community of volunteers. See live stats, explore repos, and find ways to contribute.</p>
-      <div id="community-stats" style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem">
-        <div style="padding:.5rem;background:#1a1a1a;border-radius:8px"><div style="font-size:1.2rem;font-weight:700;color:#2ecc71;font-family:'Fira Code',monospace" id="stat-repos">-</div><div style="font-size:.7rem;color:#777">Repos</div></div>
-        <div style="padding:.5rem;background:#1a1a1a;border-radius:8px"><div style="font-size:1.2rem;font-weight:700;color:#2ecc71;font-family:'Fira Code',monospace" id="stat-stars">-</div><div style="font-size:.7rem;color:#777">Stars</div></div>
-        <div style="padding:.5rem;background:#1a1a1a;border-radius:8px"><div style="font-size:1.2rem;font-weight:700;color:#2ecc71;font-family:'Fira Code',monospace" id="stat-issues">-</div><div style="font-size:.7rem;color:#777">Issues</div></div>
-        <div style="padding:.5rem;background:#1a1a1a;border-radius:8px"><div style="font-size:1.2rem;font-weight:700;color:#2ecc71;font-family:'Fira Code',monospace" id="stat-contrib">-</div><div style="font-size:.7rem;color:#777">Team</div></div>
+    <div class="box-body community-box-body" id="community-body">
+      <p class="community-intro">AcreetionOS is built by a community of volunteers. See live stats, explore repos, and find ways to contribute.</p>
+      <div id="community-stats" class="community-stats">
+        <div class="community-stat"><div class="community-stat-value" id="stat-repos">-</div><div class="community-stat-label">Repos</div></div>
+        <div class="community-stat"><div class="community-stat-value" id="stat-stars">-</div><div class="community-stat-label">Stars</div></div>
+        <div class="community-stat"><div class="community-stat-value" id="stat-issues">-</div><div class="community-stat-label">Issues</div></div>
+        <div class="community-stat"><div class="community-stat-value" id="stat-contrib">-</div><div class="community-stat-label">Team</div></div>
       </div>
-      <a href="contributors.html" style="display:inline-block;padding:.5rem 1.2rem;background:#2ecc71;color:#000;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none">View Contributor Hub →</a>
+      <a href="contributors.html" class="btn-contributors">View Contributor Hub →</a>
     </div>
   </div>
 </div>
