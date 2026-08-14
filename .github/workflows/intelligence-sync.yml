@@ -21,6 +21,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Builds the daily newsletter JSON if it doesn't exist yet (no email —
+      # SEND_EMAIL is only set by send-newsletter.yml). Exits non-zero on AI
+      # failure WITHOUT writing a placeholder, so the daily job can retry.
       - name: Generate newsletter
         run: python3 scripts/generate-newsletter.py
         env:
@@ -28,11 +31,12 @@ jobs:
           NEWSLETTER_DIR: "newsletters"
           REQUEST_TIMEOUT: "180"
 
+      # Only stage newsletters/ — never git add -A.
       - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add -A
+          git add newsletters/
           if git diff --cached --quiet; then
             echo "No new newsletter to commit."
           else

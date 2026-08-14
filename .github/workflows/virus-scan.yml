@@ -34,6 +34,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Output is tee'd to scan-report.txt so the report step below has
+      # something real to attach. The script emits ::error:: annotations and
+      # exits 1 on any malicious detection (which fails this job).
       - name: Run VirusTotal URL scan
         id: scan
         env:
@@ -42,12 +45,14 @@ jobs:
           WORKER_URL: "https://acreetionos.org/api"
         run: |
           echo "::group::VirusTotal Scan"
-          python3 scripts/scan-isos.py
+          python3 scripts/scan-isos.py 2>&1 | tee scan-report.txt
           echo "::endgroup::"
-        continue-on-error: false
 
       - name: Upload scan report
         if: always()
-        run: |
-          echo "Scan completed. See job logs for detailed results."
-          echo "Quota reminder: VirusTotal free tier = 500 req/day, ~15k/month"
+        uses: actions/upload-artifact@v4
+        with:
+          name: virustotal-scan-report
+          path: scan-report.txt
+          if-no-files-found: ignore
+          retention-days: 30

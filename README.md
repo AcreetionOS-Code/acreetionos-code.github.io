@@ -43,7 +43,7 @@ To run the website locally for testing or development:
 ```bash
 # Clone the repository
 git clone https://github.com/AcreetionOS-Code/acreetionos-code.github.io.git
-cd acreetionos.github.io
+cd acreetionos-code.github.io
 
 # Start a local server
 python3 -m http.server 8000
@@ -52,15 +52,22 @@ python3 -m http.server 8000
 
 ### Running Tests
 
-We prioritize Firefox compatibility. To run our local test suite:
+We prioritize Firefox compatibility. To run the smoke test suite:
 
 ```bash
-# Install dependencies
+# Install dependencies (includes @playwright/test + wrangler for worker deploys)
 npm install
 
-# Run Firefox tests
-bash tests/run_firefox_local.sh
+# Install the Firefox browser runtime (once)
+npm run install:browsers
+
+# Run the tests
+npm test
 ```
+
+The suite serves the repo with `python3 -m http.server` and verifies every
+public page returns 200 with a title, and that the homepage loads without
+console errors. Test files live in `tests/`.
 
 ## Community
 

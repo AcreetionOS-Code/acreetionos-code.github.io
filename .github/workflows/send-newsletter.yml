@@ -20,11 +20,15 @@ jobs:
         with:
           python-version: '3.x'
 
+      # SEND_EMAIL=1: generate today's newsletter if missing, then email it to
+      # subscribers. If the 6-hourly intelligence-sync already built today's
+      # file, this still emails it (no more silently skipped deliveries).
       - name: Generate and send newsletter
         env:
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          SEND_EMAIL: "1"
         run: python3 scripts/generate-newsletter.py
 
       - name: Commit and push newsletter

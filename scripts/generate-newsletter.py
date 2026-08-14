@@ -183,18 +183,13 @@ def send_email_smtp(to_email, subject, body_text, unsubscribe_url=""):
         return False
 
 
-def main():
-    today = date.today()
-    date_str = today.strftime("%Y-%m-%d")
-    date_display = today.strftime("%B %d, %Y")
-    filename = os.path.join(NEWSLETTER_DIR, f"{date_str}.json")
+def generate_newsletter(date_str, date_display, filename):
+    """Generate today's newsletter. Returns the newsletter dict, or None on AI failure.
 
-    os.makedirs(NEWSLETTER_DIR, exist_ok=True)
-
-    if os.path.exists(filename):
-        print(f"Newsletter already exists: {filename}")
-        return
-
+    Never writes placeholder content — if the AI chain is down we return None and
+    the caller exits non-zero, so the run is visible as failed and the next run
+    retries instead of committing a fake "not available" newsletter.
+    """
     ecosystem_text = scrape_ecosystem()
     news = fetch_news_activity()
     articles = news.get("articles", [])
@@ -253,12 +248,8 @@ def main():
                 time.sleep(5)
 
     if not content:
-        content = (
-            f"Daily AcreetionOS Update -- {date_display}\n\n"
-            "Today's AI-generated newsletter is not available.\n\n"
-            "Please check back later for the latest AcreetionOS development updates, "
-            "community news, and Linux tips."
-        )
+        print("AI generation failed after 3 attempts — not writing a placeholder newsletter.", file=sys.stderr)
+        return None
 
     newsletter = {
         "subject": f"Daily AcreetionOS Update -- {date_display}",
@@ -278,28 +269,68 @@ def main():
     })
     save_list(NEWSLETTER_DIR, entries)
 
-    # Send emails to subscribers
-    if EMAIL_ADDRESS and EMAIL_PASSWORD:
-        print("Fetching subscribers...")
-        subscribers = fetch_subscribers()
-        if subscribers:
-            print(f"Sending newsletter to {len(subscribers)} subscribers via Gmail SMTP...")
-            success_count = 0
-            for sub in subscribers:
-                email = sub.get("email", "")
-                token = sub.get("unsubscribe_token", "")
-                unsubscribe_url = f"https://acreetionos.org/api/newsletter/unsubscribe?email={email}&token={token}" if email and token else ""
-                if email:
-                    ok = send_email_smtp(email, newsletter["subject"], content, unsubscribe_url)
-                    if ok:
-                        success_count += 1
-                    print(f"  {'OK' if ok else 'FAIL'} {email}")
-                time.sleep(0.5)
-            print(f"Sent {success_count}/{len(subscribers)} emails successfully")
-        else:
-            print("No subscribers to email")
-    else:
+    return newsletter
+
+
+def send_to_subscribers(newsletter):
+    """Email the newsletter to all subscribers. Only runs when SEND_EMAIL=1."""
+    if not (EMAIL_ADDRESS and EMAIL_PASSWORD):
         print("EMAIL_ADDRESS/EMAIL_APP_PASSWORD not set — skipping email delivery. Set these in environment to send.")
+        return False
+    content = newsletter.get("body", "")
+    print("Fetching subscribers...")
+    subscribers = fetch_subscribers()
+    if not subscribers:
+        print("No subscribers to email")
+        return False
+    print(f"Sending newsletter to {len(subscribers)} subscribers via Gmail SMTP...")
+    success_count = 0
+    for sub in subscribers:
+        email = sub.get("email", "")
+        token = sub.get("unsubscribe_token", "")
+        unsubscribe_url = f"https://acreetionos.org/api/newsletter/unsubscribe?email={email}&token={token}" if email and token else ""
+        if email:
+            ok = send_email_smtp(email, newsletter["subject"], content, unsubscribe_url)
+            if ok:
+                success_count += 1
+            print(f"  {'OK' if ok else 'FAIL'} {email}")
+        time.sleep(0.5)
+    print(f"Sent {success_count}/{len(subscribers)} emails successfully")
+    return True
+
+
+def main():
+    today = date.today()
+    date_str = today.strftime("%Y-%m-%d")
+    date_display = today.strftime("%B %d, %Y")
+    filename = os.path.join(NEWSLETTER_DIR, f"{date_str}.json")
+
+    os.makedirs(NEWSLETTER_DIR, exist_ok=True)
+
+    # SEND_EMAIL=1 is the "daily delivery" mode (send-newsletter.yml).
+    # Without it we only build the file, never email (intelligence-sync.yml).
+    send_email = os.environ.get("SEND_EMAIL", "0") == "1"
+
+    newsletter = None
+    if os.path.exists(filename):
+        print(f"Newsletter already exists: {filename}")
+        try:
+            with open(filename, encoding="utf-8") as f:
+                newsletter = json.load(f)
+        except Exception as e:
+            print(f"Failed to read existing newsletter: {e}", file=sys.stderr)
+            newsletter = None
+    else:
+        newsletter = generate_newsletter(date_str, date_display, filename)
+        if newsletter is None:
+            # AI is down — fail the workflow so the next scheduled run retries.
+            sys.exit(1)
+
+    if send_email:
+        if newsletter:
+            send_to_subscribers(newsletter)
+    else:
+        print("SEND_EMAIL not set — skipping email delivery.")
 
 
 if __name__ == "__main__":

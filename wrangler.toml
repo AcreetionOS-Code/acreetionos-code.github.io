@@ -15,19 +15,24 @@ ai = { binding = "AI" }
 crons = ["*/30 * * * *"]
 
 [vars]
-ALERT_SIREN = ""
-SECRET_SAUCE = ""
+# Plaintext vars only. Anything sensitive is a SECRET, not a var —
+# declaring SECRET_SAUCE / ALERT_SIREN / SCAN_MASTER here as empty vars
+# is how they ended up unset in production.
 RETURN_ADDRESS = "developers@acreetionos.org"
-SCAN_MASTER = ""
 
-# Secrets already deployed (check with `wrangler secret list`):
-#   OPENROUTER_API_KEY    — OpenRouter API key for AI chat + newsletter generation
-#   CLOUDFLARE_API_TOKEN  — Cloudflare API token for R2 access (ISO hosting)
-#   CLOUDFLARE_ACCOUNT_ID — Cloudflare Account ID
-#   GH_TOKEN              — GitHub API token (for API rate limits)
-#
-# Required secrets (set if not present: `wrangler secret put <NAME>`):
-#   SECRET_SAUCE  — Admin key for hosting provider approval/rejection
+# Secrets are deployed by .github/workflows/deploy-worker.yml (names must
+# match what index.js reads). Verify with `wrangler secret list`:
+#   OPENROUTER_API_KEY / BRAIN_JUICE — OpenRouter API key (AI chat + newsletter)
+#   CLOUDFLARE_API_TOKEN  — Cloudflare API token (R2 ISO hosting + provider store)
+#   CLOUDFLARE_ACCOUNT_ID — Cloudflare Account ID (required for all R2 calls)
+#   SECRET_SAUCE  — Admin key for hosting/newsletter admin endpoints
 #   ALERT_SIREN   — Discord webhook URL for alerts
 #   SCAN_MASTER   — VirusTotal API key for ISO malware scanning
+#   GUEST_LIST    — JSON array of allowed CORS origins
 #   WATCH_LIST    — JSON array of threat intel keywords
+#   GROQ_API_KEY  — (optional) Groq free tier fallback
+#   GH_TOKEN      — (optional) GitHub Models free tier fallback
+#   RECAPTCHA_API_KEY — Google Cloud API key for reCAPTCHA Enterprise
+#       assessments (project clean-502708). REQUIRED to enforce reCAPTCHA.
+#   RECAPTCHA_SECRET_KEY — legacy siteverify secret; alternative to the
+#       Enterprise API key. If neither is set, verification is skipped.

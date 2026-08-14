@@ -10,9 +10,7 @@
     "install:browsers": "playwright install firefox"
   },
   "devDependencies": {
-    "@playwright/test": "^1.40.0"
-  },
-  "dependencies": {
+    "@playwright/test": "^1.40.0",
     "wrangler": "^4.111.0"
   }
 }
