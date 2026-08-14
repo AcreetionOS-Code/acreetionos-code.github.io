@@ -29,7 +29,7 @@ jobs:
       - name: Wait for site to go live
         shell: bash
         run: |
-          KEY="fc6913fec92a55410fec94f8354c378d"
+          KEY="2e369f12018dcc78a68d9ed417f3a8b4"
           for i in $(seq 1 30); do
             body=$(curl -s --max-time 10 "https://acreetionos.org/${KEY}.txt" || true)
             if [ "$body" = "$KEY" ]; then
