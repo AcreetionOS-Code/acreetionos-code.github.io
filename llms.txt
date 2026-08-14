@@ -1,0 +1,48 @@
+# AcreetionOS
+
+> AcreetionOS is a free, open-source, privacy-focused Linux distribution based on Arch Linux featuring a customized Cinnamon desktop. It is an independent, volunteer-run project led by Natalie Cole-Clift Spiva and Darren Clift, based in Spokane, WA, USA. No telemetry, repository sovereignty, 80,000+ packages via pacman and the AUR. The project is NOT affiliated with StormOS or any other distribution team.
+
+Important URLS:
+- [Homepage](https://acreetionos.org/)
+- [Downloads (ISO / Flash)](https://acreetionos.org/flash.html)
+- [Documentation](https://acreetionos.org/docs.html)
+- [Wiki](https://acreetionos.org/wiki.html)
+- [GitHub Organization](https://github.com/AcreetionOS-Code)
+- [GitLab Instance](https://gitlab.acreetionos.org)
+- [Release Changelog](https://acreetionos.org/changelog.html)
+- [System Requirements](https://acreetionos.org/requirements.html)
+- [Installation Guide](https://acreetionos.org/beginner.html)
+
+## Key pages
+
+- [About the Project](https://acreetionos.org/about.html): Mission, team, philosophy, independence, and governance overview.
+- [Features](https://acreetionos.org/features.html): Cinnamon desktop, privacy tools, pre-installed software, open-source app alternatives.
+- [Beginner Guide](https://acreetionos.org/beginner.html): The easiest Arch-based Linux distribution for newcomers; graphical installer, no terminal required.
+- [Compare](https://acreetionos.org/compare.html): AcreetionOS vs Arch Linux, Ubuntu, Linux Mint, Fedora, and Manjaro.
+- [Lightweight Edition](https://acreetionos.org/lightweight.html): Lightweight Linux distro for old computers.
+- [AcreetionOS Immutable](https://acreetionos.org/immutable.html): Immutable Arch Linux edition focused on absolute stability.
+- [Hosting](https://acreetionos.org/hosting.html): Self-hosting with AcreetionOS.
+- [FAQ](https://acreetionos.org/faq.html): Frequently asked questions — installation, dual-booting, package management, system requirements.
+- [Community Reviews](https://acreetionos.org/community-reviews.html): User reviews and testimonials.
+- [Contributors](https://acreetionos.org/contributors.html): Contributor hub, live development stats, how to contribute.
+- [Governance](https://acreetionos.org/governance.html): Project governance model and decision-making.
+- [Status](https://acreetionos.org/status.html): Live project status, services, and infrastructure.
+- [Privacy Policy](https://acreetionos.org/privacy.html): No telemetry, no tracking, no data collection.
+- [Newsletter](https://acreetionos.org/newsletter.html): Project news and updates.
+- [Contact](https://acreetionos.org/contact.html): Community Discord, social links, and contact form.
+
+## Technical facts
+
+- Base: Arch Linux (rolling release)
+- Desktop: Cinnamon (optimized)
+- Display protocol: X11 (XLibre)
+- Audio: Pipewire
+- Filesystem: EXT4
+- Bootloader: GRUB (installation), systemd-boot/syslinux (live environment)
+- Package management: pacman + AUR (80,000+ packages)
+- Custom tools: Mingle (Wayland compositor, in development), Gittracker (repository sovereignty monitor), Ermin (Stoat fork)
+- License: GNU General Public License v3.0
+
+## Full details
+
+- [llms-full.txt](https://acreetionos.org/llms-full.txt): Complete technical documentation and AI context for the project.

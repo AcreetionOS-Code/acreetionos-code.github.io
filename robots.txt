@@ -1,8 +1,17 @@
 # AcreetionOS Website - Search Engine Optimization Policy
-# Allow all major search engines, block AI training bots only
+# Allow all search engines + AI assistant/search bots (so the site gets
+# cited in ChatGPT/Claude/Perplexity answers), block AI *training* bots
+# and scraper-only crawlers from ingesting the site into models.
 
-# Block specific AI training bots
-User-agent: ChatGPT-User
+# ------------------------------------------------------------------
+# BLOCKED: AI training / large-scale scraping crawlers
+# These ingest content into model training sets. Content stays out.
+# ------------------------------------------------------------------
+
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
 Disallow: /
 
 User-agent: CCBot
@@ -11,13 +20,77 @@ Disallow: /
 User-agent: anthropic-ai
 Disallow: /
 
-User-agent: Claude-Web
+User-agent: ClaudeBot
 Disallow: /
 
 User-agent: cohere-ai
 Disallow: /
 
-# Allow all other legitimate crawlers (DuckDuckGo, Yandex, Baidu, etc.)
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+User-agent: meta-externalagent
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Timpibot
+Disallow: /
+
+User-agent: OmgiliBot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+# ------------------------------------------------------------------
+# ALLOWED: search engines + AI assistant/search bots
+# These surface the site in search results and AI answer engines
+# (ChatGPT search, Claude, Perplexity, Copilot, Gemini overviews)
+# with proper attribution. They are NOT allowed to train on it.
+# ------------------------------------------------------------------
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: YouBot
+Allow: /
+
+# Allow all other legitimate crawlers
 User-agent: *
 Disallow:
 Allow: /
