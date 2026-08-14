@@ -49,3 +49,10 @@ local/
 dev/
 dist/
 *.local.js
+
+# Local scratch / accidental artifacts
+.vercel/
+.playwright-mcp/
+captcha*.png
+base64,hashlib
+subprocess
