@@ -49,6 +49,7 @@ def submit(urls):
         "keyLocation": KEY_LOCATION,
         "urlList": urls,
     }).encode()
+    results = []
     for ep in ENDPOINTS:
         try:
             req = urllib.request.Request(
@@ -58,10 +59,21 @@ def submit(urls):
             )
             with urllib.request.urlopen(req, timeout=15) as resp:
                 print(f"  {ep} -> HTTP {resp.status}")
+                results.append(True)
         except urllib.error.HTTPError as e:
             print(f"  {ep} -> HTTP {e.code}: {e.read().decode()[:120]}")
+            results.append(False)
         except Exception as e:
             print(f"  {ep} -> ERROR: {e}")
+            results.append(False)
+    # Fail loudly if NO endpoint accepted — a silent miss means no re-crawl.
+    # Note: a 403 here usually means Bing hasn't accepted the key yet (new
+    # key file, or domain not yet verified in Bing Webmaster Tools). The
+    # Ping IndexNow workflow retries on every push, so this resolves once
+    # Bing's key-file crawl succeeds.
+    if not any(results):
+        print("IndexNow submission FAILED on all endpoints", file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
