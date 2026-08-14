@@ -1,0 +1,46 @@
+name: Ping IndexNow
+
+# Fires on every push to main — after the site is live, tell Bing /
+# Naver / Yandex / Seznam / Yep "hey, we changed" via IndexNow so they
+# re-crawl immediately instead of waiting for their normal schedule.
+# One submission fans out to every IndexNow partner engine.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # IndexNow validates the key by fetching it from the live site, so we
+      # must wait for the Pages deploy (not just the push) before submitting.
+      - name: Wait for site to go live
+        shell: bash
+        run: |
+          KEY="fc6913fec92a55410fec94f8354c378d"
+          for i in $(seq 1 30); do
+            body=$(curl -s --max-time 10 "https://acreetionos.org/${KEY}.txt" || true)
+            if [ "$body" = "$KEY" ]; then
+              echo "Site is live (key file verified) after ${i} tries"
+              exit 0
+            fi
+            echo "waiting for deploy... (${i}/30)"
+            sleep 15
+          done
+          echo "Timed out waiting for site deploy" >&2
+          exit 1
+
+      - name: Submit URLs to IndexNow
+        run: python3 scripts/submit-indexnow.py
