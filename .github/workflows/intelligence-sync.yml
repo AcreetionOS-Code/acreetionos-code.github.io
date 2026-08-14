@@ -30,6 +30,8 @@ jobs:
           WORKER_URL: "https://acreetionos.org/api"
           NEWSLETTER_DIR: "newsletters"
           REQUEST_TIMEOUT: "180"
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
 
       # Pre-generate static wiki guide pages (popular topics) so search
       # engines can index the AI guides without a visit. Uses the same

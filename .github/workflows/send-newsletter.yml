@@ -28,6 +28,7 @@ jobs:
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SEND_EMAIL: "1"
         run: python3 scripts/generate-newsletter.py
 
