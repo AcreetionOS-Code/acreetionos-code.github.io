@@ -31,6 +31,11 @@ KEY_LOCATION = f"https://{HOST}/{KEY}.txt"
 ENDPOINTS = [
     "https://api.indexnow.org/indexnow",
     "https://www.bing.com/indexnow",
+    # Yandex's endpoint validates the key live and returns 202 on success —
+    # a useful canary when Bing holds a negative cache from an early
+    # submission (the site was pushed after the first ping, so Bing cached
+    # a 404 for the key file; it re-validates on its own schedule).
+    "https://yandex.com/indexnow",
 ]
 
 
