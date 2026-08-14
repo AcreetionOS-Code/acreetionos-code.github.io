@@ -1,73 +1,223 @@
-# AcreetionOS Website — Search Engine Optimization Policy
-# Fully open: search engines AND AI crawlers (search, citation, and
-# training) are all welcome. We are flooding the internet with our
-# information. ❤️
+# AcreetionOS Website - Search Engine Optimization Policy
+# Allow all search engines + AI assistant/search bots (so the site gets
+# cited in ChatGPT/Claude/Perplexity answers), block AI *training* bots
+# and scraper-only crawlers from ingesting the site into models.
+#
+# Crawl budget: every allowed crawler is steered away from non-content
+# paths (API endpoints, JSON data, raw markdown, build artifacts) so
+# crawl budget is spent on the 23 real HTML pages. Note: per the
+# robots.txt spec, a specific User-agent group OVERRIDES the catch-all
+# "*" group, so the crawl-budget rules are duplicated into every
+# allowed group below — that is intentional.
 
-User-agent: *
-Allow: /
+# ------------------------------------------------------------------
+# BLOCKED: AI training / large-scale scraping crawlers
+# These ingest content into model training sets. Content stays out.
+# ------------------------------------------------------------------
 
-# AI training / retrieval / search crawlers — explicitly allowed
 User-agent: GPTBot
-Allow: /
-User-agent: ChatGPT-User
-Allow: /
-User-agent: OAI-SearchBot
-Allow: /
-User-agent: Claude-User
-Allow: /
-User-agent: ClaudeBot
-Allow: /
-User-agent: Claude-Web
-Allow: /
-User-agent: Claude-SearchBot
-Allow: /
-User-agent: anthropic-ai
-Allow: /
+Disallow: /
+
 User-agent: Google-Extended
-Allow: /
-User-agent: PerplexityBot
-Allow: /
+Disallow: /
+
 User-agent: CCBot
-Allow: /
-User-agent: Omgili
-Allow: /
-User-agent: FacebookBot
-Allow: /
-User-agent: Amazonbot
-Allow: /
-User-agent: Applebot
-Allow: /
-User-agent: Applebot-Extended
-Allow: /
-User-agent: Bytespider
-Allow: /
-User-agent: PetalBot
-Allow: /
-User-agent: AndiBot
-Allow: /
-User-agent: YouBot
-Allow: /
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
 User-agent: cohere-ai
-Allow: /
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Applebot-Extended
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
 User-agent: meta-externalagent
-Allow: /
+Disallow: /
+
 User-agent: ImagesiftBot
-Allow: /
+Disallow: /
+
 User-agent: Timpibot
-Allow: /
+Disallow: /
+
 User-agent: OmgiliBot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+# ------------------------------------------------------------------
+# CRAWL BUDGET (non-content paths) — appended to each allowed group:
+# API endpoints, raw JSON/markdown, build artifacts, redirect stubs.
+# ------------------------------------------------------------------
+#   Disallow: /api/          worker endpoints (401/403 to crawlers)
+#   Disallow: /newsletters/  JSON newsletter archive (81 files)
+#   Disallow: /docs/         raw markdown source (docs.html is the page)
+#   Disallow: /Reviews/      review embeds dir
+#   Disallow: /frontend/     Vite dev scaffold
+#   Disallow: /immutable/    old redirect stub (immutable.html is the page)
+#   Disallow: /404.html      not-found page itself
+#   Disallow: /test-results/ /tests/   CI artifacts
+
+# ------------------------------------------------------------------
+# ALLOWED: search engines + AI assistant/search bots
+# ------------------------------------------------------------------
+
+User-agent: Googlebot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
 Allow: /
 
-# Standard search engines — allowed
-User-agent: Googlebot
-Allow: /
 User-agent: Bingbot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
 Allow: /
+
+User-agent: ChatGPT-User
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
+User-agent: OAI-SearchBot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
+User-agent: Claude-Web
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
+User-agent: Claude-SearchBot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
 User-agent: DuckDuckBot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
 Allow: /
+
+User-agent: Applebot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
 User-agent: YandexBot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
 Allow: /
+
 User-agent: Baiduspider
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
+User-agent: YouBot
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+Allow: /
+
+# Allow all other legitimate crawlers (with same crawl-budget rules)
+User-agent: *
+Disallow: /api/
+Disallow: /newsletters/
+Disallow: /docs/
+Disallow: /Reviews/
+Disallow: /frontend/
+Disallow: /immutable/
+Disallow: /404.html
+Disallow: /test-results/
+Disallow: /tests/
+
 Allow: /
 
 # Sitemap location
