@@ -59,8 +59,11 @@ def fetch_text(url, timeout=None):
         return None
 
 
-def fetch_json(url, data=None, timeout=None):
-    req = Request(url, data=data, headers={"User-Agent": "AcreetionOS-Newsletter-Bot/1.0"})
+def fetch_json(url, data=None, timeout=None, headers=None):
+    req_headers = {"User-Agent": "AcreetionOS-Newsletter-Bot/1.0"}
+    if headers:
+        req_headers.update(headers)
+    req = Request(url, data=data, headers=req_headers)
     if data:
         req.add_header("Content-Type", "application/json")
     try:
@@ -224,8 +227,10 @@ def generate_newsletter(date_str, date_display, filename):
     content = None
     for attempt in range(3):
         try:
+            # Same AI endpoint as the wiki (/api/chat) — server-to-server
+            # calls authenticate with X-Admin-Key and skip reCAPTCHA.
             ai_response = fetch_json(
-                f"{WORKER_URL}/news/ai",
+                f"{WORKER_URL}/chat",
                 data=json.dumps({
                     "messages": [
                         {"role": "system", "content": system_prompt},
@@ -234,6 +239,7 @@ def generate_newsletter(date_str, date_display, filename):
                     "max_tokens": 4096,
                 }).encode(),
                 timeout=180,
+                headers={"X-Admin-Key": ADMIN_KEY},
             )
             content = (
                 ai_response.get("content", "")

@@ -21,6 +21,8 @@
 - [Git Tracker](https://acreetionos.org/git-tracker.html) — Live repository tracking
 - [Status](https://acreetionos.org/status.html) — Project/service status
 - [Newsletter](https://acreetionos.org/newsletter.html) — Newsletters & updates
+- [Newsletter Archive](https://acreetionos.org/newsletter-archive/index.html) — All past issues (HTML)
+- [News Feed (Atom)](https://acreetionos.org/feed.xml) — Machine-readable update feed
 - [Privacy](https://acreetionos.org/privacy.html) — Privacy policy (no telemetry)
 - [Contact](https://acreetionos.org/contact.html) — Discord, socials, contact form
 - [Unofficial](https://acreetionos.org/unofficial.html) — Unofficial community resources

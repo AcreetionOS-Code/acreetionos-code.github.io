@@ -29,6 +29,8 @@ Important URLS:
 - [Status](https://acreetionos.org/status.html): Live project status, services, and infrastructure.
 - [Privacy Policy](https://acreetionos.org/privacy.html): No telemetry, no tracking, no data collection.
 - [Newsletter](https://acreetionos.org/newsletter.html): Project news and updates.
+- [Newsletter Archive](https://acreetionos.org/newsletter-archive/index.html): All past issues (HTML).
+- [News Feed (Atom)](https://acreetionos.org/feed.xml): Machine-readable update feed.
 - [Contact](https://acreetionos.org/contact.html): Community Discord, social links, and contact form.
 
 ## Technical facts

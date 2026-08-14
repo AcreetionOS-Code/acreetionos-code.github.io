@@ -2530,14 +2530,21 @@ export default {
         });
       }
 
-      // Human verification (reCAPTCHA Enterprise) — chat burns AI tokens,
-      // so bots get stopped before any provider is called.
-      const rc = await verifyRecaptcha(env, body.recaptchaToken, 'chat');
-      if (!rc.ok) {
-        return new Response(JSON.stringify({ error: rc.error }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-        });
+      // Server-to-server calls (newsletter generator, internal tools) carry
+      // X-Admin-Key: <SECRET_SAUCE> and skip human verification. Browser
+      // traffic must pass reCAPTCHA — chat burns AI tokens, so bots get
+      // stopped before any provider is called.
+      const adminKey = request.headers.get('X-Admin-Key') || '';
+      const isAdmin = env.SECRET_SAUCE && await timingSafeCompare(adminKey, env.SECRET_SAUCE);
+
+      if (!isAdmin) {
+        const rc = await verifyRecaptcha(env, body.recaptchaToken, 'chat');
+        if (!rc.ok) {
+          return new Response(JSON.stringify({ error: rc.error }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
       }
 
       // Server-side keys stay in env (Cloudflare Worker secrets), never on the client.
@@ -2547,11 +2554,13 @@ export default {
       //   SPICY_SAUCE = CLOUDFLARE_API_TOKEN
       const isStream = body.stream === true;
 
+      // Admin (newsletter) calls may request up to 4096 tokens; browser chat
+      // stays capped at 2048 so the free tier isn't exhausted by one page.
       const result = await generateGuide(
         env,
         body.messages,
-        Math.min(body.max_tokens || 1024, 2048),
-        { useCache: true }
+        Math.min(body.max_tokens || 1024, isAdmin ? 4096 : 2048),
+        { useCache: isAdmin ? false : true }
       );
 
       if (!result.ok) {
