@@ -5,7 +5,7 @@
     </script>
     <meta charset="UTF-8" >
     <meta name="robots" content="index, follow" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://www.google.com; frame-src https://www.google.com https://recaptcha.google.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
     <meta name="referrer" content="strict-origin-when-cross-origin" >
     <title>
@@ -106,6 +106,9 @@ along with relevant RSS feeds — then summarizes everything into a daily update
     </form>
     <div id="sub-msg" class="sub-msg">
     </div>
+    <p style="font-size:0.72rem;color:#888;margin-top:0.5rem;line-height:1.5">
+      This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--green)">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--green)">Terms of Service</a> apply.
+    </p>
   </div>
   <h1>
   Newsletter Archive
@@ -153,6 +156,8 @@ along with relevant RSS feeds — then summarizes everything into a daily update
 </script>
 </div>
 </div>
+<script src="recaptcha.js" defer>
+</script>
 <script src="newsletter-page.js" defer>
 </script>
 <script src="footer.js" defer>

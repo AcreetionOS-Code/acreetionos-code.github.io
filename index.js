@@ -59,6 +59,19 @@ let allowedOrigins = [
 ];
 const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
+// ─── reCAPTCHA Enterprise (project clean-502708) ────────────────────────────
+// Protects user-facing POST endpoints (newsletter, hosting, wiki AI chat).
+// The site key is PUBLIC (safe to ship in frontend JS). The server secret is
+// deployed as a Worker secret, one of:
+//   RECAPTCHA_API_KEY    — Google Cloud API key → Enterprise assessments API
+//   RECAPTCHA_SECRET_KEY — legacy siteverify secret (classic v2/v3 style)
+// If NEITHER secret is configured, verification is skipped entirely (dev
+// mode — no behavior change). Clients send their token as `recaptchaToken`
+// in the JSON body; see frontend helper recaptcha.js.
+const RECAPTCHA_SITE_KEY = '6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w';
+const RECAPTCHA_PROJECT = 'clean-502708';
+const RECAPTCHA_SCORE_THRESHOLD = 0.5;
+
 const rateLimitMap = new Map();
 
 function checkRateLimit(ip, maxRequests = 20, windowMs = 60000) {
@@ -75,6 +88,56 @@ function checkRateLimit(ip, maxRequests = 20, windowMs = 60000) {
 
 function getClientIP(request) {
   return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown';
+}
+
+// Verifies a reCAPTCHA Enterprise token server-side.
+// Returns { ok: true } (with optional score/degraded/disabled flags) or
+// { ok: false, error } to reject the request.
+// Fail-open ONLY on network errors talking to Google (a Google outage must
+// never take the whole site down); invalid/expired tokens still fail closed.
+async function verifyRecaptcha(env, token, action) {
+  const apiKey = env.RECAPTCHA_API_KEY;
+  const secretKey = env.RECAPTCHA_SECRET_KEY;
+  if (!apiKey && !secretKey) return { ok: true, disabled: true };
+  if (!token) return { ok: false, error: 'Human verification required. Please retry.' };
+  try {
+    if (secretKey) {
+      // Legacy siteverify path (classic v2/v3 secret key)
+      const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'secret=' + encodeURIComponent(secretKey) + '&response=' + encodeURIComponent(token),
+        signal: AbortSignal.timeout(10000),
+      });
+      const data = await res.json();
+      if (!data.success) {
+        return { ok: false, error: 'Human verification failed. Please retry.', codes: data['error-codes'] || [] };
+      }
+      if (typeof data.score === 'number' && data.score < RECAPTCHA_SCORE_THRESHOLD) {
+        return { ok: false, error: 'Unable to verify you are human. Please try again.' };
+      }
+      return { ok: true, score: data.score };
+    }
+    // Enterprise assessments API (project clean-502708)
+    const res = await fetch('https://recaptchaenterprise.googleapis.com/v1/projects/' + RECAPTCHA_PROJECT + '/assessments?key=' + encodeURIComponent(apiKey), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: { token: token, expectedAction: action || 'submit', siteKey: RECAPTCHA_SITE_KEY } }),
+      signal: AbortSignal.timeout(10000),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      return { ok: false, error: 'Verification service error. Please retry.', codes: (data.error && data.error.message) || ('HTTP ' + res.status) };
+    }
+    const tp = data.tokenProperties || {};
+    const score = (data.riskAnalysis && typeof data.riskAnalysis.score === 'number') ? data.riskAnalysis.score : 0;
+    if (tp.valid !== true) return { ok: false, error: 'Human verification failed. Please retry.' };
+    if (score < RECAPTCHA_SCORE_THRESHOLD) return { ok: false, error: 'Unable to verify you are human. Please try again.' };
+    return { ok: true, score: score };
+  } catch (e) {
+    // Network failure reaching Google — fail open so the site keeps working.
+    return { ok: true, degraded: true };
+  }
 }
 
 function securityHeaders(nonce) {
@@ -105,7 +168,7 @@ function corsHeaders(request, nonce) {
   return {
     'Access-Control-Allow-Origin': allowed,
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Content-Encoding, Authorization',
+    'Access-Control-Allow-Headers': 'Content-Type, Content-Encoding, Authorization, X-Admin-Key',
     'Access-Control-Max-Age': '86400',
     'Vary': 'Origin',
     ...securityHeaders(nonce)
@@ -114,27 +177,23 @@ function corsHeaders(request, nonce) {
 
 let visitorCount = 0;
 let lastPersistTime = 0;
-const CACHE_KEY = 'https://acreetion-counter/count';
+const COUNTER_KEY = 'visitor-counter.json';
 
-async function loadCount() {
+// Persistent counter: stored in R2 (acreetionos-hosting bucket), not the
+// ephemeral cache. Falls back to in-memory silently if R2 is unavailable,
+// so the API never breaks — it just resets on redeploy.
+async function loadCount(env) {
   try {
-    const cache = caches.default;
-    const cached = await cache.match(CACHE_KEY);
-    if (cached) {
-      const data = await cached.json();
-      visitorCount = data.count || 0;
+    const data = await getR2(env, 'acreetionos-hosting', COUNTER_KEY);
+    if (data && typeof data.count === 'number') {
+      visitorCount = data.count;
     }
   } catch (e) {}
 }
 
-async function persistCount() {
+async function persistCount(env) {
   try {
-    const cache = caches.default;
-    const response = new Response(JSON.stringify({ count: visitorCount, ts: Date.now() }), {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 's-maxage=86400' }
-    });
-    // Don't await — fire and forget
-    cache.put(CACHE_KEY, response.clone());
+    await putR2(env, 'acreetionos-hosting', COUNTER_KEY, { count: visitorCount, ts: Date.now() });
   } catch (e) {}
 }
 
@@ -544,6 +603,10 @@ async function handleHostingRegister(request, env) {
       return new Response(JSON.stringify({ error: 'org, email, password, mirror_url, and location are required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
+    // Human verification (reCAPTCHA Enterprise) before any processing
+    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_register');
+    if (!rc.ok) return new Response(JSON.stringify({ success: false, error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+
     // Validate organization domain (skip if personal checkbox checked)
     const orgCheck = await validateOrgDomain(env, body.email, body.org, body.personal_email === true);
     if (!orgCheck.valid) {
@@ -623,6 +686,8 @@ async function handleHostingRemoveRequest(request, env) {
     if (!body.email || !body.password) {
       return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
+    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_manage');
+    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
     let found = null;
     for (const obj of objects) {
@@ -646,6 +711,8 @@ async function handleHostingUpdateRequest(request, env) {
     if (!body.email || !body.password) {
       return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
+    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_manage');
+    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
     let found = null;
     for (const obj of objects) {
@@ -721,6 +788,8 @@ async function handleHostingAdminPending(env) {
 async function handleHostingSubscribe(request, env) {
   try {
     const body = await request.json();
+    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_subscribe');
+    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const key = 'subscriber-' + body.email.replace(/[@.]/g, '_');
     const existing = await getR2(env, 'acreetionos-hosting', key);
@@ -751,6 +820,8 @@ async function handleHostingUnsubscribe(request, env) {
 async function handleNewsletterSubscribe(request, env) {
   try {
     const body = await request.json();
+    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'newsletter_subscribe');
+    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     const key = 'nl-subscriber-' + body.email.replace(/[@.]/g, '_');
     const existing = await getR2(env, 'acreetionos-hosting', key);
@@ -1670,7 +1741,10 @@ function parseArchAtom(xml) {
     const updated = (entry.match(/<updated>([^<]*)<\/updated>/) || [,''])[1].trim();
     const summary = (entry.match(/<summary[^>]*>(?:<!\[CDATA\[)?([\s\S]*?)(?:\]\]>)?<\/summary>/) || [,''])[1].replace(']]>', '').trim();
 
-    const cveMatch = title.match(/(CVE-\d{4}-\d+)/gi);
+    // CVE IDs moved out of <title> in the current feed format — they now live
+    // in <content> under "CVE-ID  : CVE-2025-XXXXX ...". Check both places.
+    const cveIdLine = content.match(/CVE-ID\s*:([^<\n]*)/i);
+    const cveMatch = title.match(/(CVE-\d{4}-\d+)/gi) || (cveIdLine ? cveIdLine[1].match(/CVE-\d{4}-\d+/gi) : null);
     const severityMatch = content.match(/Severity:\s*(\w+)/i);
     const packageMatch = content.match(/Package\s*:\s*([^\s<&]+)/i);
     const typeMatch = content.match(/Type\s*:\s*([^<]+)/i);
@@ -1986,12 +2060,12 @@ async function handleCVEEmbed() {
 
     const severityColor = { critical: '#e74c3c', high: '#f39c12', medium: '#3498db', low: '#2ecc71', unknown: '#888' };
     const rows = cves.map(c => {
-      const sev = (c.severity || 'unknown').toLowerCase();
-      const color = severityColor[sev] || '#888';
-      const cveId = c.primary_cve || (c.cves && c.cves[0]) || '';
-      const date = c.date ? new Date(c.date).toLocaleDateString() : '';
-      const summary = (c.summary || '').replace(/</g, '&lt;').slice(0, 200);
-      return `<tr><td><a href="https://security.archlinux.org/${cveId}" target="_blank" rel="noopener noreferrer" style="color:#e74c3c;font-family:monospace;font-size:0.85rem">${cveId}</a></td><td style="color:#999;font-size:0.8rem">${date}</td><td><span style="color:${color};font-weight:700;font-size:0.8rem">${sev.toUpperCase()}</span></td><td style="color:#ccc;font-size:0.85rem">${c.package || ''}</td><td style="color:#999;font-size:0.8rem">${summary}</td></tr>`;
+      const sev = escHtml((c.severity || 'unknown').toLowerCase());
+      const color = severityColor[(c.severity || 'unknown').toLowerCase()] || '#888';
+      const cveId = escHtml(c.primary_cve || (c.cves && c.cves[0]) || '');
+      const date = escHtml(c.date ? new Date(c.date).toLocaleDateString() : '');
+      const summary = escHtml(c.summary || '').slice(0, 200);
+      return `<tr><td><a href="https://security.archlinux.org/${cveId}" target="_blank" rel="noopener noreferrer" style="color:#e74c3c;font-family:monospace;font-size:0.85rem">${cveId}</a></td><td style="color:#999;font-size:0.8rem">${date}</td><td><span style="color:${color};font-weight:700;font-size:0.8rem">${sev.toUpperCase()}</span></td><td style="color:#ccc;font-size:0.85rem">${escHtml(c.package || '')}</td><td style="color:#999;font-size:0.8rem">${summary}</td></tr>`;
     }).join('\n');
 
     const html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Arch Linux Security Advisories</title><style nonce="${nonce}">
@@ -2152,7 +2226,7 @@ export default {
         visitorCount++;
         if (Date.now() - lastPersistTime > 60000) {
           lastPersistTime = Date.now();
-          ctx.waitUntil(persistCount());
+          ctx.waitUntil(persistCount(env));
         }
         return new Response(JSON.stringify({ count: visitorCount }), {
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
@@ -2196,7 +2270,8 @@ export default {
     // R2 ISO download proxy (supports "latest" → resolves to newest matching ISO)
     if (url.pathname.startsWith('/api/r2/get/')) {
       let filename = url.pathname.replace('/api/r2/get/', '');
-      if (!filename || !filename.endsWith('.iso')) {
+      // Strict whitelist: object keys are flat names, no slashes or dot-dot.
+      if (!filename || !filename.endsWith('.iso') || !/^[A-Za-z0-9._-]+\.iso$/.test(filename)) {
         return new Response('Not found', { status: 404 });
       }
       const cfToken = env.CLOUDFLARE_API_TOKEN;
@@ -2287,7 +2362,7 @@ export default {
 
     // Load persisted count on first request
     if (visitorCount === 0) {
-      ctx.waitUntil(loadCount());
+      ctx.waitUntil(loadCount(env));
     }
 
     // AI news article generation
@@ -2305,10 +2380,11 @@ export default {
           });
         }
         // Same free provider chain as /api/chat (Workers AI → Groq → GitHub Models → OpenRouter)
+        // Higher cap than /api/chat: the daily newsletter generation requests up to 4096 tokens.
         const result = await generateGuide(
           env,
           body.messages,
-          Math.min(body.max_tokens || 512, 2048),
+          Math.min(body.max_tokens || 512, 4096),
           { useCache: false }
         );
         if (!result.ok) {
@@ -2449,6 +2525,16 @@ export default {
       const body = await request.json();
       if (!body.messages || !Array.isArray(body.messages)) {
         return new Response(JSON.stringify({ error: 'messages array required' }), {
+          status: 400,
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+
+      // Human verification (reCAPTCHA Enterprise) — chat burns AI tokens,
+      // so bots get stopped before any provider is called.
+      const rc = await verifyRecaptcha(env, body.recaptchaToken, 'chat');
+      if (!rc.ok) {
+        return new Response(JSON.stringify({ error: rc.error }), {
           status: 400,
           headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
         });

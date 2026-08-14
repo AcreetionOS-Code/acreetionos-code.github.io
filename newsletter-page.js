@@ -29,9 +29,10 @@ async function loadNewsletters() {
             msg.textContent = 'Subscribing...';
             msg.className = 'sub-msg';
             try {
+                const recaptchaToken = (window.getRecaptchaToken) ? await window.getRecaptchaToken('newsletter_subscribe') : null;
                 const res = await fetch('/api/newsletter/subscribe', {
                     method: 'POST', headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({email: email})
+                    body: JSON.stringify({email: email, recaptchaToken: recaptchaToken})
                 });
                 const data = await res.json();
                 if (data.success) { msg.className = 'sub-msg success'; msg.textContent = 'Subscribed! Check your inbox for confirmation.'; }

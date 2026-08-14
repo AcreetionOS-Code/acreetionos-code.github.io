@@ -79,6 +79,7 @@ async function registerProvider(e) {
     subscribe: document.getElementById('subscribe').checked,
   };
   try {
+    if (window.getRecaptchaToken) body.recaptchaToken = await window.getRecaptchaToken('hosting_register');
     const res = await fetch('/api/hosting/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json();
     if (res.ok) {
@@ -99,6 +100,7 @@ async function manageListing(e) {
   const action = document.getElementById('manage-action').value;
   const body = { email: document.getElementById('manage-email').value, password: document.getElementById('manage-password').value, notes: document.getElementById('manage-notes').value };
   try {
+    if (window.getRecaptchaToken) body.recaptchaToken = await window.getRecaptchaToken('hosting_manage');
     const res = await fetch('/api/hosting/' + (action === 'remove' ? 'remove-request' : 'update-request'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const data = await res.json();
     if (res.ok) {

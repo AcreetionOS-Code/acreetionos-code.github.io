@@ -6,7 +6,7 @@
     <meta charset="UTF-8" >
     <meta name="robots" content="index, follow" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cloudflareinsights.com; base-uri 'self'; frame-src 'self'; object-src 'none'" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://cloudflareinsights.com https://www.google.com; base-uri 'self'; frame-src 'self' https://www.google.com https://recaptcha.google.com; object-src 'none'" >
     <meta http-equiv="Permissions-Policy" content="browsing-topics=(), interest-cohort=()" >
     <meta name="referrer" content="strict-origin-when-cross-origin" >
     <title>
@@ -231,6 +231,9 @@
 Submit Request
 </button>
 </form>
+<p style="font-size:0.72rem;color:#888;margin-top:0.75rem;line-height:1.5">
+  This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--green)">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--green)">Terms of Service</a> apply.
+</p>
 </div>
 </div>
 <div id="flash-container">
@@ -260,6 +263,8 @@ Submit Request
 </script>
 </div>
 </div>
+<script src="recaptcha.js" defer>
+</script>
 <script src="hosting-page.js" defer>
 </script>
 <script>
