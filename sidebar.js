@@ -47,7 +47,7 @@ function init(){
 
   var externalSection='';
 
-  sidebar.innerHTML='<div class="sidebar-body"><ul>'+links+'</ul>'+externalSection+'</div><div class="sidebar-authors"><a href="https://darren.acreetionos.org" target="_blank" rel="noopener" class="sidebar-author-link"><img src="darren_avatar_new.png" alt="Darren Clift" class="sidebar-author-avatar"> Darren</a><a href="https://natalie.acreetionos.org" target="_blank" rel="noopener" class="sidebar-author-link"><img src="natalie_avatar_new.png" alt="Natalie Cole-Clift Spiva" class="sidebar-author-avatar"> Natalie</a></div><div class="sidebar-footer"><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener">Discord</a><a href="contact.html">Contact</a></div>';
+  sidebar.innerHTML='<div class="sidebar-body"><ul>'+links+'</ul>'+externalSection+'</div><div class="sidebar-authors"><a href="https://darren.acreetionos.org" target="_blank" rel="noopener" class="sidebar-author-link"><img src="darren_avatar_new.webp" alt="Darren Clift" class="sidebar-author-avatar"> Darren</a><a href="https://natalie.acreetionos.org" target="_blank" rel="noopener" class="sidebar-author-link"><img src="natalie_avatar_new.webp" alt="Natalie Cole-Clift Spiva" class="sidebar-author-avatar"> Natalie</a></div><div class="sidebar-footer"><a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener">Discord</a><a href="contact.html">Contact</a></div>';
   document.body.appendChild(sidebar);
 }
 function toggle(){if(isOpen){close();}else{open();}}

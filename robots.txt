@@ -41,6 +41,11 @@ User-agent: Bingbot
 User-agent: DuckDuckBot
 User-agent: YandexBot
 User-agent: Baiduspider
+Allow: /api/changelog
+Allow: /api/community/stats
+Allow: /api/news
+Allow: /api/counter
+Allow: /newsletter-archive/
 Disallow: /api/
 Disallow: /newsletters/
 Disallow: /docs/
@@ -53,6 +58,11 @@ Disallow: /tests/
 Allow: /
 
 User-agent: *
+Allow: /api/changelog
+Allow: /api/community/stats
+Allow: /api/news
+Allow: /api/counter
+Allow: /newsletter-archive/
 Disallow: /api/
 Disallow: /newsletters/
 Disallow: /docs/

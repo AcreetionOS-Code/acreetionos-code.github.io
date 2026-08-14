@@ -33,9 +33,29 @@ ALLOWED_BOTS = [
 ]
 
 # Non-content paths — crawl budget steering (applies to every bot)
+#
+# NOTE on /api/: only the ADMIN/PRIVATE endpoints are disallowed. The
+# CONTENT endpoints (/api/changelog, /api/community/stats, /api/news,
+# /api/counter) power JS-rendered page content (changelog.html,
+# contributors.html, status.html) — if we block /api/ wholesale,
+# Googlebot renders those pages EMPTY. Longest-match wins in robots.txt,
+# so a more specific "Allow: /api/changelog" beats "Disallow: /api/".
+CONTENT_API_ALLOWS = [
+    "/api/changelog",
+    "/api/community/stats",
+    "/api/news",
+    "/api/counter",
+]
+
+# Content paths that were previously blocked but are now real crawlable pages
+# (newsletter archive is generated static HTML, not raw JSON)
+CONTENT_PATH_ALLOWS = [
+    "/newsletter-archive/",
+]
+
 CRAWL_BUDGET_DISALLOWS = [
-    "/api/",          # worker endpoints (401/403 to crawlers)
-    "/newsletters/",  # JSON newsletter archive (81 files)
+    "/api/",          # worker endpoints — except the content APIs allowed above
+    "/newsletters/",  # raw JSON newsletter data (HTML archive is at /newsletter-archive/)
     "/docs/",         # raw markdown source (docs.html is the page)
     "/Reviews/",      # review embeds dir
     "/frontend/",     # Vite dev scaffold
@@ -50,6 +70,9 @@ def group(agents, extra_allow=True):
     lines = []
     for a in agents:
         lines.append(f"User-agent: {a}")
+    # Content APIs + content paths must stay crawlable (longest-match wins)
+    for allow_path in CONTENT_API_ALLOWS + CONTENT_PATH_ALLOWS:
+        lines.append(f"Allow: {allow_path}")
     for d in CRAWL_BUDGET_DISALLOWS:
         lines.append(f"Disallow: {d}")
     if extra_allow:
