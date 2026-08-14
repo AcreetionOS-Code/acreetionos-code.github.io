@@ -1,0 +1,642 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>AcreetionOS — News &amp; Updates</title>
+  <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
+  <link href="https://acreetionos.org/"/>
+  <link rel="self" href="https://acreetionos.org/feed.xml"/>
+  <updated>2026-08-14T00:00:00Z</updated>
+  <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
+  <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 14, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-14.html"/>
+    <id>tag:acreetionos.org,2026-08-14:newsletter</id>
+    <updated>2026-08-14T00:00:00Z</updated>
+    <published>2026-08-14T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 14, 2026  Dear AcreetionOS community,  We&#x27;re excited to share the latest developments from the AcreetionOS project. Our community has been actively contributing to the growth and improvement of our sovereign Linux distribution. We&#x27;d like to highlight a few recent co…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 13, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-13.html"/>
+    <id>tag:acreetionos.org,2026-08-13:newsletter</id>
+    <updated>2026-08-13T00:00:00Z</updated>
+    <published>2026-08-13T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 13, 2026  Dear AcreetionOS Community,  We&#x27;re excited to share the latest updates from the AcreetionOS project with you. As we continue to work towards making our distribution the go-to choice for those seeking a lightweight, privacy-focused Linux experience, we&#x27;re g…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 12, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-12.html"/>
+    <id>tag:acreetionos.org,2026-08-12:newsletter</id>
+    <updated>2026-08-12T00:00:00Z</updated>
+    <published>2026-08-12T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 12, 2026  Development work continues at a steady pace across the AcreetionOS codebase with several important fixes implemented this week. Darren Clift has been focusing on resolving dependency conflicts, specifically addressing a critical geocode-glib update issue t…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 11, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-11.html"/>
+    <id>tag:acreetionos.org,2026-08-11:newsletter</id>
+    <updated>2026-08-11T00:00:00Z</updated>
+    <published>2026-08-11T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 11, 2026   Hello AcreetionOS community, here&#x27;s your daily snapshot of progress and news.    This week we merged several key fixes, including the &#x27;repair&#x27; branch that resolves a geocode‑glib conflict across the main and xlibre repositories. The initial commits in the…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 10, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-10.html"/>
+    <id>tag:acreetionos.org,2026-08-10:newsletter</id>
+    <updated>2026-08-10T00:00:00Z</updated>
+    <published>2026-08-10T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 10, 2026  Dear AcreetionOS community,  We&#x27;re excited to share the latest developments and updates from the AcreetionOS project. As we continue to work towards our goal of creating a user-friendly, privacy-focused Linux distribution based on Arch Linux, we&#x27;re gratefu…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 09, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-09.html"/>
+    <id>tag:acreetionos.org,2026-08-09:newsletter</id>
+    <updated>2026-08-09T00:00:00Z</updated>
+    <published>2026-08-09T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 09, 2026  Development Updates: The AcreetionOS team has been actively working on several key improvements this week. A critical fix was merged to address geocode-glib update conflicts on both the standard and XLibre editions of the distribution. These changes ensure…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 08, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-08.html"/>
+    <id>tag:acreetionos.org,2026-08-08:newsletter</id>
+    <updated>2026-08-08T00:00:00Z</updated>
+    <published>2026-08-08T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 08, 2026  Dear AcreetionOS Community,  We are excited to share the latest news and updates from the AcreetionOS project. Our community continues to grow, and we are grateful for the contributions of our developers, maintainers, and users. In this newsletter, we will…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 07, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-07.html"/>
+    <id>tag:acreetionos.org,2026-08-07:newsletter</id>
+    <updated>2026-08-07T00:00:00Z</updated>
+    <published>2026-08-07T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 07, 2026  Good morning, AcreetionOS community! We hope you&#x27;re enjoying a wonderful start to your week. Today we&#x27;ve got some important development updates, community highlights, and tips to share with you. Let&#x27;s dive right in and get you caught up on everything happe…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 06, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-06.html"/>
+    <id>tag:acreetionos.org,2026-08-06:newsletter</id>
+    <updated>2026-08-06T00:00:00Z</updated>
+    <published>2026-08-06T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 06, 2026  Welcome to today&#x27;s edition of the AcreetionOS newsletter. We&#x27;re excited to bring you the latest developments from our small but dedicated team of builders working to create the most user-friendly Arch-based Linux distribution around. Natalie and Darren con…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 05, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-05.html"/>
+    <id>tag:acreetionos.org,2026-08-05:newsletter</id>
+    <updated>2026-08-05T00:00:00Z</updated>
+    <published>2026-08-05T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 05, 2026  Dear AcreetionOS Community,  We hope this newsletter finds you well. As we continue to work on our mission to provide a user-friendly, privacy-focused Linux distribution, we wanted to take a moment to update you on some recent developments.  Firstly, we&#x27;re…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 04, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-04.html"/>
+    <id>tag:acreetionos.org,2026-08-04:newsletter</id>
+    <updated>2026-08-04T00:00:00Z</updated>
+    <published>2026-08-04T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 04, 2026  Our development team has been busy refining our automated deployment pipelines. Darren recently implemented a new process to publish ISOs directly to the public server via SSH. This improvement ensures that our stable builds reach users much faster.  We ar…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 03, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-03.html"/>
+    <id>tag:acreetionos.org,2026-08-03:newsletter</id>
+    <updated>2026-08-03T00:00:00Z</updated>
+    <published>2026-08-03T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 03, 2026  Our CI pipeline has been refined to publish the latest ISO directly to the public ISO server over SSH without unnecessary checkouts. This change reduces build time and ensures that the image you download is always the most recent stable version. The underl…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 02, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-02.html"/>
+    <id>tag:acreetionos.org,2026-08-02:newsletter</id>
+    <updated>2026-08-02T00:00:00Z</updated>
+    <published>2026-08-02T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 02, 2026   Welcome to today&#x27;s newsletter, where we share the latest development wins, community happenings, and handy tips for our users. We appreciate your continued support and feedback as we keep building a privacy‑first Arch‑based experience.  The CI pipeline no…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 01, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-01.html"/>
+    <id>tag:acreetionos.org,2026-08-01:newsletter</id>
+    <updated>2026-08-01T00:00:00Z</updated>
+    <published>2026-08-01T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - August 01, 2026  Development Updates: This week the CI pipeline saw two important fixes. The ISO publishing job now pushes directly to the public ISO server over SSH without re‑checking out the repository, speeding up releases. Additionally, secret detection was configured…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 31, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-31.html"/>
+    <id>tag:acreetionos.org,2026-07-31:newsletter</id>
+    <updated>2026-07-31T00:00:00Z</updated>
+    <published>2026-07-31T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - July 31, 2026. Welcome to another development update from the AcreetionOS team based in Spokane, Washington.  Our development team has made significant progress on the ISO build pipeline this week with the addition of a new output directory feature. Builds now automaticall…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 30, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-30.html"/>
+    <id>tag:acreetionos.org,2026-07-30:newsletter</id>
+    <updated>2026-07-30T00:00:00Z</updated>
+    <published>2026-07-30T00:00:00Z</published>
+    <summary>We need to generate a plain text newsletter with exactly 9 paragraphs, each paragraph 2-4 sentences. No markdown, no bullet lists. Should start with subject line like &#x27;Daily AcreetionOS Update - July 30, 2026&#x27;. Then 8 more paragraphs? Actually exactly 9 paragraphs total, including the subject line? …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 29, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-29.html"/>
+    <id>tag:acreetionos.org,2026-07-29:newsletter</id>
+    <updated>2026-07-29T00:00:00Z</updated>
+    <published>2026-07-29T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - July 29, 2026  Welcome to today&#x27;s edition of the AcreetionOS newsletter. We&#x27;ve got some exciting updates to share, including new security features in our GitLab repositories, progress on our web application manager, and some interesting developments in the broader Linux ec…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 28, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-28.html"/>
+    <id>tag:acreetionos.org,2026-07-28:newsletter</id>
+    <updated>2026-07-28T00:00:00Z</updated>
+    <published>2026-07-28T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - July 28, 2026. Hello AcreetionOS community, here&#x27;s what&#x27;s new today.    This week we added secret detection to the .gitlab-ci.yml files across all repositories, ensuring that any accidental credentials are caught early. We also introduced SAST scanning to the CI pipeline, …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 27, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-27.html"/>
+    <id>tag:acreetionos.org,2026-07-27:newsletter</id>
+    <updated>2026-07-27T00:00:00Z</updated>
+    <published>2026-07-27T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 27, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 26, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-26.html"/>
+    <id>tag:acreetionos.org,2026-07-26:newsletter</id>
+    <updated>2026-07-26T00:00:00Z</updated>
+    <published>2026-07-26T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 26, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 25, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-25.html"/>
+    <id>tag:acreetionos.org,2026-07-25:newsletter</id>
+    <updated>2026-07-25T00:00:00Z</updated>
+    <published>2026-07-25T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 25, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 24, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-24.html"/>
+    <id>tag:acreetionos.org,2026-07-24:newsletter</id>
+    <updated>2026-07-24T00:00:00Z</updated>
+    <published>2026-07-24T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 24, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 23, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-23.html"/>
+    <id>tag:acreetionos.org,2026-07-23:newsletter</id>
+    <updated>2026-07-23T00:00:00Z</updated>
+    <published>2026-07-23T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 23, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 22, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-22.html"/>
+    <id>tag:acreetionos.org,2026-07-22:newsletter</id>
+    <updated>2026-07-22T00:00:00Z</updated>
+    <published>2026-07-22T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 22, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 21, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-21.html"/>
+    <id>tag:acreetionos.org,2026-07-21:newsletter</id>
+    <updated>2026-07-21T00:00:00Z</updated>
+    <published>2026-07-21T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 21, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 20, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-20.html"/>
+    <id>tag:acreetionos.org,2026-07-20:newsletter</id>
+    <updated>2026-07-20T00:00:00Z</updated>
+    <published>2026-07-20T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 20, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 19, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-19.html"/>
+    <id>tag:acreetionos.org,2026-07-19:newsletter</id>
+    <updated>2026-07-19T00:00:00Z</updated>
+    <published>2026-07-19T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 19, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- July 18, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-18.html"/>
+    <id>tag:acreetionos.org,2026-07-18:newsletter</id>
+    <updated>2026-07-18T00:00:00Z</updated>
+    <published>2026-07-18T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update -- July 18, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 17, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-17.html"/>
+    <id>tag:acreetionos.org,2026-07-17:newsletter</id>
+    <updated>2026-07-17T00:00:00Z</updated>
+    <published>2026-07-17T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 17, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 16, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-16.html"/>
+    <id>tag:acreetionos.org,2026-07-16:newsletter</id>
+    <updated>2026-07-16T00:00:00Z</updated>
+    <published>2026-07-16T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 16, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 15, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-15.html"/>
+    <id>tag:acreetionos.org,2026-07-15:newsletter</id>
+    <updated>2026-07-15T00:00:00Z</updated>
+    <published>2026-07-15T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 15, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 14, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-14.html"/>
+    <id>tag:acreetionos.org,2026-07-14:newsletter</id>
+    <updated>2026-07-14T00:00:00Z</updated>
+    <published>2026-07-14T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 14, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 13, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-13.html"/>
+    <id>tag:acreetionos.org,2026-07-13:newsletter</id>
+    <updated>2026-07-13T00:00:00Z</updated>
+    <published>2026-07-13T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 13, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 12, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-12.html"/>
+    <id>tag:acreetionos.org,2026-07-12:newsletter</id>
+    <updated>2026-07-12T00:00:00Z</updated>
+    <published>2026-07-12T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 12, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 11, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-11.html"/>
+    <id>tag:acreetionos.org,2026-07-11:newsletter</id>
+    <updated>2026-07-11T00:00:00Z</updated>
+    <published>2026-07-11T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 11, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 10, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-10.html"/>
+    <id>tag:acreetionos.org,2026-07-10:newsletter</id>
+    <updated>2026-07-10T00:00:00Z</updated>
+    <published>2026-07-10T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 10, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 09, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-09.html"/>
+    <id>tag:acreetionos.org,2026-07-09:newsletter</id>
+    <updated>2026-07-09T00:00:00Z</updated>
+    <published>2026-07-09T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 09, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 08, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-08.html"/>
+    <id>tag:acreetionos.org,2026-07-08:newsletter</id>
+    <updated>2026-07-08T00:00:00Z</updated>
+    <published>2026-07-08T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 08, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 07, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-07.html"/>
+    <id>tag:acreetionos.org,2026-07-07:newsletter</id>
+    <updated>2026-07-07T00:00:00Z</updated>
+    <published>2026-07-07T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 07, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 06, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-06.html"/>
+    <id>tag:acreetionos.org,2026-07-06:newsletter</id>
+    <updated>2026-07-06T00:00:00Z</updated>
+    <published>2026-07-06T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 06, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 05, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-05.html"/>
+    <id>tag:acreetionos.org,2026-07-05:newsletter</id>
+    <updated>2026-07-05T00:00:00Z</updated>
+    <published>2026-07-05T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 05, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 04, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-04.html"/>
+    <id>tag:acreetionos.org,2026-07-04:newsletter</id>
+    <updated>2026-07-04T00:00:00Z</updated>
+    <published>2026-07-04T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 04, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 03, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-03.html"/>
+    <id>tag:acreetionos.org,2026-07-03:newsletter</id>
+    <updated>2026-07-03T00:00:00Z</updated>
+    <published>2026-07-03T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 03, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 02, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-02.html"/>
+    <id>tag:acreetionos.org,2026-07-02:newsletter</id>
+    <updated>2026-07-02T00:00:00Z</updated>
+    <published>2026-07-02T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 02, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — July 01, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-07-01.html"/>
+    <id>tag:acreetionos.org,2026-07-01:newsletter</id>
+    <updated>2026-07-01T00:00:00Z</updated>
+    <published>2026-07-01T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — July 01, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 30, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-30.html"/>
+    <id>tag:acreetionos.org,2026-06-30:newsletter</id>
+    <updated>2026-06-30T00:00:00Z</updated>
+    <published>2026-06-30T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 30, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 29, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-29.html"/>
+    <id>tag:acreetionos.org,2026-06-29:newsletter</id>
+    <updated>2026-06-29T00:00:00Z</updated>
+    <published>2026-06-29T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 29, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Take Back Control - Privacy Tips for Your AcreetionOS Setup</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-28.html"/>
+    <id>tag:acreetionos.org,2026-06-28:newsletter</id>
+    <updated>2026-06-28T00:00:00Z</updated>
+    <published>2026-06-28T00:00:00Z</published>
+    <summary>Hey AcreetionOS family,  Happy weekend! We hope you have been enjoying the smooth ride that rolling release can bring. Today we want to talk about something close to our hearts: your privacy and system sovereignty.  AcreetionOS is built on the idea that your computer should work for you, not the oth…</summary>
+  </entry>
+  <entry>
+    <title>Your Daily Dose of AcreetionOS: Privacy, Power, and Pipewire!</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-27.html"/>
+    <id>tag:acreetionos.org,2026-06-27:newsletter</id>
+    <updated>2026-06-27T00:00:00Z</updated>
+    <published>2026-06-27T00:00:00Z</published>
+    <summary>Hello AcreetionOS Community,  Welcome to another day of rolling release goodness! We hope your systems are running smoothly and your audio is crystal clear. Today, we want to shine a spotlight on one of the core pillars of AcreetionOS: your absolute system sovereignty.  In a world where data is cons…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 26, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-26.html"/>
+    <id>tag:acreetionos.org,2026-06-26:newsletter</id>
+    <updated>2026-06-26T00:00:00Z</updated>
+    <published>2026-06-26T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 26, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 25, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-25.html"/>
+    <id>tag:acreetionos.org,2026-06-25:newsletter</id>
+    <updated>2026-06-25T00:00:00Z</updated>
+    <published>2026-06-25T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 25, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 24, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-24.html"/>
+    <id>tag:acreetionos.org,2026-06-24:newsletter</id>
+    <updated>2026-06-24T00:00:00Z</updated>
+    <published>2026-06-24T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 24, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 23, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-23.html"/>
+    <id>tag:acreetionos.org,2026-06-23:newsletter</id>
+    <updated>2026-06-23T00:00:00Z</updated>
+    <published>2026-06-23T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 23, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 22, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-22.html"/>
+    <id>tag:acreetionos.org,2026-06-22:newsletter</id>
+    <updated>2026-06-22T00:00:00Z</updated>
+    <published>2026-06-22T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 22, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 21, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-21.html"/>
+    <id>tag:acreetionos.org,2026-06-21:newsletter</id>
+    <updated>2026-06-21T00:00:00Z</updated>
+    <published>2026-06-21T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 21, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Your System, Your Rules - Why Sovereignty Matters More Than Ever</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-20.html"/>
+    <id>tag:acreetionos.org,2026-06-20:newsletter</id>
+    <updated>2026-06-20T00:00:00Z</updated>
+    <published>2026-06-20T00:00:00Z</published>
+    <summary>Hey AcreetionOS Community,  Hope you&#x27;re having a great weekend! Today we want to talk about something that&#x27;s at the heart of everything we build here: system sovereignty.  In a world where more and more software phones home, tracks your habits, and makes decisions for you, having full control over y…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 19, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-19.html"/>
+    <id>tag:acreetionos.org,2026-06-19:newsletter</id>
+    <updated>2026-06-19T00:00:00Z</updated>
+    <published>2026-06-19T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 19, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 18, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-18.html"/>
+    <id>tag:acreetionos.org,2026-06-18:newsletter</id>
+    <updated>2026-06-18T00:00:00Z</updated>
+    <published>2026-06-18T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 18, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 17, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-17.html"/>
+    <id>tag:acreetionos.org,2026-06-17:newsletter</id>
+    <updated>2026-06-17T00:00:00Z</updated>
+    <published>2026-06-17T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 17, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 16, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-16.html"/>
+    <id>tag:acreetionos.org,2026-06-16:newsletter</id>
+    <updated>2026-06-16T00:00:00Z</updated>
+    <published>2026-06-16T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 16, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 15, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-15.html"/>
+    <id>tag:acreetionos.org,2026-06-15:newsletter</id>
+    <updated>2026-06-15T00:00:00Z</updated>
+    <published>2026-06-15T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 15, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 14, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-14.html"/>
+    <id>tag:acreetionos.org,2026-06-14:newsletter</id>
+    <updated>2026-06-14T00:00:00Z</updated>
+    <published>2026-06-14T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 14, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 13, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-13.html"/>
+    <id>tag:acreetionos.org,2026-06-13:newsletter</id>
+    <updated>2026-06-13T00:00:00Z</updated>
+    <published>2026-06-13T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 13, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 12, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-12.html"/>
+    <id>tag:acreetionos.org,2026-06-12:newsletter</id>
+    <updated>2026-06-12T00:00:00Z</updated>
+    <published>2026-06-12T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 12, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 11, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-11.html"/>
+    <id>tag:acreetionos.org,2026-06-11:newsletter</id>
+    <updated>2026-06-11T00:00:00Z</updated>
+    <published>2026-06-11T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 11, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 10, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-10.html"/>
+    <id>tag:acreetionos.org,2026-06-10:newsletter</id>
+    <updated>2026-06-10T00:00:00Z</updated>
+    <published>2026-06-10T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 10, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 09, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-09.html"/>
+    <id>tag:acreetionos.org,2026-06-09:newsletter</id>
+    <updated>2026-06-09T00:00:00Z</updated>
+    <published>2026-06-09T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 09, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 08, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-08.html"/>
+    <id>tag:acreetionos.org,2026-06-08:newsletter</id>
+    <updated>2026-06-08T00:00:00Z</updated>
+    <published>2026-06-08T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update — June 08, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 07, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-07.html"/>
+    <id>tag:acreetionos.org,2026-06-07:newsletter</id>
+    <updated>2026-06-07T00:00:00Z</updated>
+    <published>2026-06-07T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 07, 2026  Good morning, AcreetionOS readers. There was no recent activity to report today, so this edition focuses on a clean status update and a few practical newsletter-writing reminders drawn from current best practices.[6][9]  Development Updates  The development …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 06, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-06.html"/>
+    <id>tag:acreetionos.org,2026-06-06:newsletter</id>
+    <updated>2026-06-06T00:00:00Z</updated>
+    <published>2026-06-06T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 06, 2026. Welcome to today’s AcreetionOS update, with a focus on desktop polish, ecosystem security, and the growing conversation around easier alternatives to Windows.  Development Updates. Today’s development attention is on keeping AcreetionOS approachable while st…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 05, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-05.html"/>
+    <id>tag:acreetionos.org,2026-06-05:newsletter</id>
+    <updated>2026-06-05T00:00:00Z</updated>
+    <published>2026-06-05T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 05, 2026. Here’s today’s AcreetionOS newsletter with the latest development focus, community momentum, and practical highlights.  Development Updates. Today’s activity was driven less by a new internal release and more by the broader conversation around usability, mig…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 04, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-04.html"/>
+    <id>tag:acreetionos.org,2026-06-04:newsletter</id>
+    <updated>2026-06-04T00:00:00Z</updated>
+    <published>2026-06-04T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 04, 2026. Today’s update focuses on upstream Linux movement, security awareness, and a strong wave of community attention around desktop alternatives.  Development Updates. The team is tracking the newly released Arch Linux June ISO, which brings a fresh kernel and co…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 03, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-03.html"/>
+    <id>tag:acreetionos.org,2026-06-03:newsletter</id>
+    <updated>2026-06-03T00:00:00Z</updated>
+    <published>2026-06-03T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 03, 2026. Today’s update brings a mix of platform news, security awareness, and growing community momentum around easier, friendlier operating system choices.  Development Updates. The Arch Linux June ISO is out with a fresh kernel and core package updates, and we are…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 02, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-02.html"/>
+    <id>tag:acreetionos.org,2026-06-02:newsletter</id>
+    <updated>2026-06-02T00:00:00Z</updated>
+    <published>2026-06-02T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 02, 2026  Development Updates: No recent activity was recorded for AcreetionOS today, so there are no new feature launches, bug fixes, or infrastructure changes to report. In a quiet update like this, the main takeaway is stability, with the development team presumabl…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — June 01, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-06-01.html"/>
+    <id>tag:acreetionos.org,2026-06-01:newsletter</id>
+    <updated>2026-06-01T00:00:00Z</updated>
+    <published>2026-06-01T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - June 01, 2026  Development Updates  No recent activity was found for AcreetionOS today, so there are no confirmed code changes, releases, or merge updates to report. The latest available material still points to ongoing ecosystem-building work around documentation, wiki se…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — May 31, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-05-31.html"/>
+    <id>tag:acreetionos.org,2026-05-31:newsletter</id>
+    <updated>2026-05-31T00:00:00Z</updated>
+    <published>2026-05-31T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - May 31, 2026  Development Updates  Today’s focus is on polish, onboarding, and ecosystem awareness. With AcreetionOS receiving fresh community attention as an easy-to-use alternative for Windows 10 and 11 users, the team is continuing to prioritize first-run experience, cl…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — May 30, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-05-30.html"/>
+    <id>tag:acreetionos.org,2026-05-30:newsletter</id>
+    <updated>2026-05-30T00:00:00Z</updated>
+    <published>2026-05-30T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - May 30, 2026  Development Updates  Today’s development focus is on security triage and desktop experience polish. Following reports of multiple Linux privilege-escalation issues, including the PinTheft flaw affecting Arch-based environments and a long-standing kernel vulne…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — May 29, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-05-29.html"/>
+    <id>tag:acreetionos.org,2026-05-29:newsletter</id>
+    <updated>2026-05-29T00:00:00Z</updated>
+    <published>2026-05-29T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - May 29, 2026  Hello AcreetionOS community,  Today’s update is a quieter one, as there was no recent development activity or community activity recorded for this reporting period. Even on slower days, we want to keep the daily rhythm going and make sure everyone has a clear…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update — May 25, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-05-25.html"/>
+    <id>tag:acreetionos.org,2026-05-25:newsletter</id>
+    <updated>2026-05-25T00:00:00Z</updated>
+    <published>2026-05-25T00:00:00Z</published>
+    <summary>Daily AcreetionOS Update - May 25, 2026  Development Updates  Today’s focus across the AcreetionOS ecosystem is on stability, usability, and security awareness. Recent Linux security headlines, including reports of a long-standing kernel flaw and the newly discussed PinTheft privilege-escalation iss…</summary>
+  </entry>
+</feed>
