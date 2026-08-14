@@ -26,7 +26,7 @@ import urllib.error
 import re
 
 HOST = "acreetionos.org"
-KEY = "fc6913fec92a55410fec94f8354c378d"
+KEY = "2e369f12018dcc78a68d9ed417f3a8b4"
 KEY_LOCATION = f"https://{HOST}/{KEY}.txt"
 ENDPOINTS = [
     "https://api.indexnow.org/indexnow",
