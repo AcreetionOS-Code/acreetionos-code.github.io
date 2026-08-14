@@ -124,13 +124,48 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('build-modal-close').addEventListener('click', closeBuildModal);
 });
 
-const FLASHER_URLS = {
+const FLASHER_REPO = 'spivanatalie64/AcreetionMediaWriter';
+// Static fallbacks used only when the GitHub API is unreachable.
+// Kept on the last known-good release that has assets (5.3.1).
+const FLASHER_FALLBACK_URLS = {
     windows: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-win64-5.3.1.exe',
     macos_intel: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-macos-5.3.1.dmg',
     macos_arm: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-macos-arm64-5.3.1.dmg',
     linux: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases/download/5.3.1/AcreetionOSMediaWriter-linux-x86_64-5.3.1.AppImage',
     fallback: 'https://github.com/spivanatalie64/AcreetionMediaWriter/releases'
 };
+
+// Match release assets by OS pattern so the download button always points at
+// the newest release that actually has files — never a stale or empty one.
+function pickFlasherUrls(release) {
+    const urls = {};
+    for (const asset of (release.assets || [])) {
+        const n = asset.name;
+        if (n.endsWith('.exe') && !urls.windows) urls.windows = asset.browser_download_url;
+        else if (n.endsWith('.zip') && !urls.windows_portable) urls.windows_portable = asset.browser_download_url;
+        else if (n.endsWith('.dmg') && n.includes('arm64') && !urls.macos_arm) urls.macos_arm = asset.browser_download_url;
+        else if (n.endsWith('.dmg') && !urls.macos_intel) urls.macos_intel = asset.browser_download_url;
+        else if (n.endsWith('.AppImage') && !urls.linux) urls.linux = asset.browser_download_url;
+    }
+    return urls;
+}
+
+async function fetchLatestFlasherUrls() {
+    try {
+        const res = await fetch(`https://api.github.com/repos/${FLASHER_REPO}/releases/latest`, {
+            headers: { Accept: 'application/vnd.github+json' }
+        });
+        if (!res.ok) return null;
+        const release = await res.json();
+        const urls = pickFlasherUrls(release);
+        if (!Object.keys(urls).length) return null; // release exists but has no assets
+        urls.fallback = release.html_url || FLASHER_FALLBACK_URLS.fallback;
+        urls.version = release.tag_name;
+        return urls;
+    } catch (e) {
+        return null;
+    }
+}
 
 function detectOS() {
     const ua = navigator.userAgent;
@@ -147,6 +182,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const os = detectOS();
     if (!os) return;
 
+    const dynamic = await fetchLatestFlasherUrls();
+    const urls = dynamic || FLASHER_FALLBACK_URLS;
+
+    let href = null;
     if (os === 'macos') {
         let isArm = false;
         try {
@@ -155,10 +194,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isArm = ua.architecture === 'arm';
             }
         } catch (e) {}
-        btn.href = isArm ? FLASHER_URLS.macos_arm : FLASHER_URLS.macos_intel;
+        href = isArm ? (urls.macos_arm || urls.macos_intel) : (urls.macos_intel || urls.macos_arm);
     } else if (os === 'windows') {
-        btn.href = FLASHER_URLS.windows;
+        href = urls.windows || urls.windows_portable;
     } else if (os === 'linux') {
-        btn.href = FLASHER_URLS.linux;
+        href = urls.linux;
+    }
+
+    if (href) {
+        btn.href = href;
+        btn.classList.remove('disabled');
+    }
+
+    // Show which release the button points at, when known
+    if (dynamic && dynamic.version) {
+        const label = document.getElementById('flasher-version-label');
+        if (label) label.textContent = `Latest release: ${dynamic.version} — `;
     }
 });
