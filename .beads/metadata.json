@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "acreetionos_code_github_io",
+  "project_id": "1806f46e-1510-4996-8f45-7b42f62a9557"
+}
