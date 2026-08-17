@@ -1,26 +1,48 @@
 /*
-  X-Frame-Options: DENY
+  X-Frame-Options: SAMEORIGIN
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: browsing-topics=(), interest-cohort=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), browsing-topics=(), interest-cohort=()
   Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'
   Cache-Control: public, max-age=3600
 
-# JS/CSS: 1 hour — filenames are NOT content-hashed, so "immutable" caching
-# would serve stale code to returning visitors for a full year.
-*.js
-  Cache-Control: public, max-age=3600
-*.css
-  Cache-Control: public, max-age=3600
+/*.js
+  Cache-Control: public, max-age=604800
 
-# Images/fonts: 1 day — same reasoning, slightly longer is fine.
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.ico
-*.svg
-*.webp
-*.woff
-*.woff2
-  Cache-Control: public, max-age=86400
+/*.css
+  Cache-Control: public, max-age=604800
+
+/*.png
+  Cache-Control: public, max-age=2592000
+
+/*.jpg
+  Cache-Control: public, max-age=2592000
+
+/*.jpeg
+  Cache-Control: public, max-age=2592000
+
+/*.gif
+  Cache-Control: public, max-age=2592000
+
+/*.ico
+  Cache-Control: public, max-age=2592000
+
+/*.svg
+  Cache-Control: public, max-age=2592000
+
+/*.webp
+  Cache-Control: public, max-age=2592000
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable

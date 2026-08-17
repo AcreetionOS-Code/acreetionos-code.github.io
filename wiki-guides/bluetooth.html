@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <title>Bluetooth Setup & Pairing Guide – AcreetionOS Linux</title>
+  <meta name="description" content="Learn how to connect Bluetooth headphones, mice, keyboards, and game controllers on AcreetionOS. Includes Bluez and Blueman troubleshooting.">
+  <meta name="keywords" content="AcreetionOS Bluetooth setup, Arch Linux Bluetooth headphones, Blueman Linux, bluetoothctl pairing, Cinnamon Bluetooth">
+  <link rel="canonical" href="https://acreetionos.org/wiki-guides/bluetooth.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph Meta Tags -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://acreetionos.org/wiki-guides/bluetooth.html">
+  <meta property="og:title" content="Bluetooth Setup & Pairing Guide – AcreetionOS Linux">
+  <meta property="og:description" content="Learn how to connect Bluetooth headphones, mice, keyboards, and game controllers on AcreetionOS. Includes Bluez and Blueman troubleshooting.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="Bluetooth Setup & Pairing Guide – AcreetionOS Linux">
+  <meta name="twitter:description" content="Learn how to connect Bluetooth headphones, mice, keyboards, and game controllers on AcreetionOS. Includes Bluez and Blueman troubleshooting.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+  <link rel="stylesheet" href="../fonts.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://acreetionos.org/wiki-guides/bluetooth.html#article",
+        "headline": "AcreetionOS Bluetooth Pairing & Audio Configuration Guide",
+        "description": "Learn how to connect Bluetooth headphones, mice, keyboards, and game controllers on AcreetionOS. Includes Bluez and Blueman troubleshooting.",
+        "url": "https://acreetionos.org/wiki-guides/bluetooth.html",
+        "inLanguage": "en",
+        "datePublished": "2026-08-14T00:00:00+00:00",
+        "dateModified": "2026-08-16T00:00:00+00:00",
+        "publisher": {
+          "@type": "Organization",
+          "name": "AcreetionOS",
+          "url": "https://acreetionos.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://acreetionos.org/logo.webp"
+          }
+        },
+        "mainEntityOfPage": "https://acreetionos.org/wiki-guides/bluetooth.html",
+        "articleSection": "Linux Guides & Documentation"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/wiki-guides/bluetooth.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Wiki",
+            "item": "https://acreetionos.org/wiki.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Guides",
+            "item": "https://acreetionos.org/wiki-guides/index.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Bluetooth",
+            "item": "https://acreetionos.org/wiki-guides/bluetooth.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --green: #2ecc71;
+      --bg: #121212;
+      --panel: #1a1a1a;
+      --border: #333;
+      --text: #ddd;
+      --muted: #888;
+      --font-sans: 'Roboto', system-ui, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      max-width: 820px;
+      margin: 2rem auto;
+      padding: 0 1.25rem 3rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+    }
+    h1 { color: var(--green); font-size: 1.85rem; margin-bottom: 0.5rem; }
+    h2 { color: var(--green); font-size: 1.35rem; margin-top: 2rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    h3 { color: #a3e635; font-size: 1.1rem; margin-top: 1.4rem; margin-bottom: 0.5rem; }
+    p { margin: 0.8rem 0; }
+    ul, ol { margin: 0.8rem 0 1rem 1.75rem; }
+    li { margin-bottom: 0.4rem; }
+    pre {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      margin: 1rem 0;
+    }
+    code {
+      background: var(--panel);
+      border: 1px solid #292929;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      color: #7ee787;
+    }
+    pre code { border: none; padding: 0; background: transparent; color: inherit; }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 1.5rem; font-weight: 500; }
+    .breadcrumbs { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs a:hover { color: var(--green); }
+    .note {
+      background: rgba(46, 204, 113, 0.08);
+      border-left: 4px solid var(--green);
+      padding: 1rem 1.2rem;
+      border-radius: 4px;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="breadcrumbs">
+    <a href="../index.html">Home</a> &gt; <a href="../wiki.html">Wiki</a> &gt; <a href="index.html">Guides</a> &gt; <span>Bluetooth</span>
+  </div>
+
+  <a class="back" href="index.html">← Back to Wiki Guides Index</a>
+
+  <article>
+    <h1>AcreetionOS Bluetooth Pairing & Audio Configuration Guide</h1>
+    <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Official AcreetionOS Documentation &amp; Step-by-Step Tutorial</p>
+    
+    <h2>1. Bluetooth on AcreetionOS</h2>
+    <p>AcreetionOS includes the complete <code>bluez</code> stack, PipeWire audio routing, and the Blueman GUI management suite for low-latency audio, controllers, and peripherals.</p>
+
+    <h2>2. Pairing Devices via the Graphical Interface</h2>
+    <ol>
+      <li>Open the Application Menu and launch <strong>Bluetooth Settings</strong> (or click the Bluetooth icon in the tray).</li>
+      <li>Ensure Bluetooth is toggled <strong>ON</strong>.</li>
+      <li>Put your Bluetooth device into pairing mode.</li>
+      <li>Select your device from the discovered list and click <strong>Pair</strong> (or <strong>Connect</strong>).</li>
+    </ol>
+
+    <h2>3. Pairing via Command Line (<code>bluetoothctl</code>)</h2>
+    <pre><code>bluetoothctl
+[bluetooth]# power on
+[bluetooth]# agent on
+[bluetooth]# default-agent
+[bluetooth]# scan on
+[bluetooth]# pair XX:XX:XX:XX:XX:XX
+[bluetooth]# trust XX:XX:XX:XX:XX:XX
+[bluetooth]# connect XX:XX:XX:XX:XX:XX
+[bluetooth]# exit</code></pre>
+
+    <h2>4. Troubleshooting Bluetooth Audio &amp; Peripherals</h2>
+    <h3>Bluetooth Service Inactive</h3>
+    <p>Verify that the Bluetooth system service is active and enabled to start on boot:</p>
+    <pre><code>sudo systemctl enable --now bluetooth.service
+sudo systemctl status bluetooth.service</code></pre>
+
+    <h3>Headset Audio Quality (A2DP vs HSP/HFP)</h3>
+    <p>AcreetionOS uses PipeWire with LDAC, AAC, and aptX support. If your microphone switches the audio profile to mono telephone quality, open <strong>Sound Settings</strong> and set the profile to <strong>High Fidelity Playback (A2DP Sink)</strong>.</p>
+
+  </article>
+
+  <div class="note">
+    <strong>Need additional help?</strong> Search the <a href="../wiki.html">Interactive AI Wiki</a> or connect with our community on the <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">AcreetionOS Discord Server</a>.
+  </div>
+
+  <footer>
+    <div>&copy; 2026 AcreetionOS Project. Open Source under GPLv3.</div>
+    <div>
+      <a href="../docs.html">All Documentation</a> · <a href="../faq.html">FAQ</a> · <a href="../index.html">Official Website</a>
+    </div>
+  </footer>
+</body>
+</html>

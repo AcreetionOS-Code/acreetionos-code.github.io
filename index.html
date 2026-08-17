@@ -134,7 +134,7 @@
     <meta name="theme-color" content="#121212" >
     <meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Cinnamon desktop, lightweight Linux distro, open source OS, accredion, Linux for beginners" >
     <meta name="referrer" content="strict-origin-when-cross-origin" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
     <title>
     AcreetionOS: Arch Linux Made Easy – Fast, Private, Cinnamon Desktop
   </title>
@@ -150,21 +150,24 @@
   <meta property="og:url" content="https://acreetionos.org/" >
   <meta property="og:title" content="AcreetionOS | Sovereign Arch Linux Distribution" >
   <meta property="og:description" content="Stability and repository sovereignty for the modern power user. Experience the power of Arch Linux with the ease of Cinnamon." >
-  <meta property="og:image" content="https://acreetionos.org/og-image.webp" >
+  <meta property="og:image" content="https://acreetionos.org/og-image.png" >
   <meta property="og:site_name" content="AcreetionOS" >
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" >
   <meta property="twitter:url" content="https://acreetionos.org/" >
   <meta property="twitter:title" content="AcreetionOS | Sovereign Arch Linux Distribution" >
   <meta property="twitter:description" content="Stability and repository sovereignty for the modern power user. Stable, Fast, and Secure." >
-  <meta property="twitter:image" content="https://acreetionos.org/og-image.webp" >
+  <meta property="twitter:image" content="https://acreetionos.org/og-image.png" >
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
   <link rel="preload" href="acreetionoslogo.webp" as="image" type="image/webp">
   <link rel="preload" href="logo.webp" as="image" type="image/webp">
-  <link rel="stylesheet" href="fonts.css">
-  <link rel="stylesheet" href="styles.css">
-<link rel="stylesheet" href="sidebar.css">
+  <link rel="preload" href="fonts.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="fonts.css"></noscript>
+  <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="styles.css"></noscript>
+  <link rel="stylesheet" href="sidebar.css" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="sidebar.css"></noscript>
   
 </head>
 <body>
@@ -218,7 +221,7 @@
               
               <!-- 1. HERO SECTION -->
               <div class="hero">
-                <img src="logo.webp" alt="AcreetionOS Logo" class="hero-logo" loading="eager" fetchpriority="high">
+                <img src="logo.webp" alt="AcreetionOS Logo" class="hero-logo" width="110" height="110" loading="eager" fetchpriority="high">
                 <h1 class="hero-title">AcreetionOS</h1>
                 <p class="hero-subtitle">Arch Linux, made approachable.</p>
                 <p class="hero-tagline">
@@ -441,8 +444,7 @@
     document.getElementById('stat-contrib').textContent = t.members || 0;
   }).catch(function(){});
 </script>
-<script src="scale-page.js" defer>
-</script>
+
 <script src="sidebar.js" defer>
 </script>
 </div>
@@ -455,6 +457,6 @@
 </script>
 <script src="/coi-serviceworker.js" defer>
 </script>
-<script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module" defer crossorigin="anonymous"></script>
 </body>
 </html>

@@ -2,19 +2,215 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wiki Guides — AcreetionOS</title>
-  <meta name="description" content="Beginner-friendly AI guides for AcreetionOS. Guides are generated automatically — check back soon or use the interactive wiki.">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <title>AcreetionOS Wiki Guides – Arch Linux Step-by-Step Tutorials</title>
+  <meta name="description" content="Explore essential step-by-step guides for AcreetionOS: WiFi setup, software installation, NVIDIA GPU drivers, system maintenance, Bluetooth, and firewall configuration.">
+  <meta name="keywords" content="AcreetionOS guides, Arch Linux tutorials, Linux beginners guide, Cinnamon desktop guides, AcreetionOS troubleshooting">
   <link rel="canonical" href="https://acreetionos.org/wiki-guides/index.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/wiki-guides/index.html">
+  <meta property="og:title" content="AcreetionOS Wiki Guides – Step-by-Step Arch Linux Tutorials">
+  <meta property="og:description" content="Explore essential guides for AcreetionOS: WiFi, software installation, NVIDIA drivers, maintenance, and security.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="AcreetionOS Wiki Guides">
+  <meta name="twitter:description" content="Step-by-step tutorials and configuration guides for AcreetionOS Linux.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+  <link rel="stylesheet" href="../fonts.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": "https://acreetionos.org/wiki-guides/index.html#collection",
+        "name": "AcreetionOS Wiki Guides",
+        "description": "Collection of official step-by-step configuration and maintenance guides for AcreetionOS Linux.",
+        "url": "https://acreetionos.org/wiki-guides/index.html",
+        "isPartOf": {
+          "@id": "https://acreetionos.org/#website"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/wiki-guides/index.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Wiki",
+            "item": "https://acreetionos.org/wiki.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Guides",
+            "item": "https://acreetionos.org/wiki-guides/index.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <style>
-    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; color: #ddd; background: #121212; line-height: 1.6; }
-    h1 { color: #2ecc71; } a { color: #2ecc71; }
+    :root {
+      --green: #2ecc71;
+      --bg: #121212;
+      --panel: #1a1a1a;
+      --border: #333;
+      --text: #ddd;
+      --muted: #888;
+      --font-sans: 'Roboto', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      max-width: 860px;
+      margin: 2rem auto;
+      padding: 0 1.25rem 3rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+    }
+    h1 { color: var(--green); font-size: 2rem; margin-bottom: 0.5rem; }
+    p.lead { color: var(--muted); font-size: 1.05rem; margin-bottom: 2rem; }
+    .breadcrumbs { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .breadcrumbs a { color: var(--muted); text-decoration: none; }
+    .breadcrumbs a:hover { color: var(--green); }
+    ul.guide-list { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr; gap: 1.25rem; }
+    .guide-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .guide-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--green);
+    }
+    .guide-card h2 {
+      color: var(--green);
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem 0;
+    }
+    .guide-card p {
+      color: #bbb;
+      margin: 0 0 1rem 0;
+      font-size: 0.95rem;
+    }
+    .read-btn {
+      color: var(--green);
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 0.95rem;
+      display: inline-block;
+    }
+    .read-btn:hover { text-decoration: underline; }
+    footer {
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer a { color: var(--green); text-decoration: none; }
   </style>
 </head>
 <body>
+  <div class="breadcrumbs">
+    <a href="../index.html">Home</a> &gt; <a href="../wiki.html">Wiki</a> &gt; <span>Guides</span>
+  </div>
+
   <h1>AcreetionOS Wiki Guides</h1>
-  <p>Beginner-friendly AI guides are generated automatically by the intelligence sync. They'll appear here shortly.</p>
-  <p>Meanwhile, try the <a href="../wiki.html">interactive AI wiki search</a>.</p>
+  <p class="lead">Step-by-step tutorials and official documentation for AcreetionOS (Arch Linux &amp; Cinnamon Desktop).</p>
+
+  <ul class="guide-list">
+    <li class="guide-card">
+      <a href="system-maintenance.html">
+        <h2>AcreetionOS System Maintenance Guide: Keeping Arch Clean & Stable</h2>
+      </a>
+      <p>Learn essential system maintenance for AcreetionOS: updating packages with pacman, cleaning package caches, managing journal logs, and checking systemd services.</p>
+      <a class="read-btn" href="system-maintenance.html">Read Step-by-Step Guide →</a>
+    </li>
+    <li class="guide-card">
+      <a href="installing-software.html">
+        <h2>How to Install Software on AcreetionOS: GUI, Pacman, Flatpak & AUR</h2>
+      </a>
+      <p>Comprehensive guide to installing software on AcreetionOS. Use the Software Center GUI, Pacman package manager, Flatpak, and the Arch User Repository (AUR).</p>
+      <a class="read-btn" href="installing-software.html">Read Step-by-Step Guide →</a>
+    </li>
+    <li class="guide-card">
+      <a href="wifi.html">
+        <h2>AcreetionOS WiFi Configuration & Wireless Troubleshooting Guide</h2>
+      </a>
+      <p>Step-by-step guide to connecting to WiFi on AcreetionOS. Covers NetworkManager GUI setup, nmcli terminal commands, and driver troubleshooting.</p>
+      <a class="read-btn" href="wifi.html">Read Step-by-Step Guide →</a>
+    </li>
+    <li class="guide-card">
+      <a href="bluetooth.html">
+        <h2>AcreetionOS Bluetooth Pairing & Audio Configuration Guide</h2>
+      </a>
+      <p>Learn how to connect Bluetooth headphones, mice, keyboards, and game controllers on AcreetionOS. Includes Bluez and Blueman troubleshooting.</p>
+      <a class="read-btn" href="bluetooth.html">Read Step-by-Step Guide →</a>
+    </li>
+    <li class="guide-card">
+      <a href="printer-setup.html">
+        <h2>How to Configure Printers & Scanners on AcreetionOS (CUPS)</h2>
+      </a>
+      <p>Configure USB and network printers on AcreetionOS using CUPS, IPP Everywhere (driverless printing), and system-config-printer.</p>
+      <a class="read-btn" href="printer-setup.html">Read Step-by-Step Guide →</a>
+    </li>
+    <li class="guide-card">
+      <a href="nvidia-drivers.html">
+        <h2>NVIDIA GPU Driver Installation & Configuration for AcreetionOS</h2>
+      </a>
+      <p>Install and configure NVIDIA graphics drivers on AcreetionOS. Covers Turing, Ampere, Ada Lovelace, and legacy GPUs, Prime render offload, and Wayland/X11 setup.</p>
+      <a class="read-btn" href="nvidia-drivers.html">Read Step-by-Step Guide →</a>
+    </li>
+    <li class="guide-card">
+      <a href="firewall.html">
+        <h2>How to Configure UFW & GUFW Firewall on AcreetionOS Linux</h2>
+      </a>
+      <p>Secure your AcreetionOS system by enabling and configuring the UFW (Uncomplicated Firewall) and GUFW graphical interface. Manage ports, SSH, and gaming rules.</p>
+      <a class="read-btn" href="firewall.html">Read Step-by-Step Guide →</a>
+    </li>
+  </ul>
+
+  <div style="margin-top: 2.5rem; text-align: center;">
+    <a href="../wiki.html" style="color: var(--green); text-decoration: none; font-size: 1.05rem;">
+      🔍 Looking for something else? Try the <strong>Interactive AI Wiki Search →</strong>
+    </a>
+  </div>
+
+  <footer>
+    <div>&copy; 2026 AcreetionOS Project. Open Source under GPLv3.</div>
+    <div>
+      <a href="../docs.html">Documentation</a> · <a href="../faq.html">FAQ</a> · <a href="../index.html">Home</a>
+    </div>
+  </footer>
 </body>
 </html>

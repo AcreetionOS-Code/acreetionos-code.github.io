@@ -2,11 +2,74 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow">
-  <title>Reviews – AcreetionOS</title>
-  <meta name="description" content="AcreetionOS review index. These pages link to external review videos and do not host the content.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <title>AcreetionOS Video Reviews Directory – Community First Looks & Benchmarks</title>
+  <meta name="description" content="Browse independent video reviews, first looks, and benchmark walkthroughs of AcreetionOS Linux by content creators including Erik Dubois, Jack Keifer, and Linux Tech AI.">
   <link rel="canonical" href="https://acreetionos.org/Reviews/">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/Reviews/">
+  <meta property="og:title" content="AcreetionOS Video Reviews Directory">
+  <meta property="og:description" content="Independent community reviews, first looks, and walkthroughs of AcreetionOS Arch Linux.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="AcreetionOS Video Reviews Directory">
+  <meta name="twitter:description" content="Independent community reviews, first looks, and walkthroughs of AcreetionOS Arch Linux.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+  <link rel="stylesheet" href="../fonts.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CollectionPage",
+        "@id": "https://acreetionos.org/Reviews/#collection",
+        "name": "AcreetionOS Video Reviews Directory",
+        "description": "Index of external video reviews, walkthroughs, and first looks of AcreetionOS Linux by independent creators.",
+        "url": "https://acreetionos.org/Reviews/",
+        "isPartOf": {
+          "@id": "https://acreetionos.org/#website"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/Reviews/#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Community Reviews",
+            "item": "https://acreetionos.org/community-reviews.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Reviews Index",
+            "item": "https://acreetionos.org/Reviews/"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <style>
     :root{--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#e5e5e5;--muted:#b2b2b2;--green:#2ecc71}
     *{box-sizing:border-box}
@@ -17,65 +80,71 @@
     .notice{background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25);border-radius:12px;padding:1rem 1.1rem;margin:1rem 0 1.5rem;color:var(--muted)}
     .notice strong{color:var(--text)}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1.1rem}
-    .card h2{margin:.2rem 0 .4rem;font-size:1.05rem}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1.1rem;transition:border-color .2s ease}
+    .card:hover{border-color:var(--green)}
+    .card h2{margin:.2rem 0 .4rem;font-size:1.05rem;color:#fff}
     .card p{margin:.4rem 0;color:var(--muted);font-size:.93rem}
     .meta{font-size:.82rem;color:#999;margin-bottom:.75rem}
     .links{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:.9rem}
     .btn{display:inline-block;padding:.55rem .9rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:.88rem}
     .btn.primary{background:var(--green);color:#000}
-    .btn.secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
-    .footer{margin-top:2rem;color:#999;font-size:.85rem}
+    .footer{margin-top:2.5rem;color:#999;font-size:.85rem;border-top:1px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .footer a{color:var(--green);text-decoration:none}
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="brand">
       <div>
-        <h1 style="margin:0">Reviews</h1>
-        <div style="color:var(--muted)">External review links for AcreetionOS</div>
+        <h1 style="margin:0">AcreetionOS Video Reviews</h1>
+        <div style="color:var(--muted)">Independent Linux creator walkthroughs and first looks</div>
       </div>
-      <a href="../community-reviews.html">Back to Community Reviews</a>
+      <a href="../community-reviews.html">← Back to Community Reviews</a>
     </div>
 
-    <div class="notice"><strong>Disclaimer:</strong> AcreetionOS does not own, host, or control the review videos listed on these pages. YouTube keeps moving the goalposts with irritating embed policy changes, and the public Invidious instances we tested are now forcing bot checks and breaking playback as well. If that keeps up, we may run our own Invidious later. For now, each link goes to the original creator or the creator's video page on YouTube.</div>
+    <div class="notice"><strong>Disclaimer:</strong> AcreetionOS does not own, host, or control the review videos listed on these pages. Each link goes to the original creator's video page on YouTube.</div>
 
     <div class="grid">
       <article class="card">
-        <div class="meta">Jack Keifer · xCvXtSuNHRw</div>
+        <div class="meta">Jack Keifer · Video ID: xCvXtSuNHRw</div>
         <h2>AcreetionOS Linux - A New Distro In Town - First Look</h2>
-        <p>A detailed first look at the custom Cinnamon layout, system settings, XLibre base, and the curated software selection.</p>
+        <p>A detailed first look at the custom Cinnamon layout, system settings, XLibre base, and curated software selection.</p>
         <div class="links">
-          <a class="btn primary" href="xCvXtSuNHRw.html">Open page</a>
+          <a class="btn primary" href="xCvXtSuNHRw.html">Open Review Details →</a>
         </div>
       </article>
       <article class="card">
-        <div class="meta">Jack Keifer · UUKP5SS9m9M</div>
+        <div class="meta">Jack Keifer · Video ID: UUKP5SS9m9M</div>
         <h2>AcreetionOS Cinnamon - First Look &amp; Setting the Record Straight</h2>
         <p>A walkthrough of the Cinnamon edition, including the desktop experience, customizations, and common questions.</p>
         <div class="links">
-          <a class="btn primary" href="UUKP5SS9m9M.html">Open page</a>
+          <a class="btn primary" href="UUKP5SS9m9M.html">Open Review Details →</a>
         </div>
       </article>
       <article class="card">
-        <div class="meta">Linux Tech AI · DjYcoqAfz7w</div>
-        <h2>AcreetionOS Linux Review - First Look at This Unique Arch-Based Distro in 2026</h2>
-        <p>A comprehensive review covering the installer, desktop experience, and day-to-day usability.</p>
-        <div class="links">
-          <a class="btn primary" href="DjYcoqAfz7w.html">Open page</a>
-        </div>
-      </article>
-      <article class="card">
-        <div class="meta">Erik Dubois · IRwD-U4uVPo</div>
+        <div class="meta">Erik Dubois · Video ID: IRwD-U4uVPo</div>
         <h2>EDU 118 - AcreetionOS 01 First Look — Arch Made Approachable</h2>
-        <p>An educational deep dive into the riced desktop, ATT support, and real-world workflow scenarios.</p>
+        <p>An educational deep dive into the desktop layout, ATT tooling, and real-world workflow scenarios.</p>
         <div class="links">
-          <a class="btn primary" href="IRwD-U4uVPo.html">Open page</a>
+          <a class="btn primary" href="IRwD-U4uVPo.html">Open Review Details →</a>
+        </div>
+      </article>
+      <article class="card">
+        <div class="meta">Linux Tech AI · Video ID: DjYcoqAfz7w</div>
+        <h2>AcreetionOS Linux Review - First Look at This Unique Arch-Based Distro</h2>
+        <p>A comprehensive review showing what makes AcreetionOS unique among Arch-based distributions in 2026.</p>
+        <div class="links">
+          <a class="btn primary" href="DjYcoqAfz7w.html">Open Review Details →</a>
         </div>
       </article>
     </div>
 
-    <div class="footer">These pages are link pages only. The videos and their ownership remain with the original creators.</div>
+    <div class="footer">
+      <div>&copy; 2026 AcreetionOS Project. Open Source under GPLv3.</div>
+      <div>
+        <a href="../community-reviews.html">Community Reviews</a> · <a href="../docs.html">Docs</a> · <a href="../index.html">Home</a>
+      </div>
+    </div>
   </div>
 </body>
 </html>

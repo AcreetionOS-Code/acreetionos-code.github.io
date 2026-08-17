@@ -2,74 +2,138 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog — AcreetionOS</title>
-  <meta name="description" content="AcreetionOS blog — daily project updates, guides, and news from the team building a user-friendly Arch Linux distribution.">
-  <meta name="robots" content="index, follow">
+  <title>AcreetionOS Blog – Linux Distro News, Updates & Guides</title>
+  <meta name="description" content="AcreetionOS official blog: daily project updates, Linux tutorials, Arch packaging news, and release announcements from the development team.">
+  <meta name="keywords" content="AcreetionOS blog, Linux distro news, Arch Linux updates, open source development, Cinnamon desktop guides">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <link rel="canonical" href="https://acreetionos.org/blog.html">
-  <link rel="alternate" type="application/atom+xml" title="AcreetionOS — News &amp; Updates" href="/feed.xml">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS — News &amp; Updates" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://acreetionos.org/blog.html">
-  <meta property="og:title" content="AcreetionOS Blog">
+  <meta property="og:title" content="AcreetionOS Blog – Linux Distro News & Guides">
+  <meta property="og:description" content="Daily project updates, step-by-step guides, and news from the AcreetionOS team.">
   <meta property="og:site_name" content="AcreetionOS">
-  <meta property="og:image" content="https://acreetionos.org/og-image.webp">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="AcreetionOS Blog – Linux Distro News & Guides">
+  <meta name="twitter:description" content="Daily project updates, step-by-step guides, and news from the AcreetionOS team.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="stylesheet" href="fonts.css">
+
   <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Blog",
-  "name": "AcreetionOS Blog",
-  "url": "https://acreetionos.org/blog.html",
-  "description": "Daily updates and guides from the AcreetionOS team.",
-  "publisher": {"@type": "Organization", "name": "AcreetionOS", "url": "https://acreetionos.org"}
-}
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Blog",
+        "@id": "https://acreetionos.org/blog.html#blog",
+        "name": "AcreetionOS Blog",
+        "url": "https://acreetionos.org/blog.html",
+        "description": "Daily project updates, Linux tutorials, and news from the AcreetionOS team.",
+        "publisher": {
+          "@type": "Organization",
+          "name": "AcreetionOS",
+          "url": "https://acreetionos.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://acreetionos.org/logo.webp"
+          }
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/blog.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Blog",
+            "item": "https://acreetionos.org/blog.html"
+          }
+        ]
+      }
+    ]
+  }
   </script>
+
   <style>
     body { font-family: system-ui, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; color: #ddd; background: #121212; }
-    h1 { color: #2ecc71; }
-    h2 { color: #2ecc71; margin-top: 2rem; }
+    h1 { color: #2ecc71; font-size: 2rem; margin-bottom: 0.5rem; }
+    h2 { color: #2ecc71; margin-top: 2rem; margin-bottom: 0.75rem; }
     ul { list-style: none; padding: 0; }
     li { padding: .8rem 0; border-bottom: 1px solid #222; }
     a { color: #2ecc71; text-decoration: none; }
     a:hover { text-decoration: underline; }
     .date { color: #888; font-size: .85rem; }
-    .preamble { color: #b2b2b2; }
-    .feed { margin-top: 2rem; padding: 1rem; background: #1a1a1a; border-radius: 8px; }
+    .preamble { color: #b2b2b2; margin-bottom: 1.5rem; font-size: 1.05rem; }
+    .feed { margin-top: 2.5rem; padding: 1.25rem; background: #1a1a1a; border-radius: 8px; border: 1px solid #333; }
+    .breadcrumbs { font-size: 0.85rem; color: #888; margin-bottom: 1.5rem; }
+    .breadcrumbs a { color: #888; text-decoration: none; }
+    .breadcrumbs a:hover { color: #2ecc71; }
+    footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid #333; color: #888; font-size: 0.88rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
   </style>
 </head>
 <body>
+  <div class="breadcrumbs">
+    <a href="/index.html">Home</a> &gt; <span>Blog</span>
+  </div>
+
   <h1>AcreetionOS Blog</h1>
-  <p class="preamble">Daily updates from the AcreetionOS team — an independent, privacy-focused
-  Arch Linux distribution. <a href="/about.html">About the project</a> &middot;
-  <a href="/wiki.html">Wiki</a> &middot; <a href="/wiki-guides/index.html">Guides</a> &middot;
-  <a href="/changelog.html">Changelog</a></p>
+  <p class="preamble">Daily updates and technical guides from the AcreetionOS development team — an independent, privacy-focused Arch Linux distribution. <a href="/about.html">About the project</a> &middot; <a href="/wiki.html">Wiki</a> &middot; <a href="/wiki-guides/index.html">Guides</a> &middot; <a href="/changelog.html">Changelog</a></p>
 
   <h2>Latest updates</h2>
   <ul>
-    <li><a href="/newsletter-archive/2026-08-14.html"><strong>August 14, 2026</strong></a><br><span class="date">August 14, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-13.html"><strong>August 13, 2026</strong></a><br><span class="date">August 13, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-12.html"><strong>August 12, 2026</strong></a><br><span class="date">August 12, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-11.html"><strong>August 11, 2026</strong></a><br><span class="date">August 11, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-10.html"><strong>August 10, 2026</strong></a><br><span class="date">August 10, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-09.html"><strong>August 09, 2026</strong></a><br><span class="date">August 09, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-08.html"><strong>August 08, 2026</strong></a><br><span class="date">August 08, 2026</span></li>
-    <li><a href="/newsletter-archive/2026-08-07.html"><strong>August 07, 2026</strong></a><br><span class="date">August 07, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-16.html"><strong>August 16, 2026 – Python Packaging &amp; Security Updates</strong></a><br><span class="date">August 16, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-15.html"><strong>August 15, 2026 – Intelligence Sync &amp; Performance Polish</strong></a><br><span class="date">August 15, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-14.html"><strong>August 14, 2026 – Hyperpick &amp; Stability Testing</strong></a><br><span class="date">August 14, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-13.html"><strong>August 13, 2026 – Discoverability &amp; Package Management</strong></a><br><span class="date">August 13, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-12.html"><strong>August 12, 2026 – Ecosystem Growth &amp; Recovery</strong></a><br><span class="date">August 12, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-11.html"><strong>August 11, 2026 – Desktop Polish &amp; Onboarding</strong></a><br><span class="date">August 11, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-10.html"><strong>August 10, 2026 – Cinnamon Layout &amp; App Center</strong></a><br><span class="date">August 10, 2026</span></li>
+    <li><a href="/newsletter-archive/2026-08-09.html"><strong>August 09, 2026 – Rolling Release Enhancements</strong></a><br><span class="date">August 09, 2026</span></li>
   </ul>
-  <p><a href="/newsletter-archive/index.html">View the full archive →</a></p>
+  <p style="margin-top: 1rem;"><a href="/newsletter-archive/index.html">View the full archive of 80+ updates →</a></p>
 
-  <h2>Guides</h2>
+  <h2>Step-by-Step Guides</h2>
   <ul>
-    <li><a href="/wiki-guides/installing-software.html"><strong>Installing software</strong></a><br><span class="date">GUI package manager, pacman, and the AUR</span></li>
-    <li><a href="/wiki-guides/wifi.html"><strong>WiFi</strong></a><br><span class="date">Connect and troubleshoot wireless on AcreetionOS</span></li>
-    <li><a href="/wiki-guides/bluetooth.html"><strong>Bluetooth</strong></a><br><span class="date">Pair and use Bluetooth devices</span></li>
-    <li><a href="/wiki-guides/nvidia-drivers.html"><strong>NVIDIA drivers</strong></a><br><span class="date">GUI and terminal methods</span></li>
-    <li><a href="/wiki-guides/printer-setup.html"><strong>Printer setup</strong></a><br><span class="date">CUPS, drivers, and network printers</span></li>
-    <li><a href="/wiki-guides/firewall.html"><strong>Firewall</strong></a><br><span class="date">Keep your system secure</span></li>
+    <li><a href="/wiki-guides/system-maintenance.html"><strong>System maintenance</strong></a><br><span class="date">Keeping Arch clean and healthy with pacman, paccache, and systemd</span></li>
+    <li><a href="/wiki-guides/installing-software.html"><strong>Installing software</strong></a><br><span class="date">GUI package manager, pacman, Flatpak, and the AUR</span></li>
+    <li><a href="/wiki-guides/wifi.html"><strong>WiFi configuration</strong></a><br><span class="date">Connect and troubleshoot wireless networking on AcreetionOS</span></li>
+    <li><a href="/wiki-guides/bluetooth.html"><strong>Bluetooth pairing</strong></a><br><span class="date">Pair headphones, peripherals, and configure PipeWire audio</span></li>
+    <li><a href="/wiki-guides/nvidia-drivers.html"><strong>NVIDIA drivers</strong></a><br><span class="date">Proprietary driver setup and PRIME render offload for gaming</span></li>
+    <li><a href="/wiki-guides/printer-setup.html"><strong>Printer setup</strong></a><br><span class="date">CUPS, IPP Everywhere driverless printing, and network printers</span></li>
+    <li><a href="/wiki-guides/firewall.html"><strong>Firewall security</strong></a><br><span class="date">UFW and GUFW setup to protect your system</span></li>
   </ul>
+  <p style="margin-top: 1rem;"><a href="/wiki-guides/index.html">View all guides →</a></p>
 
   <div class="feed">
-    <strong>Subscribe:</strong> <a href="/feed.xml">Atom feed</a> &middot;
-    <a href="/newsletter.html">Email newsletter</a> &middot;
-    <a href="/newsletter-archive/index.html">Archive</a>
+    <strong>Subscribe &amp; Connect:</strong> <a href="/feed.xml">Atom RSS feed</a> &middot;
+    <a href="/newsletter.html">Daily email</a> &middot;
+    <a href="https://x.com/acreetionos" target="_blank" rel="noopener noreferrer">X (@acreetionos)</a> &middot;
+    <a href="https://bsky.app/profile/acreetionos.bsky.social" target="_blank" rel="noopener noreferrer">Bluesky</a> &middot;
+    <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">Discord Community</a>
   </div>
+
+  <footer>
+    <div>&copy; 2026 AcreetionOS Project. Open Source under GPLv3.</div>
+    <div>
+      <a href="/docs.html">Docs</a> &middot; <a href="/faq.html">FAQ</a> &middot; <a href="/index.html">Home</a>
+    </div>
+  </footer>
 </body>
 </html>

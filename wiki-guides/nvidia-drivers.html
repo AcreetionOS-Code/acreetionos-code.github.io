@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <title>NVIDIA Drivers Guide – AcreetionOS Graphics Configuration</title>
+  <meta name="description" content="Install and configure NVIDIA graphics drivers on AcreetionOS. Covers Turing, Ampere, Ada Lovelace, and legacy GPUs, Prime render offload, and Wayland/X11 setup.">
+  <meta name="keywords" content="AcreetionOS NVIDIA drivers, Arch Linux NVIDIA install, prime-run NVIDIA, nvidia-dkms, Linux gaming GPU">
+  <link rel="canonical" href="https://acreetionos.org/wiki-guides/nvidia-drivers.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph Meta Tags -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://acreetionos.org/wiki-guides/nvidia-drivers.html">
+  <meta property="og:title" content="NVIDIA Drivers Guide – AcreetionOS Graphics Configuration">
+  <meta property="og:description" content="Install and configure NVIDIA graphics drivers on AcreetionOS. Covers Turing, Ampere, Ada Lovelace, and legacy GPUs, Prime render offload, and Wayland/X11 setup.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="NVIDIA Drivers Guide – AcreetionOS Graphics Configuration">
+  <meta name="twitter:description" content="Install and configure NVIDIA graphics drivers on AcreetionOS. Covers Turing, Ampere, Ada Lovelace, and legacy GPUs, Prime render offload, and Wayland/X11 setup.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+  <link rel="stylesheet" href="../fonts.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "@id": "https://acreetionos.org/wiki-guides/nvidia-drivers.html#article",
+        "headline": "NVIDIA GPU Driver Installation & Configuration for AcreetionOS",
+        "description": "Install and configure NVIDIA graphics drivers on AcreetionOS. Covers Turing, Ampere, Ada Lovelace, and legacy GPUs, Prime render offload, and Wayland/X11 setup.",
+        "url": "https://acreetionos.org/wiki-guides/nvidia-drivers.html",
+        "inLanguage": "en",
+        "datePublished": "2026-08-14T00:00:00+00:00",
+        "dateModified": "2026-08-16T00:00:00+00:00",
+        "publisher": {
+          "@type": "Organization",
+          "name": "AcreetionOS",
+          "url": "https://acreetionos.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://acreetionos.org/logo.webp"
+          }
+        },
+        "mainEntityOfPage": "https://acreetionos.org/wiki-guides/nvidia-drivers.html",
+        "articleSection": "Linux Guides & Documentation"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/wiki-guides/nvidia-drivers.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Wiki",
+            "item": "https://acreetionos.org/wiki.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Guides",
+            "item": "https://acreetionos.org/wiki-guides/index.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Nvidia Drivers",
+            "item": "https://acreetionos.org/wiki-guides/nvidia-drivers.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --green: #2ecc71;
+      --bg: #121212;
+      --panel: #1a1a1a;
+      --border: #333;
+      --text: #ddd;
+      --muted: #888;
+      --font-sans: 'Roboto', system-ui, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      max-width: 820px;
+      margin: 2rem auto;
+      padding: 0 1.25rem 3rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+    }
+    h1 { color: var(--green); font-size: 1.85rem; margin-bottom: 0.5rem; }
+    h2 { color: var(--green); font-size: 1.35rem; margin-top: 2rem; margin-bottom: 0.75rem; border-bottom: 1px solid var(--border); padding-bottom: 0.4rem; }
+    h3 { color: #a3e635; font-size: 1.1rem; margin-top: 1.4rem; margin-bottom: 0.5rem; }
+    p { margin: 0.8rem 0; }
+    ul, ol { margin: 0.8rem 0 1rem 1.75rem; }
+    li { margin-bottom: 0.4rem; }
+    pre {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      margin: 1rem 0;
+    }
+    code {
+      background: var(--panel);
+      border: 1px solid #292929;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.9em;
+      color: #7ee787;
+    }
+    pre code { border: none; padding: 0; background: transparent; color: inherit; }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 1.5rem; font-weight: 500; }
+    .breadcrumbs { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs a:hover { color: var(--green); }
+    .note {
+      background: rgba(46, 204, 113, 0.08);
+      border-left: 4px solid var(--green);
+      padding: 1rem 1.2rem;
+      border-radius: 4px;
+      margin: 2rem 0;
+      font-size: 0.95rem;
+    }
+    footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="breadcrumbs">
+    <a href="../index.html">Home</a> &gt; <a href="../wiki.html">Wiki</a> &gt; <a href="index.html">Guides</a> &gt; <span>Nvidia Drivers</span>
+  </div>
+
+  <a class="back" href="index.html">← Back to Wiki Guides Index</a>
+
+  <article>
+    <h1>NVIDIA GPU Driver Installation & Configuration for AcreetionOS</h1>
+    <p style="color: var(--muted); font-size: 0.95rem; margin-bottom: 1.5rem;">Official AcreetionOS Documentation &amp; Step-by-Step Tutorial</p>
+    
+    <h2>1. NVIDIA Graphics on AcreetionOS</h2>
+    <p>AcreetionOS provides automated GPU detection during installation. If you need to reinstall or configure NVIDIA proprietary drivers for gaming, 3D rendering, or CUDA compute, follow this guide.</p>
+
+    <h2>2. Identifying Your GPU Architecture</h2>
+    <pre><code>lspci -k | grep -A 2 -E "(VGA|3D)"</code></pre>
+
+    <h2>3. Installing Proprietary NVIDIA Drivers</h2>
+    <p>For modern NVIDIA GPUs (GTX 16xx, RTX 20xx, 30xx, 40xx, and newer):</p>
+    <pre><code># Install driver, DKMS module, and 32-bit gaming libraries
+sudo pacman -S nvidia-dkms nvidia-utils lib32-nvidia-utils linux-headers nvidia-settings
+
+# Enable NVIDIA DRM kernel mode setting
+sudo sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/&nvidia-drm.modeset=1 /' /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg</code></pre>
+
+    <h2>4. Optimus Laptop Hybrid Graphics (Intel/AMD + NVIDIA)</h2>
+    <p>On laptops with dual GPUs, AcreetionOS uses NVIDIA PRIME Render Offload to save battery. The integrated GPU powers your desktop display, while heavy 3D apps run on the dedicated NVIDIA card:</p>
+    <pre><code># Run any application on the dedicated NVIDIA GPU
+prime-run steam
+prime-run blender</code></pre>
+
+    <h2>5. Verifying NVIDIA Installation</h2>
+    <pre><code>nvidia-smi</code></pre>
+    <p>This command displays your driver version, GPU temperature, VRAM usage, and active GPU processes.</p>
+
+  </article>
+
+  <div class="note">
+    <strong>Need additional help?</strong> Search the <a href="../wiki.html">Interactive AI Wiki</a> or connect with our community on the <a href="https://discord.gg/VHqQkJASw7" target="_blank" rel="noopener noreferrer">AcreetionOS Discord Server</a>.
+  </div>
+
+  <footer>
+    <div>&copy; 2026 AcreetionOS Project. Open Source under GPLv3.</div>
+    <div>
+      <a href="../docs.html">All Documentation</a> · <a href="../faq.html">FAQ</a> · <a href="../index.html">Official Website</a>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,29 +1,17 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <script src="/coi-serviceworker.js">
-    </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>
-    AcreetionOS — Frontend (Dev Wrapper)
-  </title>
-  <meta name="description" content="AcreetionOS frontend development wrapper. Loading the main site for incremental migration to ESM modules." />
-  <style>
-html,body,iframe{height:100%;width:100%;margin:0;border:0}
-  </style>
-</head>
-<body>
-  <!--
-      This initial scaffold intentionally uses an iframe to load the existing
-      static site so the UI is identical while we migrate pages incrementally
-      into modern ESM modules / components.
-    -->
-  <iframe src="../index.html" title="AcreetionOS site (dev wrapper)">
-</iframe>
-<script type="module" src="/src/main.js">
-</script>
-<script src="footer.js" defer>
-</script>
-</body>
+    <title>AcreetionOS — Frontend Dev Wrapper</title>
+    <meta name="description" content="AcreetionOS frontend development preview wrapper." />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://acreetionos.org/" />
+    <style>
+      html,body,iframe{height:100%;width:100%;margin:0;border:0}
+    </style>
+  </head>
+  <body>
+    <iframe src="../index.html" title="AcreetionOS site (dev wrapper)"></iframe>
+  </body>
 </html>

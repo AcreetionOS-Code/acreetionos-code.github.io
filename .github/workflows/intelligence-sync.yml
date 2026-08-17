@@ -32,10 +32,12 @@ jobs:
           REQUEST_TIMEOUT: "180"
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
+      # Pre-generate static HTML pages for all newsletters in archive
+      - name: Generate newsletter archive HTML
+        run: python3 scripts/gen-newsletter-archive.py
 
       # Pre-generate static wiki guide pages (popular topics) so search
-      # engines can index the AI guides without a visit. Uses the same
-      # /api/chat endpoint as the wiki with the admin-key bypass.
+      # engines can index the AI guides without a visit.
       - name: Generate wiki guide pages
         run: python3 scripts/gen-wiki-guides.py
         env:
@@ -43,15 +45,19 @@ jobs:
           ADMIN_KEY: ${{ secrets.ADMIN_KEY }}
           REQUEST_TIMEOUT: "240"
 
-      # Only stage newsletters/ + wiki-guides/ — never git add -A.
+      # Regenerate sitemap.xml with updated lastmod and new URLs
+      - name: Update sitemap
+        run: python3 scripts/gen-sitemap.py
+
+      # Stage newsletters, HTML archives, wiki-guides, and sitemap.xml
       - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add newsletters/ wiki-guides/
+          git add newsletters/ newsletter-archive/ wiki-guides/ sitemap.xml
           if git diff --cached --quiet; then
             echo "No new newsletter or guides to commit."
           else
-            git commit -m "intelligence sync: newsletter + wiki guides $(date +%Y-%m-%d-%H%M)"
+            git commit -m "intelligence sync: newsletter + archive + wiki guides $(date +%Y-%m-%d-%H%M)"
             git push
           fi

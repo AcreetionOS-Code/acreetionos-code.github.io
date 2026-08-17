@@ -2,40 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="robots" content="index, follow">
-  <title>EDU 118 - AcreetionOS 01 First Look — Arch Made Approachable</title>
-  <meta name="description" content="External link page for the EDU 118 AcreetionOS review video.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <title>EDU 118: AcreetionOS First Look – Arch Made Approachable by Erik Dubois</title>
+  <meta name="description" content="Watch Erik Dubois review AcreetionOS Linux (EDU 118). Deep dive into desktop customizations, ATT tooling support, and real-world Linux workflow performance.">
   <link rel="canonical" href="https://acreetionos.org/Reviews/IRwD-U4uVPo.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="video.other">
+  <meta property="og:url" content="https://acreetionos.org/Reviews/IRwD-U4uVPo.html">
+  <meta property="og:title" content="EDU 118: AcreetionOS First Look – Arch Made Approachable by Erik Dubois">
+  <meta property="og:description" content="Watch Erik Dubois review AcreetionOS Linux (EDU 118).">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="EDU 118: AcreetionOS First Look – Erik Dubois">
+  <meta name="twitter:description" content="Watch Erik Dubois review AcreetionOS Linux (EDU 118).">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+  <link rel="stylesheet" href="../fonts.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "VideoObject",
+        "@id": "https://acreetionos.org/Reviews/IRwD-U4uVPo.html#video",
+        "name": "EDU 118 - AcreetionOS 01 First Look — Arch Made Approachable",
+        "description": "An educational deep dive into the riced desktop, ATT support, and real-world workflow scenarios.",
+        "thumbnailUrl": "https://acreetionos.org/og-image.png",
+        "uploadDate": "2026-04-15T00:00:00+00:00",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/IRwD-U4uVPo",
+        "publisher": {
+          "@type": "Organization",
+          "name": "AcreetionOS",
+          "url": "https://acreetionos.org"
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/Reviews/IRwD-U4uVPo.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Community Reviews",
+            "item": "https://acreetionos.org/community-reviews.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Erik Dubois Review",
+            "item": "https://acreetionos.org/Reviews/IRwD-U4uVPo.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <style>
     :root{--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#e5e5e5;--muted:#b2b2b2;--green:#2ecc71}
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
     .wrap{max-width:820px;margin:0 auto;padding:2rem 1.5rem 3rem}
-    .notice{background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25);border-radius:12px;padding:1rem 1.1rem;color:var(--muted)}
-    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1.2rem;margin-top:1rem}
-    h1{margin:.2rem 0 0}
-    .meta{color:#999;font-size:.85rem;margin-top:.2rem}
-    p{color:var(--muted)}
-    .links{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1rem}
-    a.btn{display:inline-block;padding:.55rem .9rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:.88rem}
+    .notice{background:rgba(46,204,113,.08);border:1px solid rgba(46,204,113,.25);border-radius:12px;padding:1rem 1.1rem;color:var(--muted);margin-bottom:1.5rem}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:1.5rem}
+    h1{margin:.2rem 0 0.5rem;font-size:1.5rem;color:#fff}
+    .meta{color:#999;font-size:.85rem;margin-bottom:1rem}
+    p{color:var(--muted);margin:0.8rem 0}
+    .links{display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.5rem}
+    a.btn{display:inline-block;padding:.65rem 1.2rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:.92rem}
     .primary{background:var(--green);color:#000}
-    .secondary{background:transparent;color:var(--text);border:1px solid var(--border)}
-    .back{display:inline-block;margin-bottom:1rem;color:var(--green);text-decoration:none}
+    .back{display:inline-block;margin-bottom:1.2rem;color:var(--green);text-decoration:none}
+    .back:hover{text-decoration:underline}
+    .breadcrumbs{font-size:.85rem;color:var(--muted);margin-bottom:1.5rem}
+    .breadcrumbs a{color:var(--muted);text-decoration:none}
+    .breadcrumbs a:hover{color:var(--green)}
+    footer{margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);color:var(--muted);font-size:.85rem}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <a class="back" href="index.html">← Back to Reviews</a>
-    <div class="notice"><strong>Disclaimer:</strong> AcreetionOS does not own, host, or control this video. YouTube keeps moving the goalposts with irritating embed policy changes, and the public Invidious instances we tested are now forcing bot checks and breaking playback as well. If that keeps up, we may run our own Invidious later. This page only links to the original creator's content.</div>
-    <div class="card">
+    <div class="breadcrumbs">
+      <a href="../index.html">Home</a> &gt; <a href="../community-reviews.html">Reviews</a> &gt; <span>Erik Dubois</span>
+    </div>
+
+    <a class="back" href="index.html">← Back to Reviews Index</a>
+
+    <div class="notice"><strong>Notice:</strong> AcreetionOS links to independent content creators. This educational video was created independently by Erik Dubois.</div>
+
+    <article class="card">
       <h1>EDU 118 - AcreetionOS 01 First Look — Arch Made Approachable</h1>
       <div class="meta">Creator: Erik Dubois · Video ID: IRwD-U4uVPo</div>
-      <p>An educational deep dive into the riced desktop, ATT support, and real-world workflow scenarios.</p>
+      <p>An educational deep dive into the custom Cinnamon desktop environment, ATT tooling integration, and real-world Linux developer workflow scenarios.</p>
       <div class="links">
-        <a class="btn primary" href="https://www.youtube.com/watch?v=IRwD-U4uVPo" target="_blank" rel="noopener noreferrer">Watch on YouTube</a>
+        <a class="btn primary" href="https://www.youtube.com/watch?v=IRwD-U4uVPo" target="_blank" rel="noopener noreferrer">Watch on YouTube ↗</a>
       </div>
-    </div>
+    </article>
+
+    <footer>
+      &copy; 2026 AcreetionOS Project. Open Source under GPLv3. · <a href="../community-reviews.html" style="color:var(--green)">Community Reviews</a>
+    </footer>
   </div>
 </body>
 </html>
