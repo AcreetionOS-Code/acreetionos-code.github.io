@@ -1,1 +1,1 @@
-(function(){var b=document.getElementById('aiden-notification-banner');if(b){b.style.display='none'}})();
+(function(){var n=document.getElementById("aiden-notification-banner");n&&(n.style.display="none")})();

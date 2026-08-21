@@ -63,3 +63,4 @@ subprocess
 .beads-credential-key
 .beads/proxieddb/
 *.gate.lock*
+.vercel
