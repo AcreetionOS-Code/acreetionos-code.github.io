@@ -1,0 +1,5 @@
+Contact: mailto:natalie@acreetionos.org
+Expires: 2027-08-21T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://acreetionos.org/.well-known/security.txt
+Policy: https://acreetionos.org/security.html
