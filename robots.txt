@@ -39,6 +39,8 @@ Allow: /api/changelog
 Allow: /api/community/stats
 Allow: /api/news
 Allow: /api/counter
+Allow: /api/hosting/count
+Allow: /api/hosting/providers
 Allow: /newsletter-archive/
 Allow: /wiki-guides/
 Allow: /Reviews/
@@ -58,6 +60,8 @@ Allow: /api/changelog
 Allow: /api/community/stats
 Allow: /api/news
 Allow: /api/counter
+Allow: /api/hosting/count
+Allow: /api/hosting/providers
 Allow: /newsletter-archive/
 Allow: /wiki-guides/
 Allow: /Reviews/

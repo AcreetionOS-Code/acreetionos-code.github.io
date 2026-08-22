@@ -33,12 +33,18 @@ ALLOWED_BOTS = [
     "Googlebot", "Bingbot", "DuckDuckBot", "YandexBot", "Baiduspider",
 ]
 
-# APIs that render content on client-side pages must stay allowed
+# APIs that render content on client-side pages must stay allowed.
+# NOTE: every path here is fetched as an XHR while Googlebot renders a page —
+# if it's not allowed, Search Console reports "Page resources couldn't be
+# loaded — blocked by robots.txt". Keep this in sync with what index-providers.js,
+# hosting-page.js, changelog-worker.js, etc. actually fetch on load.
 CONTENT_API_ALLOWS = [
     "/api/changelog",
     "/api/community/stats",
     "/api/news",
     "/api/counter",
+    "/api/hosting/count",      # homepage ISO mirror counter (index-providers.js)
+    "/api/hosting/providers",  # provider list for index.html + hosting.html
 ]
 
 # High-value content subdirectories that must be explicitly crawlable
