@@ -29,7 +29,7 @@ AcreetionOS website is a static HTML/CSS/JS site hosted on GitHub Pages, built f
 ├── migrated.html       # Migration guide
 ├── selfhelp.html       # Self-help resources
 
-├── git-tracker.html    # Git activity tracker
+├── changelog.html      # Release changelog (GitLab commit feed)
 ├── TrumpOS/            # TrumpOS sub-site
 │   └── index.html
 ├── docs/               # This documentation

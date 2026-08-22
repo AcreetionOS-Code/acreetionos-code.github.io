@@ -1,0 +1,5 @@
+# Retired 2026-08-21: Git Tracker page replaced by the Release Changelog.
+/git-tracker.html /changelog.html 301
+/git-tracker-all.js /changelog.html 301
+# WWW → non-WWW canonical redirect (Netlify style)
+www.acreetionos.org https://acreetionos.org 301

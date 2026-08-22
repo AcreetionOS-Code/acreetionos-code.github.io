@@ -15,7 +15,6 @@ const PAGES = [
   '/faq.html',
   '/features.html',
   '/flash.html',
-  '/git-tracker.html',
   '/governance.html',
   '/hosting.html',
   '/immutable.html',

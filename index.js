@@ -1633,7 +1633,7 @@ async function handleISOCheck(request, env) {
 const HEALTH_PAGES = [
   '', 'flash.html', 'hosting.html', 'security.html', 'wiki.html',
   'contact.html', 'faq.html', 'install.html',
-  'git-tracker.html', 'blog.html', 'build.html', 'compare.html',
+  'changelog.html', 'blog.html', 'build.html', 'compare.html',
   'contributing.html', 'governance.html', 'requirements.html',
   'unofficial/32bit.html', 'unofficial/gnome.html',
   'unofficial/hyprland.html', 'unofficial/i3.html',

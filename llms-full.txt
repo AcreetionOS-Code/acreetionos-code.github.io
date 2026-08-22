@@ -19,7 +19,7 @@
 - [Community Reviews](https://acreetionos.org/community-reviews.html) — User testimonials
 - [Contributors](https://acreetionos.org/contributors.html) — Contributor hub & live stats
 - [Governance](https://acreetionos.org/governance.html) — Governance model
-- [Git Tracker](https://acreetionos.org/git-tracker.html) — Live repository tracking
+- [Release Changelog](https://acreetionos.org/changelog.html) — Commit history across all repos
 - [Status](https://acreetionos.org/status.html) — Project/service status
 - [Newsletter](https://acreetionos.org/newsletter.html) — Newsletters & updates
 - [Newsletter Archive](https://acreetionos.org/newsletter-archive/index.html) — All past issues (HTML)

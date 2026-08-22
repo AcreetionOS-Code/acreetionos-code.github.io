@@ -34,7 +34,6 @@ STATIC_PAGES = [
     ("/faq.html", "monthly", "0.8"),
     ("/features.html", "monthly", "0.8"),
     ("/flash.html", "monthly", "0.9"),
-    ("/git-tracker.html", "weekly", "0.6"),
     ("/governance.html", "monthly", "0.6"),
     ("/hosting.html", "monthly", "0.6"),
     ("/immutable.html", "monthly", "0.7"),
