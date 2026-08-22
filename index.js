@@ -2163,6 +2163,19 @@ export default {
     if (url.hostname === 'darren.acreetionos.org') {
       if (url.pathname.startsWith('/api/')) {
         // Pass through to normal routing
+      } else if (url.pathname === '/robots.txt') {
+        // GSC fix (2026-08-21): spivanatalie64/darren gh-pages has no
+        // robots.txt, so the not-found fallback at the bottom of this block
+        // used to 302 crawlers to https://acreetionos.org/ (path dropped) —
+        // GSC reported a redirect instead of a valid per-host robots.txt.
+        // Serve one directly; keep it in sync with natalie-robots policy.
+        return new Response('# darren.acreetionos.org\nUser-agent: *\nAllow: /\n', {
+          status: 200,
+          headers: {
+            'Content-Type': 'text/plain; charset=utf-8',
+            'Cache-Control': 'public, max-age=3600',
+          },
+        });
       } else {
         const RAW_BASE = 'https://raw.githubusercontent.com/spivanatalie64/darren/gh-pages';
         let rawPath = url.pathname;
@@ -2187,6 +2200,8 @@ export default {
             '.svg': 'image/svg+xml',
             '.webp': 'image/webp',
             '.ico': 'image/x-icon',
+            '.txt': 'text/plain; charset=utf-8',
+            '.xml': 'application/xml; charset=utf-8',
           };
           const ext = Object.keys(extMap).find(e => rawUrl.endsWith(e)) || '';
           const contentType = ext ? extMap[ext] : 'application/octet-stream';
