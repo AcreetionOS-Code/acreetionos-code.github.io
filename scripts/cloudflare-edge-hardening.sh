@@ -59,7 +59,7 @@ print(json.dumps(d.get("result"), indent=None)[:300])
 echo "== 1/3 Security response headers (Transform Rules) =="
 CSP="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://text.pollinations.ai https://www.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'"
 BODY=$(cat <<EOF
-{"rules":[{"id":"sec-headers","description":"$TAG security headers","enabled":true,
+{"rules":[{"description":"$TAG security headers","enabled":true,
  "expression":"true",
  "action":"rewrite","action_parameters":{"headers":{
    "Strict-Transport-Security":{"operation":"set","value":"max-age=31536000; includeSubDomains; preload"},
@@ -74,22 +74,52 @@ api PUT "/zones/$ZONE_ID/rulesets/phases/http_response_headers_transform/entrypo
 echo "   headers rule installed."
 
 echo "== 2/3 Cache rules for static assets =="
-cache_rule() { # name expr edge_ttl_s browser_ttl_s desc
-  cat <<EOF
-{"rules":[{"id":"$1","description":"$5","enabled":true,"expression":"($2)",
- "action":"set_cache_settings","action_parameters":{
-   "cache":true,"edge_ttl":{"mode":"override_origin","status_code_ttl":null,"default":$3},
-   "browser_ttl":{"mode":"override_origin","default":$4},
-   "serve_stale":{"disable_stale_while_updating":false}}}]}
-EOF
+# NOTE: built in Python — bash->heredoc->JSON escaping of regexes broke here
+# (error 400 "invalid character '\\\\'"); json.dumps handles it correctly.
+ZONE_ID="$ZONE_ID" TAG="$TAG" python3 - <<'PYEOF'
+import json, os, urllib.request
+API = "https://api.cloudflare.com/client/v4"
+ZONE = os.environ["ZONE_ID"]
+TAG = os.environ["TAG"]
+AUTH = {
+    "X-Auth-Email": os.environ["CF_EMAIL"],
+    "X-Auth-Key": os.environ["CF_API_KEY"],
+    "Content-Type": "application/json",
 }
-api PUT "/zones/$ZONE_ID/rulesets/phases/http_request_cache_settings/entrypoint" \
-  "$(cache_rule css-js \
-    "http.request.uri.path matches \"\\\\.(css|js)(\\\\?|\$)\"" 604800 604800 "$TAG css/js 7d")" | check
-api PUT "/zones/$ZONE_ID/rulesets/phases/http_request_cache_settings/entrypoint" \
-  "$(cache_rule imgs-fonts \
-    "http.request.uri.path matches \"\\\\.(webp|png|jpg|jpeg|gif|svg|ico|woff2?)(\\\\?|\$)\"" 2592000 2592000 "$TAG images/fonts 30d")" | check
-echo "   cache rules installed."
+def put(path, body):
+    req = urllib.request.Request(API + path, data=json.dumps(body).encode(), method="PUT", headers=AUTH)
+    try:
+        d = json.load(urllib.request.urlopen(req))
+    except urllib.error.HTTPError as e:
+        print("API ERROR:", e.read().decode()[:300]); raise SystemExit(1)
+    if not d.get("success"):
+        print("API ERROR:", d.get("errors")); raise SystemExit(1)
+def cache_ruleset(expr, edge_ttl, browser_ttl, desc):
+    return {"rules": [{
+        "description": f"{TAG} {desc}", "enabled": True, "expression": expr,
+        "action": "set_cache_settings",
+        "action_parameters": {
+            "cache": True,
+            "edge_ttl": {"mode": "override_origin", "status_code_ttl": None, "default": edge_ttl},
+            "browser_ttl": {"mode": "override_origin", "default": browser_ttl},
+            "serve_stale": {"disable_stale_while_updating": False},
+        },
+    }]}
+path_ = "/zones/%s/rulesets/phases/http_request_cache_settings/entrypoint" % ZONE
+# NOTE: regex operator `matches` requires a Business plan — use ends_with().
+# IMPORTANT: ONE PUT with BOTH rules — each PUT replaces the entire
+# entrypoint, so sequential puts would silently drop earlier rules.
+css_js = "(%s)" % " or ".join(f'ends_with(http.request.uri.path, "{e}")' for e in (".css", ".js"))
+imgs = "(%s)" % " or ".join(
+    f'ends_with(http.request.uri.path, "{e}")'
+    for e in (".webp", ".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico", ".woff", ".woff2"))
+body = {"rules": [
+    cache_ruleset(css_js, 604800, 604800, "css/js 7d")["rules"][0],
+    cache_ruleset(imgs, 2592000, 2592000, "images/fonts 30d")["rules"][0],
+]}
+put(path_, body)
+print("   cache rules installed.")
+PYEOF
 
 echo "== 3/3 Purge cache =="
 api POST "/zones/$ZONE_ID/purge_cache" '{"purge_everything":true}' | check >/dev/null
