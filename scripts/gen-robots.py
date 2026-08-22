@@ -37,7 +37,7 @@ ALLOWED_BOTS = [
 # NOTE: every path here is fetched as an XHR while Googlebot renders a page —
 # if it's not allowed, Search Console reports "Page resources couldn't be
 # loaded — blocked by robots.txt". Keep this in sync with what index-providers.js,
-# hosting-page.js, changelog-worker.js, etc. actually fetch on load.
+# hosting-page.js, etc. actually fetch on load.
 CONTENT_API_ALLOWS = [
     "/api/changelog",
     "/api/community/stats",
