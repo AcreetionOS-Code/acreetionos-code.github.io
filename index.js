@@ -1003,16 +1003,16 @@ async function handleChangelog(env) {
     async function fetchGitLabUserProjects(username) {
       const userRes = await fetch('https://gitlab.acreetionos.org/api/v4/users?username=' + encodeURIComponent(username), {
         headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(15000)
       });
       if (!userRes.ok) return [];
       const users = await userRes.json();
       const user = Array.isArray(users) ? users[0] : null;
       if (!user || !user.id) return [];
 
-      const projectsRes = await fetch('https://gitlab.acreetionos.org/api/v4/users/' + user.id + '/projects?per_page=100&order_by=last_activity_at&sort=desc', {
+      const projectsRes = await fetch('https://gitlab.acreetionos.org/api/v4/users/' + user.id + '/projects?per_page=20&order_by=last_activity_at&sort=desc', {
         headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(15000)
       });
       if (!projectsRes.ok) return [];
       return await projectsRes.json();
@@ -1021,7 +1021,7 @@ async function handleChangelog(env) {
     async function fetchGitLabCommits(project) {
       const commitsRes = await fetch('https://gitlab.acreetionos.org/api/v4/projects/' + project.id + '/repository/commits?per_page=10', {
         headers: { 'User-Agent': 'AcreetionOS-Changelog/1.0' },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(15000)
       });
       if (!commitsRes.ok) return [];
       return await commitsRes.json();
