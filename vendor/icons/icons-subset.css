@@ -1,4 +1,4 @@
-@font-face{font-display:block;font-family:bootstrap-icons;src:url(fonts/icons-subset.woff2?v=1) format("woff2")}
+@font-face{font-display:block;font-family:bootstrap-icons;src:url(icons-subset.woff2?v=1) format("woff2")}
 [class^=bi-]:before,[class*=" bi-"]:before{display:inline-block;font-family:bootstrap-icons!important;font-style:normal;font-weight:normal!important;font-variant:normal;text-transform:none;line-height:1;vertical-align:-.125em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .bi-activity:before{content:"\f66b"}
 .bi-apple:before{content:"\f65b"}

@@ -391,7 +391,7 @@ Waiting to start...
 <script src="flash-page.js" defer>
 </script>
 <script>
-document.getElementById('generate-dd-btn').addEventListener('click',generateDD);
+window.addEventListener('DOMContentLoaded',()=>{document.getElementById('generate-dd-btn').addEventListener('click',generateDD);});
 </script>
 <script src="footer.js" defer>
 </script>
