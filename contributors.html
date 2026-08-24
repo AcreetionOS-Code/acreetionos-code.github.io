@@ -236,7 +236,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
             '</a>';
         }).join('');
 
-        const membersHtml = m.map(function(mem) {
+        const membersHtml = (data.members || []).map(function(mem) {
           return '<a href="' + esc(mem.url) + '" class="contributor" target="_blank" rel="noopener">' +
             '<img src="' + esc(mem.avatar) + '" alt="' + esc(mem.login) + '" width="36" height="36" loading="lazy">' +
             '<span class="login">' + esc(mem.login) + '</span>' +
