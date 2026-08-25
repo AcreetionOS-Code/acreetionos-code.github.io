@@ -28,9 +28,9 @@
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
   <link rel="stylesheet" href="sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260825"></noscript>
-  <link rel="preload" href="vendor/icons/icons-subset.woff2?v=1" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260824" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260824"></noscript>
-  <script src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
+  <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
   </script>
   <style>
 
@@ -44,7 +44,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .search-card .bar{display:flex;border:1px solid var(--acreetion-box-border);border-radius:8px;overflow:hidden;background:var(--acreetion-body-bg);transition:border-color.2s}
 .search-card .bar:focus-within{border-color:var(--acreetion-green)}
 .search-card .bar input{flex:1;background:transparent;border:none;padding:1rem 1.2rem;color:var(--acreetion-text-bright);font-size:1rem;outline:none}
-.search-card .bar input::placeholder{color:#555}
+.search-card .bar input::placeholder{color:#999}
 .search-card .bar button{padding:0 2rem;background:var(--acreetion-green);border:none;color:#000;font-weight:700;font-family:var(--font-mono);cursor:pointer;transition:opacity.2s}
 .search-card .bar button:hover{opacity:.9}
 .results{margin-top:1rem;max-height:420px;overflow-y:auto;display:none}
@@ -52,9 +52,9 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .results .item:hover{background:var(--acreetion-box-bg);border-color:var(--acreetion-green);padding-left:1.4rem}
 .results .item h4{color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem;margin-bottom:.25rem}
 .results .item p{color:var(--acreetion-text);font-size:.85rem;line-height:1.5}
-.results .item .src{font-size:.7rem;color:#555;margin-top:.3rem}
+.results .item .src{font-size:.7rem;color:#999;margin-top:.3rem}
 .quick{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border)}
-.quick span{font-size:.8rem;color:#555;padding-top:.15rem}
+.quick span{font-size:.8rem;color:#999;padding-top:.15rem}
 .quick a{padding:.35rem .9rem;border:1px solid var(--acreetion-box-border);border-radius:6px;color:var(--acreetion-text);text-decoration:none;font-size:.82rem;transition:all.15s}
 .quick a:hover{border-color:var(--acreetion-green);color:var(--acreetion-green);background:rgba(46,204,113,.05)}
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}
@@ -75,7 +75,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .loading{text-align:center;padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem}
 .loading .spin{display:inline-block;width:24px;height:24px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:.5rem}
 @keyframes spin{to{transform:rotate(360deg)}}
-#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem}
+#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#999;font-size:.85rem}
 .page-footer a{color:var(--acreetion-green);text-decoration:underline;text-underline-offset:3px}
 .page-footer a:hover{text-decoration:underline}
 
@@ -120,14 +120,14 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
           </nav>
         </div>
       </header>
-      <div id="main-content" class="wrap">
+      <main id="main-content" class="wrap">
         <h1>
         Documentation Engine
       </h1>
       <p class="sub">
         Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.
       </p>
-      <p style="font-size:0.78rem;color:#555;margin-top:-0.5rem;margin-bottom:1.5rem">
+      <p style="font-size:0.78rem;color:#999;margin-top:-0.5rem;margin-bottom:1.5rem">
         AI guides powered by <a href="https://openrouter.ai" target="_blank" rel="noopener" style="color:#2ecc71">OpenRouter</a> free model routing — thank you for supporting open AI! <span style="color:#888">&#9201; Free models are shared, so guides can take up to a minute to generate.</span>
       </p>
       <div style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem">
@@ -197,7 +197,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
         <a href="https://acreetionos.org/wiki-guides/index.html">All guides →</a>
       </div>
     </div>
-  </div>
+  </main>
   <div id="wiki-modal" class="modal-overlay">
     <div class="modal-box">
       <button type="button" class="modal-close" id="modal-close">
@@ -306,13 +306,13 @@ document.querySelectorAll('.vote-btn').forEach(function(btn) {
 </div>
 <script src="scale-page.js?v=20260824" defer>
 </script>
-<script src="sidebar.js?v=20260824" defer>
+<script src="sidebar.js?v=20260825" defer>
 </script>
 <script src="recaptcha.js?v=20260824" defer>
 </script>
 <script src="wiki-page.js?v=20260824" defer>
 </script>
-<script src="footer.js?v=20260824" defer>
+<script src="footer.js?v=20260825" defer>
 </script>
 <script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module" defer></script>
 </body>
