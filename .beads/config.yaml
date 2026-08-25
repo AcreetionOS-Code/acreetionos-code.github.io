@@ -66,3 +66,8 @@
 # - github.token    → use GITHUB_TOKEN env var instead
 
 sync.remote: "git+ssh://git@github.com/AcreetionOS-Code/acreetionos-code.github.io.git"
+dolt:
+  mode: server
+  host: 127.0.0.1
+  port: 13307
+  user: root
