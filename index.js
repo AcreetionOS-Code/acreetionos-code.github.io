@@ -1024,25 +1024,28 @@ async function handleWikisearch(request) {
     api,
     api.replace('https://wiki.archlinux.org/api.php', 'https://iso.acreetionos.org:8448/wikiapi.php')
   ];
-  let lastErr = 'no attempt';
+  const attempts = [];
   for (const upstreamUrl of upstreams) {
+    let lastErr = '';
     try {
       const upstream = await fetch(upstreamUrl, {
         headers: { 'User-Agent': CHROME_UA, 'Accept': 'application/json' },
         signal: AbortSignal.timeout(10000)
       });
-      if (!upstream.ok) { lastErr = 'HTTP ' + upstream.status; continue; }
-      const data = await upstream.json();
+      if (!upstream.ok) { lastErr += ' [HTTP ' + upstream.status + ']'; continue; }
+      const ct = (upstream.headers.get('content-type') || '').slice(0, 40);
+      const data = await upstream.json().catch(e => { throw new Error('parse(' + ct + '): ' + e.message); });
       const out = jsonResponse(data, {
         headers: { 'Cache-Control': 'public, max-age=3600' }
       }, request);
       await cache.put(cacheKey, out.clone());
       return out;
     } catch (err) {
-      lastErr = String(err && err.message || err).slice(0, 120);
+      lastErr = String(err && err.message || err).slice(0, 160);
     }
+    attempts.push({ url: upstreamUrl.slice(8, 40), result: lastErr || 'ok' });
   }
-  return jsonResponse({ error: 'Wiki upstream unreachable', detail: lastErr }, { status: 502 }, request);
+  return jsonResponse({ error: 'Wiki upstream unreachable', attempts }, { status: 502 }, request);
 }
 
 async function handleChangelog(env) {
