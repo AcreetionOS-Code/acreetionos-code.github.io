@@ -1024,7 +1024,7 @@ async function handleWikisearch(request) {
       signal: AbortSignal.timeout(10000)
     });
     if (!upstream.ok) {
-      return jsonResponse({ error: 'Wiki upstream error' }, { status: 502 }, request);
+      return jsonResponse({ error: 'Wiki upstream error', status: upstream.status }, { status: 502 }, request);
     }
     const data = await upstream.json();
     const out = jsonResponse(data, {
@@ -1033,7 +1033,7 @@ async function handleWikisearch(request) {
     await cache.put(cacheKey, out.clone());
     return out;
   } catch (err) {
-    return jsonResponse({ error: 'Wiki upstream unreachable' }, { status: 502 }, request);
+    return jsonResponse({ error: 'Wiki upstream unreachable', detail: String(err && err.message || err).slice(0, 200) }, { status: 502 }, request);
   }
 }
 
