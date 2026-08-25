@@ -1022,7 +1022,7 @@ async function handleWikisearch(request) {
   // blocks Cloudflare DC IPs — sometimes with HTTP 200 + an HTML page).
   const upstreams = [
     api,
-    api.replace('https://wiki.archlinux.org/api.php', 'https://iso.acreetionos.org:8448/wikiapi.php')
+    api.replace('https://wiki.archlinux.org/api.php', 'https://iso.acreetionos.org/wikiapi.php')
   ];
   const attempts = [];
   for (const upstreamUrl of upstreams) {
