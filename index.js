@@ -1018,34 +1018,31 @@ async function handleWikisearch(request) {
   const hit = await cache.match(cacheKey);
   if (hit) return hit;
 
-  try {
-    let upstream = await fetch(api, {
-      headers: {
-        'User-Agent': CHROME_UA,
-        'Accept': 'application/json',
-        'Accept-Language': 'en-US,en;q=0.9'
-      },
-      signal: AbortSignal.timeout(10000)
-    });
-    if (!upstream.ok) {
-      // Arch's abuse filter blocks Cloudflare DC IPs — retry via our own
-      // nginx passthrough on the ISO server (residential IP, curl-like TLS).
-      upstream = await fetch(api.replace('https://wiki.archlinux.org/api.php', 'https://iso.acreetionos.org:8448/wikiapi.php'), {
+  // Try arch directly, then our ISO-server passthrough (Arch's abuse filter
+  // blocks Cloudflare DC IPs — sometimes with HTTP 200 + an HTML page).
+  const upstreams = [
+    api,
+    api.replace('https://wiki.archlinux.org/api.php', 'https://iso.acreetionos.org:8448/wikiapi.php')
+  ];
+  let lastErr = 'no attempt';
+  for (const upstreamUrl of upstreams) {
+    try {
+      const upstream = await fetch(upstreamUrl, {
+        headers: { 'User-Agent': CHROME_UA, 'Accept': 'application/json' },
         signal: AbortSignal.timeout(10000)
       });
+      if (!upstream.ok) { lastErr = 'HTTP ' + upstream.status; continue; }
+      const data = await upstream.json();
+      const out = jsonResponse(data, {
+        headers: { 'Cache-Control': 'public, max-age=3600' }
+      }, request);
+      await cache.put(cacheKey, out.clone());
+      return out;
+    } catch (err) {
+      lastErr = String(err && err.message || err).slice(0, 120);
     }
-    if (!upstream.ok) {
-      return jsonResponse({ error: 'Wiki upstream error', status: upstream.status }, { status: 502 }, request);
-    }
-    const data = await upstream.json();
-    const out = jsonResponse(data, {
-      headers: { 'Cache-Control': 'public, max-age=3600' }
-    }, request);
-    await cache.put(cacheKey, out.clone());
-    return out;
-  } catch (err) {
-    return jsonResponse({ error: 'Wiki upstream unreachable', detail: String(err && err.message || err).slice(0, 200) }, { status: 502 }, request);
   }
+  return jsonResponse({ error: 'Wiki upstream unreachable', detail: lastErr }, { status: 502 }, request);
 }
 
 async function handleChangelog(env) {
