@@ -995,6 +995,48 @@ function categorizeCommit(message) {
   return 'system';
 }
 
+// Arch Wiki proxy: /api/wikisearch?q=<term> (list=search) or
+// /api/wikisearch?title=<page> (prop=extracts). Returns MediaWiki JSON.
+async function handleWikisearch(request) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get('q');
+  const title = url.searchParams.get('title');
+  let api;
+  if (q) {
+    api = 'https://wiki.archlinux.org/api.php?action=query&list=search&format=json&origin=*'
+      + '&srlimit=20&srsearch=' + encodeURIComponent(q.slice(0, 300));
+  } else if (title) {
+    api = 'https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true'
+      + '&exchars=1500&redirects=1&format=json&origin=*'
+      + '&titles=' + encodeURIComponent(title.slice(0, 300));
+  } else {
+    return jsonResponse({ error: 'Provide ?q=<search term> or ?title=<page title>' }, { status: 400 }, request);
+  }
+
+  const cacheKey = new Request(url.origin + url.pathname + '?' + (q ? 'q=' : 'title=') + encodeURIComponent((q || title).toLowerCase()));
+  const cache = caches.default;
+  const hit = await cache.match(cacheKey);
+  if (hit) return hit;
+
+  try {
+    const upstream = await fetch(api, {
+      headers: { 'User-Agent': 'AcreetionOS-WikiProxy/1.0 (+https://acreetionos.org)' },
+      signal: AbortSignal.timeout(10000)
+    });
+    if (!upstream.ok) {
+      return jsonResponse({ error: 'Wiki upstream error' }, { status: 502 }, request);
+    }
+    const data = await upstream.json();
+    const out = jsonResponse(data, {
+      headers: { 'Cache-Control': 'public, max-age=3600' }
+    }, request);
+    await cache.put(cacheKey, out.clone());
+    return out;
+  } catch (err) {
+    return jsonResponse({ error: 'Wiki upstream unreachable' }, { status: 502 }, request);
+  }
+}
+
 async function handleChangelog(env) {
   try {
     const entries = [];
@@ -2419,6 +2461,12 @@ export default {
     // Changelog from GitHub + GitLab commits
     if (url.pathname === '/api/changelog' && request.method === 'GET') {
       return handleChangelog(env);
+    }
+
+    // Arch Wiki proxy — some clients have broken IPv6 paths to
+    // wiki.archlinux.org; fetch server-side and cache for an hour.
+    if (url.pathname === '/api/wikisearch' && request.method === 'GET') {
+      return handleWikisearch(request);
     }
 
     // ISO Hosting Provider management
