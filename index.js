@@ -1019,7 +1019,7 @@ async function handleWikisearch(request) {
   if (hit) return hit;
 
   try {
-    const upstream = await fetch(api, {
+    let upstream = await fetch(api, {
       headers: {
         'User-Agent': CHROME_UA,
         'Accept': 'application/json',
@@ -1027,6 +1027,13 @@ async function handleWikisearch(request) {
       },
       signal: AbortSignal.timeout(10000)
     });
+    if (!upstream.ok) {
+      // Arch's abuse filter blocks Cloudflare DC IPs — retry via our own
+      // nginx passthrough on the ISO server (residential IP, curl-like TLS).
+      upstream = await fetch(api.replace('https://wiki.archlinux.org/api.php', 'https://iso.acreetionos.org:8448/wikiapi.php'), {
+        signal: AbortSignal.timeout(10000)
+      });
+    }
     if (!upstream.ok) {
       return jsonResponse({ error: 'Wiki upstream error', status: upstream.status }, { status: 502 }, request);
     }
