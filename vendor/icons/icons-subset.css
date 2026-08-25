@@ -1,4 +1,4 @@
-@font-face{font-display:swap;font-family:bootstrap-icons;src:url(icons-subset.woff2?v=1) format("woff2")}
+@font-face{font-display:swap;font-family:bootstrap-icons;src:url(icons-subset.woff2?v=2) format("woff2")}
 [class^=bi-]:before,[class*=" bi-"]:before{display:inline-block;font-family:bootstrap-icons!important;font-style:normal;font-weight:normal!important;font-variant:normal;text-transform:none;line-height:1;vertical-align:-.125em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 .bi-activity:before{content:"\f66b"}
 .bi-apple:before{content:"\f65b"}
@@ -14,6 +14,8 @@
 .bi-bug:before{content:"\f1dc"}
 .bi-building:before{content:"\f1dd"}
 .bi-bullseye:before{content:"\f1de"}
+.bi-chat-dots:before{content:"\f24a"}
+.bi-chat-left-text:before{content:"\f252"}
 .bi-check:before{content:"\f26e"}
 .bi-clipboard:before{content:"\f290"}
 .bi-clock-history:before{content:"\f292"}
@@ -41,15 +43,18 @@
 .bi-globe:before{content:"\f3ee"}
 .bi-grid:before{content:"\f3fc"}
 .bi-grid-3x3-gap:before{content:"\f3f9"}
+.bi-hash:before{content:"\f40a"}
 .bi-hdd-stack:before{content:"\f411"}
 .bi-house:before{content:"\f425"}
 .bi-image:before{content:"\f42a"}
 .bi-incognito:before{content:"\f777"}
 .bi-info-circle:before{content:"\f431"}
+.bi-journal-text:before{content:"\f444"}
 .bi-key:before{content:"\f44f"}
 .bi-layers:before{content:"\f45b"}
 .bi-layout-three-columns:before{content:"\f465"}
 .bi-lightning-charge:before{content:"\f46d"}
+.bi-magnet:before{content:"\f779"}
 .bi-megaphone:before{content:"\f484"}
 .bi-mortarboard:before{content:"\f6fe"}
 .bi-palette:before{content:"\f4b1"}
@@ -64,11 +69,13 @@
 .bi-shield-check:before{content:"\f52f"}
 .bi-shield-lock:before{content:"\f538"}
 .bi-sliders:before{content:"\f56b"}
+.bi-speedometer:before{content:"\f57f"}
 .bi-speedometer2:before{content:"\f580"}
 .bi-star:before{content:"\f588"}
 .bi-terminal:before{content:"\f5c3"}
 .bi-tree-fill:before{content:"\f5e1"}
 .bi-trophy:before{content:"\f5e7"}
+.bi-twitter-x:before{content:"\f8db"}
 .bi-ubuntu:before{content:"\f822"}
 .bi-wifi:before{content:"\f61c"}
 .bi-window:before{content:"\f620"}
