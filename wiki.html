@@ -27,28 +27,28 @@
   <link rel="canonical" href="https://wiki.acreetionos.org/">
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-  <link rel="stylesheet" href="sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260825"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20260826">
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
   <script defer src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
   </script>
   <style>
 
-#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
 .wrap{max-width:860px;margin:2rem auto;padding:0 1.5rem}
 h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-bright);margin-bottom:.5rem}
 .sub{color:var(--acreetion-text);font-size:.95rem;margin-bottom:1.5rem;line-height:1.7}
 .search-card{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem;margin-bottom:2rem}
-.search-card .bar{display:flex;border:1px solid var(--acreetion-box-border);border-radius:8px;overflow:hidden;background:var(--acreetion-body-bg);transition:border-color.2s}
+.search-card .bar{display:flex;border:1px solid var(--acreetion-box-border);border-radius:8px;overflow:hidden;background:var(--acreetion-body-bg);transition:border-color .2s}
 .search-card .bar:focus-within{border-color:var(--acreetion-green)}
 .search-card .bar input{flex:1;background:transparent;border:none;padding:1rem 1.2rem;color:var(--acreetion-text-bright);font-size:1rem;outline:none}
 .search-card .bar input::placeholder{color:#999}
-.search-card .bar button{padding:0 2rem;background:var(--acreetion-green);border:none;color:#000;font-weight:700;font-family:var(--font-mono);cursor:pointer;transition:opacity.2s}
+.search-card .bar button{padding:0 2rem;background:var(--acreetion-green);border:none;color:#000;font-weight:700;font-family:var(--font-mono);cursor:pointer;transition:opacity .2s}
 .search-card .bar button:hover{opacity:.9}
 .results{margin-top:1rem;max-height:420px;overflow-y:auto;display:none}
-.results .item{padding:1rem 1.2rem;border:1px solid var(--acreetion-box-border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:all.15s}
+.results .item{padding:1rem 1.2rem;border:1px solid var(--acreetion-box-border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:all .15s}
 .results .item:hover{background:var(--acreetion-box-bg);border-color:var(--acreetion-green);padding-left:1.4rem}
 .results .item h4{color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem;margin-bottom:.25rem}
 .results .item p{color:var(--acreetion-text);font-size:.85rem;line-height:1.5}
@@ -58,7 +58,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .quick a{padding:.35rem .9rem;border:1px solid var(--acreetion-box-border);border-radius:6px;color:var(--acreetion-text);text-decoration:none;font-size:.82rem;transition:all.15s}
 .quick a:hover{border-color:var(--acreetion-green);color:var(--acreetion-green);background:rgba(46,204,113,.05)}
 .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}
-.modal-overlay.show{display:flex;opacity:1;visibility:visible;transition:opacity.3s}
+.modal-overlay.show{display:flex;opacity:1;visibility:visible;transition:opacity .3s}
 .modal-box{position:relative;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:16px;padding:2rem;max-width:720px;width:100%;max-height:80vh;overflow-y:auto}
 .modal-close{position:absolute;top:1rem;right:1rem;background:var(--acreetion-green);color:#000;border:none;border-radius:50%;width:36px;height:36px;font-size:1.3rem;cursor:pointer;line-height:36px;text-align:center}
 .modal-close:hover{background:#d15c64}
@@ -75,7 +75,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .loading{text-align:center;padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem}
 .loading .spin{display:inline-block;width:24px;height:24px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:.5rem}
 @keyframes spin{to{transform:rotate(360deg)}}
-#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#999;font-size:.85rem}
+#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all .15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#999;font-size:.85rem}
 .page-footer a{color:var(--acreetion-green);text-decoration:underline;text-underline-offset:3px}
 .page-footer a:hover{text-decoration:underline}
 
@@ -132,7 +132,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
       </p>
       <div style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem">
         <h2 style="color:var(--acreetion-green);font-family:var(--font-mono);font-size:1rem;margin-bottom:0.5rem">
-          <i class="bi bi-robot" style="margin-right:0.4rem"></i>AI-Powered Search
+          <i class="bi bi-robot" style="margin-right:0.4rem" aria-hidden="true"></i>AI-Powered Search
         </h2>
         <p style="color:var(--acreetion-text);font-size:0.9rem;line-height:1.7;margin:0">
           This tool searches the entire <a href="https://wiki.archlinux.org" style="color:var(--acreetion-green)">Arch Linux Wiki</a> and uses AI to generate beginner-friendly summaries of the results. Instead of reading dense technical documentation, you get clear, concise answers tailored for AcreetionOS users. The AI explains complex topics in plain language, with links back to the original Arch Wiki pages for advanced details.
@@ -161,25 +161,25 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
         <span>
           Popular:
         </span>
-        <a href="#" data-q="System maintenance">
+        <a href="#" data-q="System maintenance" aria-label="Search for System maintenance">
           System maintenance
         </a>
-        <a href="#" data-q="Installing software">
+        <a href="#" data-q="Installing software" aria-label="Search for Installing software">
           Installing software
         </a>
-        <a href="#" data-q="WiFi">
+        <a href="#" data-q="WiFi" aria-label="Search for WiFi">
           WiFi
         </a>
-        <a href="#" data-q="Bluetooth">
+        <a href="#" data-q="Bluetooth" aria-label="Search for Bluetooth">
           Bluetooth
         </a>
-        <a href="#" data-q="Printer setup">
+        <a href="#" data-q="Printer setup" aria-label="Search for Printer setup">
           Printer setup
         </a>
-        <a href="#" data-q="NVIDIA drivers">
+        <a href="#" data-q="NVIDIA drivers" aria-label="Search for NVIDIA drivers">
           NVIDIA drivers
         </a>
-        <a href="#" data-q="Firewall">
+        <a href="#" data-q="Firewall" aria-label="Search for Firewall">
           Firewall
         </a>
       </div>
@@ -187,14 +187,14 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
         <span>
           Ready-made guides:
         </span>
-        <a href="https://acreetionos.org/wiki-guides/wifi.html">WiFi</a>
-        <a href="https://acreetionos.org/wiki-guides/nvidia-drivers.html">NVIDIA drivers</a>
-        <a href="https://acreetionos.org/wiki-guides/printer-setup.html">Printer setup</a>
-        <a href="https://acreetionos.org/wiki-guides/bluetooth.html">Bluetooth</a>
-        <a href="https://acreetionos.org/wiki-guides/firewall.html">Firewall</a>
-        <a href="https://acreetionos.org/wiki-guides/installing-software.html">Installing software</a>
-        <a href="https://acreetionos.org/wiki-guides/system-maintenance.html">System maintenance</a>
-        <a href="https://acreetionos.org/wiki-guides/index.html">All guides →</a>
+        <a href="https://acreetionos.org/wiki-guides/wifi.html" aria-label="Read the WiFi guide">WiFi</a>
+        <a href="https://acreetionos.org/wiki-guides/nvidia-drivers.html" aria-label="Read the NVIDIA drivers guide">NVIDIA drivers</a>
+        <a href="https://acreetionos.org/wiki-guides/printer-setup.html" aria-label="Read the printer setup guide">Printer setup</a>
+        <a href="https://acreetionos.org/wiki-guides/bluetooth.html" aria-label="Read the Bluetooth guide">Bluetooth</a>
+        <a href="https://acreetionos.org/wiki-guides/firewall.html" aria-label="Read the firewall guide">Firewall</a>
+        <a href="https://acreetionos.org/wiki-guides/installing-software.html" aria-label="Read the installing software guide">Installing software</a>
+        <a href="https://acreetionos.org/wiki-guides/system-maintenance.html" aria-label="Read the system maintenance guide">System maintenance</a>
+        <a href="https://acreetionos.org/wiki-guides/index.html" aria-label="Browse all ready-made guides">All guides →</a>
       </div>
     </div>
   </main>
@@ -205,7 +205,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
     </button>
     <div id="progress-area">
       <div id="progress-track" style="height:4px;background:var(--acreetion-box-border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden">
-        <div id="progress-bar" style="height:100%;width:0%;background:var(--acreetion-green);border-radius:2px;transition:width.4s ease">
+        <div id="progress-bar" style="height:100%;width:100%;background:var(--acreetion-green);border-radius:2px;transform:scaleX(0);transform-origin:left center;transition:transform .4s ease">
         </div>
       </div>
       <div id="progress-steps">
@@ -249,7 +249,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
     var el = document.getElementById('vote-results');
     if (total === 0) { el.style.display = 'none'; return; }
     el.style.display = 'block';
-    el.innerHTML = '<strong style="color:var(--acreetion-green)">' + votes.yes + '</strong> Yes &middot; <strong style="color:var(--acreetion-text)">' + votes.no + '</strong> No &middot; <span style="color:#555">(' + total + ' total votes)</span>';
+    el.innerHTML = '<strong style="color:var(--acreetion-green)">' + votes.yes + '</strong> Yes &middot; <strong style="color:var(--acreetion-text)">' + votes.no + '</strong> No &middot; <span style="color:#9a9a9a">(' + total + ' total votes)</span>';
   }
   function hasVoted() {
     return localStorage.getItem('wikiVoted') === 'true';
@@ -304,13 +304,12 @@ document.querySelectorAll('.vote-btn').forEach(function(btn) {
 </p>
 </footer>
 </div>
-<script src="scale-page.js?v=20260824" defer>
-</script>
+</div>
 <script src="sidebar.js?v=20260825" defer>
 </script>
 <script src="recaptcha.js?v=20260824" defer>
 </script>
-<script src="wiki-page.js?v=20260824" defer>
+<script src="wiki-page.js?v=20260826" defer>
 </script>
 <script src="footer.js?v=20260825" defer>
 </script>
