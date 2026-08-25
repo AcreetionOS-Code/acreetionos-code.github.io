@@ -30,14 +30,14 @@
   <link rel="dns-prefetch" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="sidebar.css?v=20260824" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260824"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260825"></noscript>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=1" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260824" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260824"></noscript>
   <script src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
   </script>
   <style>
 
-html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--acreetion-code-bg:rgba(46,204,113,0.1);--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
 .header-content{display:flex;align-items:center;justify-content:flex-start;gap:.75rem;max-width:1400px;margin:0 auto;padding:0.5rem 1rem}
@@ -87,7 +87,7 @@ body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(
 @keyframes spin{to{transform:rotate(360deg)}}
 .page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem;background:var(--acreetion-panel-bg)}
 .page-footer p{color:#555;margin-bottom:.5rem}
-.page-footer a{color:var(--acreetion-green);text-decoration:none}
+.page-footer a{color:var(--acreetion-green);text-decoration:underline;text-underline-offset:3px}
 .page-footer a:hover{text-decoration:underline}
 ::-webkit-scrollbar{width:8px}
 ::-webkit-scrollbar-track{background:var(--acreetion-body-bg)}
@@ -95,8 +95,8 @@ body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(
 ::-webkit-scrollbar-thumb:hover{background:var(--acreetion-green)}
 ::selection{background:rgba(46,204,113,0.3);color:var(--acreetion-text-bright)}
 :focus-visible{outline:2px solid var(--acreetion-green);outline-offset:3px;border-radius:4px}
-.skip-link{position:absolute;top:-40px;left:0;background:var(--acreetion-green);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:top.3s;border-radius:0 0 8px 0}
-.skip-link:focus{top:0}
+.skip-link{position:absolute;top:0;left:0;background:var(--acreetion-green);color:#000;padding:8px 16px;text-decoration:none;font-weight:700;z-index:10000;transition:transform.3s ease;transform:translateY(-200%);border-radius:0 0 8px 0}
+.skip-link:focus{transform:none}
 @media(max-width:900px){.docs-wrapper{flex-direction:column;padding:0 1rem;margin:1rem auto}.docs-sidebar{width:100%;position:static;max-height:none;margin-bottom:1rem}.docs-sidebar-inner{max-height:300px;overflow-y:auto}.docs-main .box-body{padding:1rem}.docs-main .box-header{padding:.8rem 1rem}.docs-main .box-header h1{font-size:1.1rem}}
 @media(max-width:768px){.docs-wrapper{padding:0 .75rem}.docs-main .box-body{padding:.75rem;font-size:.9rem}}
 @media(max-width:480px){.docs-wrapper{padding:0 .5rem}}

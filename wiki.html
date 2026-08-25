@@ -27,14 +27,14 @@
   <link rel="canonical" href="https://acreetionos.org/wiki.html" >
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-  <link rel="stylesheet" href="sidebar.css?v=20260824" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260824"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260825"></noscript>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=1" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260824" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260824"></noscript>
   <script src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
   </script>
   <style>
 
-html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
 .wrap{max-width:860px;margin:2rem auto;padding:0 1.5rem}
@@ -76,7 +76,7 @@ h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-brig
 .loading .spin{display:inline-block;width:24px;height:24px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:.5rem}
 @keyframes spin{to{transform:rotate(360deg)}}
 #progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all.15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#555;font-size:.85rem}
-.page-footer a{color:var(--acreetion-green);text-decoration:none}
+.page-footer a{color:var(--acreetion-green);text-decoration:underline;text-underline-offset:3px}
 .page-footer a:hover{text-decoration:underline}
 
   </style>
