@@ -3,3 +3,8 @@
 /git-tracker-all.js /changelog.html 301
 # WWW → non-WWW canonical redirect (Netlify style)
 www.acreetionos.org https://acreetionos.org 301
+# /index.html duplicates the homepage — force the canonical root URL
+# (fixes "Alternate page with proper canonical tag" in Search Console)
+/index.html / 301
+# Old wiki-style path that 404s; content lives on the Unofficial page
+/unofficial/sway.html /unofficial.html 301
