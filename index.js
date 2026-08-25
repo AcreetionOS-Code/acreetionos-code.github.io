@@ -1020,7 +1020,11 @@ async function handleWikisearch(request) {
 
   try {
     const upstream = await fetch(api, {
-      headers: { 'User-Agent': 'AcreetionOS-WikiProxy/1.0 (+https://acreetionos.org)' },
+      headers: {
+        'User-Agent': CHROME_UA,
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9'
+      },
       signal: AbortSignal.timeout(10000)
     });
     if (!upstream.ok) {
