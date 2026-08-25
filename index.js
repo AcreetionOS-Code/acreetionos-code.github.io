@@ -148,7 +148,7 @@ function securityHeaders(nonce) {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Embedder-Policy': 'require-corp',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
   };
 }
 
@@ -2220,17 +2220,10 @@ export default {
       }
     }
 
-    // Serve flash.html directly from worker
-    if (url.pathname === '/flash.html' && request.method === 'GET') {
-      const res = await fetch('https://raw.githubusercontent.com/AcreetionOS-Code/acreetionos-code.github.io/main/flash.html', {
-        headers: { 'User-Agent': CHROME_UA }
-      });
-      if (res.ok) {
-        return new Response(await res.text(), {
-          headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=120', ...securityHeaders() }
-        });
-      }
-    }
+    // NOTE: the /flash.html worker route was removed on 2026-08-25 (Cloudflare
+    // zone routes). The worker proxy served the page as text/plain, which
+    // blocked Google from indexing the download page. GitHub Pages serves
+    // flash.html with the correct text/html content-type like every other page.
 
     // Page view counter — GET returns count, POST increments
     if (url.pathname === '/api/news') {
@@ -2523,7 +2516,7 @@ export default {
 
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
-      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
+      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
       return new Response('AcreetionOS Worker — POST /api/chat | POST /api/news/ai | /flash.html', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }

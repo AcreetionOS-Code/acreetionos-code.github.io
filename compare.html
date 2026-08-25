@@ -3,13 +3,13 @@
   <head>
     <meta charset="UTF-8">
   <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>
-    AcreetionOS vs Arch, Ubuntu, Mint, Fedora – Best Linux Distro 2026
+    AcreetionOS vs Arch, Ubuntu, Mint, Fedora, Manjaro, EndeavourOS & CachyOS (2026)
   </title>
-  <meta name="description" content="See how AcreetionOS compares to Arch Linux, Ubuntu, Linux Mint, Fedora, and Manjaro. Rolling release, no Snap, no telemetry — the Arch experience made easy.">
+  <meta name="description" content="See how AcreetionOS compares to Arch Linux, Ubuntu, Linux Mint, Fedora, Manjaro, EndeavourOS, and CachyOS. Curated rolling release, X11 & XLibre editions, no telemetry.">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://acreetionos.org/compare.html">
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
@@ -341,9 +341,90 @@ Manjaro
 </ul>
 <div class="our-take">
   <strong>
-  AcreetionOS stays close to upstream Arch.
+  AcreetionOS is also a curated Arch — the difference is the testing pipeline.
 </strong>
-We don't hold packages back — we trust Arch's rolling model and add our own curated repo for AcreetionOS-specific packages. Our focus is tighter: one flagship desktop, one vision. Not trying to be the "Ubuntu of the Arch world."
+Updates soak in our repository before release, and our focus is tighter: one flagship desktop, one vision. Not trying to be the "Ubuntu of the Arch world."
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-rocket-takeoff">
+</i>
+EndeavourOS
+</h2>
+<span class="label">
+  Arch Derivative
+</span>
+<div class="sub">
+  The closest thing to vanilla Arch
+</div>
+<div class="desc">
+  EndeavourOS earns its popularity: a slick Calamares installer, a genuinely welcoming forum, and an Arch experience with almost no modifications. If you want stock Arch with a friendly on-ramp, it is a great pick. The difference from AcreetionOS is the curation layer — what EndeavourOS installs is straight Arch, so when upstream has a rough week, you find out first. The default desktop is Xfce, and display-server options follow upstream Arch.
+</div>
+<ul class="pros">
+  <li>
+    Near-vanilla Arch with a friendly installer
+  </li>
+  <li>
+    Outstanding community and forum culture
+  </li>
+  <li>
+    Wide desktop choice via online installer
+  </li>
+  <li class="cons">
+    No testing buffer — you hit Arch breakage first
+  </li>
+  <li class="cons">
+    You are the QA team for upstream changes
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  If you want pure Arch and don't mind being your own stability layer, EndeavourOS is excellent at exactly that.
+</strong>
+AcreetionOS is for people who want Arch's power with someone else doing the burn-in testing — and who need X11/XLibre handled as first-class editions.
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-speedometer">
+</i>
+CachyOS
+</h2>
+<span class="label">
+  Arch Derivative
+</span>
+<div class="sub">
+  Performance-tuned Arch
+</div>
+<div class="desc">
+  CachyOS is the current shooting star of the Arch world: custom kernels with the BORE scheduler, packages compiled with x86-64-v3/v4 optimizations, and a polished KDE-focused experience. On modern hardware it is genuinely fast, and the development pace is impressive. The trade-offs are the flip side of that pace: the optimized repositories assume a relatively recent CPU, the platform moves fast by design, and the direction is Wayland-first.
+</div>
+<ul class="pros">
+  <li>
+    Serious performance engineering (kernels, optimized packages)
+  </li>
+  <li>
+    Polished, gaming-ready KDE experience
+  </li>
+  <li>
+    Very active development
+  </li>
+  <li class="cons">
+    Optimizations favor newer CPUs (x86-64-v3+)
+  </li>
+  <li class="cons">
+    Fast-moving — less conservative than a curated repo
+  </li>
+  <li class="cons">
+    Wayland-first direction
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  Modern gaming rig? CachyOS is a strong choice.
+</strong>
+Older laptop, stubborn NVIDIA hardware, or an X11 dependency? That is exactly who AcreetionOS's X11 and XLibre editions are built for — stability-first Arch that still runs on the machines Wayland left behind.
 </div>
 </div>
 </div>
