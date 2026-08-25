@@ -8,7 +8,9 @@ ai = { binding = "AI" }
 
 # Routes are managed via Cloudflare Dashboard → Workers & Pages → acreetionos-worker → Triggers → Routes
 # Route: acreetionos.org/api/*
-# Route: acreetionos.org/flash.html
+# Route: wiki.acreetionos.org/api/*
+# (acreetionos.org/flash.html route removed 2026-08-25 — the worker proxy
+#  served the download page as text/plain, blocking Google indexing.)
 
 [triggers]
 # Check every 30 min: verify all ISOs downloadable, auto-fix broken
