@@ -1006,9 +1006,8 @@ async function handleWikisearch(request) {
     api = 'https://wiki.archlinux.org/api.php?action=query&list=search&format=json&origin=*'
       + '&srlimit=20&srsearch=' + encodeURIComponent(q.slice(0, 300));
   } else if (title) {
-    api = 'https://wiki.archlinux.org/api.php?action=query&prop=extracts&explaintext=true'
-      + '&exchars=1500&redirects=1&format=json&origin=*'
-      + '&titles=' + encodeURIComponent(title.slice(0, 300));
+    api = 'https://wiki.archlinux.org/api.php?action=parse&prop=wikitext&format=json&origin=*'
+      + '&page=' + encodeURIComponent(title.slice(0, 300));
   } else {
     return jsonResponse({ error: 'Provide ?q=<search term> or ?title=<page title>' }, { status: 400 }, request);
   }
