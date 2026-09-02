@@ -23,6 +23,7 @@ const PAGES = [
   '/privacy.html',
   '/requirements.html',
   '/status.html',
+  '/translator.html',
   '/unofficial.html',
   '/wiki.html',
 ];
