@@ -1094,6 +1094,16 @@ function extractDocumentText(source, contentType) {
     .replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*\n+/g, '\n\n').trim();
 }
 
+function californiaLegislatureFallback(url) {
+  if (url.hostname.toLowerCase() !== 'legiscan.com') return null;
+  const match = url.pathname.match(/^\/CA\/text\/((?:AB|SB|ACA|SCA|AJR|SJR|ACR|SCR|HR|SR)\d+)/i);
+  if (!match) return null;
+  const year = new Date().getUTCFullYear();
+  const sessionStart = year % 2 === 0 ? year - 1 : year;
+  const billId = String(sessionStart) + String(sessionStart + 1) + '0' + match[1].toUpperCase();
+  return new URL('https://leginfo.legislature.ca.gov/faces/billTextClient.xhtml?bill_id=' + encodeURIComponent(billId));
+}
+
 async function fetchPublicDocument(inputUrl) {
   let current = parsePublicDocumentUrl(inputUrl);
   for (let redirects = 0; redirects <= 3; redirects++) {
@@ -1106,6 +1116,10 @@ async function fetchPublicDocument(inputUrl) {
       if (!location || redirects === 3) throw new Error('The document redirected too many times.');
       current = parsePublicDocumentUrl(new URL(location, current).toString());
       continue;
+    }
+    if (response.status === 403) {
+      const fallback = californiaLegislatureFallback(current);
+      if (fallback) { current = fallback; continue; }
     }
     if (!response.ok) throw new Error('The document returned HTTP ' + response.status + '.');
     const type = (response.headers.get('content-type') || '').toLowerCase();
