@@ -1123,13 +1123,21 @@ async function fetchPublicDocument(inputUrl) {
     }
     if (!response.ok) throw new Error('The document returned HTTP ' + response.status + '.');
     const type = (response.headers.get('content-type') || '').toLowerCase();
-    if (!['text/', 'application/json', 'application/xml', 'application/xhtml+xml'].some(prefix => type.startsWith(prefix))) {
+    if (/^(application\/pdf|image\/|audio\/|video\/|application\/(zip|gzip|x-rar|x-7z))/.test(type)) {
       throw new Error('That link is not a readable text document. PDF and image-only files are not supported yet.');
     }
     const length = Number(response.headers.get('content-length') || 0);
     if (length > 1000000) throw new Error('That document is too large. The limit is 1 MB.');
     const source = (await response.text()).slice(0, 1000000);
-    const text = extractDocumentText(source, type).slice(0, 18000);
+    // Some government document servers label HTML as application/octet-stream.
+    // Accept it when the bytes are clearly text, but keep rejecting binary data.
+    const sample = source.slice(0, 4096);
+    const controlChars = (sample.match(/[\x00-\x08\x0E-\x1F]/g) || []).length;
+    if (!sample || controlChars > Math.max(4, sample.length * 0.01)) {
+      throw new Error('That link is not a readable text document. PDF and image-only files are not supported yet.');
+    }
+    const effectiveType = type.includes('html') || /<!doctype\s+html|<html[\s>]|<body[\s>]/i.test(sample) ? 'text/html' : type;
+    const text = extractDocumentText(source, effectiveType).slice(0, 18000);
     if (text.length < 20) throw new Error('No readable text was found at that link.');
     return { text, finalUrl: current.toString(), truncated: source.length > 18000 };
   }
