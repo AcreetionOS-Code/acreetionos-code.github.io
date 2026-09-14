@@ -201,7 +201,11 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
   <script>
     async function loadStats() {
       try {
-        const res = await fetch('/api/community/stats');
+        // Use the live API origin when this page isn't on acreetionos.org
+        // (e.g. served from the local cached copy / file://), so stats still load.
+        const onSite = location.protocol.startsWith('http') && /(^|\.)acreetionos\.org$/.test(location.hostname);
+        const API = onSite ? '' : 'https://acreetionos.org';
+        const res = await fetch(API + '/api/community/stats');
         const data = await res.json();
         if (data.error) throw new Error(data.error);
 
@@ -246,7 +250,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
         document.getElementById('repos-container').innerHTML = '<div class="section"><h2><i class="bi bi-folder"></i> Active Repositories</h2><div class="repo-grid">' + reposHtml + '</div></div>';
         document.getElementById('team-container').innerHTML = '<div class="section"><h2><i class="bi bi-person"></i> Core Team</h2><div class="contributor-list">' + membersHtml + '</div></div>';
       } catch (e) {
-        document.getElementById('stats-container').innerHTML = '<p style="text-align:center;color:#e74c3c;padding:2rem">Failed to load community stats. Try again later.</p>';
+        document.getElementById('stats-container').innerHTML = '<p style="text-align:center;color:var(--text, #b2b2b2);padding:2rem">Live community stats are unavailable right now. This is a cached page — switch to live mode or open <a href="https://acreetionos.org/contributors.html" style="color:#2ecc71">acreetionos.org</a> for live stats.</p>';
       }
     }
     function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
