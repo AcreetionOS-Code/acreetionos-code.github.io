@@ -52,6 +52,21 @@ const FREE_MODELS = new Set([
   'cognitivecomputations/dolphin-mistral-24b-venice-edition:free',
 ]);
 const DEFAULT_MODEL = 'openrouter/free';
+
+// System context so the free-router model can actually answer about AcreetionOS.
+const ACRETION_SYSTEM = [
+  'You are the AcreetionOS assistant.',
+  'AcreetionOS is a free, open-source (GPLv3), community-driven Linux distribution based on Arch Linux.',
+  'It features the Cinnamon desktop, curated stable repositories for reliability, and both X11 (XOrg) and XLibre editions.',
+  'It is privacy-first: no telemetry, no tracking, no data collection.',
+  'It ships a graphical installer (Arch power with Windows familiarity) while keeping full access to pacman and the AUR.',
+  'Minimum requirements: 64-bit CPU, ~2GB RAM, ~20GB storage.',
+  'Co-lead developers are Natalie Cole-Clift Spiva and her father Darren Clift; the project is based in Spokane, WA.',
+  'Official site: https://acreetionos.org — source: https://github.com/AcreetionOS-Code.',
+  'Answer questions about AcreetionOS accurately and concisely using this context. If asked something unrelated, still be helpful.',
+  'Never claim AcreetionOS does not exist; it is a real project.'
+].join(' ');
+
 let allowedOrigins = [
   'https://acreetionos.org',
   'https://www.acreetionos.org',
@@ -2770,6 +2785,10 @@ export default {
             status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
           });
         }
+        // Give the free-router model AcreetionOS context so it can answer about the project.
+        if (!messages.some((m) => m && m.role === 'system')) {
+          messages = [{ role: 'system', content: ACRETION_SYSTEM }, ...messages];
+        }
         const result = await generateGuide(env, messages, Math.min(body.max_tokens || 1024, 2048), { useCache: true });
         if (!result || !result.ok) {
           return new Response(JSON.stringify({ error: 'AI service unavailable', detail: result && result.error }), {
@@ -2834,11 +2853,17 @@ export default {
       //   SPICY_SAUCE = CLOUDFLARE_API_TOKEN
       const isStream = body.stream === true;
 
+      // Give the model AcreetionOS context (so it can answer about the project).
+      let chatMessages = Array.isArray(body.messages) ? body.messages.slice() : [];
+      if (!chatMessages.some((m) => m && m.role === 'system')) {
+        chatMessages = [{ role: 'system', content: ACRETION_SYSTEM }, ...chatMessages];
+      }
+
       // Admin (newsletter) calls may request up to 4096 tokens; browser chat
       // stays capped at 2048 so the free tier isn't exhausted by one page.
       const result = await generateGuide(
         env,
-        body.messages,
+        chatMessages,
         Math.min(body.max_tokens || 1024, isAdmin ? 4096 : 2048),
         { useCache: isAdmin ? false : true }
       );
