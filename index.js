@@ -2706,6 +2706,50 @@ export default {
       return handleCVEEmbed();
     }
 
+    // ─── Cached-mode site lookup (AI mode) ───────────────────────
+    // The browser's AI mode never holds an AI/api key. It calls this endpoint;
+    // the server fetches the latest version of the target site server-side and
+    // returns it. Keys live only in env (Cloudflare Worker secrets).
+    if (request.method === 'POST' && url.pathname === '/api/cache/lookup') {
+      if (checkRateLimit(getClientIP(request))) {
+        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
+          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
+        });
+      }
+      try {
+        const body = await request.json();
+        const target = body && typeof body.url === 'string' ? body.url : '';
+        if (!/^https?:\/\//i.test(target)) {
+          return new Response(JSON.stringify({ error: 'valid http(s) url required' }), {
+            status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 12000);
+        let upstream;
+        try {
+          upstream = await fetch(target, {
+            redirect: 'follow',
+            signal: ctrl.signal,
+            headers: { 'User-Agent': CHROME_UA, 'Accept': 'text/html,application/xhtml+xml' }
+          });
+        } finally { clearTimeout(timer); }
+        const html = await upstream.text();
+        return new Response(JSON.stringify({
+          ok: true,
+          url: target,
+          status: upstream.status,
+          contentType: upstream.headers.get('content-type') || 'text/html',
+          html: html.slice(0, 500000),
+          fetchedAt: Date.now()
+        }), { headers: { 'Content-Type': 'application/json', ...corsHeaders(request) } });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: 'could not fetch target', detail: e && e.message }), {
+          status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
       const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";

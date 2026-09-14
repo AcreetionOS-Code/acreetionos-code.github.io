@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How AcreetionOS Browser Works — 100% Transparency</title>
+<style>
+  :root{ --green:#2ecc71; --body:#121212; --panel:#1a1a1a; --box:#222; --border:#333;
+         --bright:#e5e5e5; --muted:#b2b2b2; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--body);color:var(--bright);
+       font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;
+       max-width:860px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+  h1{font-size:1.7rem;margin-bottom:.25rem;letter-spacing:-.5px}
+  h2{color:var(--green);font-size:1.15rem;margin:2rem 0 .5rem;font-family:"Cascadia Code","Fira Code","JetBrains Mono",monospace}
+  p{color:var(--muted);margin-bottom:.75rem}
+  .tag{display:inline-block;background:rgba(46,204,113,.12);color:var(--green);border:1px solid rgba(46,204,113,.35);
+       padding:.15rem .6rem;border-radius:8px;font-weight:600;font-size:.8rem;margin-bottom:1rem}
+  .card{background:var(--box);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:1rem}
+  .card b{color:var(--bright)}
+  code{background:rgba(46,204,113,.1);border:1px solid rgba(46,204,113,.2);color:var(--bright);
+       padding:.1rem .4rem;border-radius:8px;font-size:.9em}
+  a{color:var(--green);text-decoration:underline;text-underline-offset:3px}
+  .toggle{background:transparent;border:2px solid var(--green);color:var(--green);border-radius:10px;
+          padding:.4rem .9rem;font-weight:700;cursor:pointer;margin:.25rem .25rem 0 0}
+  .toggle:hover{background:rgba(46,204,113,.15)}
+  hr{border:0;border-top:1px solid var(--border);margin:2rem 0}
+  .what{color:var(--green);font-weight:600}
+  ::selection{background:rgba(46,204,113,.3);color:#fff}
+</style>
+</head>
+<body>
+
+  <span class="tag">AcreetionOS · open disclosure</span>
+  <h1>How this browser works</h1>
+  <p>A plain-English, 100%-transparent explanation of every privacy decision baked into this profile.
+     Nothing here is hidden. Nothing here is a middle-man trick.</p>
+
+  <div class="card">
+    <b>🚫 No telemetry to Mozilla or Google.</b> Firefox's telemetry, studies (Normandy/Shield),
+    crash reporter, Google Safe Browsing providers, and Pocket recommendation feeds are all switched off.
+    Search uses <b>DuckDuckGo</b>; nothing reports back.
+  </div>
+
+  <h2>1. The homepage is cached (and clearly disclosed)</h2>
+  <div class="card">
+    <p class="what">What we do</p>
+    <p>Your homepage is a <b>locally cached copy of acreetionos.org</b> — it loads instantly and works offline.
+       Every <b>4 days</b> it pulls the latest live version, validates it, backs up the old one, and swaps it in.
+       If a refresh is invalid, the previous good copy is restored.</p>
+    <p class="what">How you can tell</p>
+    <p>A small <b>ⓘ bubble</b> sits in the bottom-right corner whenever you're looking at a cached copy.
+       Hover or click it to read: <i>"Cached version"</i> — it even tells you to press
+       <b>Ctrl + Shift + R</b> (Windows/Linux) or <b>Cmd + Shift + R</b> (macOS) to force the live page.</p>
+  </div>
+
+  <h2>2. The real site always stays live</h2>
+  <div class="card">
+    <p>When you actually type or visit <b>https://acreetionos.org</b>, you always get the <b>live website</b> —
+       the cache never replaces the real address. The cached copy is <i>only</i> the homepage, and only the
+       homepage.</p>
+  </div>
+
+  <h2>3. Firefox's own backend is intercepted and absorbed in-browser</h2>
+  <div class="card">
+    <p class="what">What we do</p>
+    <p>In this browser we <b>intercept Firefox's built-in network calls to Mozilla</b> —
+       the account/signing endpoint (<code>accounts.firefox.com</code>), telemetry
+       (<code>telemetry.mozilla.org</code>), the add-on store (<code>addons.mozilla.org</code>),
+       and related channels — and <b>absorb them inside the browser itself</b>.
+       Nothing is forwarded to Mozilla, and nothing is forwarded to any external
+       AcreetionOS service either.</p>
+    <p class="what">Secure by construction</p>
+    <p>No network port is opened anywhere and no daemon runs on your machine.
+       The interception happens in a privileged-but-sandboxed extension context that
+       web pages cannot reach, so there is <b>nothing a bad actor could script or
+       probe</b>. Blocked requests are recorded only in a private, on-device log.</p>
+    <p class="what">What that means</p>
+    <p>Because extension signing is ours and the add-on channel is closed,
+       this browser loads <b>only third-party extensions we ship</b>, and its
+       backend never talks to Mozilla. You won't get a random
+       <i>"Touch your security key to continue with accounts.firefox.com"</i> prompt:
+       that endpoint is absorbed here, and passkeys are handled by your
+       <b>third-party password manager</b> (e.g. Proton Pass), never by a dead built-in store.</p>
+  </div>
+
+  <h2>4. Only third-party extensions load</h2>
+  <div class="card">
+    <p class="what">What we do</p>
+    <p>Firefox's built-in add-on store and discovery channels are turned off
+       (<code>extensions.getAddons.showPane</code> = off). The only extensions that run in this browser
+       are ones we ship and pin in the profile — <b>yours</b>. We don't use Mozilla's add-on catalog at all.</p>
+  </div>
+
+  <h2>4b. Three modes: Cached · AI · Live (toolbar toggle)</h2>
+  <div class="card">
+    <p>A single toolbar button next to the search bar cycles the browser through three modes,
+       shown by its icon:</p>
+    <p>• <b style="color:#2ecc71">CACHED</b> — top sites load from a locally-archived, encrypted
+       snapshot. Every cached page carries a <b>CACHED</b> badge and a note that to see or input live
+       data you switch to LIVE. A background job <b>gradually</b> archives sites through the day from
+       the Wayback Machine (never all at once), never repeating a site unless it has no snapshot from
+       the last 7 days.</p>
+    <p>• <b style="color:#9b59b6">AI</b> — the browser asks <b>our server</b> for the latest version of
+       the site. The server does the fetching and holds all AI keys; <b>your browser never sees any API
+       key</b>. The result is stored encrypted as a fresh cached snapshot.</p>
+    <p>• <b style="color:#61afef">LIVE</b> — normal browsing; nothing is cached, nothing is stripped.</p>
+  </div>
+
+  <h2>5. DNS, search &amp; privacy defaults</h2>
+  <div class="card">
+    <p>• DNS over HTTPS to <b>9.9.9.9 (Quad9)</b> with <b>1.1.1.1 (Cloudflare)</b> as the switchable option.</p>
+    <p>• Default search is <b>DuckDuckGo</b>; Google/other engines are removed from the bar.</p>
+    <p>• Address-bar suggestions for bookmarks, history, tabs, top-sites and searches are off.</p>
+    <p>• Firefox Sync is fully disabled; the browser never restores or uploads your last session by default.</p>
+    <p>• The built-in password manager is disabled for being unsafe; credentials live in your external manager.</p>
+  </div>
+
+  <h2>6. Sites &amp; appearance</h2>
+  <div class="card">
+    <p>• The whole browser UI is themed to the AcreetionOS design — dark surfaces, green accents,
+       including about: pages. Extensions are forced to adopt the same theme.</p>
+    <p>• Tools that restyle the web (like Dark Reader) are per-site and opt-in, so we never break or
+       secretly recolor someone's page.</p>
+  </div>
+
+  <hr>
+  <p style="text-align:center;color:var(--muted);font-size:.85rem">
+    Discrete, honest, and yours. — AcreetionOS · <a href="https://acreetionos.org">acreetionos.org</a>
+  </p>
+
+</body>
+</html>
