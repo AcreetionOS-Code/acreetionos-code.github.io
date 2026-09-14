@@ -2750,6 +2750,42 @@ export default {
       }
     }
 
+    // ─── AI "ask a question" (browser AI mode) ───────────────────
+    // Same provider chain as /api/chat, but reachable from the extension so the
+    // user can just ask questions. Rate-limited; keys stay in env.
+    if (request.method === 'POST' && url.pathname === '/api/ask') {
+      if (checkRateLimit(getClientIP(request))) {
+        return new Response(JSON.stringify({ error: 'Too many requests, please slow down' }), {
+          status: 429, headers: { 'Content-Type': 'application/json', 'Retry-After': '60', ...corsHeaders(request) }
+        });
+      }
+      try {
+        const body = await request.json();
+        let messages = body && body.messages;
+        if (!Array.isArray(messages) && body && typeof body.question === 'string') {
+          messages = [{ role: 'user', content: body.question }];
+        }
+        if (!Array.isArray(messages)) {
+          return new Response(JSON.stringify({ error: 'messages array or question string required' }), {
+            status: 400, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        const result = await generateGuide(env, messages, Math.min(body.max_tokens || 1024, 2048), { useCache: true });
+        if (!result || !result.ok) {
+          return new Response(JSON.stringify({ error: 'AI service unavailable', detail: result && result.error }), {
+            status: 502, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+          });
+        }
+        return new Response(JSON.stringify({ content: result.content, model: result.model }), {
+          headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      } catch (err) {
+        return new Response(JSON.stringify({ error: 'AI service unavailable' }), {
+          status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+        });
+      }
+    }
+
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
       const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
