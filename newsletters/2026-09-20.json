@@ -1,0 +1,5 @@
+{
+  "subject": "Daily AcreetionOS Update -- September 20, 2026",
+  "date_display": "September 20, 2026",
+  "body": "geocode-glib conflict resolved in acreetionos + acreetionos-xlibre\n\nAfter weeks of dependency wrestling, the geocode-glib update conflict in AcreetionOS-Xlibre has been resolved and merged into release-1. Both the main acreetionos and acreetionos-xlibre ISOs will now build cleanly from the updated package tree, so your next install session should go without hitting a dependency wall.\n\nDevelopment\nThe geocode-glib conflict was a classic version-pin standoff: two packages pulling incompatible versions of"
+}
