@@ -34,6 +34,8 @@ ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 
 # Discord's API rejects any message over 2000 characters.
 DISCORD_MAX_CONTENT = 2000
+# Message flag 64 = SUPPRESS_NOTIFICATIONS. Allowed on Execute Webhook.
+DISCORD_SUPPRESS_NOTIFICATIONS = 64
 # Cloudflare (in front of discord.com) blocks the default Python-urllib
 # User-Agent with "error code: 1010" / HTTP 403, so send a real one.
 DISCORD_USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
@@ -358,6 +360,10 @@ def post_to_discord(newsletter):
         "username": "AcreetionOS Bot",
         # Never let AI-generated body text turn into an @everyone ping.
         "allowed_mentions": {"parse": []},
+        # SUPPRESS_NOTIFICATIONS — the newsletter is posted into the channel and
+        # nothing more. Documented as settable on Execute Webhook alongside
+        # SUPPRESS_EMBEDS. The newsletter must never buzz anyone's phone.
+        "flags": DISCORD_SUPPRESS_NOTIFICATIONS,
     }
     try:
         req = Request(webhook, data=json.dumps(payload).encode(),
