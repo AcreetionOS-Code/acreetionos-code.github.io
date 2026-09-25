@@ -4,16 +4,352 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-08-14T00:00:00Z</updated>
+  <updated>2026-09-25T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 25, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-25.html"/>
+    <id>tag:acreetionos.org,2026-09-25:newsletter</id>
+    <updated>2026-09-25T00:00:00Z</updated>
+    <published>2026-09-25T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 25, 2026 Headline: &quot;This May Be the Best Arch-Based Linux Distro I’ve Ever Used&quot; - AcreetionOS Shines in Recent Review In a glowing review published on Medium, writer Michael Swengel extols the virtues of AcreetionOS, calling it &quot;the best Arch-based Linux distro I&#x27;…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 24, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-24.html"/>
+    <id>tag:acreetionos.org,2026-09-24:newsletter</id>
+    <updated>2026-09-24T00:00:00Z</updated>
+    <published>2026-09-24T00:00:00Z</published>
+    <summary>geocode-glib conflict resolved in acreetionos + acreetionos-xlibre The merge of the release‑1 branch into main finally cleared the geocode‑glib update clash that had plagued both the main and Xlibre builds for weeks, letting users on the latest ISO finally get functional geolocation services again. …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 23, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-23.html"/>
+    <id>tag:acreetionos.org,2026-09-23:newsletter</id>
+    <updated>2026-09-23T00:00:00Z</updated>
+    <published>2026-09-23T00:00:00Z</published>
+    <summary>Firefox uBlock Origin support just landed in AcreetionOS-Xlibre, closing a notable gap for privacy-minded users who want both the XLibre fork and aggressive ad blocking out of the gate. Development Natalie and Darren have been syncing intelligence across the newsletter, archive, and wiki guides with…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 22, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-22.html"/>
+    <id>tag:acreetionos.org,2026-09-22:newsletter</id>
+    <updated>2026-09-22T00:00:00Z</updated>
+    <published>2026-09-22T00:00:00Z</published>
+    <summary>The geocode-glib conflict that was blocking AcreetionOS-Xlibre builds has been finally resolved, unlocking a fresh ISO release for users craving a clean Arch‑based experience. geocode-glib conflict resolved in acreetionos + acreetionos-xlibre Development Natalie and Darren’s merge of the ‘main’ bran…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 21, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-21.html"/>
+    <id>tag:acreetionos.org,2026-09-21:newsletter</id>
+    <updated>2026-09-21T00:00:00Z</updated>
+    <published>2026-09-21T00:00:00Z</published>
+    <summary>Today the AcreetionOS team merged the repair branch that resolves the geocode-glib update conflict, keeping system upgrades smooth for everyone. This fix landed just in time for the weekly sync and means you can now update without hitting the dreaded package blocker that stalled a few testers earlie…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 20, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-20.html"/>
+    <id>tag:acreetionos.org,2026-09-20:newsletter</id>
+    <updated>2026-09-20T00:00:00Z</updated>
+    <published>2026-09-20T00:00:00Z</published>
+    <summary>geocode-glib conflict resolved in acreetionos + acreetionos-xlibre After weeks of dependency wrestling, the geocode-glib update conflict in AcreetionOS-Xlibre has been resolved and merged into release-1. Both the main acreetionos and acreetionos-xlibre ISOs will now build cleanly from the updated pa…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 19, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-19.html"/>
+    <id>tag:acreetionos.org,2026-09-19:newsletter</id>
+    <updated>2026-09-19T00:00:00Z</updated>
+    <published>2026-09-19T00:00:00Z</published>
+    <summary>The geocode-glib update that had been blocking upgrades on installed AcreetionOS systems is now resolved after a quick merge of the repair branch. Users can safely run their regular pacman syncs again without hitting the transaction error that appeared earlier this week. Development The fix came thr…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 18, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-18.html"/>
+    <id>tag:acreetionos.org,2026-09-18:newsletter</id>
+    <updated>2026-09-18T00:00:00Z</updated>
+    <published>2026-09-18T00:00:00Z</published>
+    <summary>Calamares installer config got a real-world tune-up this week: older NVIDIA GPUs now work on first boot, and the default gfxmode switched from native 4K to 1080p so installs on lower-resolution displays actually look right. cobra3282000 landed both commits in cobra3282000/calamares-config, which mea…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 17, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-17.html"/>
+    <id>tag:acreetionos.org,2026-09-17:newsletter</id>
+    <updated>2026-09-17T00:00:00Z</updated>
+    <published>2026-09-17T00:00:00Z</published>
+    <summary>AcreetionOS CI now publishes ISOs automatically after every successful build, removing the manual step that used to delay releases by hours. Development The CI pipeline rewrite deployed yesterday means our build servers now push signed ISOs straight to the download page the moment tests pass. Darren…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 16, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-16.html"/>
+    <id>tag:acreetionos.org,2026-09-16:newsletter</id>
+    <updated>2026-09-16T00:00:00Z</updated>
+    <published>2026-09-16T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 16, 2026 PostgreSQL Development Activity In a recent blog post, PostgreSQL contributor Tomas Vondra has published an in-depth analysis of development activity in the PostgreSQL community. The post highlights the progress made in various areas, including performance…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 15, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-15.html"/>
+    <id>tag:acreetionos.org,2026-09-15:newsletter</id>
+    <updated>2026-09-15T00:00:00Z</updated>
+    <published>2026-09-15T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 15, 2026 Breaking News: Prominent Arch Linux Developer Resigns After 10 Year Run In a shocking move, a prominent Arch Linux developer has resigned after a decade of dedication to the project. This news has sent shockwaves throughout the Linux community, with many e…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 14, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-14.html"/>
+    <id>tag:acreetionos.org,2026-09-14:newsletter</id>
+    <updated>2026-09-14T00:00:00Z</updated>
+    <published>2026-09-14T00:00:00Z</published>
+    <summary>geocode-glib update conflict resolved on installed AcreetionOS systems — if you&#x27;ve been staring at a broken update in the repair branch, it&#x27;s fixed now. Head to the changelog to see the full package notes. Development Darren&#x27;s calamares-config commits landed with two installer-level changes worth kn…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 13, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-13.html"/>
+    <id>tag:acreetionos.org,2026-09-13:newsletter</id>
+    <updated>2026-09-13T00:00:00Z</updated>
+    <published>2026-09-13T00:00:00Z</published>
+    <summary>EuroPython 2026 Videos Published The EuroPython 2026 conference, held in Kraków, Poland from July 13 to 17, has released its videos online. The conference featured a wide range of talks and presentations on various topics related to Python and its ecosystem. The videos are now available on the EuroP…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 12, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-12.html"/>
+    <id>tag:acreetionos.org,2026-09-12:newsletter</id>
+    <updated>2026-09-12T00:00:00Z</updated>
+    <published>2026-09-12T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 12, 2026 Top Development: EuroPython 2026 videos published All of the videos from the EuroPython 2026 conference, held in Kraków, Poland from July 13 through July 17, have been published. The conference featured a wide range of talks and workshops on various topics…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 11, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-11.html"/>
+    <id>tag:acreetionos.org,2026-09-11:newsletter</id>
+    <updated>2026-09-11T00:00:00Z</updated>
+    <published>2026-09-11T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 11, 2026 Security Patch Released for Forgejo We&#x27;re excited to announce that the Forgejo team has released version 16.0.4 and 15.0.8, addressing a critical security vulnerability. This update is now available for all AcreetionOS users, ensuring the security and inte…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 10, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-10.html"/>
+    <id>tag:acreetionos.org,2026-09-10:newsletter</id>
+    <updated>2026-09-10T00:00:00Z</updated>
+    <published>2026-09-10T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 10, 2026 Main Event: A decade of Rustls: A decade of Rustls The AcreetionOS community has been actively contributing to the Rustls project for a decade now. Rustls is a Rust implementation of the TLS protocol, and it&#x27;s a crucial component of our distribution. We&#x27;re…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 09, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-09.html"/>
+    <id>tag:acreetionos.org,2026-09-09:newsletter</id>
+    <updated>2026-09-09T00:00:00Z</updated>
+    <published>2026-09-09T00:00:00Z</published>
+    <summary>AcreetionOS just cleaned up the installer for older Nvidia GPUs and removed mandatory disk encryption, letting users choose later. The change, made in cobra3282000/calamares-config, fixes driver compatibility and lets you postpone encryption setup until you’re ready. It’s a small but big win for any…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 08, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-08.html"/>
+    <id>tag:acreetionos.org,2026-09-08:newsletter</id>
+    <updated>2026-09-08T00:00:00Z</updated>
+    <published>2026-09-08T00:00:00Z</published>
+    <summary>AcreetionOS-Xlibre just shipped its first release with Firefox and uBlock Origin bundled, closing a long-running gap in the XLibre-based desktop image. Development Natalie pushed the missing firefox-ublock-origin package into the AcreetionOS-Xlibre build this week, then immediately merged the fix ge…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 07, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-07.html"/>
+    <id>tag:acreetionos.org,2026-09-07:newsletter</id>
+    <updated>2026-09-07T00:00:00Z</updated>
+    <published>2026-09-07T00:00:00Z</published>
+    <summary>Grml 2026.09 has arrived, bringing kernel 7.3-rc2 and fresh packages to AcreetionOS users worldwide. The new GRVM release includes critical security hardening and performance improvements that align perfectly with our focus on stability and privacy. This is the kind of update that keeps the communit…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 06, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-06.html"/>
+    <id>tag:acreetionos.org,2026-09-06:newsletter</id>
+    <updated>2026-09-06T00:00:00Z</updated>
+    <published>2026-09-06T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 06, 2026 Top Development: Grml 2026.09 released: &quot;Hä&quot; Edition The Grml team has released version 2026.09, code-named &quot;Hä&quot;. This new release includes various updates and improvements, making it a great time to explore the Grml community and learn from their experien…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 05, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-05.html"/>
+    <id>tag:acreetionos.org,2026-09-05:newsletter</id>
+    <updated>2026-09-05T00:00:00Z</updated>
+    <published>2026-09-05T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 05, 2026 Breaking News: Grml 2026.09 Released We&#x27;re excited to announce that Grml 2026.09, code-named &quot;Hä&quot;, has been released. This new version brings with it a range of updates and improvements, including security patches and bug fixes. As a community-driven distr…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 04, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-04.html"/>
+    <id>tag:acreetionos.org,2026-09-04:newsletter</id>
+    <updated>2026-09-04T00:00:00Z</updated>
+    <published>2026-09-04T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 04, 2026 Exciting Development: Audacity 4.0 Released! We&#x27;re thrilled to announce that Audacity 4.0 has been released! This popular audio editor has undergone significant changes, and we&#x27;re excited to see what this new version brings to the table. As a community-dri…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 03, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-03.html"/>
+    <id>tag:acreetionos.org,2026-09-03:newsletter</id>
+    <updated>2026-09-03T00:00:00Z</updated>
+    <published>2026-09-03T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 03, 2026 Exciting News: Incus 7.4 Released! We&#x27;re thrilled to announce that Incus 7.4 has been released, marking a significant milestone in the world of container and virtual-machine management. This update brings numerous improvements and bug fixes, making it an e…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 02, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-02.html"/>
+    <id>tag:acreetionos.org,2026-09-02:newsletter</id>
+    <updated>2026-09-02T00:00:00Z</updated>
+    <published>2026-09-02T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 02, 2026 Top Development: AcreetionOS has taken a significant step towards improved security with the introduction of Secret Detection in our .gitlab-ci.yml file. This feature, enabled by Natalie, will help identify and prevent potential security vulnerabilities in…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 01, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-01.html"/>
+    <id>tag:acreetionos.org,2026-09-01:newsletter</id>
+    <updated>2026-09-01T00:00:00Z</updated>
+    <published>2026-09-01T00:00:00Z</published>
+    <summary>OpenShot 4.0 Brings Groundbreaking Color-Like Editing to Video Creators OpenShot 4.0 has officially launched, bringing groundbreaking color-like editing capabilities to video creators worldwide. The new version introduces intuitive color grading tools that rival professional software</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 31, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-31.html"/>
+    <id>tag:acreetionos.org,2026-08-31:newsletter</id>
+    <updated>2026-08-31T00:00:00Z</updated>
+    <published>2026-08-31T00:00:00Z</published>
+    <summary>AcreetionOS resolves geocode-glib update conflict, restoring smooth package updates If you hit a wall trying to update your system today, you’re not alone. A conflict with the geocode-glib package was blocking updates, but the community has already merged a fix in the &#x27;repair&#x27; branch, and work is un…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 30, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-30.html"/>
+    <id>tag:acreetionos.org,2026-08-30:newsletter</id>
+    <updated>2026-08-30T00:00:00Z</updated>
+    <published>2026-08-30T00:00:00Z</published>
+    <summary>AcreetionOS kernel CI just got a lot faster thanks to a new secret-detection and SAST pipeline setup by Natalie Cole-Clift Spiva, co-lead developer of the project. Development Natalie&#x27;s work on us-infra-hub now includes CI/CD security scanning that pins v0.3.0 archive checksums and adds an MCP stdio…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 29, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-29.html"/>
+    <id>tag:acreetionos.org,2026-08-29:newsletter</id>
+    <updated>2026-08-29T00:00:00Z</updated>
+    <published>2026-08-29T00:00:00Z</published>
+    <summary>geocode-glib conflict resolved in acreetionos + acreetionos-xlibre The most pressing issue for our users this week was a package conflict involving geocode-glib, and I&#x27;m happy to report the &#x27;repair&#x27; branch has been merged, fixing the update conflict for everyone. If you were held back from updating,…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 28, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-28.html"/>
+    <id>tag:acreetionos.org,2026-08-28:newsletter</id>
+    <updated>2026-08-28T00:00:00Z</updated>
+    <published>2026-08-28T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - August 28, 2026 Kernel Update: Eight Stable Kernels Released This week, Greg Kroah-Hartman announced the release of eight stable kernels for Thursday, including 7.2.1 and 7.3.1. These updates bring various bug fixes and improvements to the kernel, ensuring a more stable and …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 27, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-27.html"/>
+    <id>tag:acreetionos.org,2026-08-27:newsletter</id>
+    <updated>2026-08-27T00:00:00Z</updated>
+    <published>2026-08-27T00:00:00Z</published>
+    <summary>AcreetionOS CI now publishes ISOs faster with --release‑mode – a new GitHub release tweak in acreetionos‑code/acreetionos‑immutable skips the checkout step, shaving minutes off each ISO build and letting the pipeline start releases instantly. Development The commit “ci: pass -R to gh release create …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 26, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-26.html"/>
+    <id>tag:acreetionos.org,2026-08-26:newsletter</id>
+    <updated>2026-08-26T00:00:00Z</updated>
+    <published>2026-08-26T00:00:00Z</published>
+    <summary>AcreetionOS CI now publishes ISOs automatically from the immutable pipeline, cutting release friction for the cinnamon-XLibre spin. Development Natalie Spiva pushed two CI fixes into acreetionos-code/acreetionos-immutable: per-pipeline staging dirs to avoid publish races between concurrent builds, a…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 25, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-25.html"/>
+    <id>tag:acreetionos.org,2026-08-25:newsletter</id>
+    <updated>2026-08-25T00:00:00Z</updated>
+    <published>2026-08-25T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - August 25, 2026 Immutable A/B Profile and Versioned Release Automation We&#x27;re excited to announce the completion of our immutable A/B profile and versioned release automation in acreetionos-code/acreetionos-immutable. This feature allows us to create and manage multiple versi…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 24, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-24.html"/>
+    <id>tag:acreetionos.org,2026-08-24:newsletter</id>
+    <updated>2026-08-24T00:00:00Z</updated>
+    <published>2026-08-24T00:00:00Z</published>
+    <summary>Natalie just pushed the first working bash2bat conversion script that lets AcreetionOS helpers run Bash utilities on Windows without needing WSL. The initial commit lives in the natalie/bash2bat repository and already translates common system‑administration snippets into batch files that preserve ex…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 23, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-23.html"/>
+    <id>tag:acreetionos.org,2026-08-23:newsletter</id>
+    <updated>2026-08-23T00:00:00Z</updated>
+    <published>2026-08-23T00:00:00Z</published>
+    <summary>AcreetionOS GitLab CI now runs Secret Detection on every pipeline Natalie pushed Secret Detection into .gitlab-ci.yml across the project repos, adding an automated scan that catches exposed tokens, keys, and credentials before they hit the mirror. It&#x27;s a quiet but meaningful hardening of the supply …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 22, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-22.html"/>
+    <id>tag:acreetionos.org,2026-08-22:newsletter</id>
+    <updated>2026-08-22T00:00:00Z</updated>
+    <published>2026-08-22T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - August 22, 2026 KDE Gear 26.08 Released We&#x27;re excited to announce that KDE Gear 26.08 has been released, bringing new features and improvements to the KDE ecosystem. As a community-driven Linux distribution, we&#x27;re committed to staying up-to-date with the latest developments …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 21, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-21.html"/>
+    <id>tag:acreetionos.org,2026-08-21:newsletter</id>
+    <updated>2026-08-21T00:00:00Z</updated>
+    <published>2026-08-21T00:00:00Z</published>
+    <summary>The Rust ecosystem was rocked today when a malicious supply chain attack was discovered in the proc‑macro1 crate, compromising the arrayref library that AcreetionOS developers depend on for low‑level memory handling. Development Darren Clift pushed an emergency patch to the AcreetionOS GitLab reposi…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 20, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-20.html"/>
+    <id>tag:acreetionos.org,2026-08-20:newsletter</id>
+    <updated>2026-08-20T00:00:00Z</updated>
+    <published>2026-08-20T00:00:00Z</published>
+    <summary>Let me analyze the recent development activity to pick the most interesting thing to lead with. Looking at the commits: 1. &quot;intelligence sync: newsletter + archive + wiki guides 2026-08-19-0036 in acreetionos-code.github.io&quot; 2. &quot;intelligence sync: newsletter + archive + wiki guides 2026-08-18-0035 i…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 19, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-19.html"/>
+    <id>tag:acreetionos.org,2026-08-19:newsletter</id>
+    <updated>2026-08-19T00:00:00Z</updated>
+    <published>2026-08-19T00:00:00Z</published>
+    <summary>August 19, 2026 AcreetionOS Newsletter Firefox 154.0 Released The latest version of the Firefox browser, 154.0, has been released, bringing with it several important changes, including extended local network access permissions. This update is now available for download and installation. Community Ne…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 18, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-18.html"/>
+    <id>tag:acreetionos.org,2026-08-18:newsletter</id>
+    <updated>2026-08-18T00:00:00Z</updated>
+    <published>2026-08-18T00:00:00Z</published>
+    <summary>The user wants me to write today&#x27;s AcreetionOS newsletter for August 18, 2026. I need to follow the specific rules. First, I need to pick ONE most interesting development from the activity above and lead with it. Looking at the &quot;Recent development activity&quot; section: [Community] GNU poke 5.0 released…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 17, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-17.html"/>
+    <id>tag:acreetionos.org,2026-08-17:newsletter</id>
+    <updated>2026-08-17T00:00:00Z</updated>
+    <published>2026-08-17T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - August 17, 2026 Kernel Update: 7.2 Released The latest kernel update, version 7.2, has been released, bringing new features and improvements to the Linux ecosystem. Linus Torvalds announced the release, stating that this update includes various bug fixes and performance enha…</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 16, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-16.html"/>
+    <id>tag:acreetionos.org,2026-08-16:newsletter</id>
+    <updated>2026-08-16T00:00:00Z</updated>
+    <published>2026-08-16T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - August 16, 2026 Breaking News: Python Packaging Council Candidates Announced The Python Software Foundation (PSF) has announced the candidates for the Python Packaging Council election. This is a significant development for the Python community, and we&#x27;re excited to see the …</summary>
+  </entry>
+  <entry>
+    <title>Daily AcreetionOS Update -- August 15, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-08-15.html"/>
+    <id>tag:acreetionos.org,2026-08-15:newsletter</id>
+    <updated>2026-08-15T00:00:00Z</updated>
+    <published>2026-08-15T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - August 15, 2026 Exciting News: Python Packaging Council Candidates Announced! The Python Software Foundation (PSF) has announced the candidates for the Python Packaging Council election. This is a significant development for the Python community, and we&#x27;re excited to see the…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 14, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-08-14.html"/>
     <id>tag:acreetionos.org,2026-08-14:newsletter</id>
     <updated>2026-08-14T00:00:00Z</updated>
     <published>2026-08-14T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 14, 2026  Dear AcreetionOS community,  We&#x27;re excited to share the latest developments from the AcreetionOS project. Our community has been actively contributing to the growth and improvement of our sovereign Linux distribution. We&#x27;d like to highlight a few recent co…</summary>
+    <summary>Daily AcreetionOS Update - August 14, 2026 Dear AcreetionOS community, We&#x27;re excited to share the latest developments from the AcreetionOS project. Our community has been actively contributing to the growth and improvement of our sovereign Linux distribution. We&#x27;d like to highlight a few recent comm…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 13, 2026</title>
@@ -21,7 +357,7 @@
     <id>tag:acreetionos.org,2026-08-13:newsletter</id>
     <updated>2026-08-13T00:00:00Z</updated>
     <published>2026-08-13T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 13, 2026  Dear AcreetionOS Community,  We&#x27;re excited to share the latest updates from the AcreetionOS project with you. As we continue to work towards making our distribution the go-to choice for those seeking a lightweight, privacy-focused Linux experience, we&#x27;re g…</summary>
+    <summary>Daily AcreetionOS Update - August 13, 2026 Dear AcreetionOS Community, We&#x27;re excited to share the latest updates from the AcreetionOS project with you. As we continue to work towards making our distribution the go-to choice for those seeking a lightweight, privacy-focused Linux experience, we&#x27;re gra…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 12, 2026</title>
@@ -29,7 +365,7 @@
     <id>tag:acreetionos.org,2026-08-12:newsletter</id>
     <updated>2026-08-12T00:00:00Z</updated>
     <published>2026-08-12T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 12, 2026  Development work continues at a steady pace across the AcreetionOS codebase with several important fixes implemented this week. Darren Clift has been focusing on resolving dependency conflicts, specifically addressing a critical geocode-glib update issue t…</summary>
+    <summary>Daily AcreetionOS Update - August 12, 2026 Development work continues at a steady pace across the AcreetionOS codebase with several important fixes implemented this week. Darren Clift has been focusing on resolving dependency conflicts, specifically addressing a critical geocode-glib update issue th…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 11, 2026</title>
@@ -37,7 +373,7 @@
     <id>tag:acreetionos.org,2026-08-11:newsletter</id>
     <updated>2026-08-11T00:00:00Z</updated>
     <published>2026-08-11T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 11, 2026   Hello AcreetionOS community, here&#x27;s your daily snapshot of progress and news.    This week we merged several key fixes, including the &#x27;repair&#x27; branch that resolves a geocode‑glib conflict across the main and xlibre repositories. The initial commits in the…</summary>
+    <summary>Daily AcreetionOS Update - August 11, 2026 Hello AcreetionOS community, here&#x27;s your daily snapshot of progress and news. This week we merged several key fixes, including the &#x27;repair&#x27; branch that resolves a geocode‑glib conflict across the main and xlibre repositories. The initial commits in the Linu…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 10, 2026</title>
@@ -45,7 +381,7 @@
     <id>tag:acreetionos.org,2026-08-10:newsletter</id>
     <updated>2026-08-10T00:00:00Z</updated>
     <published>2026-08-10T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 10, 2026  Dear AcreetionOS community,  We&#x27;re excited to share the latest developments and updates from the AcreetionOS project. As we continue to work towards our goal of creating a user-friendly, privacy-focused Linux distribution based on Arch Linux, we&#x27;re gratefu…</summary>
+    <summary>Daily AcreetionOS Update - August 10, 2026 Dear AcreetionOS community, We&#x27;re excited to share the latest developments and updates from the AcreetionOS project. As we continue to work towards our goal of creating a user-friendly, privacy-focused Linux distribution based on Arch Linux, we&#x27;re grateful …</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 09, 2026</title>
@@ -53,7 +389,7 @@
     <id>tag:acreetionos.org,2026-08-09:newsletter</id>
     <updated>2026-08-09T00:00:00Z</updated>
     <published>2026-08-09T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 09, 2026  Development Updates: The AcreetionOS team has been actively working on several key improvements this week. A critical fix was merged to address geocode-glib update conflicts on both the standard and XLibre editions of the distribution. These changes ensure…</summary>
+    <summary>Daily AcreetionOS Update - August 09, 2026 Development Updates: The AcreetionOS team has been actively working on several key improvements this week. A critical fix was merged to address geocode-glib update conflicts on both the standard and XLibre editions of the distribution. These changes ensure …</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 08, 2026</title>
@@ -61,7 +397,7 @@
     <id>tag:acreetionos.org,2026-08-08:newsletter</id>
     <updated>2026-08-08T00:00:00Z</updated>
     <published>2026-08-08T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 08, 2026  Dear AcreetionOS Community,  We are excited to share the latest news and updates from the AcreetionOS project. Our community continues to grow, and we are grateful for the contributions of our developers, maintainers, and users. In this newsletter, we will…</summary>
+    <summary>Daily AcreetionOS Update - August 08, 2026 Dear AcreetionOS Community, We are excited to share the latest news and updates from the AcreetionOS project. Our community continues to grow, and we are grateful for the contributions of our developers, maintainers, and users. In this newsletter, we will h…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 07, 2026</title>
@@ -69,7 +405,7 @@
     <id>tag:acreetionos.org,2026-08-07:newsletter</id>
     <updated>2026-08-07T00:00:00Z</updated>
     <published>2026-08-07T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 07, 2026  Good morning, AcreetionOS community! We hope you&#x27;re enjoying a wonderful start to your week. Today we&#x27;ve got some important development updates, community highlights, and tips to share with you. Let&#x27;s dive right in and get you caught up on everything happe…</summary>
+    <summary>Daily AcreetionOS Update - August 07, 2026 Good morning, AcreetionOS community! We hope you&#x27;re enjoying a wonderful start to your week. Today we&#x27;ve got some important development updates, community highlights, and tips to share with you. Let&#x27;s dive right in and get you caught up on everything happen…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 06, 2026</title>
@@ -77,7 +413,7 @@
     <id>tag:acreetionos.org,2026-08-06:newsletter</id>
     <updated>2026-08-06T00:00:00Z</updated>
     <published>2026-08-06T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 06, 2026  Welcome to today&#x27;s edition of the AcreetionOS newsletter. We&#x27;re excited to bring you the latest developments from our small but dedicated team of builders working to create the most user-friendly Arch-based Linux distribution around. Natalie and Darren con…</summary>
+    <summary>Daily AcreetionOS Update - August 06, 2026 Welcome to today&#x27;s edition of the AcreetionOS newsletter. We&#x27;re excited to bring you the latest developments from our small but dedicated team of builders working to create the most user-friendly Arch-based Linux distribution around. Natalie and Darren cont…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 05, 2026</title>
@@ -85,7 +421,7 @@
     <id>tag:acreetionos.org,2026-08-05:newsletter</id>
     <updated>2026-08-05T00:00:00Z</updated>
     <published>2026-08-05T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 05, 2026  Dear AcreetionOS Community,  We hope this newsletter finds you well. As we continue to work on our mission to provide a user-friendly, privacy-focused Linux distribution, we wanted to take a moment to update you on some recent developments.  Firstly, we&#x27;re…</summary>
+    <summary>Daily AcreetionOS Update - August 05, 2026 Dear AcreetionOS Community, We hope this newsletter finds you well. As we continue to work on our mission to provide a user-friendly, privacy-focused Linux distribution, we wanted to take a moment to update you on some recent developments. Firstly, we&#x27;re ex…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 04, 2026</title>
@@ -93,7 +429,7 @@
     <id>tag:acreetionos.org,2026-08-04:newsletter</id>
     <updated>2026-08-04T00:00:00Z</updated>
     <published>2026-08-04T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 04, 2026  Our development team has been busy refining our automated deployment pipelines. Darren recently implemented a new process to publish ISOs directly to the public server via SSH. This improvement ensures that our stable builds reach users much faster.  We ar…</summary>
+    <summary>Daily AcreetionOS Update - August 04, 2026 Our development team has been busy refining our automated deployment pipelines. Darren recently implemented a new process to publish ISOs directly to the public server via SSH. This improvement ensures that our stable builds reach users much faster. We are …</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 03, 2026</title>
@@ -101,7 +437,7 @@
     <id>tag:acreetionos.org,2026-08-03:newsletter</id>
     <updated>2026-08-03T00:00:00Z</updated>
     <published>2026-08-03T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 03, 2026  Our CI pipeline has been refined to publish the latest ISO directly to the public ISO server over SSH without unnecessary checkouts. This change reduces build time and ensures that the image you download is always the most recent stable version. The underl…</summary>
+    <summary>Daily AcreetionOS Update - August 03, 2026 Our CI pipeline has been refined to publish the latest ISO directly to the public ISO server over SSH without unnecessary checkouts. This change reduces build time and ensures that the image you download is always the most recent stable version. The underly…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 02, 2026</title>
@@ -109,7 +445,7 @@
     <id>tag:acreetionos.org,2026-08-02:newsletter</id>
     <updated>2026-08-02T00:00:00Z</updated>
     <published>2026-08-02T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 02, 2026   Welcome to today&#x27;s newsletter, where we share the latest development wins, community happenings, and handy tips for our users. We appreciate your continued support and feedback as we keep building a privacy‑first Arch‑based experience.  The CI pipeline no…</summary>
+    <summary>Daily AcreetionOS Update - August 02, 2026 Welcome to today&#x27;s newsletter, where we share the latest development wins, community happenings, and handy tips for our users. We appreciate your continued support and feedback as we keep building a privacy‑first Arch‑based experience. The CI pipeline now p…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- August 01, 2026</title>
@@ -117,7 +453,7 @@
     <id>tag:acreetionos.org,2026-08-01:newsletter</id>
     <updated>2026-08-01T00:00:00Z</updated>
     <published>2026-08-01T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - August 01, 2026  Development Updates: This week the CI pipeline saw two important fixes. The ISO publishing job now pushes directly to the public ISO server over SSH without re‑checking out the repository, speeding up releases. Additionally, secret detection was configured…</summary>
+    <summary>Daily AcreetionOS Update - August 01, 2026 Development Updates: This week the CI pipeline saw two important fixes. The ISO publishing job now pushes directly to the public ISO server over SSH without re‑checking out the repository, speeding up releases. Additionally, secret detection was configured …</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- July 31, 2026</title>
@@ -125,7 +461,7 @@
     <id>tag:acreetionos.org,2026-07-31:newsletter</id>
     <updated>2026-07-31T00:00:00Z</updated>
     <published>2026-07-31T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - July 31, 2026. Welcome to another development update from the AcreetionOS team based in Spokane, Washington.  Our development team has made significant progress on the ISO build pipeline this week with the addition of a new output directory feature. Builds now automaticall…</summary>
+    <summary>Daily AcreetionOS Update - July 31, 2026. Welcome to another development update from the AcreetionOS team based in Spokane, Washington. Our development team has made significant progress on the ISO build pipeline this week with the addition of a new output directory feature. Builds now automatically…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- July 30, 2026</title>
@@ -141,7 +477,7 @@
     <id>tag:acreetionos.org,2026-07-29:newsletter</id>
     <updated>2026-07-29T00:00:00Z</updated>
     <published>2026-07-29T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - July 29, 2026  Welcome to today&#x27;s edition of the AcreetionOS newsletter. We&#x27;ve got some exciting updates to share, including new security features in our GitLab repositories, progress on our web application manager, and some interesting developments in the broader Linux ec…</summary>
+    <summary>Daily AcreetionOS Update - July 29, 2026 Welcome to today&#x27;s edition of the AcreetionOS newsletter. We&#x27;ve got some exciting updates to share, including new security features in our GitLab repositories, progress on our web application manager, and some interesting developments in the broader Linux eco…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update -- July 28, 2026</title>
@@ -149,239 +485,239 @@
     <id>tag:acreetionos.org,2026-07-28:newsletter</id>
     <updated>2026-07-28T00:00:00Z</updated>
     <published>2026-07-28T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - July 28, 2026. Hello AcreetionOS community, here&#x27;s what&#x27;s new today.    This week we added secret detection to the .gitlab-ci.yml files across all repositories, ensuring that any accidental credentials are caught early. We also introduced SAST scanning to the CI pipeline, …</summary>
+    <summary>Daily AcreetionOS Update - July 28, 2026. Hello AcreetionOS community, here&#x27;s what&#x27;s new today. This week we added secret detection to the .gitlab-ci.yml files across all repositories, ensuring that any accidental credentials are caught early. We also introduced SAST scanning to the CI pipeline, str…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 27, 2026</title>
+    <title>AcreetionOS Update — July 27, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-27.html"/>
     <id>tag:acreetionos.org,2026-07-27:newsletter</id>
     <updated>2026-07-27T00:00:00Z</updated>
     <published>2026-07-27T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 27, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has been further refined with the implementation of per-pipeline staging directories and relative symlinks for the latest.iso, significantly improving the efficiency and reliability of our ISO build process, and you can learn more about our latest developments on …</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 26, 2026</title>
+    <title>AcreetionOS Update — July 26, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-26.html"/>
     <id>tag:acreetionos.org,2026-07-26:newsletter</id>
     <updated>2026-07-26T00:00:00Z</updated>
     <published>2026-07-26T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 26, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has seen another significant refinement with the implementation of relative symlinks for the latest.iso, allowing it to resolve correctly on the host web root, and this improvement is now live on our website at https://acreetionos.org/. This follows cl…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 25, 2026</title>
+    <title>AcreetionOS Update — July 25, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-25.html"/>
     <id>tag:acreetionos.org,2026-07-25:newsletter</id>
     <updated>2026-07-25T00:00:00Z</updated>
     <published>2026-07-25T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 25, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been refined with the implementation of per-pipeline staging directories and relative symlinks for the latest.iso, significantly improving the efficiency and reliability of our ISO build process. This milestone is a result of the community&#x27;s r…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 24, 2026</title>
+    <title>AcreetionOS Update — July 24, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-24.html"/>
     <id>tag:acreetionos.org,2026-07-24:newsletter</id>
     <updated>2026-07-24T00:00:00Z</updated>
     <published>2026-07-24T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 24, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has been further refined with the implementation of per-pipeline staging directories, significantly reducing the likelihood of publish races between concurrent builds and making our ISO build process more efficient. This improvement is a testament to t…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 23, 2026</title>
+    <title>AcreetionOS Update — July 23, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-23.html"/>
     <id>tag:acreetionos.org,2026-07-23:newsletter</id>
     <updated>2026-07-23T00:00:00Z</updated>
     <published>2026-07-23T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 23, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has just been released, bringing a plethora of changes and improvements to this versatile editor, and our community is already exploring its potential. This release is a significant milestone, and we&#x27;re excited to see how it will be utilized within the AcreetionOS ecosystem, which can be …</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 22, 2026</title>
+    <title>AcreetionOS Update — July 22, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-22.html"/>
     <id>tag:acreetionos.org,2026-07-22:newsletter</id>
     <updated>2026-07-22T00:00:00Z</updated>
     <published>2026-07-22T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 22, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just received another significant refinement, with the addition of per-pipeline staging directories and relative symlinks for the latest.iso file, making our ISO build process even more reliable and efficient. This improvement is a direct result of our communi…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 21, 2026</title>
+    <title>AcreetionOS Update — July 21, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-21.html"/>
     <id>tag:acreetionos.org,2026-07-21:newsletter</id>
     <updated>2026-07-21T00:00:00Z</updated>
     <published>2026-07-21T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 21, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been further refined with the implementation of per-pipeline staging directories and relative symlinks for the latest.iso file, making our ISO build process even more reliable and efficient. This improvement is a direct result of our community…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 20, 2026</title>
+    <title>AcreetionOS Update — July 20, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-20.html"/>
     <id>tag:acreetionos.org,2026-07-20:newsletter</id>
     <updated>2026-07-20T00:00:00Z</updated>
     <published>2026-07-20T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 20, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has been released, bringing a long list of changes to the popular editor, including the removal of the old Emacs Lisp compiler and many other improvements. This update is now available to AcreetionOS users through the Arch repositories, and can be easily installed using pacman, highlighti…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 19, 2026</title>
+    <title>AcreetionOS Update — July 19, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-19.html"/>
     <id>tag:acreetionos.org,2026-07-19:newsletter</id>
     <updated>2026-07-19T00:00:00Z</updated>
     <published>2026-07-19T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 19, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>A significant milestone has been achieved in our continuous integration pipeline with the implementation of per-pipeline staging directories to avoid publish races between concurrent builds, and relative symlinks for the latest.iso file, making our ISO build process more reliable. This improvement i…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update -- July 18, 2026</title>
+    <title>AcreetionOS Update — July 18, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-18.html"/>
     <id>tag:acreetionos.org,2026-07-18:newsletter</id>
     <updated>2026-07-18T00:00:00Z</updated>
     <published>2026-07-18T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update -- July 18, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has been further refined with the addition of per-pipeline staging directories and relative symlinks for the latest.iso file, making our ISO build process more reliable and efficient. This enhancement is a testament to our community&#x27;s dedication to imp…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 17, 2026</title>
+    <title>AcreetionOS Update — July 17, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-17.html"/>
     <id>tag:acreetionos.org,2026-07-17:newsletter</id>
     <updated>2026-07-17T00:00:00Z</updated>
     <published>2026-07-17T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 17, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just been improved with the addition of per-pipeline staging directories to avoid publish races between concurrent builds, and relative symlinks for the latest.iso file, making our ISO build process more reliable. This enhancement is a direct result of our com…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 16, 2026</title>
+    <title>AcreetionOS Update — July 16, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-16.html"/>
     <id>tag:acreetionos.org,2026-07-16:newsletter</id>
     <updated>2026-07-16T00:00:00Z</updated>
     <published>2026-07-16T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 16, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>A significant update to our continuous integration pipeline has just been implemented, with the addition of per-pipeline staging directories to avoid publish races between concurrent builds, and relative symlinks for the latest.iso file, making our ISO build process more reliable. This enhancement i…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 15, 2026</title>
+    <title>AcreetionOS Update — July 15, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-15.html"/>
     <id>tag:acreetionos.org,2026-07-15:newsletter</id>
     <updated>2026-07-15T00:00:00Z</updated>
     <published>2026-07-15T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 15, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has just been released, bringing a long list of changes, including the removal of the old Emacs Lisp compiler, and you can read more about it on our wiki at https://acreetionos.org/wiki.html. This release is a great example of the vibrant ecosystem surrounding Arch-based distributions lik…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 14, 2026</title>
+    <title>AcreetionOS Update — July 14, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-14.html"/>
     <id>tag:acreetionos.org,2026-07-14:newsletter</id>
     <updated>2026-07-14T00:00:00Z</updated>
     <published>2026-07-14T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 14, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline just got a significant boost with the implementation of per-pipeline staging directories, which will help avoid publish races between concurrent builds, and relative symlinks for the latest.iso file, making our ISO build process more reliable. This enhancement is …</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 13, 2026</title>
+    <title>AcreetionOS Update — July 13, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-13.html"/>
     <id>tag:acreetionos.org,2026-07-13:newsletter</id>
     <updated>2026-07-13T00:00:00Z</updated>
     <published>2026-07-13T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 13, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has become even more robust with the latest enhancements, including per-pipeline staging directories and relative symlinks for the latest.iso file, significantly improving the reliability of our ISO build process, and you can learn more about our curre…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 12, 2026</title>
+    <title>AcreetionOS Update — July 12, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-12.html"/>
     <id>tag:acreetionos.org,2026-07-12:newsletter</id>
     <updated>2026-07-12T00:00:00Z</updated>
     <published>2026-07-12T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 12, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has been released, bringing a plethora of changes and improvements to the beloved editor, and our community is already exploring its new features and capabilities. This release is a great reminder of the vibrant ecosystem surrounding AcreetionOS, an Arch-based Linux distribution that thri…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 11, 2026</title>
+    <title>AcreetionOS Update — July 11, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-11.html"/>
     <id>tag:acreetionos.org,2026-07-11:newsletter</id>
     <updated>2026-07-11T00:00:00Z</updated>
     <published>2026-07-11T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 11, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just become even more robust with the latest enhancements, including per-pipeline staging directories and relative symlinks for the latest.iso file, significantly improving the reliability of our ISO build process. This is a direct result of our co…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 10, 2026</title>
+    <title>AcreetionOS Update — July 10, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-10.html"/>
     <id>tag:acreetionos.org,2026-07-10:newsletter</id>
     <updated>2026-07-10T00:00:00Z</updated>
     <published>2026-07-10T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 10, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has become even more robust with the latest enhancements, including per-pipeline staging directories and relative symlinks for the latest.iso file, significantly improving the reliability of our ISO build process. These updates are a direct result of o…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 09, 2026</title>
+    <title>AcreetionOS Update — July 09, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-09.html"/>
     <id>tag:acreetionos.org,2026-07-09:newsletter</id>
     <updated>2026-07-09T00:00:00Z</updated>
     <published>2026-07-09T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 09, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just become even more robust with the latest enhancements, including per-pipeline staging directories and relative symlinks for the latest.iso file, which significantly improve the reliability of our ISO build process. This is a direct result of our community&#x27;…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 08, 2026</title>
+    <title>AcreetionOS Update — July 08, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-08.html"/>
     <id>tag:acreetionos.org,2026-07-08:newsletter</id>
     <updated>2026-07-08T00:00:00Z</updated>
     <published>2026-07-08T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 08, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has just been released, bringing a plethora of changes and improvements to the iconic editor, and our community is already exploring its potential. This release is a significant milestone, and you can learn more about the changes and updates on our wiki page at https://acreetionos.org/wik…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 07, 2026</title>
+    <title>AcreetionOS Update — July 07, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-07.html"/>
     <id>tag:acreetionos.org,2026-07-07:newsletter</id>
     <updated>2026-07-07T00:00:00Z</updated>
     <published>2026-07-07T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 07, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just seen another round of enhancements, building on the recent introduction of per-pipeline staging directories and relative symlinks for the latest.iso file, which has significantly improved the reliability of our ISO build process. This ongoing …</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 06, 2026</title>
+    <title>AcreetionOS Update — July 06, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-06.html"/>
     <id>tag:acreetionos.org,2026-07-06:newsletter</id>
     <updated>2026-07-06T00:00:00Z</updated>
     <published>2026-07-06T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 06, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been refined with the introduction of per-pipeline staging directories, significantly enhancing the reliability of our ISO build process by avoiding publish races between concurrent builds. This improvement is a direct result of our community&#x27;…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 05, 2026</title>
+    <title>AcreetionOS Update — July 05, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-05.html"/>
     <id>tag:acreetionos.org,2026-07-05:newsletter</id>
     <updated>2026-07-05T00:00:00Z</updated>
     <published>2026-07-05T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 05, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has seen significant enhancements recently, with the introduction of per-pipeline staging directories and the use of relative symlinks for the latest.iso file, ensuring a more stable and reliable ISO build process. This refinement is part of our ongoin…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 04, 2026</title>
+    <title>AcreetionOS Update — July 04, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-04.html"/>
     <id>tag:acreetionos.org,2026-07-04:newsletter</id>
     <updated>2026-07-04T00:00:00Z</updated>
     <published>2026-07-04T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 04, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has just been released, bringing a plethora of changes and improvements to this venerable editor, and our community is abuzz with the news, particularly in the context of our Arch-based distribution where such updates are seamlessly integrated through pacman and the Arch repos. This updat…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 03, 2026</title>
+    <title>AcreetionOS Update — July 03, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-03.html"/>
     <id>tag:acreetionos.org,2026-07-03:newsletter</id>
     <updated>2026-07-03T00:00:00Z</updated>
     <published>2026-07-03T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 03, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline just got another boost with the introduction of per-pipeline staging directories, significantly reducing the likelihood of publish races between concurrent builds, and the use of relative symlinks for the latest.iso file, ensuring it resolves correctly on the host…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 02, 2026</title>
+    <title>AcreetionOS Update — July 02, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-02.html"/>
     <id>tag:acreetionos.org,2026-07-02:newsletter</id>
     <updated>2026-07-02T00:00:00Z</updated>
     <published>2026-07-02T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 02, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just seen another round of refinements, building on the recent introduction of per-pipeline staging directories and relative symlinks for the latest.iso file, which have significantly improved the reliability of our ISO build process. These changes…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — July 01, 2026</title>
+    <title>AcreetionOS Update — July 01, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-07-01.html"/>
     <id>tag:acreetionos.org,2026-07-01:newsletter</id>
     <updated>2026-07-01T00:00:00Z</updated>
     <published>2026-07-01T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — July 01, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Recent updates to our continuous integration pipeline have significantly improved the reliability of our ISO build process, with changes such as per-pipeline staging directories to avoid publish races between concurrent builds, and the use of relative symlinks for the latest.iso file, ensuring it re…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 30, 2026</title>
+    <title>AcreetionOS Update — June 30, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-30.html"/>
     <id>tag:acreetionos.org,2026-06-30:newsletter</id>
     <updated>2026-06-30T00:00:00Z</updated>
     <published>2026-06-30T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 30, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline just got a significant boost with the introduction of per-pipeline staging directories, which will help avoid publish races between concurrent builds, and the use of relative symlinks for the latest.iso file, ensuring it resolves correctly on the host web root. Th…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 29, 2026</title>
+    <title>AcreetionOS Update — June 29, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-29.html"/>
     <id>tag:acreetionos.org,2026-06-29:newsletter</id>
     <updated>2026-06-29T00:00:00Z</updated>
     <published>2026-06-29T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 29, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Recent updates to our continuous integration pipeline have significantly improved the reliability of our ISO build process, with changes such as per-pipeline staging directories to avoid publish races between concurrent builds, and the use of relative symlinks for the latest.iso file, ensuring it re…</summary>
   </entry>
   <entry>
     <title>Take Back Control - Privacy Tips for Your AcreetionOS Setup</title>
@@ -389,7 +725,7 @@
     <id>tag:acreetionos.org,2026-06-28:newsletter</id>
     <updated>2026-06-28T00:00:00Z</updated>
     <published>2026-06-28T00:00:00Z</published>
-    <summary>Hey AcreetionOS family,  Happy weekend! We hope you have been enjoying the smooth ride that rolling release can bring. Today we want to talk about something close to our hearts: your privacy and system sovereignty.  AcreetionOS is built on the idea that your computer should work for you, not the oth…</summary>
+    <summary>Hey AcreetionOS family, Happy weekend! We hope you have been enjoying the smooth ride that rolling release can bring. Today we want to talk about something close to our hearts: your privacy and system sovereignty. AcreetionOS is built on the idea that your computer should work for you, not the other…</summary>
   </entry>
   <entry>
     <title>Your Daily Dose of AcreetionOS: Privacy, Power, and Pipewire!</title>
@@ -397,55 +733,55 @@
     <id>tag:acreetionos.org,2026-06-27:newsletter</id>
     <updated>2026-06-27T00:00:00Z</updated>
     <published>2026-06-27T00:00:00Z</published>
-    <summary>Hello AcreetionOS Community,  Welcome to another day of rolling release goodness! We hope your systems are running smoothly and your audio is crystal clear. Today, we want to shine a spotlight on one of the core pillars of AcreetionOS: your absolute system sovereignty.  In a world where data is cons…</summary>
+    <summary>Hello AcreetionOS Community, Welcome to another day of rolling release goodness! We hope your systems are running smoothly and your audio is crystal clear. Today, we want to shine a spotlight on one of the core pillars of AcreetionOS: your absolute system sovereignty. In a world where data is consta…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 26, 2026</title>
+    <title>AcreetionOS Update — June 26, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-26.html"/>
     <id>tag:acreetionos.org,2026-06-26:newsletter</id>
     <updated>2026-06-26T00:00:00Z</updated>
     <published>2026-06-26T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 26, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just been fine-tuned again, with recent changes making our release process even more reliable and efficient, and you can find all the details on our changelog page at https://acreetionos.org/changelog.html. This improvement is a great example of how our commun…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 25, 2026</title>
+    <title>AcreetionOS Update — June 25, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-25.html"/>
     <id>tag:acreetionos.org,2026-06-25:newsletter</id>
     <updated>2026-06-25T00:00:00Z</updated>
     <published>2026-06-25T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 25, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just been fine-tuned again, with recent changes making our release process even more reliable and efficient, and you can find all the details on our changelog page at https://acreetionos.org/changelog.html. This is a great example of how our community-driven d…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 24, 2026</title>
+    <title>AcreetionOS Update — June 24, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-24.html"/>
     <id>tag:acreetionos.org,2026-06-24:newsletter</id>
     <updated>2026-06-24T00:00:00Z</updated>
     <published>2026-06-24T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 24, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Emacs 31.1 has just been released, and our community is already exploring the new features and improvements it brings, including the removal of the old GUI. This update is a great example of how our Arch-based foundation keeps our users up-to-date with the latest software releases. Development The d…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 23, 2026</title>
+    <title>AcreetionOS Update — June 23, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-23.html"/>
     <id>tag:acreetionos.org,2026-06-23:newsletter</id>
     <updated>2026-06-23T00:00:00Z</updated>
     <published>2026-06-23T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 23, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, with recent changes making our release process even more reliable and efficient, and you can find all the details on our changelog page at https://acreetionos.org/changelog.html. This is a great example of how our commun…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 22, 2026</title>
+    <title>AcreetionOS Update — June 22, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-22.html"/>
     <id>tag:acreetionos.org,2026-06-22:newsletter</id>
     <updated>2026-06-22T00:00:00Z</updated>
     <published>2026-06-22T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 22, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, with recent changes making our release process even more reliable and efficient, and you can find all the details on our changelog page at https://acreetionos.org/changelog.html. This is a great example of how our commun…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 21, 2026</title>
+    <title>AcreetionOS Update — June 21, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-21.html"/>
     <id>tag:acreetionos.org,2026-06-21:newsletter</id>
     <updated>2026-06-21T00:00:00Z</updated>
     <published>2026-06-21T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 21, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just seen another round of fine-tuning, with the recent introduction of per-pipeline staging directories and relative symlinks for the latest ISO images significantly boosting the reliability and efficiency of our release process. This change is now reflected …</summary>
   </entry>
   <entry>
     <title>Your System, Your Rules - Why Sovereignty Matters More Than Ever</title>
@@ -453,103 +789,103 @@
     <id>tag:acreetionos.org,2026-06-20:newsletter</id>
     <updated>2026-06-20T00:00:00Z</updated>
     <published>2026-06-20T00:00:00Z</published>
-    <summary>Hey AcreetionOS Community,  Hope you&#x27;re having a great weekend! Today we want to talk about something that&#x27;s at the heart of everything we build here: system sovereignty.  In a world where more and more software phones home, tracks your habits, and makes decisions for you, having full control over y…</summary>
+    <summary>Hey AcreetionOS Community, Hope you&#x27;re having a great weekend! Today we want to talk about something that&#x27;s at the heart of everything we build here: system sovereignty. In a world where more and more software phones home, tracks your habits, and makes decisions for you, having full control over you…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 19, 2026</title>
+    <title>AcreetionOS Update — June 19, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-19.html"/>
     <id>tag:acreetionos.org,2026-06-19:newsletter</id>
     <updated>2026-06-19T00:00:00Z</updated>
     <published>2026-06-19T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 19, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, building on the recent introduction of per-pipeline staging directories and relative symlinks for the latest ISO images, which significantly boosts the reliability and efficiency of our release process. This change is no…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 18, 2026</title>
+    <title>AcreetionOS Update — June 18, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-18.html"/>
     <id>tag:acreetionos.org,2026-06-18:newsletter</id>
     <updated>2026-06-18T00:00:00Z</updated>
     <published>2026-06-18T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 18, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just been fine-tuned again, building on the recent introduction of per-pipeline staging directories and relative symlinks for the latest ISO images, which significantly boosts the reliability and efficiency of our release process. This improvement is a crucial…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 17, 2026</title>
+    <title>AcreetionOS Update — June 17, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-17.html"/>
     <id>tag:acreetionos.org,2026-06-17:newsletter</id>
     <updated>2026-06-17T00:00:00Z</updated>
     <published>2026-06-17T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 17, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just received another crucial fine-tuning, building on the recent introduction of per-pipeline staging directories and relative symlinks for the latest ISO images, which significantly boosts the reliability and efficiency of our release process. Th…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 16, 2026</title>
+    <title>AcreetionOS Update — June 16, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-16.html"/>
     <id>tag:acreetionos.org,2026-06-16:newsletter</id>
     <updated>2026-06-16T00:00:00Z</updated>
     <published>2026-06-16T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 16, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline has just been fine-tuned again, building on the recent introduction of per-pipeline staging directories and relative symlinks for the latest ISO images, which significantly boosts the reliability and efficiency of our release process. This improvement is a crucial…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 15, 2026</title>
+    <title>AcreetionOS Update — June 15, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-15.html"/>
     <id>tag:acreetionos.org,2026-06-15:newsletter</id>
     <updated>2026-06-15T00:00:00Z</updated>
     <published>2026-06-15T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 15, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, with the latest improvement ensuring that the latest ISO images resolve correctly on the host web root using relative symlinks, a change that is now documented on our changelog page at https://acreetionos.org/changelog.h…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 14, 2026</title>
+    <title>AcreetionOS Update — June 14, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-14.html"/>
     <id>tag:acreetionos.org,2026-06-14:newsletter</id>
     <updated>2026-06-14T00:00:00Z</updated>
     <published>2026-06-14T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 14, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline just got a significant boost with the introduction of per-pipeline staging directories, which will help avoid publish races between concurrent builds, and relative symlinks for the latest ISO images, ensuring they resolve correctly on the host web root. This impro…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 13, 2026</title>
+    <title>AcreetionOS Update — June 13, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-13.html"/>
     <id>tag:acreetionos.org,2026-06-13:newsletter</id>
     <updated>2026-06-13T00:00:00Z</updated>
     <published>2026-06-13T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 13, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has been fine-tuned once again, with the latest improvement ensuring that the latest ISO images resolve correctly on the host web root using relative symlinks, and this change is now documented on our changelog page at https://acreetionos.org/changelog…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 12, 2026</title>
+    <title>AcreetionOS Update — June 12, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-12.html"/>
     <id>tag:acreetionos.org,2026-06-12:newsletter</id>
     <updated>2026-06-12T00:00:00Z</updated>
     <published>2026-06-12T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 12, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has been further refined with the introduction of relative symlinks for the latest ISO images, building on the recent improvement of per-pipeline staging directories to avoid publish races between concurrent builds. This change ensures that the latest …</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 11, 2026</title>
+    <title>AcreetionOS Update — June 11, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-11.html"/>
     <id>tag:acreetionos.org,2026-06-11:newsletter</id>
     <updated>2026-06-11T00:00:00Z</updated>
     <published>2026-06-11T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 11, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned to use relative symlinks for the latest ISO images, ensuring that they resolve correctly on the host web root, and this change is now live and documented on our changelog page at https://acreetionos.org/changelog.html. This imp…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 10, 2026</title>
+    <title>AcreetionOS Update — June 10, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-10.html"/>
     <id>tag:acreetionos.org,2026-06-10:newsletter</id>
     <updated>2026-06-10T00:00:00Z</updated>
     <published>2026-06-10T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 10, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Our continuous integration pipeline just got a significant boost with the introduction of per-pipeline staging directories, which greatly reduces the likelihood of publish races between concurrent builds, ensuring that our users receive the latest ISO images in a timely and reliable manner. This cha…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 09, 2026</title>
+    <title>AcreetionOS Update — June 09, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-09.html"/>
     <id>tag:acreetionos.org,2026-06-09:newsletter</id>
     <updated>2026-06-09T00:00:00Z</updated>
     <published>2026-06-09T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 09, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Recent improvements to our continuous integration pipeline have significantly reduced the likelihood of publish races between concurrent builds, ensuring that our users receive the latest ISO images in a timely and reliable manner. This change, which utilizes per-pipeline staging directories, is a k…</summary>
   </entry>
   <entry>
-    <title>Daily AcreetionOS Update — June 08, 2026</title>
+    <title>AcreetionOS Update — June 08, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-06-08.html"/>
     <id>tag:acreetionos.org,2026-06-08:newsletter</id>
     <updated>2026-06-08T00:00:00Z</updated>
     <published>2026-06-08T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update — June 08, 2026  Today&#x27;s AI-generated newsletter is not available.  Please check back later for the latest AcreetionOS development updates, community news, and Linux tips.…</summary>
+    <summary>Recent improvements to our continuous integration pipeline have significantly reduced the likelihood of publish races between concurrent builds, ensuring that our users receive the latest ISO images in a timely and reliable manner. This change, which utilizes per-pipeline staging directories, is a k…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 07, 2026</title>
@@ -557,7 +893,7 @@
     <id>tag:acreetionos.org,2026-06-07:newsletter</id>
     <updated>2026-06-07T00:00:00Z</updated>
     <published>2026-06-07T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 07, 2026  Good morning, AcreetionOS readers. There was no recent activity to report today, so this edition focuses on a clean status update and a few practical newsletter-writing reminders drawn from current best practices.[6][9]  Development Updates  The development …</summary>
+    <summary>Daily AcreetionOS Update - June 07, 2026 Good morning, AcreetionOS readers. There was no recent activity to report today, so this edition focuses on a clean status update and a few practical newsletter-writing reminders drawn from current best practices.[6][9] Development Updates The development tra…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 06, 2026</title>
@@ -565,7 +901,7 @@
     <id>tag:acreetionos.org,2026-06-06:newsletter</id>
     <updated>2026-06-06T00:00:00Z</updated>
     <published>2026-06-06T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 06, 2026. Welcome to today’s AcreetionOS update, with a focus on desktop polish, ecosystem security, and the growing conversation around easier alternatives to Windows.  Development Updates. Today’s development attention is on keeping AcreetionOS approachable while st…</summary>
+    <summary>Daily AcreetionOS Update - June 06, 2026. Welcome to today’s AcreetionOS update, with a focus on desktop polish, ecosystem security, and the growing conversation around easier alternatives to Windows. Development Updates. Today’s development attention is on keeping AcreetionOS approachable while sta…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 05, 2026</title>
@@ -573,7 +909,7 @@
     <id>tag:acreetionos.org,2026-06-05:newsletter</id>
     <updated>2026-06-05T00:00:00Z</updated>
     <published>2026-06-05T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 05, 2026. Here’s today’s AcreetionOS newsletter with the latest development focus, community momentum, and practical highlights.  Development Updates. Today’s activity was driven less by a new internal release and more by the broader conversation around usability, mig…</summary>
+    <summary>Daily AcreetionOS Update - June 05, 2026. Here’s today’s AcreetionOS newsletter with the latest development focus, community momentum, and practical highlights. Development Updates. Today’s activity was driven less by a new internal release and more by the broader conversation around usability, migr…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 04, 2026</title>
@@ -581,7 +917,7 @@
     <id>tag:acreetionos.org,2026-06-04:newsletter</id>
     <updated>2026-06-04T00:00:00Z</updated>
     <published>2026-06-04T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 04, 2026. Today’s update focuses on upstream Linux movement, security awareness, and a strong wave of community attention around desktop alternatives.  Development Updates. The team is tracking the newly released Arch Linux June ISO, which brings a fresh kernel and co…</summary>
+    <summary>Daily AcreetionOS Update - June 04, 2026. Today’s update focuses on upstream Linux movement, security awareness, and a strong wave of community attention around desktop alternatives. Development Updates. The team is tracking the newly released Arch Linux June ISO, which brings a fresh kernel and cor…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 03, 2026</title>
@@ -589,7 +925,7 @@
     <id>tag:acreetionos.org,2026-06-03:newsletter</id>
     <updated>2026-06-03T00:00:00Z</updated>
     <published>2026-06-03T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 03, 2026. Today’s update brings a mix of platform news, security awareness, and growing community momentum around easier, friendlier operating system choices.  Development Updates. The Arch Linux June ISO is out with a fresh kernel and core package updates, and we are…</summary>
+    <summary>Daily AcreetionOS Update - June 03, 2026. Today’s update brings a mix of platform news, security awareness, and growing community momentum around easier, friendlier operating system choices. Development Updates. The Arch Linux June ISO is out with a fresh kernel and core package updates, and we are …</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 02, 2026</title>
@@ -597,7 +933,7 @@
     <id>tag:acreetionos.org,2026-06-02:newsletter</id>
     <updated>2026-06-02T00:00:00Z</updated>
     <published>2026-06-02T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 02, 2026  Development Updates: No recent activity was recorded for AcreetionOS today, so there are no new feature launches, bug fixes, or infrastructure changes to report. In a quiet update like this, the main takeaway is stability, with the development team presumabl…</summary>
+    <summary>Daily AcreetionOS Update - June 02, 2026 Development Updates: No recent activity was recorded for AcreetionOS today, so there are no new feature launches, bug fixes, or infrastructure changes to report. In a quiet update like this, the main takeaway is stability, with the development team presumably…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — June 01, 2026</title>
@@ -605,7 +941,7 @@
     <id>tag:acreetionos.org,2026-06-01:newsletter</id>
     <updated>2026-06-01T00:00:00Z</updated>
     <published>2026-06-01T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 01, 2026  Development Updates  No recent activity was found for AcreetionOS today, so there are no confirmed code changes, releases, or merge updates to report. The latest available material still points to ongoing ecosystem-building work around documentation, wiki se…</summary>
+    <summary>Daily AcreetionOS Update - June 01, 2026 Development Updates No recent activity was found for AcreetionOS today, so there are no confirmed code changes, releases, or merge updates to report. The latest available material still points to ongoing ecosystem-building work around documentation, wiki setu…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — May 31, 2026</title>
@@ -613,7 +949,7 @@
     <id>tag:acreetionos.org,2026-05-31:newsletter</id>
     <updated>2026-05-31T00:00:00Z</updated>
     <published>2026-05-31T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - May 31, 2026  Development Updates  Today’s focus is on polish, onboarding, and ecosystem awareness. With AcreetionOS receiving fresh community attention as an easy-to-use alternative for Windows 10 and 11 users, the team is continuing to prioritize first-run experience, cl…</summary>
+    <summary>Daily AcreetionOS Update - May 31, 2026 Development Updates Today’s focus is on polish, onboarding, and ecosystem awareness. With AcreetionOS receiving fresh community attention as an easy-to-use alternative for Windows 10 and 11 users, the team is continuing to prioritize first-run experience, clea…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — May 30, 2026</title>
@@ -621,7 +957,7 @@
     <id>tag:acreetionos.org,2026-05-30:newsletter</id>
     <updated>2026-05-30T00:00:00Z</updated>
     <published>2026-05-30T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - May 30, 2026  Development Updates  Today’s development focus is on security triage and desktop experience polish. Following reports of multiple Linux privilege-escalation issues, including the PinTheft flaw affecting Arch-based environments and a long-standing kernel vulne…</summary>
+    <summary>Daily AcreetionOS Update - May 30, 2026 Development Updates Today’s development focus is on security triage and desktop experience polish. Following reports of multiple Linux privilege-escalation issues, including the PinTheft flaw affecting Arch-based environments and a long-standing kernel vulnera…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — May 29, 2026</title>
@@ -629,7 +965,7 @@
     <id>tag:acreetionos.org,2026-05-29:newsletter</id>
     <updated>2026-05-29T00:00:00Z</updated>
     <published>2026-05-29T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - May 29, 2026  Hello AcreetionOS community,  Today’s update is a quieter one, as there was no recent development activity or community activity recorded for this reporting period. Even on slower days, we want to keep the daily rhythm going and make sure everyone has a clear…</summary>
+    <summary>Daily AcreetionOS Update - May 29, 2026 Hello AcreetionOS community, Today’s update is a quieter one, as there was no recent development activity or community activity recorded for this reporting period. Even on slower days, we want to keep the daily rhythm going and make sure everyone has a clear s…</summary>
   </entry>
   <entry>
     <title>Daily AcreetionOS Update — May 25, 2026</title>
@@ -637,6 +973,6 @@
     <id>tag:acreetionos.org,2026-05-25:newsletter</id>
     <updated>2026-05-25T00:00:00Z</updated>
     <published>2026-05-25T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - May 25, 2026  Development Updates  Today’s focus across the AcreetionOS ecosystem is on stability, usability, and security awareness. Recent Linux security headlines, including reports of a long-standing kernel flaw and the newly discussed PinTheft privilege-escalation iss…</summary>
+    <summary>Daily AcreetionOS Update - May 25, 2026 Development Updates Today’s focus across the AcreetionOS ecosystem is on stability, usability, and security awareness. Recent Linux security headlines, including reports of a long-standing kernel flaw and the newly discussed PinTheft privilege-escalation issue…</summary>
   </entry>
 </feed>

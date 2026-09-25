@@ -36,6 +36,14 @@ jobs:
       - name: Generate newsletter archive HTML
         run: python3 scripts/gen-newsletter-archive.py
 
+      # Rebuild the Atom feed from the newsletters generated above. Without
+      # this step feed.xml stays frozen at whatever it was last committed as —
+      # it was a one-off snapshot until this was added (see gen-feed.py).
+      # Runs after the archive step because the feed only links issues whose
+      # archive page exists.
+      - name: Generate Atom feed
+        run: python3 scripts/gen-feed.py
+
       # Pre-generate static wiki guide pages (popular topics) so search
       # engines can index the AI guides without a visit.
       - name: Generate wiki guide pages
@@ -49,15 +57,15 @@ jobs:
       - name: Update sitemap
         run: python3 scripts/gen-sitemap.py
 
-      # Stage newsletters, HTML archives, wiki-guides, and sitemap.xml
+      # Stage newsletters, HTML archives, wiki-guides, feed.xml and sitemap.xml
       - name: Commit and push
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add newsletters/ newsletter-archive/ wiki-guides/ sitemap.xml
+          git add newsletters/ newsletter-archive/ wiki-guides/ feed.xml sitemap.xml
           if git diff --cached --quiet; then
             echo "No new newsletter or guides to commit."
           else
-            git commit -m "intelligence sync: newsletter + archive + wiki guides $(date +%Y-%m-%d-%H%M)"
+            git commit -m "intelligence sync: newsletter + archive + wiki guides + feed $(date +%Y-%m-%d-%H%M)"
             git push
           fi
