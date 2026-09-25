@@ -32,6 +32,13 @@ EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS", "")
 EMAIL_PASSWORD = os.environ.get("EMAIL_APP_PASSWORD", "")
 ADMIN_KEY = os.environ.get("ADMIN_KEY", "")
 
+# Discord's API rejects any message over 2000 characters.
+DISCORD_MAX_CONTENT = 2000
+# Cloudflare (in front of discord.com) blocks the default Python-urllib
+# User-Agent with "error code: 1010" / HTTP 403, so send a real one.
+DISCORD_USER_AGENT = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                      "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36")
+
 # Sources to scrape for ecosystem context
 ECOSYSTEM_PAGES = [
     ("acreetionos.org", "https://acreetionos.org"),
@@ -336,18 +343,30 @@ def post_to_discord(newsletter):
     # First 3 paragraphs as the Discord snippet
     paras = [p.strip() for p in body.split("\n\n") if p.strip()]
     snippet = "\n\n".join(paras[:3])
-    if len(snippet) > 1800:
-        snippet = snippet[:1800] + "…"
     date_display = newsletter.get("date_display", "")
+    header = f"📬 **{subject}**\n\n"
+    footer = ("\n\nRead the full newsletter: https://acreetionos.org/newsletter.html "
+              "| Archive: https://acreetionos.org/newsletter-archive/")
+    # Discord rejects content over 2000 chars with a 400, and the header and
+    # footer are added on top of the snippet — so cap the assembled message,
+    # not the snippet alone, or a long subject tips it over.
+    budget = DISCORD_MAX_CONTENT - len(header) - len(footer) - 1
+    if len(snippet) > budget:
+        snippet = snippet[:budget] + "…"
     payload = {
-        "content": f"📬 **{subject}**\n\n{snippet}\n\n"
-                   f"Read the full newsletter: https://acreetionos.org/newsletter.html "
-                   f"| Archive: https://acreetionos.org/newsletter-archive/",
+        "content": f"{header}{snippet}{footer}",
         "username": "AcreetionOS Bot",
+        # Never let AI-generated body text turn into an @everyone ping.
+        "allowed_mentions": {"parse": []},
     }
     try:
         req = Request(webhook, data=json.dumps(payload).encode(),
-                      headers={"Content-Type": "application/json"})
+                      headers={"Content-Type": "application/json",
+                               # Discord sits behind Cloudflare, which answers
+                               # Python's default User-Agent with
+                               # "error code: 1010" and a 403. That was the real
+                               # cause of the long-standing push failures.
+                               "User-Agent": DISCORD_USER_AGENT})
         with urlopen(req, timeout=15) as resp:
             if resp.status not in (200, 204):
                 print(f"Discord push: HTTP {resp.status}", file=sys.stderr)
