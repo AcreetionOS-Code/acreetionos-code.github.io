@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-09-25T00:00:00Z</updated>
+  <updated>2026-09-26T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 26, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-26.html"/>
+    <id>tag:acreetionos.org,2026-09-26:newsletter</id>
+    <updated>2026-09-26T00:00:00Z</updated>
+    <published>2026-09-26T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 26, 2026 Top Development: Shelly 3.1.5 Expands AUR Support Shelly, the popular GUI package manager for Arch Linux, has just released version 3.1.5, which adds support for the AUR (Arch User Repository). This means that users can now easily browse and install packag…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- September 25, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-09-25.html"/>
