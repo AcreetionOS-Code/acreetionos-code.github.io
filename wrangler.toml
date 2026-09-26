@@ -35,6 +35,17 @@ RETURN_ADDRESS = "developers@acreetionos.org"
 #   GROQ_API_KEY  — (optional) Groq free tier fallback
 #   GH_TOKEN      — (optional) GitHub Models free tier fallback
 #   RECAPTCHA_API_KEY — Google Cloud API key for reCAPTCHA Enterprise
-#       assessments (project clean-502708). REQUIRED to enforce reCAPTCHA.
+#       assessments (project clean-502708).
 #   RECAPTCHA_SECRET_KEY — legacy siteverify secret; alternative to the
-#       Enterprise API key. If neither is set, verification is skipped.
+#       Enterprise API key.
+#
+#   ⚠ AS OF 2026-09-26 NEITHER KEY IS SET, so reCAPTCHA is NOT enforced in
+#   production. The old comment here said "REQUIRED to enforce reCAPTCHA" and
+#   read like it was configured — it was not, and the code failed open
+#   silently, leaving /api/newsletter/subscribe and the three /api/hosting/*
+#   write endpoints open to unauthenticated traffic for months.
+#
+#   Set ONE of the two keys above to enforce reCAPTCHA (no deploy needed
+#   beyond `wrangler secret put`). Until then the state is reported by
+#   GET /api/health/check under "security", and the Worker logs a
+#   [SECURITY] warning naming the open endpoints.

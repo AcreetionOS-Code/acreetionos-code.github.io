@@ -110,10 +110,30 @@ function getClientIP(request) {
 // { ok: false, error } to reject the request.
 // Fail-open ONLY on network errors talking to Google (a Google outage must
 // never take the whole site down); invalid/expired tokens still fail closed.
+// Set to true in [vars] to refuse every protected write while reCAPTCHA is
+// unconfigured, instead of the default fail-open behaviour. The default stays
+// open so a missing key never takes hosting or signups down — but the state is
+// now reported by GET /api/health/check rather than being silent.
+const RECAPTCHA_FAIL_CLOSED = false;
+let recaptchaDisabledWarned = false;
+
 async function verifyRecaptcha(env, token, action) {
   const apiKey = env.RECAPTCHA_API_KEY;
   const secretKey = env.RECAPTCHA_SECRET_KEY;
-  if (!apiKey && !secretKey) return { ok: true, disabled: true };
+  if (!apiKey && !secretKey) {
+    // These endpoints write to R2 and are otherwise unauthenticated and
+    // unthrottled, so an unconfigured key means they are open to anyone.
+    if (!recaptchaDisabledWarned) {
+      recaptchaDisabledWarned = true;
+      console.warn('[SECURITY] reCAPTCHA is DISABLED: neither RECAPTCHA_API_KEY nor RECAPTCHA_SECRET_KEY is set. Protected writes (' +
+        "newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are accepting unauthenticated traffic. " +
+        'Set the key, or set RECAPTCHA_FAIL_CLOSED=true to refuse writes instead.');
+    }
+    if (RECAPTCHA_FAIL_CLOSED) {
+      return { ok: false, error: 'Human verification is temporarily unavailable. Please try again later.' };
+    }
+    return { ok: true, disabled: true };
+  }
   if (!token) return { ok: false, error: 'Human verification required. Please retry.' };
   try {
     if (secretKey) {
@@ -1850,6 +1870,23 @@ const HEALTH_APIS = [
 async function handleHealthCheck(env) {
   const results = { pages: [], apis: [], downloads: [], healthy: true, timestamp: new Date().toISOString() };
   let totalIssues = 0;
+
+  // 0. Security posture — report the reCAPTCHA state instead of letting an
+  // unconfigured key silently leave the public write endpoints open.
+  const recaptchaConfigured = Boolean(env.RECAPTCHA_API_KEY || env.RECAPTCHA_SECRET_KEY);
+  results.security = {
+    recaptcha: recaptchaConfigured ? 'configured' : 'DISABLED',
+    recaptchaMode: recaptchaConfigured ? 'enforced' : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed' : 'fail-open'),
+    openEndpoints: recaptchaConfigured ? [] : [
+      'POST /api/newsletter/subscribe',
+      'POST /api/hosting/register',
+      'POST /api/hosting/manage',
+      'POST /api/hosting/subscribe',
+    ],
+    note: recaptchaConfigured
+      ? 'Protected writes require a valid token.'
+      : 'No reCAPTCHA key is set, so these unauthenticated endpoints accept writes from anyone. Set RECAPTCHA_API_KEY (or RECAPTCHA_SECRET_KEY).',
+  };
 
   // 1. Check all HTML pages
   const pageChecks = HEALTH_PAGES.map(async (page) => {
