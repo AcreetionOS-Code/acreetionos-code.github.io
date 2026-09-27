@@ -203,7 +203,7 @@ async function verifyRecaptcha(env, token, action) {
       const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'secret=' + encodeURIComponent(secretKey) + '&response=' + encodeURIComponent(token),
+        body: 'secret=' + encodeURIComponent(secret) + '&response=' + encodeURIComponent(token),
         signal: AbortSignal.timeout(10000),
       });
       const data = await res.json();
@@ -234,6 +234,15 @@ async function verifyRecaptcha(env, token, action) {
     return { ok: true, score: score };
   } catch (e) {
     // Network failure reaching Google — fail open so the site keeps working.
+    //
+    // Logged, because "degraded" is indistinguishable from "verified" in the
+    // response. A rename once left `secretKey` referenced after the variable
+    // was renamed to `secret`, which threw a ReferenceError here. That was
+    // swallowed silently, every gated endpoint failed open, and the health
+    // check still reported "enforced" because the secret was present. A
+    // missing-token test could not catch it either, since that check runs
+    // before this block. A bogus token would have.
+    console.warn('[SECURITY] reCAPTCHA verification error, allowing request unverified:', e && e.message ? e.message : e);
     return { ok: true, degraded: true };
   }
 }
