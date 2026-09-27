@@ -44,11 +44,17 @@ RETURN_ADDRESS = "developers@acreetionos.org"
 #   "REQUIRED to enforce reCAPTCHA" and read like it was configured — it was
 #   not.
 #
-#   That is fixed at the code level: RECAPTCHA_FAIL_CLOSED = true in index.js,
-#   so with no secret set those four writes are REFUSED rather than accepted.
-#   The exposure is closed. The cost is that newsletter signup and hosting
-#   registration return "Human verification is temporarily unavailable" until
-#   the secret exists.
+#   That is fixed in index.js. Seven actions are reCAPTCHA-gated, split by
+#   what they do:
+#     writes  (FAIL_CLOSED_ACTIONS) — newsletter/subscribe, hosting/register,
+#              hosting/manage, hosting/subscribe. These REFUSE while the
+#              secret is unset, because an unauthenticated write is unbounded.
+#     reads   — /api/chat, /api/translate. These stay SERVED and rely on rate
+#              limiting, since they mutate nothing. An earlier single-flag
+#              approach took both offline at once and silently broke the wiki
+#              AI guide.
+#   RECAPTCHA_FAIL_CLOSED = true is a master override that locks all seven,
+#   including the read-only AI endpoints. Leave it false.
 #
 #   The secret is dispatched on its shape, because the two reCAPTCHA families
 #   authenticate differently:
@@ -61,6 +67,5 @@ RETURN_ADDRESS = "developers@acreetionos.org"
 #   GitHub Actions secrets of the same names, on every deploy.
 #   `wrangler secret put RECAPTCHA_API_SECRET_KEY` also works.
 #
-#   GET /api/health/check reports this under "security": recaptchaMode is
-#   "fail-closed" and openEndpoints is empty, while unavailableEndpoints
-#   lists the four refused writes.
+#   GET /api/health/check reports this under "security", with unavailableEndpoints
+#   listing the refused writes and unverifiedEndpoints the AI reads.

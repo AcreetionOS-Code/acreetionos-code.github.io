@@ -124,31 +124,54 @@ function getClientIP(request) {
 // { ok: false, error } to reject the request.
 // Fail-open ONLY on network errors talking to Google (a Google outage must
 // never take the whole site down); invalid/expired tokens still fail closed.
-// TRUE as of 2026-09-27 — was false. RECAPTCHA_API_SECRET_KEY was unset, and
-// confirmed absent from GitHub Actions secrets at the time, so there was no
-// secret to enforce with. Fail-open therefore left four unauthenticated,
-// unthrottled R2 write endpoints open to anyone, which was verified live
-// rather than inferred: an unauthenticated POST /api/newsletter/subscribe
-// returned 200 and persisted a row.
 //
-// The trade-off this accepts: with no secret set, the four protected writes
-// refuse, so newsletter signup and hosting registration return "Human
-// verification is temporarily unavailable. Please try again later." That is
-// deliberate — an open write endpoint is a worse failure than a temporarily
-// unavailable form, and the exposure was unbounded.
+// When the secret is unset, which actions refuse is decided by the action
+// itself, not by one global switch — see FAIL_CLOSED_ACTIONS below.
 //
-// TO RESTORE SERVICE, set the secret (no code change needed — this flag only
-// governs the unconfigured case). It is supplied automatically by
-// .github/workflows/deploy-worker.yml from the GitHub Actions secret of the
-// same name; `wrangler secret put RECAPTCHA_API_SECRET_KEY` also works.
-// The frontend already collects a token: recaptcha.js loads the Enterprise
-// script and the forms send recaptchaToken.
-const RECAPTCHA_FAIL_CLOSED = true;
+// This was originally a single boolean, RECAPTCHA_FAIL_CLOSED, set to true to
+// close the unauthenticated writes. That did close them, and it also silently
+// took down /api/chat and /api/translate, which share this gate. The only
+// user-visible symptom was the wiki AI guide quietly falling back to raw Arch
+// Wiki markup, and it went unnoticed because the four write endpoints
+// behaved exactly as intended.
+//
+// The lesson generalises past this function: when one security change makes
+// several things fail, enumerate every call site before reporting blast
+// radius, and prefer refusing the specific risky actions over refusing
+// everything behind one flag.
+const RECAPTCHA_FAIL_CLOSED = false;
+
+// Actions that MUTATE shared state — they write to R2, publish a provider
+// entry, or post to a Discord webhook. When reCAPTCHA is unconfigured these
+// refuse rather than serve, because an unauthenticated write is an unbounded
+// exposure that no other control here contains.
+//
+// Read-only AI actions (chat, translate) are deliberately NOT in this set.
+// They mutate nothing, so refusing them removes no risk — it only breaks
+// features. They stay served and rely on checkRateLimit plus the upstream
+// provider's own limits.
+//
+// This set exists because a single global flag is the wrong tool: setting
+// RECAPTCHA_FAIL_CLOSED = true to protect the writes also silently took the
+// wiki AI guide (/api/chat) and /api/translate offline, since they share the
+// same gate. That was a real regression, invisible in testing because the
+// four write endpoints kept behaving exactly as expected.
+const FAIL_CLOSED_ACTIONS = new Set([
+  'hosting_register',
+  'hosting_manage',
+  'hosting_subscribe',
+  'newsletter_subscribe',
+]);
+
 let recaptchaDisabledWarned = false;
 
 async function verifyRecaptcha(env, token, action) {
   const siteKey = env.RECAPTCHA_API_KEY || RECAPTCHA_SITE_KEY;
   const secret = env.RECAPTCHA_API_SECRET_KEY;
+  // RECAPTCHA_FAIL_CLOSED is a master override that locks EVERY gated action,
+  // including the read-only AI ones. Default off, so an unconfigured key
+  // cannot silently take the AI guide offline.
+  const failClosed = RECAPTCHA_FAIL_CLOSED || FAIL_CLOSED_ACTIONS.has(action);
   if (!secret) {
     // These endpoints write to R2 and are otherwise unauthenticated and
     // unthrottled, so an unconfigured key is a security problem either way.
@@ -158,14 +181,14 @@ async function verifyRecaptcha(env, token, action) {
       recaptchaDisabledWarned = true;
       console.warn(
         '[SECURITY] reCAPTCHA is DISABLED: RECAPTCHA_API_SECRET_KEY is not set. ' +
-        'Protected writes (newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are ' +
-        (RECAPTCHA_FAIL_CLOSED
-          ? 'being REFUSED (RECAPTCHA_FAIL_CLOSED=true). Signup and hosting registration stay unavailable until the secret is set. '
-          : 'ACCEPTING UNAUTHENTICATED TRAFFIC (RECAPTCHA_FAIL_CLOSED=false). ') +
-        'Set RECAPTCHA_API_SECRET_KEY to restore service.'
+        (failClosed
+          ? 'State-changing writes (newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are being REFUSED. '
+          : 'State-changing writes are ACCEPTING UNAUTHENTICATED TRAFFIC. ') +
+        'Read-only AI actions (chat, translate) are served without verification and rely on rate limiting. ' +
+        'Set RECAPTCHA_API_SECRET_KEY to enforce everywhere.'
       );
     }
-    if (RECAPTCHA_FAIL_CLOSED) {
+    if (failClosed) {
       return { ok: false, error: 'Human verification is temporarily unavailable. Please try again later.' };
     }
     return { ok: true, disabled: true };
@@ -1914,27 +1937,33 @@ async function handleHealthCheck(env) {
   // 0. Security posture — report the reCAPTCHA state instead of letting an
   // unconfigured key silently leave the public write endpoints open.
   const recaptchaConfigured = Boolean(env.RECAPTCHA_API_SECRET_KEY);
-  const PROTECTED_WRITES = [
+  // All seven reCAPTCHA-gated actions, split by what they do. The write list
+  // mirrors FAIL_CLOSED_ACTIONS; an earlier version of this block listed only
+  // four and omitted chat/translate entirely, which understated the blast
+  // radius of a fail-closed change.
+  const WRITE_ACTIONS = [
     'POST /api/newsletter/subscribe',
     'POST /api/hosting/register',
     'POST /api/hosting/manage',
     'POST /api/hosting/subscribe',
   ];
-  // With no key set these endpoints are either refused (fail-closed, the
-  // current setting) or wide open (fail-open). Only the second case is a
-  // security problem, and only the second case belongs in `openEndpoints` —
-  // listing refused endpoints as open would send whoever reads this chasing a
-  // vulnerability that is not there.
+  const READ_AI_ACTIONS = [
+    'POST /api/chat',
+    'POST /api/translate',
+  ];
+  const writesRefused = !recaptchaConfigured;
   results.security = {
     recaptcha: recaptchaConfigured ? 'configured' : 'DISABLED',
-    recaptchaMode: recaptchaConfigured ? 'enforced' : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed' : 'fail-open'),
-    openEndpoints: (recaptchaConfigured || RECAPTCHA_FAIL_CLOSED) ? [] : PROTECTED_WRITES,
-    unavailableEndpoints: (recaptchaConfigured || !RECAPTCHA_FAIL_CLOSED) ? [] : PROTECTED_WRITES,
+    recaptchaMode: recaptchaConfigured ? 'enforced'
+      : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed (all actions)' : 'fail-closed (writes only)'),
+    // Nothing is open while unconfigured: the writes refuse, and the read-only
+    // AI actions are served without verification but mutate nothing.
+    openEndpoints: [],
+    unavailableEndpoints: writesRefused ? WRITE_ACTIONS : [],
+    unverifiedEndpoints: writesRefused ? READ_AI_ACTIONS : [],
     note: recaptchaConfigured
-      ? 'Protected writes require a valid token.'
-      : RECAPTCHA_FAIL_CLOSED
-        ? 'No reCAPTCHA secret is set, so the protected writes are REFUSED rather than served. This is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. Set RECAPTCHA_API_SECRET_KEY to restore service — the frontend already sends recaptchaToken.'
-        : 'No reCAPTCHA secret is set and RECAPTCHA_FAIL_CLOSED is false, so these unauthenticated endpoints accept writes from anyone. Set RECAPTCHA_API_SECRET_KEY, or set RECAPTCHA_FAIL_CLOSED = true in index.js.',
+      ? 'All gated endpoints require a valid token.'
+      : 'No reCAPTCHA secret is set. The four state-changing writes are REFUSED rather than served, which is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. The read-only AI endpoints (chat, translate) stay served and rely on rate limiting, since they mutate nothing. Set RECAPTCHA_API_SECRET_KEY to enforce everywhere — the frontend already sends recaptchaToken.',
   };
 
   // 1. Check all HTML pages
