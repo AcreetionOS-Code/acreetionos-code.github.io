@@ -1945,7 +1945,27 @@ async function handleHealthCheck(env) {
 
   // 0. Security posture — report the reCAPTCHA state instead of letting an
   // unconfigured key silently leave the public write endpoints open.
-  const recaptchaConfigured = Boolean(env.RECAPTCHA_API_SECRET_KEY);
+  //
+  // "configured" below means the secret is PRESENT, which is not the same as
+  // verification WORKING. A secret of the wrong family (a classic 6L secret
+  // paired with an Enterprise site key) is present but can never validate the
+  // tokens the frontend sends, and a bug that made the verify path throw would
+  // fail open while still reporting "configured". So this block also reports
+  // which verification path the secret selects, and whether that path can
+  // actually validate the site key the frontend uses. The frontend's
+  // recaptcha.js always calls grecaptcha.enterprise.execute, so every token it
+  // produces is an Enterprise token, and only the Enterprise assessments API
+  // can validate one.
+  const recaptchaSecret = env.RECAPTCHA_API_SECRET_KEY || '';
+  const recaptchaConfigured = Boolean(recaptchaSecret);
+  const recaptchaSecretKind = !recaptchaSecret ? 'none'
+    : (recaptchaSecret.startsWith('AIza') ? 'google-api-key' : 'classic-secret');
+  // RECAPTCHA_SITE_KEY is 6Lf-… (Enterprise). A classic 6L secret cannot verify
+  // an Enterprise token, so that pairing is reported as a misconfiguration
+  // rather than as working enforcement.
+  const recaptchaMismatched = recaptchaSecretKind === 'classic-secret'
+    && RECAPTCHA_SITE_KEY.startsWith('6Lf');
+  const recaptchaWorking = recaptchaConfigured && !recaptchaMismatched;
   // All seven reCAPTCHA-gated actions, split by what they do. The write list
   // mirrors FAIL_CLOSED_ACTIONS; an earlier version of this block listed only
   // four and omitted chat/translate entirely, which understated the blast
@@ -1960,19 +1980,26 @@ async function handleHealthCheck(env) {
     'POST /api/chat',
     'POST /api/translate',
   ];
-  const writesRefused = !recaptchaConfigured;
+  const writesRefused = !recaptchaWorking;
   results.security = {
     recaptcha: recaptchaConfigured ? 'configured' : 'DISABLED',
-    recaptchaMode: recaptchaConfigured ? 'enforced'
+    // "working" is the field that matters. recaptchaMode describes intent;
+    // recaptchaWorking describes whether that intent is actually in effect.
+    recaptchaMode: recaptchaWorking ? 'enforced'
       : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed (all actions)' : 'fail-closed (writes only)'),
+    recaptchaSecretKind,
+    recaptchaSiteKeyKind: RECAPTCHA_SITE_KEY.startsWith('6Lf') ? 'enterprise' : 'classic',
+    recaptchaWorking,
     // Nothing is open while unconfigured: the writes refuse, and the read-only
     // AI actions are served without verification but mutate nothing.
     openEndpoints: [],
     unavailableEndpoints: writesRefused ? WRITE_ACTIONS : [],
     unverifiedEndpoints: writesRefused ? READ_AI_ACTIONS : [],
-    note: recaptchaConfigured
-      ? 'All gated endpoints require a valid token.'
-      : 'No reCAPTCHA secret is set. The four state-changing writes are REFUSED rather than served, which is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. The read-only AI endpoints (chat, translate) stay served and rely on rate limiting, since they mutate nothing. Set RECAPTCHA_API_SECRET_KEY to enforce everywhere — the frontend already sends recaptchaToken.',
+    note: recaptchaMismatched
+      ? 'MISCONFIGURATION: RECAPTCHA_API_SECRET_KEY looks like a classic reCAPTCHA secret, but the frontend site key is an Enterprise key, so every token recaptcha.js produces is an Enterprise token and classic siteverify can never validate it. All gated endpoints therefore reject every request, including legitimate ones. Set RECAPTCHA_API_SECRET_KEY to a Google Cloud API key (AIza…) for project ' + RECAPTCHA_PROJECT + '.'
+      : recaptchaWorking
+        ? 'Secret is present and its family matches the site key. Gated endpoints require a valid token.'
+        : 'No usable reCAPTCHA secret is set. The four state-changing writes are REFUSED rather than served, which is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. The read-only AI endpoints (chat, translate) stay served and rely on rate limiting, since they mutate nothing. Set RECAPTCHA_API_SECRET_KEY to enforce everywhere — the frontend already sends recaptchaToken.',
   };
 
   // 1. Check all HTML pages
