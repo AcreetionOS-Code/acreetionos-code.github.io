@@ -110,11 +110,27 @@ function getClientIP(request) {
 // { ok: false, error } to reject the request.
 // Fail-open ONLY on network errors talking to Google (a Google outage must
 // never take the whole site down); invalid/expired tokens still fail closed.
-// Set to true in [vars] to refuse every protected write while reCAPTCHA is
-// unconfigured, instead of the default fail-open behaviour. The default stays
-// open so a missing key never takes hosting or signups down — but the state is
-// now reported by GET /api/health/check rather than being silent.
-const RECAPTCHA_FAIL_CLOSED = false;
+// TRUE as of 2026-09-27 — was false. Neither RECAPTCHA_API_KEY nor
+// RECAPTCHA_SECRET_KEY is set, and confirmed absent from GitHub Actions
+// secrets too, so there is no key to enforce with. Fail-open therefore left
+// four unauthenticated, unthrottled R2 write endpoints open to anyone,
+// which was verified live rather than inferred: an unauthenticated
+// POST /api/newsletter/subscribe returned 200 and persisted a row.
+//
+// The trade-off this accepts: with no key set, the four protected writes now
+// refuse, so newsletter signup and hosting registration return
+// "Human verification is temporarily unavailable. Please try again later."
+// until a key exists. That is deliberate — an open write endpoint is a worse
+// failure than a temporarily unavailable form, and the exposure was unbounded.
+//
+// TO RESTORE SERVICE, set either key (no code change needed — this flag only
+// governs the unconfigured case):
+//   wrangler secret put RECAPTCHA_API_KEY      # Enterprise, project clean-502708
+//   wrangler secret put RECAPTCHA_SECRET_KEY   # legacy siteverify
+// The frontend already collects a token: recaptcha.js loads the Enterprise
+// script with site key 6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w and the
+// forms send recaptchaToken. Only the server-side key is missing.
+const RECAPTCHA_FAIL_CLOSED = true;
 let recaptchaDisabledWarned = false;
 
 async function verifyRecaptcha(env, token, action) {
@@ -122,12 +138,19 @@ async function verifyRecaptcha(env, token, action) {
   const secretKey = env.RECAPTCHA_SECRET_KEY;
   if (!apiKey && !secretKey) {
     // These endpoints write to R2 and are otherwise unauthenticated and
-    // unthrottled, so an unconfigured key means they are open to anyone.
+    // unthrottled, so an unconfigured key is a security problem either way.
+    // RECAPTCHA_FAIL_CLOSED decides which failure mode we take: refuse the
+    // writes (safe, but the forms break) or accept them (available, but open).
     if (!recaptchaDisabledWarned) {
       recaptchaDisabledWarned = true;
-      console.warn('[SECURITY] reCAPTCHA is DISABLED: neither RECAPTCHA_API_KEY nor RECAPTCHA_SECRET_KEY is set. Protected writes (' +
-        "newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are accepting unauthenticated traffic. " +
-        'Set the key, or set RECAPTCHA_FAIL_CLOSED=true to refuse writes instead.');
+      console.warn(
+        '[SECURITY] reCAPTCHA is DISABLED: neither RECAPTCHA_API_KEY nor RECAPTCHA_SECRET_KEY is set. ' +
+        'Protected writes (newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are ' +
+        (RECAPTCHA_FAIL_CLOSED
+          ? 'being REFUSED (RECAPTCHA_FAIL_CLOSED=true). Signup and hosting registration stay unavailable until a key is set. '
+          : 'ACCEPTING UNAUTHENTICATED TRAFFIC (RECAPTCHA_FAIL_CLOSED=false). ') +
+        'Set RECAPTCHA_API_KEY or RECAPTCHA_SECRET_KEY to restore service.'
+      );
     }
     if (RECAPTCHA_FAIL_CLOSED) {
       return { ok: false, error: 'Human verification is temporarily unavailable. Please try again later.' };
@@ -1874,18 +1897,27 @@ async function handleHealthCheck(env) {
   // 0. Security posture — report the reCAPTCHA state instead of letting an
   // unconfigured key silently leave the public write endpoints open.
   const recaptchaConfigured = Boolean(env.RECAPTCHA_API_KEY || env.RECAPTCHA_SECRET_KEY);
+  const PROTECTED_WRITES = [
+    'POST /api/newsletter/subscribe',
+    'POST /api/hosting/register',
+    'POST /api/hosting/manage',
+    'POST /api/hosting/subscribe',
+  ];
+  // With no key set these endpoints are either refused (fail-closed, the
+  // current setting) or wide open (fail-open). Only the second case is a
+  // security problem, and only the second case belongs in `openEndpoints` —
+  // listing refused endpoints as open would send whoever reads this chasing a
+  // vulnerability that is not there.
   results.security = {
     recaptcha: recaptchaConfigured ? 'configured' : 'DISABLED',
     recaptchaMode: recaptchaConfigured ? 'enforced' : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed' : 'fail-open'),
-    openEndpoints: recaptchaConfigured ? [] : [
-      'POST /api/newsletter/subscribe',
-      'POST /api/hosting/register',
-      'POST /api/hosting/manage',
-      'POST /api/hosting/subscribe',
-    ],
+    openEndpoints: (recaptchaConfigured || RECAPTCHA_FAIL_CLOSED) ? [] : PROTECTED_WRITES,
+    unavailableEndpoints: (recaptchaConfigured || !RECAPTCHA_FAIL_CLOSED) ? [] : PROTECTED_WRITES,
     note: recaptchaConfigured
       ? 'Protected writes require a valid token.'
-      : 'No reCAPTCHA key is set, so these unauthenticated endpoints accept writes from anyone. Set RECAPTCHA_API_KEY (or RECAPTCHA_SECRET_KEY).',
+      : RECAPTCHA_FAIL_CLOSED
+        ? 'No reCAPTCHA key is set, so the protected writes are REFUSED rather than served. This is the safe failure mode: newsletter signup and hosting registration return an error until a key exists. Set RECAPTCHA_API_KEY (or RECAPTCHA_SECRET_KEY) to restore service — the frontend already sends recaptchaToken.'
+        : 'No reCAPTCHA key is set and RECAPTCHA_FAIL_CLOSED is false, so these unauthenticated endpoints accept writes from anyone. Set RECAPTCHA_API_KEY (or RECAPTCHA_SECRET_KEY), or set RECAPTCHA_FAIL_CLOSED = true in index.js.',
   };
 
   // 1. Check all HTML pages
