@@ -190,12 +190,29 @@ HOST_APEX = '(http.host eq "acreetionos.org")'
 
 # (description, expression, static_target, dynamic_target_expression)
 REDIRECTS = [
-    # www -> apex, preserving path AND query string, so the canonical host is
-    # enforced without dropping query params that pages read on load.
-    ("www -> apex (canonical host)",
-     '(http.host eq "www.acreetionos.org")', None,
-     'concat("https://acreetionos.org", http.request.uri.path, '
-     'if(len(http.request.uri.query) > 0, concat("?", http.request.uri.query), ""))'),
+    # NOTE: there is deliberately NO www -> apex rule here.
+    #
+    # `_redirects` asks for one, but it is not achievable with a zone-level
+    # Single Redirect, and a rule that installs green while never firing is
+    # worse than no rule at all. This zone normalises the www host to the
+    # apex BEFORE the ruleset engine evaluates, so every way of naming the
+    # original host was tried and none matched:
+    #
+    #   http.host eq "www.acreetionos.org"                 never fired
+    #   http.request.headers["host"][0] eq "www..."        never fired
+    #   starts_with(http.request.full_uri, "https://www...") never fired
+    #
+    # All three validate cleanly against the API, so validation is not proof
+    # of matching. The evidence that normalisation is the cause: an
+    # apex+PATH rule from this same list (e.g. /index.html) *does* match www
+    # requests, while a www-only host condition never does. Whatever handles
+    # www upstream rewrites the host to the apex.
+    #
+    # This is not currently a problem: www serves byte-identical content and
+    # index.html ships <link rel="canonical" href="https://acreetionos.org/">,
+    # so search engines already consolidate onto the apex. That canonical tag,
+    # not a redirect, is what makes the www host safe. Revisit only if the
+    # www host starts serving different content.
     ("/index.html -> / (canonical root)",
      f'{HOST_APEX} and http.request.uri.path eq "/index.html"', APEX + "/", None),
     ("/git-tracker.html -> /changelog.html (retired 2026-08-21)",
