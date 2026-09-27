@@ -4,6 +4,18 @@ name: Cloudflare Edge Hardening
 # are set by scripts/cloudflare-edge-hardening.sh as Transform Rules at the
 # Cloudflare edge. Run this whenever the script changes, or manually after
 # editing header values.
+#
+# This job FAILED on all three runs on 2026-08-25. The script's Python blocks
+# used to read CF_EMAIL/CF_API_KEY unconditionally, but this workflow only
+# provides CF_API_TOKEN — so they raised KeyError and aborted. That is fixed;
+# both blocks now resolve auth the same way the bash path does. The script also
+# gained a Single Redirects step (the `_redirects` rules GitHub Pages ignores).
+#
+# `secrets.CLOUDFLARE_TOKEN_GITHUB` must be a token with these Zone scopes in
+# Edit, or the run fails again at the first API call:
+#   Zone Rulesets  (the PUTs below)
+#   Zone Settings  (purge_cache)
+# Confirm with:  wrangler whoami   /   check the token in the dashboard.
 
 on:
   workflow_dispatch:
