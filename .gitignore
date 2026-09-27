@@ -63,4 +63,7 @@ subprocess
 .beads-credential-key
 .beads/proxieddb/
 *.gate.lock*
+# Generated per-machine by 'bd dolt start' — contains an absolute cfg_dir path,
+# so it is local runtime state and must not be committed.
+.beads/dolt-server-config.yaml
 .vercel
