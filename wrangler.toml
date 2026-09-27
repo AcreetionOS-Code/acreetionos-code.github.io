@@ -34,33 +34,32 @@ RETURN_ADDRESS = "developers@acreetionos.org"
 #   WATCH_LIST    — JSON array of threat intel keywords
 #   GROQ_API_KEY  — (optional) Groq free tier fallback
 #   GH_TOKEN      — (optional) GitHub Models free tier fallback
-#   RECAPTCHA_API_KEY — Google Cloud API key for reCAPTCHA Enterprise
-#       assessments (project clean-502708).
-#   RECAPTCHA_SECRET_KEY — legacy siteverify secret; alternative to the
-#       Enterprise API key.
+#   RECAPTCHA_API_KEY         — the reCAPTCHA SITE key (public by design;
+#       also hardcoded as RECAPTCHA_SITE_KEY in index.js as a fallback)
+#   RECAPTCHA_API_SECRET_KEY  — the server-side secret
 #
-#   ⚠ AS OF 2026-09-27 NEITHER KEY IS SET, and neither exists as a GitHub
-#   Actions secret either (verified with `gh secret list`), so there is no
-#   key to enforce with. The old comment here said "REQUIRED to enforce
-#   reCAPTCHA" and read like it was configured — it was not, and the code
-#   failed open silently, leaving /api/newsletter/subscribe and the three
-#   /api/hosting/* write endpoints open to unauthenticated traffic for
-#   months.
+#   ⚠ UNTIL 2026-09-27 the secret was unset and the code failed open, leaving
+#   /api/newsletter/subscribe and the three /api/hosting/* write endpoints
+#   open to unauthenticated traffic for months. The old comment here said
+#   "REQUIRED to enforce reCAPTCHA" and read like it was configured — it was
+#   not.
 #
-#   That is now fixed at the code level: RECAPTCHA_FAIL_CLOSED = true in
-#   index.js, so with no key set those four writes are REFUSED rather than
-#   accepted. The exposure is closed. The cost is that newsletter signup and
-#   hosting registration return "Human verification is temporarily
-#   unavailable" until a key exists.
+#   That is fixed at the code level: RECAPTCHA_FAIL_CLOSED = true in index.js,
+#   so with no secret set those four writes are REFUSED rather than accepted.
+#   The exposure is closed. The cost is that newsletter signup and hosting
+#   registration return "Human verification is temporarily unavailable" until
+#   the secret exists.
 #
-#   TO RESTORE SERVICE — set ONE of the two keys, no code change and no
-#   redeploy needed beyond the secret (this flag only governs the
-#   unconfigured case):
-#       wrangler secret put RECAPTCHA_API_KEY     # Enterprise, clean-502708
-#       wrangler secret put RECAPTCHA_SECRET_KEY  # legacy siteverify
-#   The frontend already collects a token (site key
-#   6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w, recaptcha.js, forms send
-#   recaptchaToken) — only the server-side key is missing.
+#   The secret is dispatched on its shape, because the two reCAPTCHA families
+#   authenticate differently:
+#       AIza…  Google Cloud API key  → Enterprise assessments API
+#       6L…    classic v2/v3 secret  → siteverify
+#   recaptcha.js loads enterprise.js and emits Enterprise tokens, so an AIza
+#   Google Cloud API key is the value that verifies successfully.
+#
+#   Supplied automatically by .github/workflows/deploy-worker.yml from the
+#   GitHub Actions secrets of the same names, on every deploy.
+#   `wrangler secret put RECAPTCHA_API_SECRET_KEY` also works.
 #
 #   GET /api/health/check reports this under "security": recaptchaMode is
 #   "fail-closed" and openEndpoints is empty, while unavailableEndpoints

@@ -76,13 +76,27 @@ const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 
 // ─── reCAPTCHA Enterprise (project clean-502708) ────────────────────────────
 // Protects user-facing POST endpoints (newsletter, hosting, wiki AI chat).
-// The site key is PUBLIC (safe to ship in frontend JS). The server secret is
-// deployed as a Worker secret, one of:
-//   RECAPTCHA_API_KEY    — Google Cloud API key → Enterprise assessments API
-//   RECAPTCHA_SECRET_KEY — legacy siteverify secret (classic v2/v3 style)
-// If NEITHER secret is configured, verification is skipped entirely (dev
-// mode — no behavior change). Clients send their token as `recaptchaToken`
-// in the JSON body; see frontend helper recaptcha.js.
+//
+// Secret names (both supplied via GitHub Actions secrets, forwarded to the
+// Worker by .github/workflows/deploy-worker.yml):
+//   RECAPTCHA_API_KEY         — the reCAPTCHA SITE key (public by design)
+//   RECAPTCHA_API_SECRET_KEY  — the server-side secret
+//
+// RECAPTCHA_API_KEY is read from the environment and only falls back to the
+// hardcoded constant below, so a new key can be rotated by changing the
+// secret rather than the code.
+//
+// The secret is dispatched on its shape, because the two reCAPTCHA families
+// authenticate differently:
+//   AIza…  Google Cloud API key  → Enterprise assessments API (the path the
+//                                  frontend matches, since recaptcha.js loads
+//                                  enterprise.js and emits Enterprise tokens)
+//   6L…    classic v2/v3 secret  → siteverify
+// Note the frontend only ever produces Enterprise tokens, so a classic secret
+// will be rejected by siteverify for real users. AIza is the value that works
+// with the current frontend.
+//
+// If the secret is not configured, see RECAPTCHA_FAIL_CLOSED below.
 const RECAPTCHA_SITE_KEY = '6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w';
 const RECAPTCHA_PROJECT = 'clean-502708';
 const RECAPTCHA_SCORE_THRESHOLD = 0.5;
@@ -110,33 +124,32 @@ function getClientIP(request) {
 // { ok: false, error } to reject the request.
 // Fail-open ONLY on network errors talking to Google (a Google outage must
 // never take the whole site down); invalid/expired tokens still fail closed.
-// TRUE as of 2026-09-27 — was false. Neither RECAPTCHA_API_KEY nor
-// RECAPTCHA_SECRET_KEY is set, and confirmed absent from GitHub Actions
-// secrets too, so there is no key to enforce with. Fail-open therefore left
-// four unauthenticated, unthrottled R2 write endpoints open to anyone,
-// which was verified live rather than inferred: an unauthenticated
-// POST /api/newsletter/subscribe returned 200 and persisted a row.
+// TRUE as of 2026-09-27 — was false. RECAPTCHA_API_SECRET_KEY was unset, and
+// confirmed absent from GitHub Actions secrets at the time, so there was no
+// secret to enforce with. Fail-open therefore left four unauthenticated,
+// unthrottled R2 write endpoints open to anyone, which was verified live
+// rather than inferred: an unauthenticated POST /api/newsletter/subscribe
+// returned 200 and persisted a row.
 //
-// The trade-off this accepts: with no key set, the four protected writes now
-// refuse, so newsletter signup and hosting registration return
-// "Human verification is temporarily unavailable. Please try again later."
-// until a key exists. That is deliberate — an open write endpoint is a worse
-// failure than a temporarily unavailable form, and the exposure was unbounded.
+// The trade-off this accepts: with no secret set, the four protected writes
+// refuse, so newsletter signup and hosting registration return "Human
+// verification is temporarily unavailable. Please try again later." That is
+// deliberate — an open write endpoint is a worse failure than a temporarily
+// unavailable form, and the exposure was unbounded.
 //
-// TO RESTORE SERVICE, set either key (no code change needed — this flag only
-// governs the unconfigured case):
-//   wrangler secret put RECAPTCHA_API_KEY      # Enterprise, project clean-502708
-//   wrangler secret put RECAPTCHA_SECRET_KEY   # legacy siteverify
+// TO RESTORE SERVICE, set the secret (no code change needed — this flag only
+// governs the unconfigured case). It is supplied automatically by
+// .github/workflows/deploy-worker.yml from the GitHub Actions secret of the
+// same name; `wrangler secret put RECAPTCHA_API_SECRET_KEY` also works.
 // The frontend already collects a token: recaptcha.js loads the Enterprise
-// script with site key 6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w and the
-// forms send recaptchaToken. Only the server-side key is missing.
+// script and the forms send recaptchaToken.
 const RECAPTCHA_FAIL_CLOSED = true;
 let recaptchaDisabledWarned = false;
 
 async function verifyRecaptcha(env, token, action) {
-  const apiKey = env.RECAPTCHA_API_KEY;
-  const secretKey = env.RECAPTCHA_SECRET_KEY;
-  if (!apiKey && !secretKey) {
+  const siteKey = env.RECAPTCHA_API_KEY || RECAPTCHA_SITE_KEY;
+  const secret = env.RECAPTCHA_API_SECRET_KEY;
+  if (!secret) {
     // These endpoints write to R2 and are otherwise unauthenticated and
     // unthrottled, so an unconfigured key is a security problem either way.
     // RECAPTCHA_FAIL_CLOSED decides which failure mode we take: refuse the
@@ -144,12 +157,12 @@ async function verifyRecaptcha(env, token, action) {
     if (!recaptchaDisabledWarned) {
       recaptchaDisabledWarned = true;
       console.warn(
-        '[SECURITY] reCAPTCHA is DISABLED: neither RECAPTCHA_API_KEY nor RECAPTCHA_SECRET_KEY is set. ' +
+        '[SECURITY] reCAPTCHA is DISABLED: RECAPTCHA_API_SECRET_KEY is not set. ' +
         'Protected writes (newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are ' +
         (RECAPTCHA_FAIL_CLOSED
-          ? 'being REFUSED (RECAPTCHA_FAIL_CLOSED=true). Signup and hosting registration stay unavailable until a key is set. '
+          ? 'being REFUSED (RECAPTCHA_FAIL_CLOSED=true). Signup and hosting registration stay unavailable until the secret is set. '
           : 'ACCEPTING UNAUTHENTICATED TRAFFIC (RECAPTCHA_FAIL_CLOSED=false). ') +
-        'Set RECAPTCHA_API_KEY or RECAPTCHA_SECRET_KEY to restore service.'
+        'Set RECAPTCHA_API_SECRET_KEY to restore service.'
       );
     }
     if (RECAPTCHA_FAIL_CLOSED) {
@@ -158,8 +171,11 @@ async function verifyRecaptcha(env, token, action) {
     return { ok: true, disabled: true };
   }
   if (!token) return { ok: false, error: 'Human verification required. Please retry.' };
+  // A Google Cloud API key (AIza…) drives the Enterprise assessments API; a
+  // classic v2/v3 secret (6L…) drives siteverify. Dispatch on the prefix.
+  const isGoogleApiKey = secret.startsWith('AIza');
   try {
-    if (secretKey) {
+    if (!isGoogleApiKey) {
       // Legacy siteverify path (classic v2/v3 secret key)
       const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
         method: 'POST',
@@ -176,11 +192,12 @@ async function verifyRecaptcha(env, token, action) {
       }
       return { ok: true, score: data.score };
     }
-    // Enterprise assessments API (project clean-502708)
-    const res = await fetch('https://recaptchaenterprise.googleapis.com/v1/projects/' + RECAPTCHA_PROJECT + '/assessments?key=' + encodeURIComponent(apiKey), {
+    // Enterprise assessments API (project clean-502708), authenticated with
+    // the Google Cloud API key from RECAPTCHA_API_SECRET_KEY.
+    const res = await fetch('https://recaptchaenterprise.googleapis.com/v1/projects/' + RECAPTCHA_PROJECT + '/assessments?key=' + encodeURIComponent(secret), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event: { token: token, expectedAction: action || 'submit', siteKey: RECAPTCHA_SITE_KEY } }),
+      body: JSON.stringify({ event: { token: token, expectedAction: action || 'submit', siteKey: siteKey } }),
       signal: AbortSignal.timeout(10000),
     });
     const data = await res.json();
@@ -1896,7 +1913,7 @@ async function handleHealthCheck(env) {
 
   // 0. Security posture — report the reCAPTCHA state instead of letting an
   // unconfigured key silently leave the public write endpoints open.
-  const recaptchaConfigured = Boolean(env.RECAPTCHA_API_KEY || env.RECAPTCHA_SECRET_KEY);
+  const recaptchaConfigured = Boolean(env.RECAPTCHA_API_SECRET_KEY);
   const PROTECTED_WRITES = [
     'POST /api/newsletter/subscribe',
     'POST /api/hosting/register',
@@ -1916,8 +1933,8 @@ async function handleHealthCheck(env) {
     note: recaptchaConfigured
       ? 'Protected writes require a valid token.'
       : RECAPTCHA_FAIL_CLOSED
-        ? 'No reCAPTCHA key is set, so the protected writes are REFUSED rather than served. This is the safe failure mode: newsletter signup and hosting registration return an error until a key exists. Set RECAPTCHA_API_KEY (or RECAPTCHA_SECRET_KEY) to restore service — the frontend already sends recaptchaToken.'
-        : 'No reCAPTCHA key is set and RECAPTCHA_FAIL_CLOSED is false, so these unauthenticated endpoints accept writes from anyone. Set RECAPTCHA_API_KEY (or RECAPTCHA_SECRET_KEY), or set RECAPTCHA_FAIL_CLOSED = true in index.js.',
+        ? 'No reCAPTCHA secret is set, so the protected writes are REFUSED rather than served. This is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. Set RECAPTCHA_API_SECRET_KEY to restore service — the frontend already sends recaptchaToken.'
+        : 'No reCAPTCHA secret is set and RECAPTCHA_FAIL_CLOSED is false, so these unauthenticated endpoints accept writes from anyone. Set RECAPTCHA_API_SECRET_KEY, or set RECAPTCHA_FAIL_CLOSED = true in index.js.',
   };
 
   // 1. Check all HTML pages
