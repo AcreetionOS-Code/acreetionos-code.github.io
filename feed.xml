@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-09-27T00:00:00Z</updated>
+  <updated>2026-09-28T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 28, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-28.html"/>
+    <id>tag:acreetionos.org,2026-09-28:newsletter</id>
+    <updated>2026-09-28T00:00:00Z</updated>
+    <published>2026-09-28T00:00:00Z</published>
+    <summary>CI pipeline fix ensures reliable AcreetionOS releases by stopping false &quot;enforced&quot; health checks in acreetionos-code.github.io Development activity this week centered on tightening our release pipeline reliability. The team pushed commits to acreetionos-code.github.io addressing a health endpoint bu…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- September 27, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-09-27.html"/>
