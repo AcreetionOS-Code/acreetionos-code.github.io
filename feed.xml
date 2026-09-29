@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-09-28T00:00:00Z</updated>
+  <updated>2026-09-29T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- September 29, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-09-29.html"/>
+    <id>tag:acreetionos.org,2026-09-29:newsletter</id>
+    <updated>2026-09-29T00:00:00Z</updated>
+    <published>2026-09-29T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - September 29, 2026 Git v2.56.0 Released The latest version of the Git distributed version-control system has been released, featuring 748 non-merge commits since the previous version. This update brings various improvements and bug fixes to the popular version control system…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- September 28, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-09-28.html"/>
