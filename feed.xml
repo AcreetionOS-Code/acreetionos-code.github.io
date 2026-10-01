@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-09-30T00:00:00Z</updated>
+  <updated>2026-10-01T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 01, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-01.html"/>
+    <id>tag:acreetionos.org,2026-10-01:newsletter</id>
+    <updated>2026-10-01T00:00:00Z</updated>
+    <published>2026-10-01T00:00:00Z</published>
+    <summary>Rust 1.99.0 Released: A New Era for System Programming The Rust programming language has reached a new milestone with the release of version 1.99.0. This update brings significant improvements, including support for extern &quot;C&quot; blocks, which enable developers to interface with C code more seamlessly.…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- September 30, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-09-30.html"/>
