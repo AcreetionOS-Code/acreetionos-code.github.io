@@ -1,0 +1,5 @@
+{
+  "subject": "Daily AcreetionOS Update -- October 03, 2026",
+  "date_display": "October 03, 2026",
+  "body": "Zig 0.17 Released \u2013 Performance Boost for Build Systems and Toolchains\n\nZig 0.17 was officially released yesterday, delivering measurable speedups in compilation and memory efficiency that directly benefit AcreetionOS's build pipeline and package management tools. The new compiler includes optimized escape sequences and reduced allocation overhead, which means"
+}
