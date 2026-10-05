@@ -1,23 +1,18 @@
-# ⚠️ NOT ENFORCED BY GITHUB PAGES — read the rules here as intent only.
-# This is Netlify / Cloudflare-Pages syntax. The static site is served by
-# GitHub Pages, which ignores this file completely, so none of the rules
-# below have any effect. Verified 2026-09-27: /git-tracker.html and
-# /unofficial/sway.html both returned 404, and /index.html + the www host
-# both served duplicate 200s.
-#
-# The enforcing copy lives in scripts/cloudflare-edge-hardening.sh, which
-# installs them as Cloudflare Single Redirects at the edge. If you change a
-# rule here, change it there too, then run that script.
-#
-# Retired 2026-08-21: Git Tracker page replaced by the Release Changelog.
-/git-tracker.html /changelog.html 301
-/git-tracker-all.js /changelog.html 301
-# WWW → non-WWW canonical redirect (Netlify style)
-www.acreetionos.org https://acreetionos.org 301
-# /index.html duplicates the homepage — force the canonical root URL
-# (fixes "Alternate page with proper canonical tag" in Search Console)
-# NOTE: currently served as a 200; mitigated only by the <link rel=canonical>
-# in index.html, not by this rule.
-/index.html / 301
-# Old wiki-style path that 404s; content lives on the Unofficial page
-/unofficial/sway.html /unofficial.html 301
+# GitHub Pages _redirects file
+# Block scanner/prober paths — return 404 cleanly (no logging noise)
+/.env* 404
+/.git* 404
+/.DS_Store 404
+/.htaccess 404
+/.htpasswd 404
+/.svn* 404
+/info.php 404
+/phpinfo.php 404
+/xmlrpc.php 404
+/wp-admin* 404
+/wp-login* 404
+/wp-config* 404
+/wp-content* 404
+/wp-includes* 404
+/.well-known/nodeinfo 404
+/robots.txt 200
