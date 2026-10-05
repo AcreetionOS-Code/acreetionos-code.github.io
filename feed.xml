@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-04T00:00:00Z</updated>
+  <updated>2026-10-05T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 05, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-05.html"/>
+    <id>tag:acreetionos.org,2026-10-05:newsletter</id>
+    <updated>2026-10-05T00:00:00Z</updated>
+    <published>2026-10-05T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - October 05, 2026 Community News We&#x27;re excited to announce that the Rust Foundation has posted the recordings from RustConf 2026! You can now watch the talks and sessions from the event on YouTube. Head over to the RustConf playlist to catch up on the latest developments in t…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 04, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-04.html"/>
