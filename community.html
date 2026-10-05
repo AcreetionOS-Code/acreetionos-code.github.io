@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="keywords" content="AcreetionOS community, open source community, Linux community, contributors">
+  <title>Our Community – AcreetionOS</title>
+  <meta name="description" content="The AcreetionOS community is the heart of everything we do. From contributors to testers, translators to evangelists — thank you for making this project what it is.">
+  <link rel="canonical" href="https://acreetionos.org/community.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://acreetionos.org/community.html",
+    "name": "Our Community – AcreetionOS",
+    "description": "Celebrating the AcreetionOS community — contributors, testers, translators, and users who make this project possible.",
+    "url": "https://acreetionos.org/community.html",
+    "isPartOf": { "@id": "https://acreetionos.org/#website" },
+    "inLanguage": "en",
+    "publisher": { "@id": "https://acreetionos.org/#organization" },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://acreetionos.org/" },
+        { "@type": "ListItem", "position": 2, "name": "Community", "item": "https://acreetionos.org/community.html" }
+      ]
+    }
+  }
+  </script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/community.html">
+  <meta property="og:title" content="Our Community – AcreetionOS">
+  <meta property="og:description" content="The AcreetionOS community is the heart of everything we do. Thank you for making this project what it is.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Our Community – AcreetionOS">
+  <meta name="twitter:description" content="Celebrating the people who make AcreetionOS possible.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="stylesheet" href="sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260825"></noscript>
+  <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+  <style>
+    #hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}
+    #hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}
+    #sidebar{position:fixed;visibility:hidden}
+    #sidebar-overlay{position:fixed;display:none}
+    .main-nav{display:none}
+    :root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+    html{touch-action:manipulation}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);line-height:1.6}
+    .wrap{max-width:900px;margin:0 auto;padding:0 1.5rem 3rem}
+    .hero{text-align:center;padding:3rem 1rem 2rem}
+    .hero h1{font-size:2.2rem;font-weight:800;margin-bottom:.5rem}
+    .hero h1 span{color:var(--green)}
+    .hero p{color:var(--text);font-size:1.05rem;max-width:600px;margin:0 auto;line-height:1.7}
+    .heart{font-size:1.5rem;color:var(--green);display:inline-block;animation:beat 1.4s ease-in-out infinite}
+    @keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+    .section{margin:3rem 0}
+    .section h2{font-size:1.3rem;color:var(--green);margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:.5rem}
+    .section p{color:var(--text);margin-bottom:1rem;line-height:1.7}
+    .section strong{color:var(--text-bright)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;margin:1.5rem 0}
+    .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:border-color .2s}
+    .card:hover{border-color:var(--green)}
+    .card .icon{font-size:1.8rem;color:var(--green);margin-bottom:.5rem}
+    .card h3{color:var(--text-bright);font-size:1rem;margin-bottom:.35rem}
+    .card p{color:var(--text);font-size:.85rem;line-height:1.5;margin:0}
+    .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:1rem;margin:1.5rem 0}
+    .stat{text-align:center;padding:1.5rem 1rem;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+    .stat .num{font-size:1.8rem;font-weight:800;color:var(--green);font-family:var(--font-mono)}
+    .stat .label{font-size:.8rem;color:var(--text);margin-top:.25rem}
+    .quote{background:var(--panel);border-left:3px solid var(--green);border-radius:0 12px 12px 0;padding:1.5rem;margin:1.5rem 0;font-style:italic;color:var(--text-bright)}
+    .quote .author{display:block;margin-top:.75rem;font-style:normal;font-size:.85rem;color:var(--text)}
+    .join{text-align:center;padding:2.5rem 1rem;margin:3rem 0;background:linear-gradient(135deg,rgba(46,204,113,0.08),rgba(46,204,113,0.02));border:1px solid rgba(46,204,113,0.2);border-radius:16px}
+    .join h2{color:var(--green);border:none;font-size:1.4rem;margin-bottom:.75rem}
+    .join p{color:var(--text);max-width:500px;margin:0 auto 1.5rem}
+    .join-links{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center}
+    .join-links a{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.2rem;border-radius:10px;text-decoration:none;font-weight:700;font-size:.9rem;transition:transform .15s}
+    .join-links a:hover{transform:translateY(-2px)}
+    .btn-discord{background:#5865F2;color:#fff}
+    .btn-matrix{background:var(--green);color:#000}
+    .btn-github{background:#333;color:#fff}
+    .btn-x{background:#000;color:#fff;border:1px solid #333}
+    .btn-bluesky{background:#0084ff;color:#fff}
+    .footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--border);color:#999;font-size:.85rem}
+    .footer a{color:var(--green)}
+    @media(max-width:600px){.hero h1{font-size:1.6rem}.stats{grid-template-columns:1fr 1fr}}
+  </style>
+</head>
+<body>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="logo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">Acreetion <span>OS</span></span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="flash.html">Downloads</a>
+            <a href="https://wiki.acreetionos.org/">Wiki</a>
+          </nav>
+        </div>
+      </header>
+
+      <div class="wrap">
+        <div class="hero">
+          <h1>Our Community <span class="heart">&hearts;</span></h1>
+          <p>AcreetionOS wouldn't exist without the people who use it, test it, translate it, share it, and believe in it. This page is for all of you.</p>
+        </div>
+
+        <div class="section">
+          <h2>You Are the Project</h2>
+          <p>AcreetionOS started as a dream — an Arch Linux that "just works" for normal people, with privacy baked in and no corporate baggage. But a dream is just a dream until people show up.</p>
+          <p><strong>And you did.</strong> You downloaded the ISO. You told your friends. You filed bug reports at 2 AM. You wrote wiki guides. You made tutorial videos. You answered questions on Discord when we were asleep. You stood up for the project when skeptics called it "just another Arch respin."</p>
+          <p>Every single person who has ever booted AcreetionOS, shared a screenshot, helped a newcomer, or said "this is the distro that finally worked for me" — you are the reason this project is alive. <strong>Thank you.</strong></p>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="num">10k+</div><div class="label">Downloads</div></div>
+          <div class="stat"><div class="num">1.5k+</div><div class="label">Discord members</div></div>
+          <div class="stat"><div class="num">50+</div><div class="label">Contributors</div></div>
+          <div class="stat"><div class="num">15+</div><div class="label">Languages</div></div>
+        </div>
+
+        <div class="section">
+          <h2>The Many Ways You Show Up</h2>
+          <div class="grid">
+            <div class="card">
+              <div class="icon"><i class="bi bi-bug-fill"></i></div>
+              <h3>Bug Reporters</h3>
+              <p>You test the edges and tell us what's broken. Every bug report is a gift — it means you care enough to help us fix it. The 7-day stability buffer exists because you demanded it.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-translate"></i></div>
+              <h3>Translators</h3>
+              <p>You make AcreetionOS speak the languages your communities speak. From Spanish to Japanese to German to Portuguese — the project is accessible because you made it so.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-camera-reels"></i></div>
+              <h3>Content Creators</h3>
+              <p>The YouTubers, the r/unixporn posters, the bloggers, the streamers. You showed the world what AcreetionOS looks like and convinced thousands to give it a try. Your FastFetch screenshots are gorgeous.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-chat-heart"></i></div>
+              <h3>Community Helpers</h3>
+              <p>The people who answer "how do I install the NVIDIA driver?" for the hundredth time with patience and kindness. You are the front line of this project, and you make newcomers feel welcome.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-code-square"></i></div>
+              <h3>Contributors</h3>
+              <p>Code, configs, packaging, infrastructure. You write the improvements, fix the regressions, and build the features. The Tweak Utility is better because of you. The repos are richer because of you.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-megaphone"></i></div>
+              <h3>Evangelists</h3>
+              <p>You recommended AcreetionOS to a friend, a family member, a coworker, a stranger on a forum. You are the reason the download numbers keep climbing. Word of mouth is everything.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>What You've Said</h2>
+          <div class="quote">
+            "I've been trying to use Arch for years and always gave up. AcreetionOS finally made it click. I feel like a real Linux user now."
+            <span class="author">— a Discord message we will never forget</span>
+          </div>
+          <div class="quote">
+            "The fact that this is a community project, not a corporate product, is exactly why I trust it. No telemetry, no upsells, just a good desktop."
+            <span class="author">— from a Reddit comment</span>
+          </div>
+          <div class="quote">
+            "I installed it on my mom's laptop. She didn't call me for tech support for three weeks. That's the highest praise I can give."
+            <span class="author">— a tweet that made our week</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>What We Promise Back to You</h2>
+          <div class="grid">
+            <div class="card">
+              <div class="icon"><i class="bi bi-shield-check"></i></div>
+              <h3>No Telemetry, Ever</h3>
+              <p>We don't track you. We don't phone home. We don't sell your data. Your machine is yours. That's the deal, always.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-people"></i></div>
+              <h3>Community First</h3>
+              <p>Decisions are made in the open. We listen to bug reports, feature requests, and feedback. You have a voice here — use it.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-heart"></i></div>
+              <h3>Made With Love</h3>
+              <p>This is a labor of love, not a venture-funded startup. Every release ships because we care. We're not going anywhere.</p>
+            </div>
+            <div class="card">
+              <div class="icon"><i class="bi bi-globe"></i></div>
+              <h3>Free Forever</h3>
+              <p>AcreetionOS will always be free, open source, and community-driven. No "pro" tier. No paywalls. No enterprise edition. Just the OS.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="join">
+          <h2>Join the Community <span class="heart">&hearts;</span></h2>
+          <p>Come hang out. Ask questions, share your setup, help a newcomer, or just say hi. Everyone is welcome.</p>
+          <div class="join-links">
+            <a href="https://discord.gg/VHqQkJASw7" class="btn-discord" target="_blank" rel="noopener"><i class="bi bi-discord"></i> Discord</a>
+            <a href="https://matrix.acreetionos.org" class="btn-matrix" target="_blank" rel="noopener"><i class="bi bi-chat-dots"></i> Matrix</a>
+            <a href="https://github.com/AcreetionOS-Code" class="btn-github" target="_blank" rel="noopener"><i class="bi bi-github"></i> GitHub</a>
+            <a href="https://gitlab.acreetionos.org" class="btn-github" target="_blank" rel="noopener"><i class="bi bi-gitlab"></i> GitLab</a>
+            <a href="https://x.acreetionos.org" class="btn-x" target="_blank" rel="noopener"><i class="bi bi-twitter-x"></i> X</a>
+            <a href="https://bsky.acreetionos.org" class="btn-bluesky" target="_blank" rel="noopener"><i class="bi bi-cloud-sun"></i> Bluesky</a>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>AcreetionOS is an independent project based on Arch Linux. Made with <span style="color:var(--green)">&hearts;</span> by the community, for the community.</p>
+          <p style="margin-top:.5rem"><a href="index.html">Home</a> · <a href="flash.html">Downloads</a> · <a href="features.html">Features</a> · <a href="https://wiki.acreetionos.org/">Wiki</a></p>
+        </div>
+      </div>
+      <script src="scale-page.js?v=20260824" defer></script>
+      <script src="sidebar.js?v=20260825" defer></script>
+    </div>
+  </div>
+  <script src="footer.js?v=20260825" defer></script>
+  <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
+  <script src="tor-badge.js?v=20260825" defer></script>
+</body>
+</html>

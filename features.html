@@ -124,14 +124,15 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
         <h2 style="text-align:center;font-size:1.2rem;color:var(--green);margin-bottom:.5rem">Stock Desktop vs. AcreetionOS Tweaked</h2>
         <p style="text-align:center;color:var(--text);font-size:.85rem;margin-bottom:1rem">Drag the slider to compare a default Cinnamon desktop with our curated layout</p>
         <div class="slider-wrap" id="slider">
-          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--panel);color:#555;font-size:.9rem;font-family:var(--font-mono);flex-direction:column;gap:.5rem;text-align:center;padding:1rem">
-            <i class="bi bi-image" style="font-size:2rem;color:#444"></i>
-            <span>Screenshot placeholder — replace with actual desktop screenshots</span>
-            <span style="font-size:.75rem;color:#444">Upload stock Cinnamon screenshot + AcreetionOS tweaked screenshot</span>
+          <!-- AFTER image (full width, behind) -->
+          <img class="slider-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='700' height='438' viewBox='0 0 700 438'><rect width='700' height='438' fill='%231a1a1a'/><rect width='700' height='36' fill='%23222'/><circle cx='18' cy='18' r='6' fill='%23e74c3c'/><circle cx='38' cy='18' r='6' fill='%23f39c12'/><circle cx='58' cy='18' r='6' fill='%232ecc71'/><text x='350' y='230' font-family='monospace' font-size='18' fill='%232ecc71' text-anchor='middle'>AcreetionOS Tweaked</text><text x='350' y='258' font-family='sans-serif' font-size='12' fill='%23555' text-anchor='middle'>Custom panel, green accents, curated layout</text><rect x='20' y='50' width='120' height='28' rx='6' fill='%232ecc71' opacity='0.15'/><text x='80' y='68' font-family='sans-serif' font-size='11' fill='%232ecc71' text-anchor='middle'>Menu</text><rect x='560' y='50' width='120' height='28' rx='6' fill='%23333'/><text x='620' y='68' font-family='sans-serif' font-size='10' fill='%23999' text-anchor='middle'>tray</text></svg>" alt="AcreetionOS tweaked desktop">
+          <!-- BEFORE image (clipped by slider) -->
+          <div class="slider-after" id="slider-after">
+            <img class="slider-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='700' height='438' viewBox='0 0 700 438'><rect width='700' height='438' fill='%23333333'/><rect width='700' height='36' fill='%23222'/><circle cx='18' cy='18' r='6' fill='%23e74c3c'/><circle cx='38' cy='18' r='6' fill='%23f39c12'/><circle cx='58' cy='18' r='6' fill='%232ecc71'/><text x='350' y='230' font-family='monospace' font-size='18' fill='%23999' text-anchor='middle'>Stock Cinnamon</text><text x='350' y='258' font-family='sans-serif' font-size='12' fill='%23555' text-anchor='middle'>Default Arch + Cinnamon, no tweaks</text><rect x='20' y='50' width='120' height='28' rx='6' fill='%23444'/><text x='80' y='68' font-family='sans-serif' font-size='11' fill='%23bbb' text-anchor='middle'>Menu</text><rect x='560' y='50' width='120' height='28' rx='6' fill='%23444'/><text x='620' y='68' font-family='sans-serif' font-size='10' fill='%23bbb' text-anchor='middle'>tray</text></svg>" alt="Stock Cinnamon desktop">
           </div>
-          <div class="slider-handle" id="slider-handle" style="display:none"></div>
-          <div class="slider-label before">Before</div>
-          <div class="slider-label after">After</div>
+          <div class="slider-handle" id="slider-handle"></div>
+          <div class="slider-label before">Stock</div>
+          <div class="slider-label after">AcreetionOS</div>
         </div>
 
         <!-- Interactive App Tabs -->
@@ -238,7 +239,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
       });
     });
 
-    // Before/After slider drag
+    // Before/After slider drag — click anywhere on slider to move handle
     var slider = document.getElementById('slider');
     var after = document.getElementById('slider-after');
     var handle = document.getElementById('slider-handle');
@@ -251,11 +252,12 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
       handle.style.left = pct + '%';
     }
 
-    handle.addEventListener('mousedown', function(e) { isDragging = true; e.preventDefault(); });
+    // Drag the handle OR click anywhere on the slider to set position
+    slider.addEventListener('mousedown', function(e) { isDragging = true; setSlider(e.clientX); e.preventDefault(); });
     document.addEventListener('mousemove', function(e) { if (isDragging) setSlider(e.clientX); });
     document.addEventListener('mouseup', function() { isDragging = false; });
 
-    handle.addEventListener('touchstart', function(e) { isDragging = true; e.preventDefault(); });
+    slider.addEventListener('touchstart', function(e) { isDragging = true; setSlider(e.touches[0].clientX); e.preventDefault(); });
     document.addEventListener('touchmove', function(e) { if (isDragging) setSlider(e.touches[0].clientX); });
     document.addEventListener('touchend', function() { isDragging = false; });
   </script>
