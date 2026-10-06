@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-05T00:00:00Z</updated>
+  <updated>2026-10-06T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 06, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-06.html"/>
+    <id>tag:acreetionos.org,2026-10-06:newsletter</id>
+    <updated>2026-10-06T00:00:00Z</updated>
+    <published>2026-10-06T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - October 06, 2026 OpenSSH 10.6 Released The OpenSSH team has announced the release of version 10.6, which includes several security updates and improvements. This release addresses a large number of vulnerabilities and issues, making it an important update for all users. As a…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 05, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-05.html"/>
