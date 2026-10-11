@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-10T00:00:00Z</updated>
+  <updated>2026-10-11T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 11, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-11.html"/>
+    <id>tag:acreetionos.org,2026-10-11:newsletter</id>
+    <updated>2026-10-11T00:00:00Z</updated>
+    <published>2026-10-11T00:00:00Z</published>
+    <summary>The CI workflow for acreetionos-immutable is green again after fixing a block‑scalar indentation error in release.yml that had been blocking automated releases. This quick patch restores the ability to cut new ISO images without manual intervention, keeping the release pipeline smooth for the team. …</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 10, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-10.html"/>
