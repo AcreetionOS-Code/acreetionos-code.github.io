@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-12T00:00:00Z</updated>
+  <updated>2026-10-13T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 13, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-13.html"/>
+    <id>tag:acreetionos.org,2026-10-13:newsletter</id>
+    <updated>2026-10-13T00:00:00Z</updated>
+    <published>2026-10-13T00:00:00Z</published>
+    <summary>October 13, 2026 AcreetionOS Newsletter Top Development: AcreetionOS has been featured in BetaNews as an &quot;easy-to-use alternative to Windows 10/11&quot;! In the article, &quot;It just works&quot;: AcreetionOS is the easy-to-use alternative to Windows 10/11, the author highlights the user-friendly interface and sea…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 12, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-12.html"/>
