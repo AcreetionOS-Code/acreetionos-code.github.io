@@ -82,9 +82,20 @@ const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 //   RECAPTCHA_API_KEY         — the reCAPTCHA SITE key (public by design)
 //   RECAPTCHA_API_SECRET_KEY  — the server-side secret
 //
-// RECAPTCHA_API_KEY is read from the environment and only falls back to the
-// hardcoded constant below, so a new key can be rotated by changing the
-// secret rather than the code.
+// RECAPTCHA_API_KEY is REQUIRED and is read only from the environment. There is
+// deliberately no hardcoded fallback: a literal site key in source is a value
+// that silently survives a console-side rotation, so the site keeps minting
+// tokens from a key that has been disabled and every form fails with Google's
+// "Invalid site key" while nothing in the repo shows why. Rotating the key is a
+// secret change, not a code change.
+//
+// The frontend reads the same value at runtime from GET /api/config/public, so
+// there is exactly one source of truth and nothing has to be edited in two
+// places to rotate it.
+//
+// The site key is not a credential — Google embeds it in every page that renders
+// a widget. The credential is RECAPTCHA_API_SECRET_KEY, which never leaves the
+// Worker secret store.
 //
 // The secret is dispatched on its shape, because the two reCAPTCHA families
 // authenticate differently:
@@ -94,12 +105,53 @@ const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 
 //   6L…    classic v2/v3 secret  → siteverify
 // Note the frontend only ever produces Enterprise tokens, so a classic secret
 // will be rejected by siteverify for real users. AIza is the value that works
-// with the current frontend.
+// with the current frontend. The site key and the secret must belong to the SAME
+// GCP project, or the token the site key mints is rejected by the assessment.
 //
 // If the secret is not configured, see RECAPTCHA_FAIL_CLOSED below.
-const RECAPTCHA_SITE_KEY = '6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w';
 const RECAPTCHA_PROJECT = 'clean-502708';
 const RECAPTCHA_SCORE_THRESHOLD = 0.5;
+
+// The site key is public by design, so it is safe to hand to the browser. It is
+// still configuration, not a constant: see the note above.
+function getSiteKey(env) {
+  const key = (env && env.RECAPTCHA_API_KEY) || '';
+  return key || null;
+}
+
+// Enterprise site keys are 6Lf…; classic ones are 6L…. The two families are not
+// interchangeable, and pairing an Enterprise site key with a classic secret is the
+// misconfiguration that made verification look enforced while rejecting everyone.
+function siteKeyKind(key) {
+  if (!key) return 'none';
+  return key.startsWith('6Lf') ? 'enterprise' : 'classic';
+}
+
+// One place decides whether reCAPTCHA is actually usable, because the two things
+// that report on it used to disagree — and that disagreement is the whole problem.
+// "The secret is set" is not the same claim as "verification works".
+//
+// A present-but-mismatched pairing is the dangerous case. The site key mints
+// Enterprise tokens; a classic 6L secret can only reach siteverify, which can
+// never validate one. So both values are non-empty, everything looks configured,
+// and every request from every real user is rejected.
+function recaptchaState(env) {
+  const siteKey = getSiteKey(env);
+  const secret = (env && env.RECAPTCHA_API_SECRET_KEY) || '';
+  const siteKind = siteKeyKind(siteKey);
+  const secretKind = !secret ? 'none'
+    : (secret.startsWith('AIza') ? 'google-api-key' : 'classic-secret');
+  const hasSiteKey = Boolean(siteKey);
+  const hasSecret = Boolean(secret);
+  const mismatched = secretKind === 'classic-secret' && siteKind === 'enterprise';
+  // working === the frontend can mint a token AND the server can validate it.
+  const working = hasSiteKey && hasSecret && !mismatched;
+  let fault = null;
+  if (!hasSiteKey) fault = 'missing-site-key';
+  else if (!hasSecret) fault = 'missing-secret';
+  else if (mismatched) fault = 'family-mismatch';
+  return { siteKey, hasSiteKey, hasSecret, siteKind, secretKind, mismatched, working, fault };
+}
 
 const rateLimitMap = new Map();
 
@@ -166,7 +218,7 @@ const FAIL_CLOSED_ACTIONS = new Set([
 let recaptchaDisabledWarned = false;
 
 async function verifyRecaptcha(env, token, action) {
-  const siteKey = env.RECAPTCHA_API_KEY || RECAPTCHA_SITE_KEY;
+  const siteKey = getSiteKey(env);
   const secret = env.RECAPTCHA_API_SECRET_KEY;
   // RECAPTCHA_FAIL_CLOSED is a master override that locks EVERY gated action,
   // including the read-only AI ones. Default off, so an unconfigured key
@@ -1956,16 +2008,19 @@ async function handleHealthCheck(env) {
   // recaptcha.js always calls grecaptcha.enterprise.execute, so every token it
   // produces is an Enterprise token, and only the Enterprise assessments API
   // can validate one.
-  const recaptchaSecret = env.RECAPTCHA_API_SECRET_KEY || '';
-  const recaptchaConfigured = Boolean(recaptchaSecret);
-  const recaptchaSecretKind = !recaptchaSecret ? 'none'
-    : (recaptchaSecret.startsWith('AIza') ? 'google-api-key' : 'classic-secret');
-  // RECAPTCHA_SITE_KEY is 6Lf-… (Enterprise). A classic 6L secret cannot verify
-  // an Enterprise token, so that pairing is reported as a misconfiguration
-  // rather than as working enforcement.
-  const recaptchaMismatched = recaptchaSecretKind === 'classic-secret'
-    && RECAPTCHA_SITE_KEY.startsWith('6Lf');
-  const recaptchaWorking = recaptchaConfigured && !recaptchaMismatched;
+  // Delegates to recaptchaState so the admin health check and the public config
+  // endpoint can never disagree about whether verification works. They used to
+  // compute this separately, which is how presence came to be reported as
+  // enforcement.
+  const rc = recaptchaState(env);
+  const recaptchaSecret = (env && env.RECAPTCHA_API_SECRET_KEY) || '';
+  const recaptchaConfigured = rc.hasSecret;
+  const recaptchaSecretKind = rc.secretKind;
+  const recaptchaSiteKey = rc.siteKey;
+  const recaptchaSiteKeyConfigured = rc.hasSiteKey;
+  const recaptchaSiteKeyKind = rc.siteKind;
+  const recaptchaMismatched = rc.mismatched;
+  const recaptchaWorking = rc.working;
   // All seven reCAPTCHA-gated actions, split by what they do. The write list
   // mirrors FAIL_CLOSED_ACTIONS; an earlier version of this block listed only
   // four and omitted chat/translate entirely, which understated the blast
@@ -1988,17 +2043,20 @@ async function handleHealthCheck(env) {
     recaptchaMode: recaptchaWorking ? 'enforced'
       : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed (all actions)' : 'fail-closed (writes only)'),
     recaptchaSecretKind,
-    recaptchaSiteKeyKind: RECAPTCHA_SITE_KEY.startsWith('6Lf') ? 'enterprise' : 'classic',
+    recaptchaSiteKeyConfigured,
+    recaptchaSiteKeyKind,
     recaptchaWorking,
     // Nothing is open while unconfigured: the writes refuse, and the read-only
     // AI actions are served without verification but mutate nothing.
     openEndpoints: [],
     unavailableEndpoints: writesRefused ? WRITE_ACTIONS : [],
     unverifiedEndpoints: writesRefused ? READ_AI_ACTIONS : [],
-    note: recaptchaMismatched
+    note: !recaptchaSiteKeyConfigured
+      ? 'MISCONFIGURATION: RECAPTCHA_API_KEY is not set, so the frontend cannot mint a reCAPTCHA token at all — GET /api/config/public returns no key and recaptcha.js never loads enterprise.js. There is no hardcoded fallback by design, so every gated form fails closed with no code-level symptom. Set RECAPTCHA_API_KEY to an Enterprise site key (6Lf…) for project ' + RECAPTCHA_PROJECT + '.'
+      : recaptchaMismatched
       ? 'MISCONFIGURATION: RECAPTCHA_API_SECRET_KEY looks like a classic reCAPTCHA secret, but the frontend site key is an Enterprise key, so every token recaptcha.js produces is an Enterprise token and classic siteverify can never validate it. All gated endpoints therefore reject every request, including legitimate ones. Set RECAPTCHA_API_SECRET_KEY to a Google Cloud API key (AIza…) for project ' + RECAPTCHA_PROJECT + '.'
       : recaptchaWorking
-        ? 'Secret is present and its family matches the site key. Gated endpoints require a valid token.'
+        ? 'Secret is present, the site key is present, and their families match. Gated endpoints require a valid token.'
         : 'No usable reCAPTCHA secret is set. The four state-changing writes are REFUSED rather than served, which is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. The read-only AI endpoints (chat, translate) stay served and rely on rate limiting, since they mutate nothing. Set RECAPTCHA_API_SECRET_KEY to enforce everywhere — the frontend already sends recaptchaToken.',
   };
 
@@ -2812,6 +2870,28 @@ export default {
     }
     if (url.pathname === '/api/hosting/subscribe' && request.method === 'POST') {
       return handleHostingSubscribe(request, env);
+    }
+    // Public, unauthenticated, and deliberately minimal. This exists so the
+    // browser can read the reCAPTCHA site key from configuration instead of from
+    // a literal baked into recaptcha.js — a site key is public by design, so
+    // serving it leaks nothing, whereas a hardcoded copy silently outlives a
+    // console-side rotation.
+    //
+    // It returns ONLY the site key and its family. It must never grow the
+    // endpoint lists, secret kinds, or open/unavailable state that
+    // /api/health/check reports: publishing your security posture is a different
+    // decision, and /api/health/check stays admin-gated. See bead 483.
+    if (url.pathname === '/api/config/public' && request.method === 'GET') {
+      const st = recaptchaState(env);
+      return new Response(JSON.stringify({
+        recaptchaSiteKey: st.siteKey,
+        recaptchaSiteKeyKind: st.siteKind,
+        // Means "verification should succeed", not "both values are non-empty".
+        // Reporting presence here is what made the earlier classic-secret
+        // misconfiguration look enforced while rejecting every real user.
+        recaptchaConfigured: st.working,
+        recaptchaFault: st.fault,
+      }), { headers: { 'Content-Type': 'application/json', ...corsHeaders(request) } });
     }
     if (url.pathname === '/api/newsletter/subscribe' && request.method === 'POST') {
       return handleNewsletterSubscribe(request, env);

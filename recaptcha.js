@@ -1,6 +1,17 @@
 (function () {
   'use strict';
-  var siteKey = '6Lf-EoAtAAAAAI8dwkXHkdisu4eoz1KaZlFMK47w';
+  // The site key is NOT hardcoded here. It is read at runtime from
+  // GET /api/config/public, which serves it from the Worker's RECAPTCHA_API_KEY
+  // secret. A literal in this file looked harmless — site keys are public by
+  // design — but it silently outlives a console-side rotation: the key gets
+  // disabled, this file keeps asking Google for a token, and every form fails
+  // with "Invalid site key" while nothing in the repo hints at the cause.
+  // Rotating the key is now a secret change, not a code change.
+  //
+  // The same value is used server-side, so there is one source of truth.
+  var CONFIG_URL = '/api/config/public';
+  var siteKey = null;
+  var keyPromise = null;
   var loadPromise = null;
 
   function enterprise() {
@@ -32,17 +43,44 @@
     });
   }
 
+  // Fetch the key once per page load. A missing key is a configuration fault,
+  // not something to paper over, so it warns loudly instead of failing silently
+  // the way the old hardcoded-but-invalid key did.
+  function fetchSiteKey() {
+    if (keyPromise) return keyPromise;
+    keyPromise = fetch(CONFIG_URL, { headers: { 'Accept': 'application/json' } })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (cfg) {
+        if (!cfg || !cfg.recaptchaSiteKey) {
+          throw new Error('no recaptchaSiteKey in ' + CONFIG_URL + ' — is RECAPTCHA_API_KEY set on the Worker?');
+        }
+        siteKey = cfg.recaptchaSiteKey;
+        return siteKey;
+      })
+      .catch(function (e) {
+        console.error('[recaptcha] could not load the site key: ' + (e && e.message ? e.message : e));
+        return null;
+      });
+    return keyPromise;
+  }
+
   function loadRecaptcha() {
     if (isReady()) return Promise.resolve(enterprise());
     if (loadPromise) return loadPromise;
-    loadPromise = new Promise(function (resolve) {
-      var script = document.createElement('script');
-      script.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + encodeURIComponent(siteKey);
-      script.async = true;
-      script.defer = true;
-      script.onload = function () { waitForEnterprise(10000).then(resolve); };
-      script.onerror = function () { resolve(null); };
-      document.head.appendChild(script);
+    loadPromise = fetchSiteKey().then(function (key) {
+      if (!key) return null;
+      return new Promise(function (resolve) {
+        var script = document.createElement('script');
+        script.src = 'https://www.google.com/recaptcha/enterprise.js?render=' + encodeURIComponent(key);
+        script.async = true;
+        script.defer = true;
+        script.onload = function () { waitForEnterprise(10000).then(resolve); };
+        script.onerror = function () { resolve(null); };
+        document.head.appendChild(script);
+      });
     });
     // A failed load must not poison every later call.
     loadPromise = loadPromise.then(function (api) {

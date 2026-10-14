@@ -34,9 +34,17 @@ RETURN_ADDRESS = "developers@acreetionos.org"
 #   WATCH_LIST    — JSON array of threat intel keywords
 #   GROQ_API_KEY  — (optional) Groq free tier fallback
 #   GH_TOKEN      — (optional) GitHub Models free tier fallback
-#   RECAPTCHA_API_KEY         — the reCAPTCHA SITE key (public by design;
-#       also hardcoded as RECAPTCHA_SITE_KEY in index.js as a fallback)
+#   RECAPTCHA_API_KEY         — the reCAPTCHA SITE key (public by design).
+#       REQUIRED. It is no longer hardcoded in index.js or recaptcha.js: the
+#       browser reads it from GET /api/config/public, which serves it from this
+#       secret, so there is one source of truth. Must be an Enterprise key
+#       (6Lf…) and must belong to the SAME project as the secret below.
 #   RECAPTCHA_API_SECRET_KEY  — the server-side secret
+#
+#   Both keys must be set for the four gated forms to work (newsletter signup,
+#   hosting registration, wiki AI guide, document translator). A missing key
+#   fails CLOSED with no code-level symptom, which is why /api/health/check
+#   reports recaptchaSiteKeyConfigured alongside recaptchaWorking.
 #
 #   ⚠ UNTIL 2026-09-27 the secret was unset and the code failed open, leaving
 #   /api/newsletter/subscribe and the three /api/hosting/* write endpoints
