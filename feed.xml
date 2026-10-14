@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-13T00:00:00Z</updated>
+  <updated>2026-10-14T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 14, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-14.html"/>
+    <id>tag:acreetionos.org,2026-10-14:newsletter</id>
+    <updated>2026-10-14T00:00:00Z</updated>
+    <published>2026-10-14T00:00:00Z</published>
+    <summary>geocode-glib update conflict resolved in acreetionos + acreetionos-xlibre If you recently updated your AcreetionOS system and hit a wall with geolocation services, you are not alone. A dependency conflict between geocode-glib and its GLib counterpart was breaking location lookups for some users, and…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 13, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-13.html"/>
