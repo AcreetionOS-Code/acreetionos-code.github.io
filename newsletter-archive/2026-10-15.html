@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <title>Daily AcreetionOS Update -- October 15, 2026 | AcreetionOS Newsletter</title>
+  <meta name="description" content="Daily AcreetionOS Update -- October 15, 2026 — A sneaky YAML block-scalar indentation bug in acreetionos-immutable&#x27;s release.yml was silently breaking our CI...">
+  <link rel="canonical" href="https://acreetionos.org/newsletter-archive/2026-10-15.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml">
+
+  <!-- OpenGraph -->
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://acreetionos.org/newsletter-archive/2026-10-15.html">
+  <meta property="og:title" content="Daily AcreetionOS Update -- October 15, 2026">
+  <meta property="og:description" content="Daily AcreetionOS Update -- October 15, 2026 — A sneaky YAML block-scalar indentation bug in acreetionos-immutable&#x27;s release.yml was silently breaking our CI...">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:title" content="Daily AcreetionOS Update -- October 15, 2026">
+  <meta name="twitter:description" content="Daily AcreetionOS Update -- October 15, 2026 — A sneaky YAML block-scalar indentation bug in acreetionos-immutable&#x27;s release.yml was silently breaking our CI...">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+
+  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
+  <link rel="stylesheet" href="../fonts.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "NewsArticle",
+        "@id": "https://acreetionos.org/newsletter-archive/2026-10-15.html#article",
+        "headline": "Daily AcreetionOS Update -- October 15, 2026",
+        "datePublished": "2026-10-15",
+        "dateModified": "2026-10-15",
+        "description": "Daily AcreetionOS Update -- October 15, 2026 — A sneaky YAML block-scalar indentation bug in acreetionos-immutable&#x27;s release.yml was silently breaking our CI...",
+        "publisher": {
+          "@type": "Organization",
+          "name": "AcreetionOS",
+          "url": "https://acreetionos.org",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://acreetionos.org/logo.webp"
+          }
+        },
+        "mainEntityOfPage": "https://acreetionos.org/newsletter-archive/2026-10-15.html",
+        "inLanguage": "en"
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": "https://acreetionos.org/newsletter-archive/2026-10-15.html#breadcrumb",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://acreetionos.org/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Newsletter",
+            "item": "https://acreetionos.org/newsletter.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Archive",
+            "item": "https://acreetionos.org/newsletter-archive/index.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "2026-10-15",
+            "item": "https://acreetionos.org/newsletter-archive/2026-10-15.html"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --green: #2ecc71;
+      --bg: #121212;
+      --panel: #1a1a1a;
+      --border: #333;
+      --text: #ddd;
+      --muted: #888;
+      --font-sans: 'Roboto', system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      max-width: 740px;
+      margin: 2rem auto;
+      padding: 0 1.25rem 3rem;
+      line-height: 1.7;
+      color: var(--text);
+      background: var(--bg);
+    }
+    h1 { color: var(--green); font-size: 1.75rem; margin-bottom: 0.25rem; }
+    h2 { color: var(--green); font-size: 1.3rem; margin-top: 1.8rem; margin-bottom: 0.5rem; }
+    h3 { color: #a3e635; font-size: 1.1rem; margin-top: 1.2rem; }
+    .date { color: var(--muted); font-size: 0.95rem; margin-bottom: 1.75rem; }
+    p { margin: 0.85rem 0; }
+    ul { margin: 0.85rem 0 1rem 1.75rem; }
+    li { margin-bottom: 0.4rem; }
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .back { display: inline-block; margin-bottom: 1.5rem; font-weight: 500; }
+    .breadcrumbs { font-size: 0.85rem; color: var(--muted); margin-bottom: 1.5rem; }
+    .breadcrumbs a { color: var(--muted); }
+    .breadcrumbs a:hover { color: var(--green); }
+    footer {
+      margin-top: 3.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="breadcrumbs">
+    <a href="../index.html">Home</a> &gt; <a href="../newsletter.html">Newsletter</a> &gt; <a href="index.html">Archive</a> &gt; <span>2026-10-15</span>
+  </div>
+
+  <a class="back" href="index.html">← All newsletters</a>
+
+  <article>
+    <h1>Daily AcreetionOS Update -- October 15, 2026</h1>
+    <div class="date">October 15, 2026</div>
+    <p>A sneaky YAML block-scalar indentation bug in acreetionos-immutable&#x27;s release.yml was silently breaking our CI release validation, and today it&#x27;s fixed. The same commit also tweaked the release job to pass -R to gh release create, preventing an unwanted source checkout during releases.</p>
+<p>Development
+The acreetionos-immutable team tracked down the indentation issue that was failing workflow validation, and they&#x27;ve adjusted the release job so it no longer tries to check out source when creating a GitHub release. Over in acreetionos-code, we synced up the newsletter, archive, wiki guides, and feed for October 14, keeping the documentation current. The AcreetionOS-Xlibre branch got some quiet updates as well, and we re-triggered the GitLab mirror after a deploy key fix, which means your GitLab clones should be syncing smoothly again. You can track all the nitty-gritty in the changelog at <a href="https://acreetionos.org/changelog.html." target="_blank" rel="noopener noreferrer">https://acreetionos.org/changelog.html.</a></p>
+<p>Community
+In bigger news, BetaNews ran a piece calling AcreetionOS the easy-to-use alternative to Windows 10/11, which is exactly the kind of practical recognition we want. How-To Geek published a personal essay about finally giving up on the Arch User Repository, and Phoronix reported on a prominent Arch Linux developer resigning after a decade. It&#x27;s a reminder that the ecosystem is always shifting, but AcreetionOS is built to be the stable, user-friendly layer on top of all that motion. We&#x27;re also keeping an eye on the Linux kernel news, with seven stable kernels dropping Thursday including a fix for a critical vulnerability.</p>
+<p>Tip of the day
+If you&#x27;re still running Windows 10 or 11 and curious about switching, the easiest path is to grab the latest AcreetionOS ISO from <a href="https://acreetionos.org/flash.html," target="_blank" rel="noopener noreferrer">https://acreetionos.org/flash.html,</a> write it to a USB with the AcreetionMediaWriter, and boot it live. No commitment, no data loss, just a test drive with the Cinnamon desktop. If it feels right, the Calamares installer makes the actual install painless.</p>
+  </article>
+
+  <a class="back" style="margin-top: 2rem;" href="index.html">← Back to all newsletters</a>
+
+  <footer>
+    <div>&copy; 2026 AcreetionOS Project. Open Source under GPLv3.</div>
+    <div>
+      <a href="../newsletter.html">Subscribe</a> · <a href="../feed.xml">RSS Feed</a> · <a href="../index.html">Home</a>
+    </div>
+  </footer>
+</body>
+</html>
