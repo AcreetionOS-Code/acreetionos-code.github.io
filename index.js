@@ -11,6 +11,22 @@
 // NOTE: darren.acreetionos.org AI chatbot has been completely removed.
 // The Darren bot, its frontend JS/CSS/HTML, and the Worker proxying are all gone.
 
+// Provider and subscriber records go through storage.js, which picks a backend
+// at runtime from DB_BACKEND ('r2' by default, or 'sqlite' for the container on
+// the US VPS). Every stateful read and write in this file uses those helpers so
+// that flipping the flag moves all of them at once, with no data loss, because
+// the R2 objects are left untouched as the fallback.
+//
+// Blob and cache storage (cve-cache.json, ai-health-status.json, scan quota,
+// counter, threat-intel) deliberately stays on the raw R2 helpers below. Those
+// are files and caches, not records: they need no uniqueness, no pagination and
+// no transactional read-modify-write.
+import {
+  getProvider, putProvider, deleteProvider, listProviders,
+  findProviderByCredentials,
+  getSubscriber, putSubscriber, deleteSubscriber, listSubscribers,
+} from './storage.js';
+
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 // opencode-go API — set OPENCODE_GO_API_KEY and OPENCODE_GO_BASE_URL in worker secrets
 // OPENCODE_GO_BASE_URL defaults to https://opencode-go.ai/api/v1 if not set
@@ -666,18 +682,14 @@ async function sendHostingEmail(env, to, subject, body) {
 }
 
 async function handleHostingGetProviders(env) {
-  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-  const providers = [];
-  for (const obj of objects) {
-    const data = await getR2(env, 'acreetionos-hosting', obj.key);
-    if (data) providers.push({
-      org: data.org,
-      mirror_url: data.mirror_url,
-      location: data.location,
-      bandwidth: data.bandwidth || '',
-      status: data.status
-    });
-  }
+  const { providers } = await listProviders(env, { limit: 500 });
+  const providerList = providers.map(data => ({
+    org: data.org,
+    mirror_url: data.mirror_url,
+    location: data.location,
+    bandwidth: data.bandwidth || '',
+    status: data.status
+  }));
   return jsonResponse({ providers }, {}, null);
 }
 
@@ -692,12 +704,7 @@ function safeUrl(url) {
 }
 
 async function handleHostingSnippets(env) {
-  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-  const providers = [];
-  for (const obj of objects) {
-    const data = await getR2(env, 'acreetionos-hosting', obj.key);
-    if (data) providers.push(data);
-  }
+  const { providers } = await listProviders(env, { limit: 500 });
   const active = providers.filter(p => p.status === 'active');
   const count = active.length;
 
@@ -801,14 +808,14 @@ async function handleHostingRegister(request, env) {
       last_seen: new Date().toISOString(),
       expiry_warning_sent: false
     };
-    const ok = await putR2(env, 'acreetionos-hosting', 'provider-' + id, provider);
+    const ok = await putProvider(env, provider);
     if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
 
     // Mailing list subscription
     if (body.subscribe && body.email) {
       const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
       const token = btoa(String.fromCharCode(...tokenBytes)).replace(/[/+]/g, '').slice(0, 32);
-      await putR2(env, 'acreetionos-hosting', 'subscriber-' + body.email.replace(/[@.]/g, '_'), {
+      await putSubscriber(env, 'hosting', {
         email: body.email, org: body.org, subscribed: new Date().toISOString(), unsubscribe_token: token
       });
     }
@@ -847,16 +854,12 @@ async function handleHostingRemoveRequest(request, env) {
     }
     const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_manage');
     if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-    let found = null;
-    for (const obj of objects) {
-      const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email === body.email && data.password === await hashPassword(body.password, data.password.split(':')[0])) { found = data; break; }
-    }
+    const found = await findProviderByCredentials(env, body.email, async p =>
+      p.password === await hashPassword(body.password, p.password.split(':')[0]));
     if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
     found.removal_requested = true;
     found.removal_reason = body.notes || 'No reason given';
-    await putR2(env, 'acreetionos-hosting', 'provider-' + found.id, found);
+    await putProvider(env, found);
     sendDiscordWebhook(env, `**Removal Requested**\n**Provider:** ${found.org} (${found.email})\n**Reason:** ${body.notes || 'None'}\n**ID:** ${found.id}`);
     return new Response(JSON.stringify({ success: true, message: 'Removal request submitted for admin approval' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
@@ -872,15 +875,11 @@ async function handleHostingUpdateRequest(request, env) {
     }
     const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_manage');
     if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-    let found = null;
-    for (const obj of objects) {
-      const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email === body.email && data.password === await hashPassword(body.password, data.password.split(':')[0])) { found = data; break; }
-    }
+    const found = await findProviderByCredentials(env, body.email, async p =>
+      p.password === await hashPassword(body.password, p.password.split(':')[0]));
     if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
     found.notes = body.notes || found.notes;
-    await putR2(env, 'acreetionos-hosting', 'provider-' + found.id, found);
+    await putProvider(env, found);
     return new Response(JSON.stringify({ success: true, message: 'Listing updated' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -892,10 +891,10 @@ async function handleHostingAdminApprove(request, env) {
     const body = await request.json();
     if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.SECRET_SAUCE))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const data = await getR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
+    const data = await getProvider(env, body.provider_id);
     if (!data) return new Response(JSON.stringify({ error: 'Provider not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (body.action === 'approve-removal' || body.action === 'remove') {
-      await deleteR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
+      await deleteProvider(env, body.provider_id);
       sendDiscordWebhook(env, `**Provider Removed (Admin Approved)**\n**Provider:** ${data.org} (${data.email})`);
       // Notify mailing list about removal
       if (data.subscribed && data.email) {
@@ -906,7 +905,7 @@ async function handleHostingAdminApprove(request, env) {
     }
     // Approve registration
     data.status = 'active';
-    await putR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id, data);
+    await putProvider(env, data);
     sendDiscordWebhook(env, `**Provider Approved**\n**Provider:** ${data.org} (${data.email}) is now active.`);
 
     // Send welcome email to subscribed providers
@@ -925,7 +924,7 @@ async function handleHostingAdminReject(request, env) {
     const body = await request.json();
     if (!body.admin_key || !(await timingSafeCompare(body.admin_key, env.SECRET_SAUCE))) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.provider_id) return new Response(JSON.stringify({ error: 'provider_id required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    await deleteR2(env, 'acreetionos-hosting', 'provider-' + body.provider_id);
+    await deleteProvider(env, body.provider_id);
     sendDiscordWebhook(env, `**Provider Registration Rejected**\n**ID:** ${body.provider_id}`);
     return new Response(JSON.stringify({ success: true, message: 'Provider registration rejected and removed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
@@ -934,12 +933,7 @@ async function handleHostingAdminReject(request, env) {
 }
 
 async function handleHostingAdminPending(env) {
-  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-  const all = [];
-  for (const obj of objects) {
-    const data = await getR2(env, 'acreetionos-hosting', obj.key);
-    if (data) all.push(data);
-  }
+  const { providers: all } = await listProviders(env, { limit: 500 });
   const pending = all.filter(p => p.status === 'pending' || p.removal_requested);
   return new Response(JSON.stringify({ pending, total: all.length }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
@@ -950,12 +944,11 @@ async function handleHostingSubscribe(request, env) {
     const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_subscribe');
     if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const key = 'subscriber-' + body.email.replace(/[@.]/g, '_');
-    const existing = await getR2(env, 'acreetionos-hosting', key);
+    const existing = await getSubscriber(env, 'hosting', body.email);
     if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     const hTokenBytes = crypto.getRandomValues(new Uint8Array(32));
     const hToken = btoa(String.fromCharCode(...hTokenBytes)).replace(/[/+]/g, '').slice(0, 32);
-    await putR2(env, 'acreetionos-hosting', key, {
+    await putSubscriber(env, 'hosting', {
       email: body.email, org: body.org || '', subscribed: new Date().toISOString(), unsubscribe_token: hToken
     });
     return new Response(JSON.stringify({ success: true, message: 'Subscribed to hosting updates' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -968,11 +961,10 @@ async function handleHostingUnsubscribe(request, env) {
   const email = request.url.searchParams?.get?.('email') || '';
   const token = request.url.searchParams?.get?.('token') || '';
   if (!email || !token) return new Response(JSON.stringify({ error: 'email and token required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-  const key = 'subscriber-' + email.replace(/[@.]/g, '_');
-  const record = await getR2(env, 'acreetionos-hosting', key);
+  const record = await getSubscriber(env, 'hosting', email);
   if (!record) return new Response(JSON.stringify({ error: 'Subscriber not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
   if (record.unsubscribe_token !== token) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
-  await deleteR2(env, 'acreetionos-hosting', key);
+  await deleteSubscriber(env, 'hosting', email);
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
@@ -982,12 +974,11 @@ async function handleNewsletterSubscribe(request, env) {
     const rc = await verifyRecaptcha(env, body.recaptchaToken, 'newsletter_subscribe');
     if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const key = 'nl-subscriber-' + body.email.replace(/[@.]/g, '_');
-    const existing = await getR2(env, 'acreetionos-hosting', key);
+    const existing = await getSubscriber(env, 'newsletter', body.email);
     if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     const nlTokenBytes = crypto.getRandomValues(new Uint8Array(32));
     const nlToken = btoa(String.fromCharCode(...nlTokenBytes)).replace(/[/+]/g, '').slice(0, 32);
-    await putR2(env, 'acreetionos-hosting', key, {
+    await putSubscriber(env, 'newsletter', {
       email: body.email, subscribed: new Date().toISOString(), unsubscribe_token: nlToken
     });
     return new Response(JSON.stringify({ success: true, message: 'Subscribed to newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -1000,24 +991,18 @@ async function handleNewsletterUnsubscribe(request, env) {
   const email = request.url.searchParams?.get?.('email') || '';
   const token = request.url.searchParams?.get?.('token') || '';
   if (!email || !token) return new Response(JSON.stringify({ error: 'email and token required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-  const key = 'nl-subscriber-' + email.replace(/[@.]/g, '_');
-  const record = await getR2(env, 'acreetionos-hosting', key);
+  const record = await getSubscriber(env, 'newsletter', email);
   if (!record) return new Response(JSON.stringify({ error: 'Subscriber not found' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
   if (record.unsubscribe_token !== token) return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 403, headers: corsHeaders({ headers: { get: () => '' } }) });
-  await deleteR2(env, 'acreetionos-hosting', key);
+  await deleteSubscriber(env, 'newsletter', email);
   return new Response(JSON.stringify({ success: true, message: 'Unsubscribed from newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function handleNewsletterSubscribers(env) {
   try {
-    const objects = await listR2(env, 'acreetionos-hosting', 'nl-subscriber-');
-    const subscribers = [];
-    for (const obj of objects) {
-      const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email) {
-        subscribers.push({ email: data.email, subscribed: data.subscribed, unsubscribe_token: data.unsubscribe_token || '' });
-      }
-    }
+    const subscribers = (await listSubscribers(env, { list: 'newsletter' }))
+      .filter(s => s && s.email)
+      .map(s => ({ email: s.email, subscribed: s.subscribed, unsubscribe_token: s.unsubscribe_token || '' }));
     return new Response(JSON.stringify({ subscribers, count: subscribers.length }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
     });
@@ -1520,7 +1505,7 @@ async function localScanISO(env, data) {
 }
 
 async function scanISOSuspicious(env) {
-  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  const { providers: objects } = await listProviders(env, { limit: 500 });
   const flagged = [];
   const errors = [];
   const vtDisabled = [];
@@ -1538,8 +1523,7 @@ async function scanISOSuspicious(env) {
 
   let useVt = !quota.vt_disabled && env.SCAN_MASTER;
 
-  for (const obj of objects) {
-    const data = await getR2(env, 'acreetionos-hosting', obj.key);
+  for (const data of objects) {
     if (!data || (data.status !== 'active' && data.status !== 'reactivating')) continue;
 
     const isoUrl = data.mirror_url;
@@ -1637,7 +1621,7 @@ async function scanISOSuspicious(env) {
         }
       }
 
-      await putR2(env, 'acreetionos-hosting', obj.key, data);
+      await putProvider(env, data);
     }
 
     if (!result.clean) {
@@ -1660,14 +1644,13 @@ async function scanISOSuspicious(env) {
 }
 
 async function checkStaleProviders(env) {
-  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
+  const { providers: objects } = await listProviders(env, { limit: 500 });
   const warned = [];
   const expired = [];
   const now = Date.now();
   const twoWeeks = 14 * 24 * 60 * 60 * 1000;
 
-  for (const obj of objects) {
-    const data = await getR2(env, 'acreetionos-hosting', obj.key);
+  for (const data of objects) {
     if (!data || data.status !== 'active') continue;
 
     const lastSeen = data.last_seen ? new Date(data.last_seen).getTime() : 0;
@@ -1677,7 +1660,7 @@ async function checkStaleProviders(env) {
       // Send expiry warning if not already sent (send once at 14 days)
       if (!data.expiry_warning_sent) {
         data.expiry_warning_sent = true;
-        await putR2(env, 'acreetionos-hosting', obj.key, data);
+        await putProvider(env, data);
 
         // Store email notification job
         const emailBody = `Hi ${data.org},\n\nYour AcreetionOS hosting provider listing has been flagged as inactive.\n\nYour ISO mirror (${data.mirror_url}) has not been reachable for 14 days. Per our requirements, providers must maintain an active mirror.\n\nIf you believe this is an error, please contact us at developers@acreetionos.org or re-register at https://acreetionos.org/hosting.html\n\nIf we don't hear from you within 7 days, your listing will be automatically removed.\n\n- AcreetionOS Team`;
@@ -1688,7 +1671,7 @@ async function checkStaleProviders(env) {
 
       // Remove after 21 days (14 days + 7 day grace)
       if (age > twoWeeks + (7 * 24 * 60 * 60 * 1000)) {
-        await deleteR2(env, 'acreetionos-hosting', obj.key);
+        await deleteProvider(env, data.id);
         const removalBody = `Hi ${data.org},\n\nYour AcreetionOS hosting provider listing has been removed.\n\nReason: Your ISO mirror (${data.mirror_url}) was unreachable for more than 21 days. This violates our hosting requirements.\n\nIf you'd like to re-register, please visit https://acreetionos.org/hosting.html and ensure your mirror is online before submitting.\n\nIf you believe this is an error, contact us at developers@acreetionos.org\n\n- AcreetionOS Team`;
         await sendHostingEmail(env, data.email, 'AcreetionOS Hosting — Listing Removed (Inactivity)', removalBody);
         expired.push({ org: data.org, email: data.email, last_seen: data.last_seen, reason: 'inactive_21_days' });
@@ -1716,7 +1699,7 @@ async function handleHostingScan(request, env) {
   // Auto-deregister flagged providers (VT-confirmed only — local_quick cannot confirm malware)
   for (const flagged of result.flagged) {
     if (flagged.scan_method === 'virustotal') {
-      await deleteR2(env, 'acreetionos-hosting', 'provider-' + flagged.id);
+      await deleteProvider(env, flagged.id);
       sendDiscordWebhook(env,
         `**🚨 MALWARE DETECTED — Provider Auto-Deregistered**\n**Provider:** ${flagged.org}\n**Email:** ${flagged.email}\n**ISO:** ${flagged.mirror_url}\n**Method:** ${flagged.scan_method}\n**Malicious detections:** ${flagged.malicious || 0}\n**Issues:** ${(flagged.issues || []).join(', ')}\n\nProvider has been immediately removed from the website.`
       );
@@ -1757,12 +1740,8 @@ async function handleHostingScan(request, env) {
 }
 
 async function handleHostingCount(env) {
-  const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-  let active = 0;
-  for (const obj of objects) {
-    const data = await getR2(env, 'acreetionos-hosting', obj.key);
-    if (data && data.status === 'active') active++;
-  }
+  const { providers } = await listProviders(env, { limit: 500 });
+  const active = providers.filter(p => p && p.status === 'active').length;
   return new Response(JSON.stringify({ count: active, threshold: 5, show_fastest: active >= 5 }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
@@ -1780,15 +1759,8 @@ async function handleHostingReactivate(request, env) {
 
     // Check if provider exists (including deleted/expired — we can't find deleted ones)
     // Scan all providers for matching email
-    const objects = await listR2(env, 'acreetionos-hosting', 'provider-');
-    let found = null;
-    let providerKey = '';
-    for (const obj of objects) {
-      const data = await getR2(env, 'acreetionos-hosting', obj.key);
-      if (data && data.email === body.email && data.password === await hashPassword(body.password, data.password.split(':')[0])) {
-        found = data; providerKey = obj.key; break;
-      }
-    }
+    const found = await findProviderByCredentials(env, body.email, async p =>
+      p.password === await hashPassword(body.password, p.password.split(':')[0]));
 
     if (!found) {
       // Check if they were deleted — store a reactivation request
@@ -1803,7 +1775,7 @@ async function handleHostingReactivate(request, env) {
     found.reactivation_requested_at = new Date().toISOString();
     found.reactivation_agreement_accepted = true;
     found.status = 'reactivating';
-    await putR2(env, 'acreetionos-hosting', providerKey, found);
+    await putProvider(env, found);
 
     sendDiscordWebhook(env,
       `**🔄 Reactivation Requested**\n**Provider:** ${found.org} (${found.email})\n**ISO:** ${found.mirror_url}\n**Agreement accepted:** Yes\n\nMirror will be verified every 6 hours. If online for 24+ consecutive hours, it will be automatically reactivated.`
