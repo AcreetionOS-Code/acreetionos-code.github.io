@@ -202,6 +202,15 @@ def generate_newsletter(date_str, date_display, filename):
     the caller exits non-zero, so the run is visible as failed and the next run
     retries instead of committing a fake "not available" newsletter.
     """
+    if not ADMIN_KEY:
+        # Loud, up-front, and unambiguous: an empty ADMIN_KEY sends
+        # X-Admin-Key: "" to the Worker, which routes the call down the browser
+        # reCAPTCHA path and 400s it three times before we learn anything.
+        print(
+            "ADMIN_KEY is NOT set — /api/chat will reject this run as a browser "
+            "client (fix: map ADMIN_KEY: ${{ secrets.ADMIN_KEY }} in the workflow step).",
+            file=sys.stderr,
+        )
     ecosystem_text = scrape_ecosystem()
     news = fetch_news_activity()
     articles = news.get("articles", [])
