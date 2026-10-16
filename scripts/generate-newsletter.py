@@ -140,7 +140,14 @@ def fetch_news_activity():
 
 
 def fetch_subscribers():
-    """Fetch subscriber list from Worker API using admin key."""
+    """Fetch subscriber list from Worker API using admin key.
+
+    The Worker returns only CONFIRMED subscriptions (bead 7k8), but this side
+    re-checks the flag anyway: if a backend ever regresses, an unconfirmed
+    row still cannot cause a mail to somebody who never asked. Defense that
+    costs one filter expression is not defense in depth theater — it is the
+    difference between "someone misconfigures the Worker and the least-harm
+    outcome is a quieter inbox" and the opposite."""
     if not ADMIN_KEY:
         print("No ADMIN_KEY set — skipping subscriber fetch", file=sys.stderr)
         return []
@@ -150,7 +157,19 @@ def fetch_subscribers():
         req.add_header("User-Agent", "AcreetionOS-Newsletter-Bot/1.0")
         with urlopen(req, timeout=30) as resp:
             data = json.loads(resp.read())
-            return data.get("subscribers", [])
+            subs = data.get("subscribers", [])
+            # Rows from the 7k8 Worker are already confirmed-only (the response
+            # does not even carry a confirmed_at field). Rows WITH the field
+            # present and NULL are unconfirmed: drop them.
+            def mailable(s):
+                return "confirmed_at" not in s or bool(s["confirmed_at"])
+            confirmed = [s for s in subs if mailable(s)]
+            dropped = len(subs) - len(confirmed)
+            if dropped:
+                print(f"{dropped} unconfirmed subscriber row(s) silently dropped", file=sys.stderr)
+            if data.get("pending"):
+                print(f"{data['pending']} subscriber row(s) waiting for confirmation (not mailable)", file=sys.stderr)
+            return confirmed
     except Exception as e:
         print(f"Failed to fetch subscribers: {e}", file=sys.stderr)
         return []

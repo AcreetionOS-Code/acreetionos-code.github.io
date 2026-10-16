@@ -25,6 +25,8 @@ import {
   getProvider, putProvider, deleteProvider, listProviders,
   findProviderByCredentials,
   getSubscriber, putSubscriber, deleteSubscriber, listSubscribers,
+  confirmSubscriber, findSubscriberByToken,
+  sharedLimit, sharedReplay, enqueueMail,
 } from './storage.js';
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -90,92 +92,48 @@ let allowedOrigins = [
 ];
 const CHROME_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36';
 
-// ─── reCAPTCHA Enterprise (project clean-502708) ────────────────────────────
-// Protects user-facing POST endpoints (newsletter, hosting, wiki AI chat).
+// ─── Self-hosted limits (beads ray + 38u + try epic) ─────────────────────────
+// Gate map after de-googling:
+//   Tier 1  /api/chat, /api/translate     per-IP daily token budget + cache
+//   Tier 2  newsletter/hosting subscribe  double opt-in (proof of ownership)
+//   Tier 3  hosting manage/remove         password + attempt limiter (below)
+//   Tier 4  reserved                      Altcha in-Worker, only if a real gap
 //
-// Secret names (both supplied via GitHub Actions secrets, forwarded to the
-// Worker by .github/workflows/deploy-worker.yml):
-//   RECAPTCHA_API_KEY         — the reCAPTCHA SITE key (public by design)
-//   RECAPTCHA_API_SECRET_KEY  — the server-side secret
+// What is genuinely lost with reCAPTCHA going away: SCORE_THRESHOLD had a
+// graded confidence signal, and nothing here replaces it. Proof-of-work and
+// ownership are binary: a link was owned or it was not, a solve happened or it
+// did not. We do NOT fake a confidence number to keep dashboards happy.
 //
-// RECAPTCHA_API_KEY is REQUIRED and is read only from the environment. There is
-// deliberately no hardcoded fallback: a literal site key in source is a value
-// that silently survives a console-side rotation, so the site keeps minting
-// tokens from a key that has been disabled and every form fails with Google's
-// "Invalid site key" while nothing in the repo shows why. Rotating the key is a
-// secret change, not a code change.
-//
-// The frontend reads the same value at runtime from GET /api/config/public, so
-// there is exactly one source of truth and nothing has to be edited in two
-// places to rotate it.
-//
-// The site key is not a credential — Google embeds it in every page that renders
-// a widget. The credential is RECAPTCHA_API_SECRET_KEY, which never leaves the
-// Worker secret store.
-//
-// The secret is dispatched on its shape, because the two reCAPTCHA families
-// authenticate differently:
-//   AIza…  Google Cloud API key  → Enterprise assessments API (the path the
-//                                  frontend matches, since recaptcha.js loads
-//                                  enterprise.js and emits Enterprise tokens)
-//   6L…    classic v2/v3 secret  → siteverify
-// Note the frontend only ever produces Enterprise tokens, so a classic secret
-// will be rejected by siteverify for real users. AIza is the value that works
-// with the current frontend. The site key and the secret must belong to the SAME
-// GCP project, or the token the site key mints is rejected by the assessment.
-//
-// If the secret is not configured, see RECAPTCHA_FAIL_CLOSED below.
-const RECAPTCHA_PROJECT = 'clean-502708';
-const RECAPTCHA_SCORE_THRESHOLD = 0.5;
+// The shared store is the acreetionos-db shim on the US VPS. When it is not
+// configured the in-worker Map takes over — it is per-isolate and cold-starts
+// empty, which is the honest limitation that makes the shared store wanted in
+// the first place (bead ray).
+const LIMIT_WINDOW_MS_DEFAULT = 60_000;
+const LIMIT_LOCAL_MAP_MAX = 5_000;
 
-// The site key is public by design, so it is safe to hand to the browser. It is
-// still configuration, not a constant: see the note above.
-function getSiteKey(env) {
-  const key = (env && env.RECAPTCHA_API_KEY) || '';
-  return key || null;
+function limitHash(env, parts) {
+  // Privacy: raw visitor identities are never sent to the store. HMAC under
+  // LIMIT_SALT so unhashed IP reuse across different salted deployments (or
+  // dictionary reversing of unsalted hashes) is not possible.
+  const salt = (env && env.LIMIT_SALT) || 'acre-limit-v1';
+  return hmacSha256Hex(salt, parts.filter(Boolean).join('|'));
 }
 
-// Enterprise site keys are 6Lf…; classic ones are 6L…. The two families are not
-// interchangeable, and pairing an Enterprise site key with a classic secret is the
-// misconfiguration that made verification look enforced while rejecting everyone.
-function siteKeyKind(key) {
-  if (!key) return 'none';
-  return key.startsWith('6Lf') ? 'enterprise' : 'classic';
-}
-
-// One place decides whether reCAPTCHA is actually usable, because the two things
-// that report on it used to disagree — and that disagreement is the whole problem.
-// "The secret is set" is not the same claim as "verification works".
-//
-// A present-but-mismatched pairing is the dangerous case. The site key mints
-// Enterprise tokens; a classic 6L secret can only reach siteverify, which can
-// never validate one. So both values are non-empty, everything looks configured,
-// and every request from every real user is rejected.
-function recaptchaState(env) {
-  const siteKey = getSiteKey(env);
-  const secret = (env && env.RECAPTCHA_API_SECRET_KEY) || '';
-  const siteKind = siteKeyKind(siteKey);
-  const secretKind = !secret ? 'none'
-    : (secret.startsWith('AIza') ? 'google-api-key' : 'classic-secret');
-  const hasSiteKey = Boolean(siteKey);
-  const hasSecret = Boolean(secret);
-  const mismatched = secretKind === 'classic-secret' && siteKind === 'enterprise';
-  // working === the frontend can mint a token AND the server can validate it.
-  const working = hasSiteKey && hasSecret && !mismatched;
-  let fault = null;
-  if (!hasSiteKey) fault = 'missing-site-key';
-  else if (!hasSecret) fault = 'missing-secret';
-  else if (mismatched) fault = 'family-mismatch';
-  return { siteKey, hasSiteKey, hasSecret, siteKind, secretKind, mismatched, working, fault };
+async function hmacSha256Hex(secret, message) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(message));
+  return Array.from(new Uint8Array(sig), b => b.toString(16).padStart(2, '0')).join('');
 }
 
 const rateLimitMap = new Map();
 
-function checkRateLimit(ip, maxRequests = 20, windowMs = 60000) {
+function localRateLimit(key, maxRequests = 20, windowMs = LIMIT_WINDOW_MS_DEFAULT) {
+  if (rateLimitMap.size > LIMIT_LOCAL_MAP_MAX) rateLimitMap.clear();
   const now = Date.now();
-  const entry = rateLimitMap.get(ip);
+  const entry = rateLimitMap.get(key);
   if (!entry || now > entry.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + windowMs });
+    rateLimitMap.set(key, { count: 1, resetTime: now + windowMs });
     return false;
   }
   if (entry.count >= maxRequests) return true;
@@ -183,136 +141,70 @@ function checkRateLimit(ip, maxRequests = 20, windowMs = 60000) {
   return false;
 }
 
+// Shared daily AI budget (38u): approximate in 1k-token units, because the
+// provider does not hand back synchronous usage counters. Prompt characters
+// and response characters are converted at ~4 chars/token, padded up. The
+// approximation is deliberately generous so budget overruns stay rare.
+function aiBudgetUnits(messages, responseText) {
+  const charsPerToken = 4;
+  const promptChars = (messages || []).reduce((n, m) => n + String(m?.content || '').length, 0);
+  const RESPONSE_PLACEHOLDER_MAX = 3600; // precharge ceiling; topped up after
+  const respChars = responseText ? Math.min(String(responseText).length, RESPONSE_PLACEHOLDER_MAX) : RESPONSE_PLACEHOLDER_MAX;
+  const units = Math.max(1, Math.ceil((promptChars + respChars) / (charsPerToken * 1000)));
+  return Math.min(units, 50);
+}
+
 function getClientIP(request) {
   return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown';
 }
 
-// Verifies a reCAPTCHA Enterprise token server-side.
-// Returns { ok: true } (with optional score/degraded/disabled flags) or
-// { ok: false, error } to reject the request.
-// Fail-open ONLY on network errors talking to Google (a Google outage must
-// never take the whole site down); invalid/expired tokens still fail closed.
-//
-// When the secret is unset, which actions refuse is decided by the action
-// itself, not by one global switch — see FAIL_CLOSED_ACTIONS below.
-//
-// This was originally a single boolean, RECAPTCHA_FAIL_CLOSED, set to true to
-// close the unauthenticated writes. That did close them, and it also silently
-// took down /api/chat and /api/translate, which share this gate. The only
-// user-visible symptom was the wiki AI guide quietly falling back to raw Arch
-// Wiki markup, and it went unnoticed because the four write endpoints
-// behaved exactly as intended.
-//
-// The lesson generalises past this function: when one security change makes
-// several things fail, enumerate every call site before reporting blast
-// radius, and prefer refusing the specific risky actions over refusing
-// everything behind one flag.
-const RECAPTCHA_FAIL_CLOSED = false;
+// Tier 1 (38u): read-only AI endpoints get a shared, persistent per-IP budget
+// instead of a captcha. Fails OPEN when the store is unconfigured — these
+// endpoints mutate nothing, and per the epic they are cost problems (OpenRouter
+// free quota), not security boundaries. The in-worker map still runs first so
+// obvious floods die without a store round trip.
+async function aiBudgetAllow(env, route, request, messages) {
+  const ip = getClientIP(request);
+  if (localRateLimit(`aib:${route}:${ip}`, 12, 10 * LIMIT_WINDOW_MS_DEFAULT)) return false;
+  const key = await limitHash(env, ['aib', route, ip]);
+  const allow = await sharedLimit(env, key, {
+    limit: Number(env.AI_BUDGET_DAILY || 120),  // 1k-token units / rolling day
+    windowMs: 86_400_000,
+    weight: aiBudgetUnits(messages, null),
+  });
+  return allow !== false; // null (no store) => serve; false => over budget
+}
 
-// Actions that MUTATE shared state — they write to R2, publish a provider
-// entry, or post to a Discord webhook. When reCAPTCHA is unconfigured these
-// refuse rather than serve, because an unauthenticated write is an unbounded
-// exposure that no other control here contains.
-//
-// Read-only AI actions (chat, translate) are deliberately NOT in this set.
-// They mutate nothing, so refusing them removes no risk — it only breaks
-// features. They stay served and rely on checkRateLimit plus the upstream
-// provider's own limits.
-//
-// This set exists because a single global flag is the wrong tool: setting
-// RECAPTCHA_FAIL_CLOSED = true to protect the writes also silently took the
-// wiki AI guide (/api/chat) and /api/translate offline, since they share the
-// same gate. That was a real regression, invisible in testing because the
-// four write endpoints kept behaving exactly as expected.
-const FAIL_CLOSED_ACTIONS = new Set([
-  'hosting_register',
-  'hosting_manage',
-  'hosting_subscribe',
-  'newsletter_subscribe',
-]);
+// Charged after generation so the kept response's real size lands in the
+// budget; the precharge above already claimed the prompt's share.
+async function aiBudgetCharge(env, route, request, messages, responseText) {
+  const key = await limitHash(env, ['aib', route, getClientIP(request)]);
+  return sharedLimit(env, key, {
+    limit: Number(env.AI_BUDGET_DAILY || 120),
+    windowMs: 86_400_000,
+    weight: Math.min(aiBudgetUnits(messages, responseText), 20),
+    allowOver: true,
+  });
+}
 
-let recaptchaDisabledWarned = false;
-
-async function verifyRecaptcha(env, token, action) {
-  const siteKey = getSiteKey(env);
-  const secret = env.RECAPTCHA_API_SECRET_KEY;
-  // RECAPTCHA_FAIL_CLOSED is a master override that locks EVERY gated action,
-  // including the read-only AI ones. Default off, so an unconfigured key
-  // cannot silently take the AI guide offline.
-  const failClosed = RECAPTCHA_FAIL_CLOSED || FAIL_CLOSED_ACTIONS.has(action);
-  if (!secret) {
-    // These endpoints write to R2 and are otherwise unauthenticated and
-    // unthrottled, so an unconfigured key is a security problem either way.
-    // RECAPTCHA_FAIL_CLOSED decides which failure mode we take: refuse the
-    // writes (safe, but the forms break) or accept them (available, but open).
-    if (!recaptchaDisabledWarned) {
-      recaptchaDisabledWarned = true;
-      console.warn(
-        '[SECURITY] reCAPTCHA is DISABLED: RECAPTCHA_API_SECRET_KEY is not set. ' +
-        (failClosed
-          ? 'State-changing writes (newsletter/subscribe, hosting/register, hosting/manage, hosting/subscribe) are being REFUSED. '
-          : 'State-changing writes are ACCEPTING UNAUTHENTICATED TRAFFIC. ') +
-        'Read-only AI actions (chat, translate) are served without verification and rely on rate limiting. ' +
-        'Set RECAPTCHA_API_SECRET_KEY to enforce everywhere.'
-      );
-    }
-    if (failClosed) {
-      return { ok: false, error: 'Human verification is temporarily unavailable. Please try again later.' };
-    }
-    return { ok: true, disabled: true };
+// Tier 3: password-protected actions still get an attempt limiter, shared
+// when possible. Two keys: one binding the TARGET account (hash), one binding
+// the visitor — IP rotation cannot brute one victim and a victim's owner
+// cannot lock everyone else out. Fails OPEN when neither store is reachable:
+// the password itself remains the real gate (defense-in-depth, not boundary).
+async function attemptLimit(env, action, email, ip) {
+  const emailKey = await limitHash(env, ['atkp', action, String(email).trim().toLowerCase()]);
+  const ipKey = await limitHash(env, ['atki', action, ip]);
+  const perAccount = await sharedLimit(env, emailKey, { limit: 5, windowMs: 10 * LIMIT_WINDOW_MS_DEFAULT });
+  const perVisitor = await sharedLimit(env, ipKey, { limit: 5, windowMs: 10 * LIMIT_WINDOW_MS_DEFAULT });
+  if (perAccount === null && perVisitor === null) {
+    // No shared store configured: degrade to the per-isolate Map. Honest about
+    // the gap (comment on bead ray) instead of pretending it is shared.
+    const overAccount = localRateLimit(`atk:${action}:${emailKey}`, 5, 10 * LIMIT_WINDOW_MS_DEFAULT);
+    const overVisitor = localRateLimit(`atk:${action}:${ipKey}`, 5, 10 * LIMIT_WINDOW_MS_DEFAULT);
+    return !(overAccount || overVisitor);
   }
-  if (!token) return { ok: false, error: 'Human verification required. Please retry.' };
-  // A Google Cloud API key (AIza…) drives the Enterprise assessments API; a
-  // classic v2/v3 secret (6L…) drives siteverify. Dispatch on the prefix.
-  const isGoogleApiKey = secret.startsWith('AIza');
-  try {
-    if (!isGoogleApiKey) {
-      // Legacy siteverify path (classic v2/v3 secret key)
-      const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'secret=' + encodeURIComponent(secret) + '&response=' + encodeURIComponent(token),
-        signal: AbortSignal.timeout(10000),
-      });
-      const data = await res.json();
-      if (!data.success) {
-        return { ok: false, error: 'Human verification failed. Please retry.', codes: data['error-codes'] || [] };
-      }
-      if (typeof data.score === 'number' && data.score < RECAPTCHA_SCORE_THRESHOLD) {
-        return { ok: false, error: 'Unable to verify you are human. Please try again.' };
-      }
-      return { ok: true, score: data.score };
-    }
-    // Enterprise assessments API (project clean-502708), authenticated with
-    // the Google Cloud API key from RECAPTCHA_API_SECRET_KEY.
-    const res = await fetch('https://recaptchaenterprise.googleapis.com/v1/projects/' + RECAPTCHA_PROJECT + '/assessments?key=' + encodeURIComponent(secret), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event: { token: token, expectedAction: action || 'submit', siteKey: siteKey } }),
-      signal: AbortSignal.timeout(10000),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      return { ok: false, error: 'Verification service error. Please retry.', codes: (data.error && data.error.message) || ('HTTP ' + res.status) };
-    }
-    const tp = data.tokenProperties || {};
-    const score = (data.riskAnalysis && typeof data.riskAnalysis.score === 'number') ? data.riskAnalysis.score : 0;
-    if (tp.valid !== true) return { ok: false, error: 'Human verification failed. Please retry.' };
-    if (score < RECAPTCHA_SCORE_THRESHOLD) return { ok: false, error: 'Unable to verify you are human. Please try again.' };
-    return { ok: true, score: score };
-  } catch (e) {
-    // Network failure reaching Google — fail open so the site keeps working.
-    //
-    // Logged, because "degraded" is indistinguishable from "verified" in the
-    // response. A rename once left `secretKey` referenced after the variable
-    // was renamed to `secret`, which threw a ReferenceError here. That was
-    // swallowed silently, every gated endpoint failed open, and the health
-    // check still reported "enforced" because the secret was present. A
-    // missing-token test could not catch it either, since that check runs
-    // before this block. A bogus token would have.
-    console.warn('[SECURITY] reCAPTCHA verification error, allowing request unverified:', e && e.message ? e.message : e);
-    return { ok: true, degraded: true };
-  }
+  return perAccount !== false && perVisitor !== false;
 }
 
 function securityHeaders(nonce) {
@@ -769,11 +661,10 @@ async function handleHostingRegister(request, env) {
       return new Response(JSON.stringify({ error: 'org, email, password, mirror_url, and location are required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
 
-    // Human verification (reCAPTCHA Enterprise) before any processing
-    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_register');
-    if (!rc.ok) return new Response(JSON.stringify({ success: false, error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-
-    // Validate organization domain (skip if personal checkbox checked)
+    // Server-side org-email rule (bead 7k8): the free-mail blocker used to
+    // exist only in hosting-page.js, which is a suggestion, not a gate.
+    // validateOrgDomain already enforces the real rule; its "personal email"
+    // escape hatch is now authoritative ONLY when the checkbox arrived true.
     const orgCheck = await validateOrgDomain(env, body.email, body.org, body.personal_email === true);
     if (!orgCheck.valid) {
       return new Response(JSON.stringify({ success: false, error: orgCheck.reason }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -793,6 +684,10 @@ async function handleHostingRegister(request, env) {
     }
 
     const id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
+    // Registration is confirmed by email (bead 7k8): until the link is opened,
+    // admin approval is refused (see approve handlers) and the provider never
+    // lists as actionable.
+    const regConfirmToken = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2, '0')).join('');
     const provider = {
       id, org: body.org, email: body.email, website: body.website || '',
       mirror_url: body.mirror_url, location: body.location,
@@ -806,18 +701,62 @@ async function handleHostingRegister(request, env) {
       vetting: { score: vetResult.score, flags: vetResult.flags },
       personal_email: body.personal_email === true,
       last_seen: new Date().toISOString(),
-      expiry_warning_sent: false
+      expiry_warning_sent: false,
+      confirm_token: regConfirmToken,
+      email_confirmed_at: null
     };
     const ok = await putProvider(env, provider);
     if (!ok) return new Response(JSON.stringify({ error: 'Storage error' }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
 
-    // Mailing list subscription
+    // Registration confirmation email — enqueue and drain. If the queue is
+    // down, the registration is stored but NOT activatable until the user
+    // confirms; that is the DEFERRED failure, not an open one.
+    const regConfirmUrl = `https://acreetionos.org/api/hosting/confirm?provider=1&token=${encodeURIComponent(regConfirmToken)}`;
+    const regConfirmed = await enqueueMail(env, {
+      id: `provider-confirm-${regConfirmToken}`,
+      kind: 'confirm',
+      toEmail: body.email,
+      payload: {
+        list: 'hosting-provider',
+        token: regConfirmToken,
+        provider: true,
+        subject: `Confirm your AcreetionOS mirror registration — ${body.org}`,
+        body: confirmEmailBody(
+          `AcreetionOS mirror registration for ${body.org}`,
+          regConfirmUrl,
+          `https://acreetionos.org/api/hosting/remove-request?email=${encodeURIComponent(body.email)}`
+        ),
+      },
+      ttlSeconds: 72 * 3600,
+    });
+
+    // Mailing list subscription — pending until ITS confirmation link is used
+    let subNote = '';
     if (body.subscribe && body.email) {
-      const tokenBytes = crypto.getRandomValues(new Uint8Array(32));
-      const token = btoa(String.fromCharCode(...tokenBytes)).replace(/[/+]/g, '').slice(0, 32);
+      const token = Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2, '0')).join('');
       await putSubscriber(env, 'hosting', {
-        email: body.email, org: body.org, subscribed: new Date().toISOString(), unsubscribe_token: token
+        email: body.email, org: body.org,
+        subscribed: new Date().toISOString(),
+        unsubscribe_token: token,
+        confirmed_at: null,
       });
+      const queued = await enqueueMail(env, {
+        id: `hosting-confirm-${token}`,
+        kind: 'confirm',
+        toEmail: body.email,
+        payload: {
+          list: 'hosting',
+          token,
+          subject: 'Confirm your AcreetionOS hosting updates subscription',
+          body: confirmEmailBody(
+            'AcreetionOS hosting updates',
+            `https://acreetionos.org/api/hosting/confirm?token=${encodeURIComponent(token)}`,
+            `https://acreetionos.org/api/hosting/unsubscribe?email=${encodeURIComponent(body.email)}&token=${token}`
+          ),
+        },
+        ttlSeconds: 48 * 3600,
+      });
+      subNote = queued ? '' : ' The hosting-updates confirmation email could not be queued right now.';
     }
 
     const statusEmoji = vetResult.needs_manual_review ? '⚠️' : '✅';
@@ -836,9 +775,11 @@ async function handleHostingRegister(request, env) {
 
     const msg = vetResult.auto_rejected
       ? 'Registration rejected by security vetting'
-      : vetResult.needs_manual_review
-        ? 'Registration submitted — flagged for manual review due to security indicators'
-        : 'Registration submitted for review';
+      : regConfirmed
+        ? (vetResult.needs_manual_review
+          ? 'Registration submitted and flagged for manual review. Confirm your email address — approvals wait on it.'
+          : 'Registration submitted for review. Confirm your email address — approvals wait on it.' + subNote)
+        : 'Registration submitted, but the confirmation email could not be queued right now. Confirm later — approvals wait on it.' + subNote;
 
     return new Response(JSON.stringify({ success: true, message: msg, id, vetting: { score: vetResult.score, flagged: vetResult.needs_manual_review } }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
@@ -852,8 +793,12 @@ async function handleHostingRemoveRequest(request, env) {
     if (!body.email || !body.password) {
       return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
-    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_manage');
-    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+    // Tier 3 (epic try): the gate is the password plus an attempt limiter.
+    // Keyed on the ACCOUNT target and the visitor, so IP rotation cannot
+    // brute one victim and one victim's owner cannot lock everyone out.
+    if (!(await attemptLimit(env, 'hosting_remove', body.email, getClientIP(request)))) {
+      return new Response(JSON.stringify({ error: 'Too many attempts, please try again later' }), { status: 429, headers: corsHeaders({ headers: { get: () => '' } }) });
+    }
     const found = await findProviderByCredentials(env, body.email, async p =>
       p.password === await hashPassword(body.password, p.password.split(':')[0]));
     if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -873,8 +818,9 @@ async function handleHostingUpdateRequest(request, env) {
     if (!body.email || !body.password) {
       return new Response(JSON.stringify({ error: 'email and password required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     }
-    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_manage');
-    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+    if (!(await attemptLimit(env, 'hosting_update', body.email, getClientIP(request)))) {
+      return new Response(JSON.stringify({ error: 'Too many attempts, please try again later' }), { status: 429, headers: corsHeaders({ headers: { get: () => '' } }) });
+    }
     const found = await findProviderByCredentials(env, body.email, async p =>
       p.password === await hashPassword(body.password, p.password.split(':')[0]));
     if (!found) return new Response(JSON.stringify({ error: 'Provider not found or password incorrect' }), { status: 404, headers: corsHeaders({ headers: { get: () => '' } }) });
@@ -903,7 +849,15 @@ async function handleHostingAdminApprove(request, env) {
       }
       return new Response(JSON.stringify({ success: true, message: 'Provider removed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
     }
-    // Approve registration
+    // Approve registration — REFUSED while the provider has not confirmed its
+    // email address (bead 7k8). Approval without proof of ownership would
+    // re-open the arbitrary-address spam hole that captcha pretended to close.
+    if (!data.email_confirmed_at) {
+      return new Response(JSON.stringify({
+        error: 'Provider has not confirmed their email address yet. Ask them to open the confirmation link, then approve.',
+        email_confirmed: false,
+      }), { status: 409, headers: corsHeaders({ headers: { get: () => '' } }) });
+    }
     data.status = 'active';
     await putProvider(env, data);
     sendDiscordWebhook(env, `**Provider Approved**\n**Provider:** ${data.org} (${data.email}) is now active.`);
@@ -935,26 +889,14 @@ async function handleHostingAdminReject(request, env) {
 async function handleHostingAdminPending(env) {
   const { providers: all } = await listProviders(env, { limit: 500 });
   const pending = all.filter(p => p.status === 'pending' || p.removal_requested);
-  return new Response(JSON.stringify({ pending, total: all.length }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+  // Surfacing the confirmation state so an approving admin is not surprised
+  // by the 409 that an unconfirmed provider earns.
+  const annotated = pending.map(p => ({ ...p, email_confirmed: !!p.email_confirmed_at }));
+  return new Response(JSON.stringify({ pending: annotated, total: all.length }), { headers: corsHeaders({ headers: { get: () => '' } }) });
 }
 
 async function handleHostingSubscribe(request, env) {
-  try {
-    const body = await request.json();
-    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'hosting_subscribe');
-    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const existing = await getSubscriber(env, 'hosting', body.email);
-    if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
-    const hTokenBytes = crypto.getRandomValues(new Uint8Array(32));
-    const hToken = btoa(String.fromCharCode(...hTokenBytes)).replace(/[/+]/g, '').slice(0, 32);
-    await putSubscriber(env, 'hosting', {
-      email: body.email, org: body.org || '', subscribed: new Date().toISOString(), unsubscribe_token: hToken
-    });
-    return new Response(JSON.stringify({ success: true, message: 'Subscribed to hosting updates' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
-  } catch (e) {
-    return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
-  }
+  return subscribeWithDoubleOptIn(request, env, 'hosting');
 }
 
 async function handleHostingUnsubscribe(request, env) {
@@ -969,22 +911,120 @@ async function handleHostingUnsubscribe(request, env) {
 }
 
 async function handleNewsletterSubscribe(request, env) {
+  return subscribeWithDoubleOptIn(request, env, 'newsletter');
+}
+
+// ─── Double opt-in (bead 7k8) ─────────────────────────────────────────
+//
+// The OLD flow wrote whatever email it received and told /newsletter "check
+// your inbox for confirmation" while the newsletter job mailed every row,
+// filtered on nothing — anyone could add any address. Now proof of ownership
+// exists instead of filtering:
+//
+//   1. subscribe writes the row with confirmed_at unset — INERT forever until
+//      the link is opened. The newsletter script reads confirmed rows only,
+//      both Worker- and script-side.
+//   2. the confirmation email lands in the container mail queue, enqueue-and-
+//      drain: a VPS outage defers it, it does not open the write (bead 7k8).
+//   3. the click is GET /api/<list>/confirm?token= — one-shot via the shared
+//      replay store, one token per address.
+//
+// Response messages finally describe the behaviour that actually happens.
+const CONFIRM_URL_PREFIX = 'https://acreetionos.org/api';
+
+function confirmEmailBody(kind, confirmUrl, unsubscribeUrl) {
+  return (
+    'You (or someone using your address) asked for updates from AcreetionOS.\n\n' +
+    `Confirm it is really you by opening this link exactly once. The link expires.\n\n` +
+    `${confirmUrl}\n\n` +
+    'Nothing will be sent to this address before the link is opened.\n' +
+    `If it was not you: ignore this email. You can also unsubscribe at ${unsubscribeUrl}.\n\n` +
+    'AcreetionOS — https://acreetionos.org'
+  );
+}
+
+async function subscribeWithDoubleOptIn(request, env, list) {
   try {
     const body = await request.json();
-    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'newsletter_subscribe');
-    if (!rc.ok) return new Response(JSON.stringify({ error: rc.error }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
     if (!body.email) return new Response(JSON.stringify({ error: 'email required' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
-    const existing = await getSubscriber(env, 'newsletter', body.email);
-    if (existing) return new Response(JSON.stringify({ success: true, message: 'Already subscribed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
-    const nlTokenBytes = crypto.getRandomValues(new Uint8Array(32));
-    const nlToken = btoa(String.fromCharCode(...nlTokenBytes)).replace(/[/+]/g, '').slice(0, 32);
-    await putSubscriber(env, 'newsletter', {
-      email: body.email, subscribed: new Date().toISOString(), unsubscribe_token: nlToken
+    const email = String(body.email).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
+      return new Response(JSON.stringify({ error: 'invalid email' }), { status: 400, headers: corsHeaders({ headers: { get: () => '' } }) });
+    }
+    const existing = await getSubscriber(env, list, email);
+    if (existing && existing.confirmed_at) {
+      return new Response(JSON.stringify({ success: true, message: 'Already subscribed and confirmed' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+    }
+    // Resend reuses the stored token (the older email keeps working); fresh
+    // signups mint one.
+    const token = (existing && existing.unsubscribe_token)
+      ? existing.unsubscribe_token
+      : Array.from(crypto.getRandomValues(new Uint8Array(24)), b => b.toString(16).padStart(2, '0')).join('');
+    await putSubscriber(env, list, {
+      ...(existing || {}),
+      email,
+      org: body.org || (existing && existing.org) || '',
+      subscribed: (existing && existing.subscribed) || new Date().toISOString(),
+      unsubscribe_token: token,
+      confirmed_at: null,
     });
-    return new Response(JSON.stringify({ success: true, message: 'Subscribed to newsletter' }), { headers: corsHeaders({ headers: { get: () => '' } }) });
+    const confirmUrl = `${CONFIRM_URL_PREFIX}/${list}/confirm?token=${encodeURIComponent(token)}`;
+    const unsubscribeUrl = `${CONFIRM_URL_PREFIX}/${list}/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+    const subject = (list === 'newsletter')
+      ? 'Confirm your AcreetionOS newsletter subscription'
+      : 'Confirm your AcreetionOS hosting updates subscription';
+    const queued = await enqueueMail(env, {
+      id: `${list}-confirm-${token}`,
+      kind: 'confirm',
+      toEmail: email,
+      payload: { list, token, subject, body: confirmEmailBody(subject, confirmUrl, unsubscribeUrl) },
+      ttlSeconds: 48 * 3600,
+    });
+    if (!queued) {
+      // Store down: fail DEFERRED, not OPEN. The row is inert either way, but
+      // without the email the user cannot finish, so say that honestly.
+      return new Response(JSON.stringify({
+        success: false,
+        error: 'The confirmation service is unavailable right now. Your address is saved as pending and needs a confirmation link — try again in a few minutes.',
+      }), { status: 503, headers: corsHeaders({ headers: { get: () => '' } }) });
+    }
+    return new Response(JSON.stringify({
+      success: true,
+      pending: true,
+      message: 'Almost there — open the confirmation link the email brings. Nothing will be sent to this address before that.',
+    }), { headers: corsHeaders({ headers: { get: () => '' } }) });
   } catch (e) {
     return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: corsHeaders({ headers: { get: () => '' } }) });
   }
+}
+
+const CONFIRM_LANDING = 'https://acreetionos.org/newsletter.html?confirmed=1';
+const CONFIRM_LANDING_FAIL = 'https://acreetionos.org/newsletter.html?confirmed=0';
+
+async function subscribeConfirm(env, list, landing, token) {
+  if (!token) return new Response(null, { status: 302, headers: { Location: CONFIRM_LANDING_FAIL } });
+  const firstUse = await sharedReplay(env, `confirm:${list}:${token}`, 72 * 3600);
+  if (firstUse === false) {
+    // Already used (store-configured): treat like failure the same way the
+    // newsletter page reads ?confirmed=. HONEST NOTE: this makes the link
+    // truly one-shot; without the shared store single-use falls back to the
+    // row itself (an already-confirmed token is 404 on re-click).
+    return new Response(null, { status: 302, headers: { Location: CONFIRM_LANDING_FAIL } });
+  }
+  if (firstUse !== true && firstUse !== null) {
+    return new Response(JSON.stringify({ error: 'Replay service unavailable' }), { status: 503 });
+  }
+  let ok = false;
+  try {
+    ok = await confirmSubscriber(env, token);
+  } catch (e) {
+    return new Response(JSON.stringify({ error: e.message }), { status: 503 });
+  }
+  const target = ok ? landing : CONFIRM_LANDING_FAIL;
+  return new Response(JSON.stringify({ success: ok }), {
+    status: ok ? 200 : 404,
+    headers: { 'Content-Type': 'application/json', Location: target, ...corsHeaders({ headers: { get: () => '' } }) },
+  });
 }
 
 async function handleNewsletterUnsubscribe(request, env) {
@@ -1000,10 +1040,21 @@ async function handleNewsletterUnsubscribe(request, env) {
 
 async function handleNewsletterSubscribers(env) {
   try {
-    const subscribers = (await listSubscribers(env, { list: 'newsletter' }))
+    // Only confirmed addresses are mailable (bead 7k8). The script that sends
+    // the newsletter calls this endpoint — it must never see unconfirmed rows.
+    const confirmed = (await listSubscribers(env, { list: 'newsletter', confirmedOnly: true }))
       .filter(s => s && s.email)
       .map(s => ({ email: s.email, subscribed: s.subscribed, unsubscribe_token: s.unsubscribe_token || '' }));
-    return new Response(JSON.stringify({ subscribers, count: subscribers.length }), {
+    let pendingCount = null;
+    try {
+      const all = await listSubscribers(env, { list: 'newsletter' });
+      pendingCount = all.filter(s => s && s.email && !s.confirmed_at).length;
+    } catch { pendingCount = null; }
+    return new Response(JSON.stringify({
+      subscribers: confirmed,
+      count: confirmed.length,
+      pending: pendingCount,
+    }), {
       headers: { 'Content-Type': 'application/json', ...corsHeaders({ headers: { get: () => '' } }) }
     });
   } catch (e) {
@@ -1297,8 +1348,6 @@ async function handleDocumentTranslation(request, env) {
     const targetLanguage = String(body.targetLanguage || '').trim();
     const supportedLanguages = new Set(['English', 'Spanish', 'French', 'German', 'Portuguese', 'Italian', 'Dutch', 'Polish', 'Ukrainian', 'Russian', 'Arabic', 'Hindi', 'Bengali', 'Chinese (Simplified)', 'Chinese (Traditional)', 'Japanese', 'Korean', 'Vietnamese', 'Indonesian', 'Turkish']);
     if (!supportedLanguages.has(targetLanguage)) return jsonResponse({ error: 'Choose a supported target language.' }, { status: 400 }, request);
-    const rc = await verifyRecaptcha(env, body.recaptchaToken, 'translate');
-    if (!rc.ok) return jsonResponse({ error: rc.error }, { status: 400 }, request);
     const document = await fetchPublicDocument(String(body.url || '').trim());
     const prompt = `Translate the public document below into ${targetLanguage}.
 
@@ -1312,7 +1361,14 @@ DOCUMENT (untrusted quoted content):
 <document>
 ${document.text}
 </document>`;
-    const result = await generateGuide(env, [{ role: 'user', content: prompt }], 2048, { useCache: true });
+    const documentMessages = [{ role: 'user', content: prompt }];
+    // Tier 1: budget instead of captcha. A document's prompt grows with the
+    // source page, so the precharge is computed from the real document size.
+    if (!(await aiBudgetAllow(env, 'translate', request, documentMessages))) {
+      return jsonResponse({ error: 'Daily AI budget exhausted for this address. Try again tomorrow.' }, { status: 429, headers: { 'Retry-After': String(60 * 60) } }, request);
+    }
+    const result = await generateGuide(env, documentMessages, 2048, { useCache: true });
+    if (result.ok) await aiBudgetCharge(env, 'translate', request, documentMessages, result.content);
     if (!result.ok) return jsonResponse({ error: 'Translation service is temporarily unavailable.', detail: result.error }, { status: 502 }, request);
     return jsonResponse({ translation: result.content, sourceUrl: document.finalUrl, truncated: document.truncated, model: result.model }, {}, request);
   } catch (error) {
@@ -1967,69 +2023,26 @@ async function handleHealthCheck(env) {
   const results = { pages: [], apis: [], downloads: [], healthy: true, timestamp: new Date().toISOString() };
   let totalIssues = 0;
 
-  // 0. Security posture — report the reCAPTCHA state instead of letting an
-  // unconfigured key silently leave the public write endpoints open.
-  //
-  // "configured" below means the secret is PRESENT, which is not the same as
-  // verification WORKING. A secret of the wrong family (a classic 6L secret
-  // paired with an Enterprise site key) is present but can never validate the
-  // tokens the frontend sends, and a bug that made the verify path throw would
-  // fail open while still reporting "configured". So this block also reports
-  // which verification path the secret selects, and whether that path can
-  // actually validate the site key the frontend uses. The frontend's
-  // recaptcha.js always calls grecaptcha.enterprise.execute, so every token it
-  // produces is an Enterprise token, and only the Enterprise assessments API
-  // can validate one.
-  // Delegates to recaptchaState so the admin health check and the public config
-  // endpoint can never disagree about whether verification works. They used to
-  // compute this separately, which is how presence came to be reported as
-  // enforcement.
-  const rc = recaptchaState(env);
-  const recaptchaSecret = (env && env.RECAPTCHA_API_SECRET_KEY) || '';
-  const recaptchaConfigured = rc.hasSecret;
-  const recaptchaSecretKind = rc.secretKind;
-  const recaptchaSiteKey = rc.siteKey;
-  const recaptchaSiteKeyConfigured = rc.hasSiteKey;
-  const recaptchaSiteKeyKind = rc.siteKind;
-  const recaptchaMismatched = rc.mismatched;
-  const recaptchaWorking = rc.working;
-  // All seven reCAPTCHA-gated actions, split by what they do. The write list
-  // mirrors FAIL_CLOSED_ACTIONS; an earlier version of this block listed only
-  // four and omitted chat/translate entirely, which understated the blast
-  // radius of a fail-closed change.
-  const WRITE_ACTIONS = [
-    'POST /api/newsletter/subscribe',
-    'POST /api/hosting/register',
-    'POST /api/hosting/manage',
-    'POST /api/hosting/subscribe',
-  ];
-  const READ_AI_ACTIONS = [
-    'POST /api/chat',
-    'POST /api/translate',
-  ];
-  const writesRefused = !recaptchaWorking;
+  // 0. Security posture — self-hosted verification (epic try). The report
+  // describes the tier model that actually exists now: which actions are
+  // gated by what, and whether the shared store is wired up. "Configured"
+  // again means capability, not intent: with or without the store the write
+  // endpoints are protected by double opt-in, and the AI endpoints are
+  // bounded by the in-worker limiter even when the store is absent.
+  const sharedStoreUp = Boolean(env.DB_BACKEND === 'sqlite' && env.DB_API_BASE && env.DB_API_TOKEN);
   results.security = {
-    recaptcha: recaptchaConfigured ? 'configured' : 'DISABLED',
-    // "working" is the field that matters. recaptchaMode describes intent;
-    // recaptchaWorking describes whether that intent is actually in effect.
-    recaptchaMode: recaptchaWorking ? 'enforced'
-      : (RECAPTCHA_FAIL_CLOSED ? 'fail-closed (all actions)' : 'fail-closed (writes only)'),
-    recaptchaSecretKind,
-    recaptchaSiteKeyConfigured,
-    recaptchaSiteKeyKind,
-    recaptchaWorking,
-    // Nothing is open while unconfigured: the writes refuse, and the read-only
-    // AI actions are served without verification but mutate nothing.
+    verification: 'self-hosted',
+    tiers: {
+      subscribe: 'double opt-in (proof of ownership; unconfirmed rows are unmailable)',
+      register: 'double opt-in + email-confirmed approval gate',
+      manage: 'password + attempt rate limit',
+      ai_read: 'per-IP daily token budget + response cache',
+    },
+    sharedStore: sharedStoreUp ? 'connected' : 'NOT CONNECTED — per-isolate limiter only (set DB_BACKEND/DB_API_BASE/DB_API_TOKEN)',
     openEndpoints: [],
-    unavailableEndpoints: writesRefused ? WRITE_ACTIONS : [],
-    unverifiedEndpoints: writesRefused ? READ_AI_ACTIONS : [],
-    note: !recaptchaSiteKeyConfigured
-      ? 'MISCONFIGURATION: RECAPTCHA_API_KEY is not set, so the frontend cannot mint a reCAPTCHA token at all — GET /api/config/public returns no key and recaptcha.js never loads enterprise.js. There is no hardcoded fallback by design, so every gated form fails closed with no code-level symptom. Set RECAPTCHA_API_KEY to an Enterprise site key (6Lf…) for project ' + RECAPTCHA_PROJECT + '.'
-      : recaptchaMismatched
-      ? 'MISCONFIGURATION: RECAPTCHA_API_SECRET_KEY looks like a classic reCAPTCHA secret, but the frontend site key is an Enterprise key, so every token recaptcha.js produces is an Enterprise token and classic siteverify can never validate it. All gated endpoints therefore reject every request, including legitimate ones. Set RECAPTCHA_API_SECRET_KEY to a Google Cloud API key (AIza…) for project ' + RECAPTCHA_PROJECT + '.'
-      : recaptchaWorking
-        ? 'Secret is present, the site key is present, and their families match. Gated endpoints require a valid token.'
-        : 'No usable reCAPTCHA secret is set. The four state-changing writes are REFUSED rather than served, which is the safe failure mode: newsletter signup and hosting registration return an error until the secret exists. The read-only AI endpoints (chat, translate) stay served and rely on rate limiting, since they mutate nothing. Set RECAPTCHA_API_SECRET_KEY to enforce everywhere — the frontend already sends recaptchaToken.',
+    unavailableEndpoints: [],
+    unverifiedEndpoints: [],
+    note: 'Nothing is unauthenticated-writable: subscribers are inert until their confirmation link is used, and provider approvals wait on email confirmation. Score grading from reCAPTCHA deliberately has no successor; see the epic.',
   };
 
   // 1. Check all HTML pages
@@ -2843,30 +2856,29 @@ export default {
     if (url.pathname === '/api/hosting/subscribe' && request.method === 'POST') {
       return handleHostingSubscribe(request, env);
     }
-    // Public, unauthenticated, and deliberately minimal. This exists so the
-    // browser can read the reCAPTCHA site key from configuration instead of from
-    // a literal baked into recaptcha.js — a site key is public by design, so
-    // serving it leaks nothing, whereas a hardcoded copy silently outlives a
-    // console-side rotation.
-    //
-    // It returns ONLY the site key and its family. It must never grow the
-    // endpoint lists, secret kinds, or open/unavailable state that
-    // /api/health/check reports: publishing your security posture is a different
-    // decision, and /api/health/check stays admin-gated. See bead 483.
+    // /api/config/public is GONE (bead c6c): it existed only to hand the
+    // reCAPTCHA site key to the browser, and there is no key to hand over.
+    // Anything still requesting it gets a deliberate 410, not a silent 404.
+    // It must never grow the endpoint lists, secret kinds, or open/unavailable
+    // state that /api/health/check reports: publishing your security posture is
+    // a different decision, and /api/health/check stays admin-gated. See bead 483.
     if (url.pathname === '/api/config/public' && request.method === 'GET') {
-      const st = recaptchaState(env);
-      return new Response(JSON.stringify({
-        recaptchaSiteKey: st.siteKey,
-        recaptchaSiteKeyKind: st.siteKind,
-        // Means "verification should succeed", not "both values are non-empty".
-        // Reporting presence here is what made the earlier classic-secret
-        // misconfiguration look enforced while rejecting every real user.
-        recaptchaConfigured: st.working,
-        recaptchaFault: st.fault,
-      }), { headers: { 'Content-Type': 'application/json', ...corsHeaders(request) } });
+      return new Response(JSON.stringify({ error: 'removed', reason: 'reCAPTCHA has been deleted end to end (bead c6c)' }), {
+        status: 410, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
+      });
     }
     if (url.pathname === '/api/newsletter/subscribe' && request.method === 'POST') {
       return handleNewsletterSubscribe(request, env);
+    }
+    if (url.pathname === '/api/newsletter/confirm' && request.method === 'GET') {
+      return subscribeConfirm(env, 'newsletter',
+        'https://acreetionos.org/newsletter.html?confirmed=1',
+        url.searchParams.get('token'));
+    }
+    if (url.pathname === '/api/hosting/confirm' && request.method === 'GET') {
+      return subscribeConfirm(env, 'hosting',
+        'https://acreetionos.org/hosting.html?confirmed=1',
+        url.searchParams.get('token'));
     }
     if (url.pathname === '/api/newsletter/unsubscribe' && request.method === 'GET') {
       return handleNewsletterUnsubscribe(request, env);
@@ -3033,21 +3045,13 @@ export default {
       }
 
       // Server-to-server calls (newsletter generator, internal tools) carry
-      // X-Admin-Key: <SECRET_SAUCE> and skip human verification. Browser
-      // traffic must pass reCAPTCHA — chat burns AI tokens, so bots get
-      // stopped before any provider is called.
+      // X-Admin-Key: <SECRET_SAUCE> and skip the budget entirely: this is a
+      // trusted producer. Browser traffic carries NO captcha — the edit-drop
+      // of reCAPTCHA replaced it with a per-IP daily token budget moved into
+      // the shared store (beads 38u + ray), which binds cost instead of
+      // pretending to bind bots.
       const adminKey = request.headers.get('X-Admin-Key') || '';
       const isAdmin = env.SECRET_SAUCE && await timingSafeCompare(adminKey, env.SECRET_SAUCE);
-
-      if (!isAdmin) {
-        const rc = await verifyRecaptcha(env, body.recaptchaToken, 'chat');
-        if (!rc.ok) {
-          return new Response(JSON.stringify({ error: rc.error }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json', ...corsHeaders(request) }
-          });
-        }
-      }
 
       // Server-side keys stay in env (Cloudflare Worker secrets), never on the client.
       // Free provider chain: Workers AI → Groq → GitHub Models → OpenRouter free router.
@@ -3062,14 +3066,31 @@ export default {
         chatMessages = [{ role: 'system', content: ACRETION_SYSTEM }, ...chatMessages];
       }
 
+      if (!isAdmin) {
+        const budgetOk = await aiBudgetAllow(env, 'chat', request, chatMessages);
+        if (!budgetOk) {
+          return new Response(JSON.stringify({
+            error: 'Daily AI budget exhausted for this address. The wiki guide pages are static and always available; try again tomorrow.',
+          }), {
+            status: 429,
+            headers: { 'Content-Type': 'application/json', 'Retry-After': String(60 * 60), ...corsHeaders(request) }
+          });
+        }
+      }
+
       // Admin (newsletter) calls may request up to 4096 tokens; browser chat
-      // stays capped at 2048 so the free tier isn't exhausted by one page.
+      // is capped at 1024 (bead 38u tightened 2048→1024) because the free
+      // tier budget is finite and the cache absorbs most repeat traffic.
       const result = await generateGuide(
         env,
         chatMessages,
-        Math.min(body.max_tokens || 1024, isAdmin ? 4096 : 2048),
+        Math.min(body.max_tokens || 1024, isAdmin ? 4096 : 1024),
         { useCache: isAdmin ? false : true }
       );
+
+      if (result.ok && !isAdmin) {
+        await aiBudgetCharge(env, 'chat', request, chatMessages, result.content);
+      }
 
       if (!result.ok) {
         return new Response(JSON.stringify({ error: 'AI service unavailable', detail: result.error }), {

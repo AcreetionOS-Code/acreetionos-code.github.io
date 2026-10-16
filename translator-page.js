@@ -36,7 +36,7 @@
       var token = window.getRecaptchaToken ? await window.getRecaptchaToken('translate') : null;
       var response = await fetch('/api/translate-document', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: urlInput.value.trim(), targetLanguage: language.value, recaptchaToken: token })
+        body: JSON.stringify({ url: urlInput.value.trim(), targetLanguage: language.value })
       });
       var data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Translation failed.');

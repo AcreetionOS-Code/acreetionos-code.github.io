@@ -220,12 +220,148 @@ async function listSubscribers(env, { list, confirmedOnly = false } = {}) {
   return out;
 }
 
-// confirmSubscriber() and findSubscriberByToken() are deliberately NOT exported
-// yet. Double opt-in needs a confirmation endpoint on the Worker and a
-// confirmed-only filter in generate-newsletter.py before any address can be
-// considered proven; wiring the shim side early would let a caller believe
-// confirmation is enforced when nothing consumes confirmed_at yet. Add them
-// with that work, not before.
+// confirmSubscriber() and findSubscriberByToken() — exported now as part of
+// 7k8: the Worker exposes GET confirm routes, so "consuming confirmed_at"
+// exists (the confirm endpoint) and the newsletter job asks for confirmed
+// rows only.
+
+async function confirmSubscriber(env, token) {
+  if (useSqlite(env)) {
+    const r = await dbFetch(env, '/subscribers/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ unsubscribe_token: token }),
+    });
+    return Boolean(r && r.ok);
+  }
+  // R2 path: read the row by token (unsubscribe_token), stamp confirmed_at,
+  // write it back. No uniqueness server-side, so a torn read/write window
+  // exists here that the sqlite backend does not have.
+  const prefix = ['nl-subscriber-', 'subscriber-'];
+  for (const p of prefix) {
+    for (const obj of await listR2(env, BUCKET, p)) {
+      const row = await getR2(env, BUCKET, obj.key);
+      if (row && row.unsubscribe_token === token && !row.confirmed_at) {
+        await putR2(env, BUCKET, obj.key, { ...row, confirmed_at: new Date().toISOString() });
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+async function findSubscriberByToken(env, token) {
+  if (useSqlite(env)) {
+    try {
+      return await dbFetch(env, '/subscribers/by-token/' + encodeURIComponent(token));
+    } catch { return null; }
+  }
+  for (const p of ['nl-subscriber-', 'subscriber-']) {
+    for (const obj of await listR2(env, BUCKET, p)) {
+      const row = await getR2(env, BUCKET, obj.key);
+      if (row && row.unsubscribe_token === token) return row;
+    }
+  }
+  return null;
+}
+
+// Provider registration confirmation (7k8): mirrors carry confirm_token and
+// email_confirmed_at exactly like subscribers carry unsubscribe_token and
+// confirmed_at, so an approval without proof of ownership cannot happen.
+async function findProviderByToken(env, token) {
+  if (useSqlite(env)) {
+    try {
+      return await dbFetch(env, '/providers/by-token/' + encodeURIComponent(token));
+    } catch { return null; }
+  }
+  for (const obj of await listR2(env, BUCKET, 'provider-')) {
+    const row = await getR2(env, BUCKET, obj.key);
+    if (row && row.confirm_token === token) return row;
+  }
+  return null;
+}
+
+async function confirmProvider(env, token) {
+  if (useSqlite(env)) {
+    const r = await dbFetch(env, '/providers/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ confirm_token: token }),
+    });
+    return Boolean(r && r.ok && r.provider);
+  }
+  const row = await findProviderByToken(env, token);
+  if (!row || row.email_confirmed_at) return false;
+  return putProvider(env, {
+    ...row,
+    email_confirmed_at: new Date().toISOString(),
+    confirm_token: null,
+  });
+}
+
+// ── shared store: limits, replay, mail queue (beads ray, 38u, 7k8) ──────
+//
+// These are the Worker-side doors to the same shim. When the store is not
+// configured (DB_BACKEND not 'sqlite', or DB_API_BASE/TOKEN missing) every
+// helper returns null and the caller falls back to its old behaviour. That
+// keeps the deploy order free: code can land before the secrets exist.
+//
+// Fail semantics, chosen deliberately:
+//  - LIMITS: fail-open for reads (chat/translate are not state-changing and
+//    the epic explicitly serves reads on rate limit when the store is down).
+//    The call sites that protect state-changing writes use fail-open too but
+//    survive because the WRITE itself is now double-opt-in gated instead.
+//  - REPLAY/MAIL QUEUE: fail-closed for mail enqueue is wrong (defers would
+//    vanish), so enqueue failure surfaces as an error the caller turns into a
+//    503, matching "fails DEFERRED, not OPEN".
+
+async function sharedLimit(env, bucket, { limit, windowMs, weight = 1, allowOver = false } = {}) {
+  if (!useSqlite(env)) return null;
+  if (allowOver) {
+    // charge without a check (budget top-ups after a served response)
+    try {
+      await dbFetch(env, '/limits/add', {
+        method: 'POST',
+        body: JSON.stringify({ bucket, limit, window_ms: windowMs, weight }),
+      });
+      return true;
+    } catch { return null; }
+  }
+  try {
+    const r = await dbFetch(env, '/limits/check', {
+      method: 'POST',
+      body: JSON.stringify({ bucket, limit, window_ms: windowMs, weight }),
+    });
+    return Boolean(r && r.allowed);
+  } catch {
+    return null; // store unreachable: caller decides (documented fail-open)
+  }
+}
+
+async function sharedReplay(env, key, ttlSeconds = 86_400) {
+  if (!useSqlite(env)) return null;
+  try {
+    const r = await dbFetch(env, '/replay', {
+      method: 'POST',
+      body: JSON.stringify({ key, ttl: ttlSeconds }),
+    });
+    return Boolean(r && r.claimed);
+  } catch {
+    return null;
+  }
+}
+
+async function enqueueMail(env, { id, kind, toEmail, payload, ttlSeconds = 172_800 }) {
+  if (!useSqlite(env)) return null;
+  const r = await dbFetch(env, '/mail-queue', {
+    method: 'POST',
+    body: JSON.stringify({
+      id, kind,
+      to_email: toEmail,
+      payload,
+      ttl: ttlSeconds,
+    }),
+  });
+  return Boolean(r && r.ok);
+}
 
 export {
   BUCKET,
@@ -234,4 +370,7 @@ export {
   getProvider, putProvider, deleteProvider, listProviders,
   findProviderByCredentials,
   getSubscriber, putSubscriber, deleteSubscriber, listSubscribers,
+  confirmSubscriber, findSubscriberByToken,
+  findProviderByToken, confirmProvider,
+  sharedLimit, sharedReplay, enqueueMail,
 };
