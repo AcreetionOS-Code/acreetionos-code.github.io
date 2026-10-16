@@ -128,6 +128,14 @@ async function hmacSha256Hex(secret, message) {
 
 const rateLimitMap = new Map();
 
+// Kept under the old name: many entry points call it directly (translate,
+// news, counters). It is the per-isolate fast path. Anything that truly
+// matters goes through the shared store on top of this — see aiBudgetAllow,
+// attemptLimit and the sharedLimit helper in storage.js (bead ray).
+function checkRateLimit(key, maxRequests = 20, windowMs = LIMIT_WINDOW_MS_DEFAULT) {
+  return localRateLimit(key, maxRequests, windowMs);
+}
+
 function localRateLimit(key, maxRequests = 20, windowMs = LIMIT_WINDOW_MS_DEFAULT) {
   if (rateLimitMap.size > LIMIT_LOCAL_MAP_MAX) rateLimitMap.clear();
   const now = Date.now();
