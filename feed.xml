@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-20T00:00:00Z</updated>
+  <updated>2026-10-21T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 21, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-21.html"/>
+    <id>tag:acreetionos.org,2026-10-21:newsletter</id>
+    <updated>2026-10-21T00:00:00Z</updated>
+    <published>2026-10-21T00:00:00Z</published>
+    <summary>Critical PHP Security Update Coming: Protect Your AcreetionOS System A critical PHP security update is scheduled to be released on October 21, 2026, at 14:00 UTC. This update addresses a high-stakes security vulnerability that could potentially compromise the security of your AcreetionOS system. We …</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 20, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-20.html"/>
