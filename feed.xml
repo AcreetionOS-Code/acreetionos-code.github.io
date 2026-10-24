@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-23T00:00:00Z</updated>
+  <updated>2026-10-24T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 24, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-24.html"/>
+    <id>tag:acreetionos.org,2026-10-24:newsletter</id>
+    <updated>2026-10-24T00:00:00Z</updated>
+    <published>2026-10-24T00:00:00Z</published>
+    <summary>Fake Arch Linux packages hid scripts that could run attacker-controlled code as root, raising serious security alarms across the community. Development The security community went into overdrive this week after Bitdefender, BleepingComputer, and other outlets exposed a campaign distributing trojaniz…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 23, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-23.html"/>
