@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-25T00:00:00Z</updated>
+  <updated>2026-10-26T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 26, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-26.html"/>
+    <id>tag:acreetionos.org,2026-10-26:newsletter</id>
+    <updated>2026-10-26T00:00:00Z</updated>
+    <published>2026-10-26T00:00:00Z</published>
+    <summary>The intelligence sync commit merged newsletter, archive, wiki guides, and feed, streamlining project documentation for AcreetionOS. Natalie spivanatalie64 and Darren cobra3282000 pushed the sync to acreetionos-code.github.io, unifying community resources under a single update. This milestone means r…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 25, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-25.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-05-29T00:00:00Z</updated>
     <published>2026-05-29T00:00:00Z</published>
     <summary>Daily AcreetionOS Update - May 29, 2026 Hello AcreetionOS community, Today’s update is a quieter one, as there was no recent development activity or community activity recorded for this reporting period. Even on slower days, we want to keep the daily rhythm going and make sure everyone has a clear s…</summary>
-  </entry>
-  <entry>
-    <title>Daily AcreetionOS Update — May 25, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-05-25.html"/>
-    <id>tag:acreetionos.org,2026-05-25:newsletter</id>
-    <updated>2026-05-25T00:00:00Z</updated>
-    <published>2026-05-25T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - May 25, 2026 Development Updates Today’s focus across the AcreetionOS ecosystem is on stability, usability, and security awareness. Recent Linux security headlines, including reports of a long-standing kernel flaw and the newly discussed PinTheft privilege-escalation issue…</summary>
   </entry>
 </feed>
