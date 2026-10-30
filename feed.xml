@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-10-29T00:00:00Z</updated>
+  <updated>2026-10-30T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- October 30, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-10-30.html"/>
+    <id>tag:acreetionos.org,2026-10-30:newsletter</id>
+    <updated>2026-10-30T00:00:00Z</updated>
+    <published>2026-10-30T00:00:00Z</published>
+    <summary>AcreetionOS CI now publishes ISOs automatically after a weekend of fixing release workflow validation and adding the -R flag to gh release create. The new pipeline in acreetionos-code.github.io syncs the newsletter, archive, and wiki guides on every push, so the latest builds and documentation stay …</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- October 29, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-10-29.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-06-02T00:00:00Z</updated>
     <published>2026-06-02T00:00:00Z</published>
     <summary>Daily AcreetionOS Update - June 02, 2026 Development Updates: No recent activity was recorded for AcreetionOS today, so there are no new feature launches, bug fixes, or infrastructure changes to report. In a quiet update like this, the main takeaway is stability, with the development team presumably…</summary>
-  </entry>
-  <entry>
-    <title>Daily AcreetionOS Update — June 01, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-01.html"/>
-    <id>tag:acreetionos.org,2026-06-01:newsletter</id>
-    <updated>2026-06-01T00:00:00Z</updated>
-    <published>2026-06-01T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 01, 2026 Development Updates No recent activity was found for AcreetionOS today, so there are no confirmed code changes, releases, or merge updates to report. The latest available material still points to ongoing ecosystem-building work around documentation, wiki setu…</summary>
   </entry>
 </feed>
