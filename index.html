@@ -521,57 +521,22 @@
 
 <!-- Carousel JavaScript - Thanks to Garyw for the suggestion! -->
 <script>
-(function() {
-  const carousel = document.getElementById('hero-carousel');
-  if (!carousel) return;
-  
-  const slides = carousel.querySelectorAll('.carousel-slide');
-  const indicators = carousel.querySelectorAll('.carousel-indicator');
-  const prevBtn = document.getElementById('carousel-prev');
-  const nextBtn = document.getElementById('carousel-next');
-  let currentSlide = 0;
-  let autoplayInterval;
-  
-  function showSlide(n) {
-    slides[currentSlide].classList.remove('active');
-    indicators[currentSlide].classList.remove('active');
-    currentSlide = (n + slides.length) % slides.length;
-    slides[currentSlide].classList.add('active');
-    indicators[currentSlide].classList.add('active');
-  }
-  
-  if (prevBtn) prevBtn.addEventListener('click', () => {
-    showSlide(currentSlide - 1);
-    resetAutoplay();
-  });
-  
-  if (nextBtn) nextBtn.addEventListener('click', () => {
-    showSlide(currentSlide + 1);
-    resetAutoplay();
-  });
-  
-  indicators.forEach((indicator, index) => {
-    indicator.addEventListener('click', () => {
-      showSlide(index);
-      resetAutoplay();
-    });
-  });
-  
-  function startAutoplay() {
-    autoplayInterval = setInterval(() => {
-      showSlide(currentSlide + 1);
-    }, 3000);
-  }
-  
-  function resetAutoplay() {
-    clearInterval(autoplayInterval);
-    startAutoplay();
-  }
-  
-  startAutoplay();
-  
-  // Pause on hover
-  carousel.addEventListener('mouseenter', () => clearInterval(autoplayInterval));
-  carousel.addEventListener('mouseleave', startAutoplay);
+(function(){
+  var c=document.getElementById('hero-carousel');
+  if(!c)return;
+  var s=c.querySelectorAll('.carousel-slide');
+  var i=c.querySelectorAll('.carousel-indicator');
+  var p=document.getElementById('carousel-prev');
+  var n=document.getElementById('carousel-next');
+  var cur=0,t;
+  function go(x){s[cur].classList.remove('active');i[cur].classList.remove('active');cur=(x+s.length)%s.length;s[cur].classList.add('active');i[cur].classList.add('active');}
+  if(p)p.onclick=function(){go(cur-1);reset();};
+  if(n)n.onclick=function(){go(cur+1);reset();};
+  for(var j=0;j<i.length;j++){(function(idx){i[idx].onclick=function(){go(idx);reset();};})(j);}
+  function start(){t=setInterval(function(){go(cur+1);},3000);}
+  function reset(){clearInterval(t);start();}
+  start();c.onmouseenter=function(){clearInterval(t);};c.onmouseleave=start;
 })();
 </script>
+
+
