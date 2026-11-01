@@ -7,8 +7,8 @@ const STATIC_ASSETS = [
   "/flash.html", "/governance.html", "/hosting.html", "/immutable.html",
   "/index.html", "/lightweight.html", "/newsletter.html", "/privacy.html",
   "/requirements.html", "/status.html", "/unofficial.html",
-  "/styles.css?v=20260826", "/sidebar.css?v=20260825", "/contact.css?v=20260825",
-  "/acreetionoslogo.webp", "/logo.webp"
+  "/css/styles.css?v=20260826", "/css/sidebar.css?v=20260825", "/css/contact.css?v=20260825",
+  "/assets/acreetionoslogo.webp", "/assets/logo.webp", "/assets/favicon.ico"
 ];
 
 // Tell the page it is looking at a cached copy (triggers the disclosure bubble).

@@ -66,7 +66,7 @@ Then open a pull request on GitHub.
 
 **Code style for the website:**
 - Use semantic HTML5 elements
-- Follow existing CSS patterns in `contact.css`
+- Follow existing CSS patterns in `css/contact.css`
 - No JavaScript frameworks - vanilla JS only
 - Mobile-responsive design required
 - Test in Firefox before submitting

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>
+    AcreetionOS vs Arch, Ubuntu, Mint, Fedora, Manjaro, EndeavourOS & CachyOS (2026)
+  </title>
+  <meta name="description" content="See how AcreetionOS compares to Arch Linux, Ubuntu, Linux Mint, Fedora, Manjaro, EndeavourOS, and CachyOS. Curated rolling release, X11 & XLibre editions, no telemetry.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://acreetionos.org/compare.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <meta property="og:title" content="AcreetionOS vs Other Distributions">
+  <meta property="og:description" content="We built AcreetionOS so people don't get screwed by Big Tech. See how we compare.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:url" content="https://acreetionos.org/compare.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AcreetionOS vs Other Distributions">
+  <meta name="twitter:description" content="We built AcreetionOS so people don't get screwed by Big Tech. See how we compare.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+  <link rel="stylesheet" href="/css/sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/sidebar.css?v=20260825"></noscript>
+  <link rel="preload" href="/assets/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825"></noscript>
+  <style>
+
+#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--red:#e74c3c;--amber:#f39c12}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-serif;line-height:1.6}
+.wrap{max-width:900px;margin:2rem auto;padding:0 1.5rem}
+.hero{text-align:center;margin-bottom:2.5rem}
+.hero h1{font-family:'Fira Code',monospace;font-size:1.8rem;color:var(--text-bright);margin-bottom:.5rem}
+.hero h1 i{color:var(--green);margin-right:.5rem}
+.hero p{color:var(--text);font-size:.95rem;max-width:650px;margin:.5rem auto 0;line-height:1.7}
+.our-position{background:linear-gradient(135deg,rgba(46,204,113,.08),rgba(46,204,113,.02));border:1px solid var(--green);border-radius:12px;padding:1.5rem;margin-bottom:2rem;text-align:center}
+.our-position h2{font-family:'Fira Code',monospace;font-size:1.1rem;color:var(--green);margin-bottom:.75rem}
+.our-position p{color:var(--text);font-size:.9rem;line-height:1.7;max-width:700px;margin:0 auto}
+.our-position strong{color:var(--text-bright)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:1.25rem;margin-bottom:2rem}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:border-color .2s;display:flex;flex-direction:column}
+.card:hover{border-color:var(--green)}
+.card h2{font-size:1.1rem;color:var(--text-bright);margin-bottom:.25rem;font-family:'Fira Code',monospace}
+.card h2 i{color:var(--green);margin-right:.4rem}
+.card .label{display:inline-block;font-size:.7rem;padding:.15rem .5rem;border-radius:4px;background:rgba(46,204,113,.15);color:var(--green);font-weight:600;margin-left:.4rem;vertical-align:middle}
+.card .sub{color:var(--text);font-size:.78rem;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.05em}
+.card .desc{color:var(--text);font-size:.85rem;line-height:1.7;margin-bottom:.75rem;flex:1}
+.card .pros{list-style:none;padding:0;margin:0 0 .75rem}
+.card .pros li{color:var(--text);font-size:.82rem;padding:.2rem 0;padding-left:1.2rem;position:relative}
+.card .pros li::before{content:"\2713";color:var(--green);position:absolute;left:0;font-weight:700}
+.card .pros li.cons::before{content:"\2717";color:var(--red)}
+.card .pros li.cons{color:#999}
+.card .bad{display:inline-block;font-size:.7rem;padding:.15rem .5rem;border-radius:4px;background:rgba(231,76,60,.15);color:var(--red);font-weight:600;margin-left:.4rem;vertical-align:middle}
+.our-take{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:.75rem 1rem;margin-top:auto;font-size:.82rem;line-height:1.6;color:var(--text);border-left:3px solid var(--green)}
+.our-take strong{color:var(--green)}
+.outro{background:linear-gradient(135deg,rgba(46,204,113,.08),rgba(46,204,113,.02));border:1px solid var(--green);border-radius:12px;padding:1.5rem;margin-bottom:2rem;text-align:center}
+.outro h2{font-family:'Fira Code',monospace;font-size:1.1rem;color:var(--green);margin-bottom:.75rem}
+.outro p{color:var(--text);font-size:.9rem;line-height:1.7;max-width:650px;margin:0 auto}
+.outro strong{color:var(--text-bright)}
+.outro .btn{display:inline-block;margin-top:1rem;padding:.6rem 1.5rem;background:var(--green);color:#000;border-radius:8px;text-decoration:none;font-weight:700;font-size:.9rem;transition:box-shadow .2s}
+.outro .btn:hover{box-shadow:0 0 15px rgba(46,204,113,.3)}
+.footer-note{text-align:center;padding:1.5rem 0;border-top:1px solid var(--border);color:var(--text);font-size:.85rem}
+@media(max-width:480px){.grid{grid-template-columns:1fr}}
+
+  </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://acreetionos.org/"},
+  {"@type":"ListItem","position":2,"name":"Compare","item":"https://acreetionos.org/compare.html"}
+]}
+</script>
+</head>
+<body>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="/index.html" class="logo">
+            <img src="/assets/logo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="/index.html">
+              Home
+            </a>
+            <a href="/flash.html">
+              Downloads
+            </a>
+            <a href="https://wiki.acreetionos.org/">
+              Wiki
+            </a>
+            <a href="/status.html">
+              Status
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div class="wrap">
+        <div class="hero">
+          <h1>
+          <i class="bi bi-arrow-left-right">
+        </i>
+        Why AcreetionOS?
+      </h1>
+      <p>
+        We built AcreetionOS because we believe Linux should be for everyone — not just tech elites. Here's how we compare to the other guys.
+      </p>
+    </div>
+    <div class="our-position">
+      <h2>
+      <i class="bi bi-bullseye">
+    </i>
+    Our Position
+  </h2>
+  <p>
+    <strong>
+    We're here so people don't get screwed by Microsoft, Google, and Apple.
+  </strong>
+  Big Tech has spent decades locking users into ecosystems that prioritize shareholder value over user freedom. AcreetionOS is our middle finger to that — an Arch Linux foundation that actually
+  <em>
+  works
+</em>
+for normal people, with a graphical installer, Cinnamon desktop, and curated stability. No telemetry, no accounts required, no planned obsolescence. Just a computer that does what you tell it to do.
+</p>
+</div>
+<div class="grid">
+  <div class="card">
+    <h2>
+    <i class="bi bi-gear">
+  </i>
+  Arch Linux
+</h2>
+<span class="label">
+  The Foundation
+</span>
+<div class="sub">
+  Technical excellence, but not for everyone
+</div>
+<div class="desc">
+  Arch is the most powerful Linux distribution available. The rolling model, AUR, and Arch Wiki are unmatched. But Arch makes no compromises for accessibility — you're expected to read the Wiki and configure everything yourself. That's fine for power users, but it's a non-starter for people who just want a working computer.
+</div>
+<ul class="pros">
+  <li>
+    Maximum flexibility and control
+  </li>
+  <li>
+    Arch Wiki is the gold standard
+  </li>
+  <li>
+    True rolling release
+  </li>
+  <li class="cons">
+    Manual install only — no graphical installer
+  </li>
+  <li class="cons">
+    Requires significant Linux knowledge day-to-day
+  </li>
+  <li class="cons">
+    Bleeding edge can break — you fix it
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  AcreetionOS is Arch that just works.
+</strong>
+Same rolling base, same official repos, plus our curated repo. But with a graphical installer, pre-configured Cinnamon desktop, and stability testing. You get Arch power — none of the hassle.
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-ubuntu">
+</i>
+Ubuntu
+</h2>
+<span class="label">
+  Corporate Linux
+</span>
+<div class="sub">
+  Canonical's walled garden
+</div>
+<div class="desc">
+  Ubuntu made Linux accessible to millions, and for that it deserves respect. But Canonical has been pushing Snap packages aggressively — proprietary backends, forced updates, and slower performance than native packages. Ubuntu also uses point releases, meaning you're stuck on older packages until the next version. And every LTS release eventually goes end-of-life, forcing upgrades.
+</div>
+<ul class="pros">
+  <li>
+    Good hardware support
+  </li>
+  <li>
+    Large community
+  </li>
+  <li class="cons">
+    Canonical pushes Snap whether you want it or not
+  </li>
+  <li class="cons">
+    Point releases — outdated packages quickly
+  </li>
+  <li class="cons">
+    Forced upgrade cycles every few years
+  </li>
+  <li class="cons">
+    Growing corporate influence over direction
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  AcreetionOS respects your choices.
+</strong>
+No Snap, no Flatpak pushed on you. Native packages and AUR. Rolling updates so you're never stuck on old software. No corporate overlord deciding what's best for your system.
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-flower2">
+</i>
+Linux Mint
+</h2>
+<span class="label">
+  Respected Competitor
+</span>
+<div class="sub">
+  Great Cinnamon distro, different base
+</div>
+<div class="desc">
+  Linux Mint is excellent — the team behind Cinnamon, great user experience, rock-solid stability. But it's built on Ubuntu (ultimately Debian), which means point releases. Every version upgrade is a gamble, and packages get stale between releases. You also inherit all of Ubuntu's Snap baggage.
+</div>
+<ul class="pros">
+  <li>
+    Best Cinnamon implementation in the Debian world
+  </li>
+  <li>
+    Polished and beginner-friendly
+  </li>
+  <li class="cons">
+    Ubuntu/Debian base — point release model
+  </li>
+  <li class="cons">
+    Version upgrades can break things
+  </li>
+  <li class="cons">
+    AUR not available
+  </li>
+  <li class="cons">
+    Older packages between releases
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  AcreetionOS gives you Cinnamon on Arch.
+</strong>
+Same great desktop, but with rolling updates, AUR access, and no version upgrades. We believe Cinnamon belongs on a rolling base — and we built it.
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-rocket-takeoff">
+</i>
+Fedora
+</h2>
+<span class="label">
+  Innovation First
+</span>
+<div class="sub">
+  RPM/DNF ecosystem
+</div>
+<div class="desc">
+  Fedora pushes Linux forward with cutting-edge features. But it uses RPM/DNF instead of pacman, which many find less intuitive. Fedora's release cycle (6 months) means you're constantly facing upgrade decisions, and each release is only supported for 13 months — forcing you to stay current whether you want to or not.
+</div>
+<ul class="pros">
+  <li>
+    Up-to-date software
+  </li>
+  <li>
+    Strong security practices
+  </li>
+  <li class="cons">
+    RPM/DNF — different ecosystem from Arch/Debian
+  </li>
+  <li class="cons">
+    13-month support window — frequent upgrades required
+  </li>
+  <li class="cons">
+    Not truly rolling — periodic releases
+  </li>
+  <li class="cons">
+    Smaller third-party package selection
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  AcreetionOS rolls forever.
+</strong>
+No version upgrades. No end-of-life deadlines. One install, continuous updates, pacman package management, and access to the AUR's massive package selection.
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-bricks">
+</i>
+Manjaro
+</h2>
+<span class="label">
+  Arch Derivative
+</span>
+<span class="bad">
+  Not Recommended
+</span>
+<div class="sub">
+  Arch-based, but compromised
+</div>
+<div class="desc">
+  Manjaro deserves credit for making Arch accessible to many users. However, their approach has real problems. They hold packages back from Arch repos for "stability" — but then don't have the testing infrastructure to actually validate those delays. This has caused multiple certificate expiration incidents and broken updates that wouldn't have happened on stock Arch. Their AUR handling encourages unsafe practices, and their governance has been controversial.
+</div>
+<ul class="pros">
+  <li>
+    User-friendly tools (MHWD, pamac)
+  </li>
+  <li class="cons">
+    Holds packages back without proper testing infrastructure
+  </li>
+  <li class="cons">
+    Multiple security incidents from delayed updates
+  </li>
+  <li class="cons">
+    AUR handling that bypasses safety checks
+  </li>
+  <li class="cons">
+    Governance and transparency concerns
+  </li>
+  <li class="cons">
+    Larger, less focused — tries to be everything to everyone
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  AcreetionOS is also a curated Arch — the difference is the testing pipeline.
+</strong>
+Updates soak in our repository before release, and our focus is tighter: one flagship desktop, one vision. Not trying to be the "Ubuntu of the Arch world."
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-rocket-takeoff">
+</i>
+EndeavourOS
+</h2>
+<span class="label">
+  Arch Derivative
+</span>
+<div class="sub">
+  The closest thing to vanilla Arch
+</div>
+<div class="desc">
+  EndeavourOS earns its popularity: a slick Calamares installer, a genuinely welcoming forum, and an Arch experience with almost no modifications. If you want stock Arch with a friendly on-ramp, it is a great pick. The difference from AcreetionOS is the curation layer — what EndeavourOS installs is straight Arch, so when upstream has a rough week, you find out first. The default desktop is Xfce, and display-server options follow upstream Arch.
+</div>
+<ul class="pros">
+  <li>
+    Near-vanilla Arch with a friendly installer
+  </li>
+  <li>
+    Outstanding community and forum culture
+  </li>
+  <li>
+    Wide desktop choice via online installer
+  </li>
+  <li class="cons">
+    No testing buffer — you hit Arch breakage first
+  </li>
+  <li class="cons">
+    You are the QA team for upstream changes
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  If you want pure Arch and don't mind being your own stability layer, EndeavourOS is excellent at exactly that.
+</strong>
+AcreetionOS is for people who want Arch's power with someone else doing the burn-in testing — and who need X11/XLibre handled as first-class editions.
+</div>
+</div>
+<div class="card">
+  <h2>
+  <i class="bi bi-speedometer">
+</i>
+CachyOS
+</h2>
+<span class="label">
+  Arch Derivative
+</span>
+<div class="sub">
+  Performance-tuned Arch
+</div>
+<div class="desc">
+  CachyOS is the current shooting star of the Arch world: custom kernels with the BORE scheduler, packages compiled with x86-64-v3/v4 optimizations, and a polished KDE-focused experience. On modern hardware it is genuinely fast, and the development pace is impressive. The trade-offs are the flip side of that pace: the optimized repositories assume a relatively recent CPU, the platform moves fast by design, and the direction is Wayland-first.
+</div>
+<ul class="pros">
+  <li>
+    Serious performance engineering (kernels, optimized packages)
+  </li>
+  <li>
+    Polished, gaming-ready KDE experience
+  </li>
+  <li>
+    Very active development
+  </li>
+  <li class="cons">
+    Optimizations favor newer CPUs (x86-64-v3+)
+  </li>
+  <li class="cons">
+    Fast-moving — less conservative than a curated repo
+  </li>
+  <li class="cons">
+    Wayland-first direction
+  </li>
+</ul>
+<div class="our-take">
+  <strong>
+  Modern gaming rig? CachyOS is a strong choice.
+</strong>
+Older laptop, stubborn NVIDIA hardware, or an X11 dependency? That is exactly who AcreetionOS's X11 and XLibre editions are built for — stability-first Arch that still runs on the machines Wayland left behind.
+</div>
+</div>
+</div>
+<div class="outro">
+  <h2>
+  <i class="bi bi-people">
+</i>
+So Why AcreetionOS?
+</h2>
+<p>
+  <strong>
+  Because we built it for you, not for a corporation.
+</strong>
+We're a family team funded out of our own pockets — no VC money, no shareholders, no board. Our only incentive is making Linux accessible to people who are tired of being treated like products by Microsoft, Google, and Apple.
+</p>
+<p style="margin-top:.75rem">
+  Arch power. Cinnamon familiarity. No BS. That's AcreetionOS.
+</p>
+<a href="/flash.html" class="btn">
+  <i class="bi bi-download">
+</i>
+Download AcreetionOS
+</a>
+</div>
+</div>
+</div>
+<script src="/js/scale-page.js?v=20260824" defer>
+</script>
+<script src="/js/sidebar.js?v=20260825" defer>
+</script>
+</div>
+</div>
+<script src="/js/sw-register.js?v=20260825" defer>
+<script src="/js/cached-version.js?v=2" defer>
+</script>
+<script src="/js/footer.js?v=20260825" defer>
+</script>
+<script src="/js/vendor/instantpage.min.js?v=20260825" type="module" defer></script>
+<script src="/js/tor-badge.js?v=20260825" defer></script>
+</body>
+</html>

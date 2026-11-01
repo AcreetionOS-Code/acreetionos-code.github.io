@@ -106,8 +106,8 @@ def render_issue_html(date_str, data):
   <meta name="twitter:description" content="{html.escape(meta_desc)}">
   <meta name="twitter:image" content="{BASE_URL}/og-image.png">
 
-  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
-  <link rel="stylesheet" href="../fonts.css">
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/fonts.css">
 
   <script type="application/ld+json">
   {{
@@ -279,8 +279,8 @@ def render_archive_index(entries):
   <meta name="twitter:description" content="Browse all daily updates and community newsletters for AcreetionOS.">
   <meta name="twitter:image" content="{BASE_URL}/og-image.png">
 
-  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
-  <link rel="stylesheet" href="../fonts.css">
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/fonts.css">
 
   <script type="application/ld+json">
   {{

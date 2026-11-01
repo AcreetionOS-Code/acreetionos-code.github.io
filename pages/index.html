@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
+    
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://acreetionos.org/#author",
+      "name": "Natalie Cole-Clift Spiva",
+      "jobTitle": "Co-Lead Developer",
+      "url": "https://acreetionos.org/about.html",
+      "sameAs": [
+        "https://github.com/AcreetionOS-Code"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://acreetionos.org/#organization",
+      "name": "AcreetionOS Project",
+      "url": "https://acreetionos.org",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://acreetionos.org/acreetionoslogo.webp",
+        "width": 512,
+        "height": 512
+      },
+      "sameAs": [
+        "https://github.com/AcreetionOS-Code",
+        "https://discord.gg/VHqQkJASw7",
+        "https://x.com/acreetionos",
+        "https://bsky.app/profile/acreetionos.bsky.social"
+      ],
+      "description": "A community-driven, user-friendly Linux distribution based on Arch Linux.",
+      "location": {
+        "@type": "Place",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Spokane",
+          "addressRegion": "WA",
+          "addressCountry": "US"
+        }
+      }
+    },
+    {
+      "@type": ["OperatingSystem", "SoftwareApplication", "SoftwareSourceCode"],
+      "@id": "https://acreetionos.org/#software",
+      "name": "AcreetionOS",
+      "operatingSystem": "Linux",
+      "applicationCategory": "OperatingSystem",
+      "programmingLanguage": "C, Shell, Python",
+      "runtimePlatform": "Linux",
+      "codeRepository": "https://github.com/AcreetionOS-Code/acreetionos-code.github.io",
+      "description": "A lightweight, privacy-focused Linux distribution based on Arch Linux featuring the Cinnamon desktop. No telemetry. Repository sovereignty.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock"
+      },
+      "screenshot": "https://acreetionos.org/logo.webp",
+      "downloadUrl": "https://acreetionos.org/flash.html",
+      "softwareVersion": "1.0",
+      "datePublished": "2026-01-01",
+      "author": { "@id": "https://acreetionos.org/#author" },
+      "publisher": { "@id": "https://acreetionos.org/#organization" },
+      "maintainer": { "@id": "https://acreetionos.org/#organization" },
+      "keywords": "Linux, Arch Linux, Cinnamon Desktop, Operating System, privacy",
+      "processorRequirements": "64-bit",
+      "memoryRequirements": "Minimum 2GB",
+      "storageRequirements": "20GB"
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://acreetionos.org/#website",
+      "url": "https://acreetionos.org/",
+      "name": "AcreetionOS",
+      "description": "A community-driven, user-friendly Linux distribution based on Arch Linux. Download it free, browse the wiki, and join the community.",
+      "inLanguage": "en",
+      "publisher": { "@id": "https://acreetionos.org/#organization" },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.qwant.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://acreetionos.org/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Who leads the AcreetionOS project?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "AcreetionOS is led by Co-Lead Developers Natalie Cole-Clift Spiva and her father, Darren Clift. It is an independent, volunteer-run project based in Spokane, WA."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the official source for AcreetionOS information?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The official source for all AcreetionOS information, documentation, and downloads is https://acreetionos.org and the official GitHub repository at https://github.com/AcreetionOS-Code. We also have a GitLab at https://gitlab.acreetionos.org and are on X (https://x.com/acreetionos) and Bluesky."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is AcreetionOS based on Arch Linux?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, AcreetionOS is built on Arch Linux and features the Cinnamon desktop environment. It offers a graphical installer, pre-configured experience, and curated stability testing while keeping full access to the AUR and pacman package manager."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is AcreetionOS free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, AcreetionOS is completely free and open source under the GNU General Public License v3.0. Download, install, modify, and share it freely."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
+    <meta charset="UTF-8" >
+    <meta name="robots" content="index, follow" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#121212" >
+    <meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Cinnamon desktop, lightweight Linux distro, open source OS, accredion, Linux for beginners" >
+    <meta name="referrer" content="strict-origin-when-cross-origin" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <title>
+    AcreetionOS: Arch Linux Made Easy – Fast, Private
+  </title>
+  <link rel="preload" href="/assets/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825"></noscript>
+  <meta name="description" content="Download AcreetionOS, the beginner-friendly Arch Linux distribution. Cinnamon desktop, privacy-first design, no telemetry." >
+  <meta name="keywords" content="AcreetionOS, Arch Linux, Linux for beginners, Cinnamon desktop, lightweight Linux distro, privacy OS, operating system, Arch based distro, accredion" >
+  <link rel="canonical" href="https://acreetionos.org/" >
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
+  <link rel="alternate" type="text/markdown" href="https://acreetionos.org/llms.txt" title="AcreetionOS for AI agents (llms.txt)" >
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" >
+  <meta property="og:url" content="https://acreetionos.org/" >
+  <meta property="og:title" content="AcreetionOS | Sovereign Arch Linux Distribution" >
+  <meta property="og:description" content="Stability and repository sovereignty for the modern power user. Experience the power of Arch Linux with the ease of Cinnamon." >
+  <meta property="og:image" content="https://acreetionos.org/og-image.png" >
+  <meta property="og:site_name" content="AcreetionOS" >
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" >
+  <meta property="twitter:url" content="https://acreetionos.org/" >
+  <meta property="twitter:title" content="AcreetionOS | Sovereign Arch Linux Distribution" >
+  <meta property="twitter:description" content="Stability and repository sovereignty for the modern power user. Stable, Fast, and Secure." >
+  <meta property="twitter:image" content="https://acreetionos.org/og-image.png" >
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+  <link rel="preload" href="/assets/logo.webp" as="image" type="image/webp">
+  <style>/* Critical above-the-fold CSS */
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,"Open Sans","Helvetica Neue",sans-serif;--font-mono:"Cascadia Code","Fira Code","JetBrains Mono","Source Code Pro",Menlo,Monaco,Consolas,"Courier New",monospace;color-scheme:dark}*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{overflow-x:hidden;touch-action:manipulation;scroll-behavior:smooth}body{font-family:var(--font-sans);background-color:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6;overflow-x:hidden;max-width:100vw;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,0.03) 1px,transparent 0);background-size:40px 40px}.skip-link{position:absolute;top:0;left:0;background:var(--acreetion-green);color:#000;padding:8px;text-decoration:none;font-weight:700;z-index:10000;transition:transform.3s ease;transform:translateY(-200%);border-radius:0 0 8px 0}.skip-link:focus{transform:none}.page-header{background:rgba(24,26,27,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:2px solid var(--acreetion-green);border-radius:0 0 16px 16px;position:sticky;top:0;z-index:1000}.header-content{display:flex;align-items:center;gap:.5rem;max-width:1400px;margin:0 auto;padding:.5rem 1rem;position:relative}.logo{display:flex;align-items:center;gap:.75rem;font-family:var(--font-mono);font-size:1.3rem;font-weight:700;color:var(--acreetion-text-bright);text-decoration:none}.logo-img{height:32px;width:auto;border-radius:6px}@media(min-width:769px){.header-content{padding:.75rem 2rem}.logo{font-size:1.6rem}.logo-img{height:40px}}.logo-text span{color:var(--acreetion-green)}.main-nav{display:none}.main-nav a{color:var(--acreetion-text);text-decoration:none;margin-left:2rem;font-weight:500;padding:.5rem 1rem}.search-strip{background:var(--acreetion-panel-bg);border-bottom:1px solid var(--acreetion-box-border);padding:1rem 0}.search-container{max-width:1400px;margin:0 auto;padding:0 2rem}.search-form{display:flex;border:1px solid var(--acreetion-box-border);background:var(--acreetion-body-bg)}.search-form:focus-within{border-color:var(--acreetion-green)}.search-input{flex-grow:1;background:transparent;border:none;padding:.8rem 1.2rem;color:var(--acreetion-text-bright);font-size:1rem;outline:none}.search-btn{background:var(--acreetion-green);border:none;color:#000;padding:0 2rem;cursor:pointer;font-weight:700;text-transform:uppercase}a{color:var(--acreetion-green);text-decoration:underline;text-underline-offset:3px}.logo,.btn,.btn-download,.btn-download--ghost,.btn-contributors,.community-link,.main-nav a,.skip-link,.search-btn,.hero-note,.hero-note--muted{text-decoration:none}.page-wrapper{display:grid;grid-template-columns:1fr 350px;gap:2rem;max-width:1400px;margin:2rem auto;padding:0 2rem}.content-feed{display:flex;flex-direction:column;gap:2rem;min-width:0}.sidebar{min-width:0}.content-box{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px}.box-header{padding:.8rem 1.2rem;border-bottom:1px solid var(--acreetion-box-border);background:#1a1a1a}.box-header h2{font-family:var(--font-mono);font-size:1.3rem;color:var(--acreetion-text-bright);font-weight:700}.box-body{padding:1.5rem}.btn{display:inline-block;color:#000;text-decoration:none;padding:.7rem 1.5rem;border-radius:12px;font-weight:700;border:none;cursor:pointer}.hero{text-align:center;padding:2.5rem 1rem 1.5rem}.hero-logo{width:110px;height:110px;margin-bottom:1.25rem}.hero-title{font-size:clamp(2rem,7.5vw,2.8rem);font-weight:800;color:var(--acreetion-text-bright);margin:0 0 .25rem;letter-spacing:-.5px;line-height:1.1}.hero-subtitle{font-size:1.2rem;color:var(--acreetion-green);margin:0 0 1.5rem;font-weight:500}.hero-tagline{color:var(--acreetion-text);max-width:620px;margin:0 auto 2rem;font-size:1.05rem;line-height:1.7}.hero-tagline strong{color:var(--acreetion-text-bright)}.hero-cta{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem}.btn-download{background:var(--acreetion-green);color:#000;padding:.9rem 2rem;font-size:1.05rem;border-radius:10px;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;border:none;cursor:pointer;font-weight:700}.btn-download--ghost{background:transparent;color:var(--acreetion-green);border:2px solid var(--acreetion-green)}.hero-links{display:flex;gap:.5rem 1rem;justify-content:center;flex-wrap:wrap;font-size:.9rem;margin-top:.5rem}.hero-links a{display:inline-flex;align-items:center;min-height:48px;padding:.5rem .75rem}.hero-note{color:var(--acreetion-green);font-weight:500}.hero-note--muted{color:var(--acreetion-text-bright);font-weight:500;text-decoration:underline;text-underline-offset:3px}.section-title{color:var(--acreetion-text-bright)}.section-title--center-lg{text-align:center;font-size:1.6rem;margin:3rem 0 1.5rem}.feature-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:2.5rem}.feature-card{background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem}.feature-card .bi{display:block;font-size:1.6rem;color:var(--acreetion-green);margin-bottom:.75rem}.feature-card h3{color:var(--acreetion-text-bright);font-size:1.05rem;margin:0 0 .4rem}.feature-card p{color:var(--acreetion-text);font-size:.9rem;margin:0;line-height:1.5}.community-box-body{padding:1rem;text-align:center}.community-intro{color:var(--acreetion-text);font-size:.85rem;margin-bottom:.75rem}.community-stats{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.75rem}.community-stat{padding:.5rem;background:var(--acreetion-panel-bg);border-radius:8px}.community-stat-value{font-size:1.2rem;font-weight:700;color:var(--acreetion-green);font-family:var(--font-mono)}.community-stat-label{font-size:.75rem;color:var(--acreetion-text-bright);font-weight:500}.btn-contributors{display:inline-block;padding:.5rem 1.2rem;background:var(--acreetion-green);color:#000;border-radius:8px;font-weight:700;font-size:.85rem;text-decoration:none}.sidebar-spaced{margin-top:2rem}@media(max-width:768px){.header-content{flex-direction:column;gap:1rem;padding:.5rem 1rem}}@media(max-width:600px){.feature-grid,.spec-grid{grid-template-columns:1fr}}@media(max-width:480px){.btn-download{padding:.5rem 1rem;font-size:.9rem;width:100%;text-align:center}}#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}
+</style>
+  <link rel="stylesheet" href="/css/styles.css?v=20261031b" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/styles.css?v=20261031b"></noscript>
+  <link rel="stylesheet" href="/css/sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/sidebar.css?v=20260825"></noscript>
+  
+</head>
+<body>
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="/index.html" class="logo">
+            <img src="/assets/logo.webp" alt="Official AcreetionOS Logo: A modern, minimalist icon representing stability and user sovereignty" class="logo-img" width="40" height="40" decoding="auto" loading="eager" fetchpriority="high">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="/index.html">
+              Home
+            </a>
+            <a href="/flash.html">
+              Downloads
+            </a>
+            <a href="https://wiki.acreetionos.org/">
+              Wiki
+            </a>
+            <a href="/status.html">
+              Status
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div class="search-strip">
+        <div class="search-container">
+          <form class="search-form" action="https://www.qwant.com/" method="GET" target="_blank">
+            <input type="text" name="q" class="search-input" placeholder="Is AcreetionOS Better than Arch?" aria-label="Search the web with SearX">
+            <button type="submit" class="search-btn">
+            Search
+          </button>
+        </form>
+      </div>
+    </div>
+    <div class="page-wrapper">
+      <main id="main-content" class="content-feed">
+        <article id="about" class="content-box">
+          <div class="box-body">
+            <div class="article-content">
+              
+              <!-- 1. HERO SECTION -->
+              <div class="hero">
+                <img src="/assets/logo.webp" alt="AcreetionOS Logo" class="hero-logo" width="110" height="110" loading="eager" fetchpriority="high">
+                <h1 class="hero-title">AcreetionOS</h1>
+                <p class="hero-subtitle">Arch Linux, made approachable.</p>
+                <p class="hero-tagline">
+                  <strong>AcreetionOS is the beginner-friendly Arch Linux distribution for real-world hardware.</strong>
+                  Every update soaks in our curated repository before it reaches you — and we ship both X11 and XLibre editions, because Wayland still isn't the answer for every machine.
+                </p>
+
+                <!-- Screenshot Carousel - Suggested by our community member Garyw (https://discord.acreetionos.org). Great idea! Thank you so much Garyw for the suggestion! All screenshots and wallpapers from https://github.com/AcreetionOS-Code/AcreetionOS_Carousel_Wallpapers are displayed here. -->
+                <div class="screenshot-carousel" id="hero-carousel" aria-label="AcreetionOS screenshots">
+                  <div class="carousel-container">
+                    <div class="carousel-slides">
+                      <div class="carousel-slide active">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 1">
+                          <img src="/assets/darren_7dtd.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 2">
+                          <img src="/assets/darren_civ.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 3">
+                          <img src="/assets/darren_fastfetch.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 4">
+                          <img src="/assets/darren_widgetspng.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 5">
+                          <img src="/assets/natalie_screenshot_clear.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 6">
+                          <img src="/assets/natalie_screenshot_fastfetch.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 7">
+                          <img src="/assets/Screenshot from 2026-10-31 15-40-24.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                      <div class="carousel-slide">
+                        <button type="button" class="carousel-open" aria-label="Enlarge screenshot 8">
+                          <img src="/assets/Screenshot from 2026-10-31 15-41-44.png" alt="AcreetionOS desktop screenshot showcasing Cinnamon desktop environment" loading="lazy" draggable="false">
+                        </button>
+                      </div>
+                    </div>
+                    <button class="carousel-btn carousel-btn-prev" id="carousel-prev" aria-label="Previous screenshot">&#10094;</button>
+                    <button class="carousel-btn carousel-btn-next" id="carousel-next" aria-label="Next screenshot">&#10095;</button>
+                  </div>
+                  <div class="carousel-controls">
+                    <div class="carousel-indicators">
+                      <button class="carousel-indicator active" data-slide="0" aria-label="Go to screenshot 1"></button>
+                      <button class="carousel-indicator" data-slide="1" aria-label="Go to screenshot 2"></button>
+                      <button class="carousel-indicator" data-slide="2" aria-label="Go to screenshot 3"></button>
+                      <button class="carousel-indicator" data-slide="3" aria-label="Go to screenshot 4"></button>
+                      <button class="carousel-indicator" data-slide="4" aria-label="Go to screenshot 5"></button>
+                      <button class="carousel-indicator" data-slide="5" aria-label="Go to screenshot 6"></button>
+                      <button class="carousel-indicator" data-slide="6" aria-label="Go to screenshot 7"></button>
+                      <button class="carousel-indicator" data-slide="7" aria-label="Go to screenshot 8"></button>
+                    </div>
+                    <button class="carousel-pause" id="carousel-pause" aria-label="Pause carousel">⏸ Pause</button>
+                  </div>
+                </div>
+
+                <!-- Download Buttons -->
+                <div class="hero-cta">
+                  <a href="https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso" class="btn btn-download">
+                    <i class="bi bi-download"></i> X11 (XOrg) Cinnamon Edition
+                  </a>
+                  <a href="https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso" class="btn btn-download btn-download--ghost">
+                    <i class="bi bi-download"></i> XL (XLibre) Cinnamon Edition
+                  </a>
+                </div>
+
+                <div class="hero-links">
+                  <a href="/flash.html" class="hero-note">Cinnamon X11/XLibre Editions + GNOME Community Edition available now! More coming soon!→</a>
+                  <a href="/flash.html" class="hero-note--muted">Need help flashing? Use the Media Writer →</a>
+                </div>
+                <div class="hero-links">
+                  <a href="/beginner.html" class="hero-note--muted">New to Linux? Start here →</a>
+                  <a href="/lightweight.html" class="hero-note--muted">Lightweight Edition for old computers →</a>
+                  <a href="/immutable.html" class="hero-note--muted">AcreetionOS Immutable →</a>
+                  <a href="/unofficial.html" class="hero-note--muted">GNOME Edition →</a>
+                </div>
+              </div>
+              
+              <!-- 2. FEATURES SECTION -->
+              <h2 class="section-title section-title--center-lg">Why AcreetionOS?</h2>
+              <div class="feature-grid">
+
+                <div class="feature-card">
+                  <i class="bi bi-cpu"></i>
+                  <h3>Arch Linux Powered</h3>
+                  <p>Rolling release with curated packages for stability you can trust.</p>
+                </div>
+
+                <div class="feature-card">
+                  <i class="bi bi-box-seam"></i>
+                  <h3>Cinnamon Desktop</h3>
+                  <p>Polished, traditional desktop experience that just works out of the box.</p>
+                </div>
+
+                <div class="feature-card">
+                  <i class="bi bi-shield-check"></i>
+                  <h3>Privacy Focused</h3>
+                  <p>No telemetry, no tracking, no data collection. Ever.</p>
+                </div>
+
+                <div class="feature-card">
+                  <i class="bi bi-layers"></i>
+                  <h3>Repository Sovereignty</h3>
+                  <p>We curate every component carefully for your peace of mind.</p>
+                </div>
+
+                <div class="feature-card">
+                  <i class="bi bi-people"></i>
+                  <h3>Multiple Editions</h3>
+                  <p>10+ desktop environments to choose from — <a href="/lightweight.html">Lightweight</a>, <a href="/immutable.html">Immutable</a>, and <a href="/unofficial.html">community editions</a>.</p>
+                </div>
+
+                <div class="feature-card">
+                  <i class="bi bi-download"></i>
+                  <h3>Media Writer</h3>
+                  <p>Official USB flasher for Linux, Windows, and macOS.</p>
+                </div>
+
+              </div>
+
+              <!-- 3. GALLERY / SCREENSHOTS -->
+              <h2 class="section-title section-title--center-lg">AcreetionOS Benefits</h2>
+              <div class="benefit-grid">
+
+                <div class="benefit-card">
+                  <i class="bi bi-display"></i>
+                  <p class="benefit-name">Cinnamon Desktop</p>
+                  <p class="benefit-desc">Polished and familiar</p>
+                </div>
+
+                <div class="benefit-card">
+                  <i class="bi bi-gear"></i>
+                  <p class="benefit-name">System Settings</p>
+                  <p class="benefit-desc">Easy configuration</p>
+                </div>
+
+                <div class="benefit-card">
+                  <i class="bi bi-box"></i>
+                  <p class="benefit-name">Software Manager</p>
+                  <p class="benefit-desc">Curated packages</p>
+                </div>
+
+              </div>
+              
+              <!-- 4. NEWSLETTER SIGNUP -->
+              <!-- <div style="margin:2rem 0;padding:1.5rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;text-align:center">
+                <h3 style="color:var(--acreetion-green);margin:0 0 0.5rem;font-size:1.2rem;border:none">
+                  <i class="bi bi-envelope" style="margin-right:0.5rem"></i>Stay Updated
+                </h3>
+                <p style="color:var(--acreetion-text);margin:0 0 1rem;font-size:0.9rem">
+                  Get daily AcreetionOS news delivered to your inbox.
+                </p>
+                <a href="/newsletter.html" class="btn" style="background:var(--acreetion-green);color:#000;padding:0.7rem 2rem;border-radius:8px;font-weight:700;text-decoration:none;display:inline-block">
+                  Subscribe to Newsletter
+                </a>
+              </div> -->
+              
+              <!-- 5. TECH SPECS TABLE -->
+              <h2 class="section-title section-title--block section-title--mt-lg">Technical Specifications</h2>
+              <div class="spec-grid">
+
+                <div class="spec-item">
+                  <span class="spec-label">Base Distribution</span>
+                  <span class="spec-value">Arch Linux (Rolling with Control)</span>
+                </div>
+
+                <div class="spec-item">
+                  <span class="spec-label">Desktop Environment</span>
+                  <span class="spec-value">Cinnamon</span>
+                </div>
+
+                <div class="spec-item">
+                  <span class="spec-label">Display Protocol</span>
+                  <span class="spec-value">X11 / XLibre</span>
+                </div>
+
+                <div class="spec-item">
+                  <span class="spec-label">Audio Server</span>
+                  <span class="spec-value">Pipewire</span>
+                </div>
+
+                <div class="spec-item">
+                  <span class="spec-label">Primary Goal</span>
+                  <span class="spec-value">Accessibility &amp; Ease of Use</span>
+                </div>
+
+              </div>
+
+              <!-- 6. TEAM SECTION -->
+              <h2 class="section-title section-title--block section-title--mt-sm">Our Team</h2>
+              <div class="team-members">
+                <div class="team-member">
+                  <span class="team-member-name"><a href="https://darren.acreetionos.org">Darren Clift</a></span>
+                  <span class="team-member-role">Co-Lead Developer</span>
+                </div>
+                <div class="team-member">
+                  <span class="team-member-name"><a href="https://natalie.acreetionos.org">Natalie Cole-Clift Spiva</a></span>
+                  <span class="team-member-role">Co-Lead Developer</span>
+                </div>
+                <div class="team-member">
+                  <span class="team-member-name"><a href="/community.html">Our Community</a></span>
+                  <span class="team-member-role"><a href="https://discord.gg/VHqQkJASw7">Discord</a></span>
+                </div>
+              </div>
+              <p class="mt-1">
+                <a href="/about.html">Read more about our philosophy on our About page</a>
+              </p>
+              
+              <!-- 7. MISSION -->
+              <h2 class="section-title section-title--block section-title--mt-md">Our Mission</h2>
+              <p>
+                <strong>AcreetionOS</strong> bridges the gap between the power of
+                <a href="https://archlinux.org" target="_blank" rel="noopener noreferrer">Arch Linux</a>
+                and the simplicity everyday users expect. We curate a stable, pre-configured, and beautiful
+                desktop experience — making the Arch ecosystem accessible to everyone from students to developers.
+              </p>
+              <p>
+                This project is made possible by the incredible work of the Arch Linux developers and the
+                broader open-source community. We see ourselves as curators, adding convenience, rigorous testing,
+                and thoughtful design to create a cohesive operating system for all.
+              </p>
+              
+            </div>
+          </div>
+        </article>
+              <!-- 8. COMMUNITY SPOTLIGHT -->
+              <h2 class="section-title section-title--block section-title--mt-lg">Community &amp; Reviews</h2>
+              <div class="community-links">
+                <a href="/features.html" class="community-link">
+                  <i class="bi bi-palette"></i>
+                  <div class="community-link-title">Feature Showcase</div>
+                  <div class="community-link-desc">Desktop tweaks, app alternatives &amp; privacy tools</div>
+                </a>
+                <a href="/community-reviews.html" class="community-link">
+                  <i class="bi bi-play-btn"></i>
+                  <div class="community-link-title">Video Reviews</div>
+                  <div class="community-link-desc">Watch community first looks and deep dives</div>
+                </a>
+                <a href="/changelog.html" class="community-link">
+                  <i class="bi bi-clock-history"></i>
+                  <div class="community-link-title">Changelog</div>
+                  <div class="community-link-desc">Track kernel, desktop &amp; package updates</div>
+                </a>
+                <a href="/compare.html" class="community-link">
+                  <i class="bi bi-columns-gap"></i>
+                  <div class="community-link-title">Compare Distros</div>
+                  <div class="community-link-desc">AcreetionOS vs Arch, Mint, EndeavourOS &amp; more</div>
+                </a>
+              </div>
+
+<div id="hosting-providers-container">
+</div>
+<div class="sidebar sidebar-spaced">
+  <div class="sidebar-box content-box" id="community-box">
+    <div class="box-header"><h2><i class="bi bi-people"></i> Community</h2></div>
+    <div class="box-body community-box-body" id="community-body">
+      <p class="community-intro">AcreetionOS is built by a community of volunteers. See live stats, explore repos, and find ways to contribute.</p>
+      <div id="community-stats" class="community-stats">
+        <div class="community-stat"><div class="community-stat-value" id="stat-repos">-</div><div class="community-stat-label">Repos</div></div>
+        <div class="community-stat"><div class="community-stat-value" id="stat-stars">-</div><div class="community-stat-label">Stars</div></div>
+        <div class="community-stat"><div class="community-stat-value" id="stat-issues">-</div><div class="community-stat-label">Issues</div></div>
+        <div class="community-stat"><div class="community-stat-value" id="stat-contrib">-</div><div class="community-stat-label">Team</div></div>
+      </div>
+      <a href="/contributors.html" class="btn-contributors">View Contributor Hub →</a>
+    </div>
+  </div>
+</div>
+<script>
+  (function(){
+    var loadStats = function(){
+      fetch('/api/community/stats').then(function(r){return r.json()}).then(function(d){
+        var t = d.totals || {};
+        document.getElementById('stat-repos').textContent = t.repos || 0;
+        document.getElementById('stat-stars').textContent = t.stars || 0;
+        document.getElementById('stat-issues').textContent = t.open_issues || 0;
+        document.getElementById('stat-contrib').textContent = t.members || 0;
+      }).catch(function(){});
+    };
+    if ('requestIdleCallback' in window) { requestIdleCallback(loadStats, { timeout: 4000 }); }
+    else { setTimeout(loadStats, 200); }
+  })();
+</script>
+
+<script src="/js/sidebar.js?v=20260825" defer>
+</script>
+</div>
+</div>
+<script src="/js/sw-register.js?v=20260825" defer>
+</script>
+<script src="/js/cached-version.js?v=2" defer>
+</script>
+<script src="/js/index-providers.js?v=20260825" defer>
+</script>
+<script src="/js/footer.js?v=20260825" defer>
+</script>
+<script src="/js/vendor/instantpage.min.js?v=20260825" type="module" defer crossorigin="anonymous"></script>
+<script src="/js/tor-badge.js?v=20260825" defer></script>
+
+<!-- Blow-up viewer: scroll or use +/- to zoom, drag to pan. -->
+<div class="carousel-lightbox" id="carousel-lightbox" role="dialog" aria-modal="true" aria-label="Screenshot viewer" aria-hidden="true">
+  <div class="lightbox-toolbar">
+    <button type="button" class="lightbox-btn" id="lightbox-zoom-out" aria-label="Zoom out">&minus;</button>
+    <span class="lightbox-zoom-level" id="lightbox-zoom-level" aria-live="polite">100%</span>
+    <button type="button" class="lightbox-btn" id="lightbox-zoom-in" aria-label="Zoom in">+</button>
+    <button type="button" class="lightbox-btn" id="lightbox-reset" aria-label="Reset zoom">Reset</button>
+    <button type="button" class="lightbox-btn lightbox-close" id="lightbox-close" aria-label="Close screenshot viewer">&#10005; Close</button>
+  </div>
+  <div class="lightbox-stage" id="lightbox-stage">
+    <img class="lightbox-img" id="lightbox-img" alt="" draggable="false" decoding="async">
+  </div>
+  <p class="lightbox-hint">Scroll or use + / &minus; to zoom, drag to pan, Esc to close.</p>
+</div>
+
+<!-- Carousel JavaScript - Thanks to Garyw for the suggestion! -->
+<script>
+(function(){
+  var c=document.getElementById('hero-carousel');
+  if(!c)return;
+  var s=c.querySelectorAll('.carousel-slide');
+  var i=c.querySelectorAll('.carousel-indicator');
+  var p=document.getElementById('carousel-prev');
+  var n=document.getElementById('carousel-next');
+  var pauseBtn=document.getElementById('carousel-pause');
+  var cur=0,t,paused=false;
+  var DELAY=6000;
+  function go(x){
+    s[cur].classList.remove('active');
+    i[cur].classList.remove('active');
+    cur=(x+s.length)%s.length;
+    s[cur].classList.add('active');
+    i[cur].classList.add('active');
+    syncOpenLabels();
+  }
+  function syncOpenLabels(){
+    for(var k=0;k<s.length;k++){
+      var b=s[k].querySelector('.carousel-open');
+      if(b){b.setAttribute('aria-label','Enlarge screenshot '+(k+1));}
+    }
+  }
+  function clear(){if(t){clearInterval(t);t=null;}}
+  function start(){clear();if(paused)return;t=setInterval(function(){go(cur+1);},DELAY);}
+  function reset(){clear();start();}
+  function setPaused(v){
+    paused=!!v;
+    if(pauseBtn){
+      pauseBtn.textContent=paused?'\u25B6 Play':'\u23F8 Pause';
+      pauseBtn.setAttribute('aria-label',paused?'Play carousel':'Pause carousel');
+    }
+    if(paused){clear();}else{start();}
+  }
+  if(p) p.onclick=function(){go(cur-1);reset();};
+  if(n) n.onclick=function(){go(cur+1);reset();};
+  for(var j=0;j<i.length;j++){(function(idx){i[idx].onclick=function(){go(idx);reset();};})(j);}
+  if(pauseBtn) pauseBtn.onclick=function(){setPaused(!paused);};
+  function onEnter(){clear();}
+  function onLeave(){start();}
+  if(window.matchMedia && window.matchMedia('(hover:hover)').matches){
+    c.addEventListener('mouseenter',onEnter);
+    c.addEventListener('mouseleave',onLeave);
+  }
+  c.addEventListener('focusin',onEnter);
+  c.addEventListener('focusout',onLeave);
+
+  // Small public API so the lightbox can hold the slideshow while it is open.
+  window.acreetionCarousel={
+    setPaused:setPaused,
+    isPaused:function(){return paused;},
+    index:function(){return cur;},
+    go:function(x){go(x);reset();}
+  };
+
+  syncOpenLabels();
+  start();
+})();
+</script>
+
+<!-- Blow-up viewer JavaScript. This only removes the easy "right click -> Save
+     image as" / drag-out paths. It is not copy protection: anyone can still
+     screenshot the screen or pull the file from devtools/network. -->
+<script>
+(function(){
+  var lb=document.getElementById('carousel-lightbox');
+  if(!lb)return;
+  var stage=document.getElementById('lightbox-stage');
+  var img=document.getElementById('lightbox-img');
+  var zoomLabel=document.getElementById('lightbox-zoom-level');
+  var closeBtn=document.getElementById('lightbox-close');
+  var zoomInBtn=document.getElementById('lightbox-zoom-in');
+  var zoomOutBtn=document.getElementById('lightbox-zoom-out');
+  var resetBtn=document.getElementById('lightbox-reset');
+  var sources=[];
+  var idx=0,scale=1,tx=0,ty=0;
+  var MIN=1,MAX=6;
+  var lastFocus=null,carouselWasPaused=false,moved=false;
+
+  Array.prototype.forEach.call(document.querySelectorAll('.carousel-open'),function(btn){
+    var im=btn.querySelector('img');
+    if(im) sources.push({src:im.getAttribute('src'),alt:im.getAttribute('alt')||''});
+  });
+  if(!sources.length) return;
+
+  function apply(){
+    img.style.transform='translate('+tx+'px,'+ty+'px) scale('+scale+')';
+    if(zoomLabel) zoomLabel.textContent=Math.round(scale*100)+'%';
+  }
+  function baseDims(){ return {w:img.offsetWidth||1,h:img.offsetHeight||1}; }
+  function clamp(){
+    var r=stage.getBoundingClientRect(),b=baseDims();
+    var mx=Math.max(0,(b.w*scale-r.width)/2);
+    var my=Math.max(0,(b.h*scale-r.height)/2);
+    if(tx>mx)tx=mx; if(tx<-mx)tx=-mx;
+    if(ty>my)ty=my; if(ty<-my)ty=-my;
+  }
+  function setScale(next,clientX,clientY){
+    next=Math.min(MAX,Math.max(MIN,next));
+    var r=stage.getBoundingClientRect();
+    var cx=(typeof clientX==='number'?clientX:r.left+r.width/2)-(r.left+r.width/2);
+    var cy=(typeof clientY==='number'?clientY:r.top+r.height/2)-(r.top+r.height/2);
+    var k=next/scale;
+    tx=cx*(1-k)+k*tx;
+    ty=cy*(1-k)+k*ty;
+    scale=next;
+    if(scale<=MIN+0.001){scale=MIN;tx=0;ty=0;}
+    clamp();
+    apply();
+  }
+  function resetView(){ scale=1;tx=0;ty=0;apply(); }
+  function load(i){
+    idx=(i+sources.length)%sources.length;
+    img.setAttribute('src',sources[idx].src);
+    img.setAttribute('alt',sources[idx].alt);
+    resetView();
+  }
+  function open(i,trigger){
+    lastFocus=trigger||document.activeElement;
+    load(i);
+    carouselWasPaused=!!(window.acreetionCarousel&&window.acreetionCarousel.isPaused());
+    if(window.acreetionCarousel) window.acreetionCarousel.setPaused(true);
+    lb.classList.add('open');
+    lb.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+    if(closeBtn) closeBtn.focus();
+  }
+  function close(){
+    lb.classList.remove('open');
+    lb.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+    if(!carouselWasPaused&&window.acreetionCarousel) window.acreetionCarousel.setPaused(false);
+    if(lastFocus&&lastFocus.focus) lastFocus.focus();
+  }
+
+  var pts={},dragging=null,pinch=null;
+  function count(){ return Object.keys(pts).length; }
+  function two(){ var k=Object.keys(pts); return [pts[k[0]],pts[k[1]]]; }
+
+  stage.addEventListener('pointerdown',function(e){
+    if(e.pointerType==='mouse'&&e.button!==0) return;
+    moved=false;
+    pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    try{ stage.setPointerCapture(e.pointerId); }catch(err){}
+    if(count()===1){
+      dragging={x:e.clientX,y:e.clientY,tx:tx,ty:ty};
+      stage.classList.add('dragging');
+    }else if(count()===2){
+      dragging=null;
+      var t=two(),d=Math.hypot(t[0].x-t[1].x,t[0].y-t[1].y)||1;
+      pinch={dist:d,scale:scale};
+    }
+  });
+  stage.addEventListener('pointermove',function(e){
+    if(!pts[e.pointerId]) return;
+    pts[e.pointerId]={x:e.clientX,y:e.clientY};
+    if(count()>=2&&pinch){
+      moved=true;
+      var t=two(),d=Math.hypot(t[0].x-t[1].x,t[0].y-t[1].y)||1;
+      setScale(pinch.scale*(d/pinch.d),(t[0].x+t[1].x)/2,(t[0].y+t[1].y)/2);
+      return;
+    }
+    if(dragging&&scale>1){
+      var dx=e.clientX-dragging.x,dy=e.clientY-dragging.y;
+      if(Math.abs(dx)+Math.abs(dy)>6) moved=true;
+      e.preventDefault();
+      tx=dragging.tx+dx;
+      ty=dragging.ty+dy;
+      clamp();
+      apply();
+    }
+  });
+  function release(e){
+    delete pts[e.pointerId];
+    if(count()<2) pinch=null;
+    if(count()===0){ dragging=null; stage.classList.remove('dragging'); }
+  }
+  stage.addEventListener('pointerup',release);
+  stage.addEventListener('pointercancel',release);
+
+  stage.addEventListener('wheel',function(e){
+    e.preventDefault();
+    var factor=Math.exp(-e.deltaY*(e.deltaMode===1?0.05:0.0015));
+    setScale(scale*factor,e.clientX,e.clientY);
+  },{passive:false});
+
+  stage.addEventListener('dblclick',function(e){
+    e.preventDefault();
+    setScale(scale>1.2?1:2.5,e.clientX,e.clientY);
+  });
+  stage.addEventListener('click',function(e){
+    if(e.target===stage&&!moved) close();
+  });
+
+  if(zoomInBtn) zoomInBtn.onclick=function(){ setScale(scale*1.4); };
+  if(zoomOutBtn) zoomOutBtn.onclick=function(){ setScale(scale/1.4); };
+  if(resetBtn) resetBtn.onclick=resetView;
+  if(closeBtn) closeBtn.onclick=close;
+
+  function focusables(){
+    return Array.prototype.filter.call(lb.querySelectorAll('button'),function(b){
+      return !b.disabled && b.offsetParent!==null;
+    });
+  }
+  document.addEventListener('keydown',function(e){
+    if(!lb.classList.contains('open')) return;
+    if(e.key==='Escape'){ e.preventDefault(); close(); }
+    else if(e.key==='ArrowRight'){ e.preventDefault(); load(idx+1); }
+    else if(e.key==='ArrowLeft'){ e.preventDefault(); load(idx-1); }
+    else if(e.key==='+'||e.key==='='){ e.preventDefault(); setScale(scale*1.4); }
+    else if(e.key==='-'||e.key==='_'){ e.preventDefault(); setScale(scale/1.4); }
+    else if(e.key==='0'){ e.preventDefault(); resetView(); }
+    else if(e.key==='Tab'){
+      var f=focusables();
+      if(!f.length) return;
+      var first=f[0],last=f[f.length-1];
+      if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+    }
+  });
+
+  img.addEventListener('load',function(){ clamp(); apply(); });
+  window.addEventListener('resize',function(){
+    if(lb.classList.contains('open')){ clamp(); apply(); }
+  });
+
+  // Best-effort save deterrents.
+  ['contextmenu','dragstart','selectstart'].forEach(function(ev){
+    lb.addEventListener(ev,function(e){ e.preventDefault(); });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.carousel-slide img'),function(im){
+    im.addEventListener('dragstart',function(e){ e.preventDefault(); });
+    im.addEventListener('contextmenu',function(e){ e.preventDefault(); });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.carousel-open'),function(btn,k){
+    btn.addEventListener('click',function(e){ e.preventDefault(); open(k,btn); });
+  });
+})();
+</script>
+
+                </body>
+</html>

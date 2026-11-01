@@ -367,8 +367,8 @@ def render_guide_html(guide):
   <meta name="twitter:description" content="{description}">
   <meta name="twitter:image" content="{BASE_URL}/og-image.png">
 
-  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
-  <link rel="stylesheet" href="../fonts.css">
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/fonts.css">
 
   <script type="application/ld+json">
   {{
@@ -574,8 +574,8 @@ def render_index_html(guides):
   <meta name="twitter:description" content="Step-by-step tutorials and configuration guides for AcreetionOS Linux.">
   <meta name="twitter:image" content="{BASE_URL}/og-image.png">
 
-  <link rel="icon" type="image/webp" href="../acreetionoslogo.webp">
-  <link rel="stylesheet" href="../fonts.css">
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/fonts.css">
 
   <script type="application/ld+json">
   {{

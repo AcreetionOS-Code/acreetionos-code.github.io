@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
+    <meta charset="UTF-8" >
+    <meta name="robots" content="index, follow" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="keywords" content="AcreetionOS, Arch Linux, Linux distribution, Wiki, Search, Documentation" >
+    <meta name="referrer" content="strict-origin-when-cross-origin" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://wiki.archlinux.org https://iso.acreetionos.org:8448 https://static.cloudflareinsights.com; frame-src; base-uri 'self'" >
+    <title>
+    AcreetionOS Documentation & Wiki Hub – Arch Linux Guides
+  </title>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/wiki.html">
+  <meta property="og:title" content="AcreetionOS Documentation & Wiki Hub – Arch Linux Guides">
+  <meta property="og:description" content="Search Arch Linux documentation and AcreetionOS guides with AI-powered answers. Step-by-step tutorials for WiFi, NVIDIA, CUPS printing, and pacman.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@acreetionos">
+  <meta name="twitter:url" content="https://acreetionos.org/wiki.html">
+  <meta name="twitter:title" content="AcreetionOS Documentation & Wiki Hub – Arch Linux Guides">
+  <meta name="twitter:description" content="Search Arch Linux documentation and AcreetionOS guides with AI-powered answers. Step-by-step tutorials for WiFi, NVIDIA, CUPS printing, and pacman.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+  <meta name="description" content="Search Arch Linux documentation and AcreetionOS guides with AI-powered answers. Step-by-step tutorials for WiFi, NVIDIA, CUPS printing, and pacman." >
+  <link rel="canonical" href="https://wiki.acreetionos.org/">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/sidebar.css?v=20260826">
+  <link rel="preload" href="/assets/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825"></noscript>
+  <script defer src="https://cdn.jsdelivr.net/npm/marked@18.0.5/lib/marked.umd.js" integrity="sha384-ZD0fTOwPMHi7zM6WTVIWJR21I07lq0ccnqz3J6WMvQKG9thh4y7TA1QE6PJu0Af8" crossorigin="anonymous">
+  </script>
+  <style>
+
+:root{--acreetion-green:#2ecc71;--acreetion-body-bg:#121212;--acreetion-panel-bg:#1a1a1a;--acreetion-box-bg:#222;--acreetion-box-border:#333;--acreetion-text-bright:#e5e5e5;--acreetion-text:#b2b2b2;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--acreetion-body-bg);color:var(--acreetion-text-bright);line-height:1.6}
+.wrap{max-width:860px;margin:2rem auto;padding:0 1.5rem}
+h1{font-family:var(--font-mono);font-size:1.5rem;color:var(--acreetion-text-bright);margin-bottom:.5rem}
+.sub{color:var(--acreetion-text);font-size:.95rem;margin-bottom:1.5rem;line-height:1.7}
+.search-card{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem;margin-bottom:2rem}
+.search-card .bar{display:flex;border:1px solid var(--acreetion-box-border);border-radius:8px;overflow:hidden;background:var(--acreetion-body-bg);transition:border-color .2s}
+.search-card .bar:focus-within{border-color:var(--acreetion-green)}
+.search-card .bar input{flex:1;background:transparent;border:none;padding:1rem 1.2rem;color:var(--acreetion-text-bright);font-size:1rem;outline:none}
+.search-card .bar input::placeholder{color:#999}
+.search-card .bar button{padding:0 2rem;background:var(--acreetion-green);border:none;color:#000;font-weight:700;font-family:var(--font-mono);cursor:pointer;transition:opacity .2s}
+.search-card .bar button:hover{opacity:.9}
+.results{margin-top:1rem;max-height:420px;overflow-y:auto;display:none}
+.results .item{padding:1rem 1.2rem;border:1px solid var(--acreetion-box-border);border-radius:8px;margin-bottom:.5rem;cursor:pointer;transition:all .15s}
+.results .item:hover{background:var(--acreetion-box-bg);border-color:var(--acreetion-green);padding-left:1.4rem}
+.results .item h4{color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem;margin-bottom:.25rem}
+.results .item p{color:var(--acreetion-text);font-size:.85rem;line-height:1.5}
+.results .item .src{font-size:.7rem;color:#999;margin-top:.3rem}
+.quick{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border)}
+.quick span{font-size:.8rem;color:#999;padding-top:.15rem}
+.quick a{padding:.35rem .9rem;border:1px solid var(--acreetion-box-border);border-radius:6px;color:var(--acreetion-text);text-decoration:none;font-size:.82rem;transition:all.15s}
+.quick a:hover{border-color:var(--acreetion-green);color:var(--acreetion-green);background:rgba(46,204,113,.05)}
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;padding:1rem;opacity:0;visibility:hidden}
+.modal-overlay.show{display:flex;opacity:1;visibility:visible;transition:opacity .3s}
+.modal-box{position:relative;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:16px;padding:2rem;max-width:720px;width:100%;max-height:80vh;overflow-y:auto}
+.modal-close{position:absolute;top:1rem;right:1rem;background:var(--acreetion-green);color:#000;border:none;border-radius:50%;width:36px;height:36px;font-size:1.3rem;cursor:pointer;line-height:36px;text-align:center}
+.modal-close:hover{background:#d15c64}
+.modal-box h2{color:var(--acreetion-green);font-family:var(--font-mono);border-bottom:1px solid var(--acreetion-box-border);padding-bottom:.75rem;margin-bottom:1.25rem;font-size:1.2rem}
+.ai-content{color:var(--acreetion-text);font-size:.93rem;line-height:1.8}
+.ai-content h3{color:var(--acreetion-text-bright);font-size:1.05rem;margin:1.5rem 0 .5rem}
+.ai-content p{margin-bottom:.75rem}
+.ai-content code{background:var(--acreetion-code-bg);border:1px solid rgba(46,204,113,.2);padding:.15em .4em;border-radius:6px;font-family:var(--font-mono);font-size:.85rem;color:var(--acreetion-text-bright)}
+.ai-content pre{background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);padding:1rem;border-radius:8px;overflow-x:auto;margin:.75rem 0;font-size:.85rem}
+.ai-content pre code{background:none;border:none;padding:0}
+.ai-content ul,.ai-content ol{padding-left:1.5rem;margin-bottom:.75rem}
+.ai-content li{margin-bottom:.3rem}
+.ai-content a{color:var(--acreetion-green)}
+.loading{text-align:center;padding:2rem;color:var(--acreetion-green);font-family:var(--font-mono);font-size:.9rem}
+.loading .spin{display:inline-block;width:24px;height:24px;border:2px solid var(--acreetion-box-border);border-top-color:var(--acreetion-green);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+#progress-area{margin-bottom:.5rem}#progress-steps{font-size:.85rem;line-height:2;color:var(--acreetion-text);margin-bottom:.5rem}#preview-area{font-size:.78rem;line-height:1.5;color:#888;margin-top:.5rem}#show-raw-btn{transition:all .15s}#show-raw-btn:hover{border-color:var(--acreetion-green)!important;color:var(--acreetion-green)!important}.page-footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--acreetion-box-border);color:#999;font-size:.85rem}
+.page-footer a{color:var(--acreetion-green);text-decoration:underline;text-underline-offset:3px}
+.page-footer a:hover{text-decoration:underline}
+
+  </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://acreetionos.org/"},
+  {"@type":"ListItem","position":2,"name":"Wiki","item":"https://acreetionos.org/wiki.html"}
+]}
+</script>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">
+    Skip to main content
+  </a>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="https://acreetionos.org/" class="logo">
+            <img src="/assets/logo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="https://acreetionos.org/">
+              Home
+            </a>
+            <a href="https://acreetionos.org/flash.html">
+              Downloads
+            </a>
+            <a href="https://wiki.acreetionos.org/">
+              Wiki
+            </a>
+            <a href="https://acreetionos.org/status.html">
+              Status
+            </a>
+          </nav>
+        </div>
+      </header>
+      <main id="main-content" class="wrap">
+        <h1>
+        Documentation Engine
+      </h1>
+      <p class="sub">
+        Search the Arch Linux Wiki and get AI-powered beginner-friendly guides tailored for AcreetionOS. Select a topic below or type anything you want help with.
+      </p>
+      <p style="font-size:0.78rem;color:#999;margin-top:-0.5rem;margin-bottom:1.5rem">
+        AI guides powered by <a href="https://openrouter.ai" target="_blank" rel="noopener" style="color:#2ecc71">OpenRouter</a> free model routing — thank you for supporting open AI! <span style="color:#888">&#9201; Free models are shared, so guides can take up to a minute to generate.</span>
+      </p>
+      <div style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem">
+        <h2 style="color:var(--acreetion-green);font-family:var(--font-mono);font-size:1rem;margin-bottom:0.5rem">
+          <i class="bi bi-robot" style="margin-right:0.4rem" aria-hidden="true"></i>AI-Powered Search
+        </h2>
+        <p style="color:var(--acreetion-text);font-size:0.9rem;line-height:1.7;margin:0">
+          This tool searches the entire <a href="https://wiki.archlinux.org" style="color:var(--acreetion-green)">Arch Linux Wiki</a> and uses AI to generate beginner-friendly summaries of the results. Instead of reading dense technical documentation, you get clear, concise answers tailored for AcreetionOS users. The AI explains complex topics in plain language, with links back to the original Arch Wiki pages for advanced details.
+        </p>
+        <p style="color:var(--acreetion-text);font-size:0.9rem;line-height:1.7;margin:0.9rem 0 0;padding-top:0.9rem;border-top:1px dashed var(--acreetion-box-border)">
+          <strong style="color:var(--acreetion-text-bright)">&#9201; Expect up to a minute:</strong> the AI backend runs on OpenRouter's <strong>free model router</strong> — free community models that are shared across all users and rate-limited, so they can be slow when busy. That's the tradeoff that keeps this tool 100% free: we're a small independent project, and a paid AI backend at this scale would be a bill we simply can't afford. Slow doesn't mean weak, though — the free models are still genuinely capable, and you'll get a complete, step-by-step guide that's beginner-friendly and tailored to AcreetionOS. If generation ever stalls, the raw Arch Wiki content is shown as a fallback, so you're never left empty-handed.
+        </p>
+      </div>
+      <p style="font-size:0.72rem;color:#888;margin-top:-1rem;margin-bottom:1.5rem;line-height:1.5">
+        This site is protected by reCAPTCHA and the Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" style="color:var(--acreetion-green)">Privacy Policy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noopener" style="color:var(--acreetion-green)">Terms of Service</a> apply.
+      </p>
+      <div id="ai-status-notice" style="display:none;margin-bottom:1.5rem;padding:1rem 1.25rem;border:1px solid #f39c12;border-radius:10px;background:rgba(243,156,18,0.08);font-size:0.85rem;line-height:1.6;color:var(--acreetion-text);position:relative">
+        <span style="position:absolute;top:0.5rem;right:0.75rem;cursor:pointer;color:#666;font-size:1.1rem;line-height:1" id="dismiss-notice" title="Dismiss">&times;</span>
+        <strong style="color:#f39c12">&#9888;&#65039; Notice:</strong> AI guide generation was temporarily unavailable but has been fixed. We now use an <strong>auto-updating free model router</strong> from OpenRouter that automatically keeps the AI working even as free models come and go. If you still encounter issues, the raw wiki content is shown as a fallback.
+      </div>
+      <div class="search-card">
+        <div class="bar">
+          <input type="text" id="search-input" placeholder="e.g. Software Updates, WiFi, Bluetooth, GRUB..." autofocus>
+          <button type="button" id="search-btn">
+          Search
+        </button>
+      </div>
+      <div id="results" class="results">
+      </div>
+      <div class="quick">
+        <span>
+          Popular:
+        </span>
+        <a href="#" data-q="System maintenance" aria-label="Search for System maintenance">
+          System maintenance
+        </a>
+        <a href="#" data-q="Installing software" aria-label="Search for Installing software">
+          Installing software
+        </a>
+        <a href="#" data-q="WiFi" aria-label="Search for WiFi">
+          WiFi
+        </a>
+        <a href="#" data-q="Bluetooth" aria-label="Search for Bluetooth">
+          Bluetooth
+        </a>
+        <a href="#" data-q="Printer setup" aria-label="Search for Printer setup">
+          Printer setup
+        </a>
+        <a href="#" data-q="NVIDIA drivers" aria-label="Search for NVIDIA drivers">
+          NVIDIA drivers
+        </a>
+        <a href="#" data-q="Firewall" aria-label="Search for Firewall">
+          Firewall
+        </a>
+      </div>
+      <div class="quick" style="margin-top:0.9rem;padding-top:0.9rem;border-top:1px dashed var(--acreetion-box-border)">
+        <span>
+          Ready-made guides:
+        </span>
+        <a href="https://acreetionos.org/wiki-guides/wifi.html" aria-label="Read the WiFi guide">WiFi</a>
+        <a href="https://acreetionos.org/wiki-guides/nvidia-drivers.html" aria-label="Read the NVIDIA drivers guide">NVIDIA drivers</a>
+        <a href="https://acreetionos.org/wiki-guides/printer-setup.html" aria-label="Read the printer setup guide">Printer setup</a>
+        <a href="https://acreetionos.org/wiki-guides/bluetooth.html" aria-label="Read the Bluetooth guide">Bluetooth</a>
+        <a href="https://acreetionos.org/wiki-guides/firewall.html" aria-label="Read the firewall guide">Firewall</a>
+        <a href="https://acreetionos.org/wiki-guides/installing-software.html" aria-label="Read the installing software guide">Installing software</a>
+        <a href="https://acreetionos.org/wiki-guides/system-maintenance.html" aria-label="Read the system maintenance guide">System maintenance</a>
+        <a href="https://acreetionos.org/wiki-guides/index.html" aria-label="Browse all ready-made guides">All guides →</a>
+      </div>
+    </div>
+  </main>
+  <div id="wiki-modal" class="modal-overlay">
+    <div class="modal-box">
+      <button type="button" class="modal-close" id="modal-close">
+      &times;
+    </button>
+    <div id="progress-area">
+      <div id="progress-track" style="height:4px;background:var(--acreetion-box-border);border-radius:2px;margin-bottom:1.5rem;overflow:hidden">
+        <div id="progress-bar" style="height:100%;width:100%;background:var(--acreetion-green);border-radius:2px;transform:scaleX(0);transform-origin:left center;transition:transform .4s ease">
+        </div>
+      </div>
+      <div id="progress-steps">
+      </div>
+      <div id="preview-area" style="display:none;margin-bottom:1rem;padding:.8rem;background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:8px;max-height:200px;overflow-y:auto;font-size:.8rem;color:var(--acreetion-text);white-space:pre-wrap;font-family:var(--font-mono)">
+      </div>
+    </div>
+    <div id="content-area" style="display:none">
+      <h2 id="modal-title-result">
+      &#8203;
+    </h2>
+    <div id="modal-body" class="ai-content">
+    </div>
+    <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--acreetion-box-border);display:flex;gap:.5rem;flex-wrap:wrap">
+      <a id="modal-link" href="#" target="_blank" rel="noopener" style="display:inline-block;padding:.6rem 1.2rem;background:var(--acreetion-green);color:#000;border-radius:8px;font-weight:700;text-decoration:none;font-size:.85rem">
+        View on Arch Wiki &rarr;
+      </a>
+      <button id="show-raw-btn" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--acreetion-box-border);color:var(--acreetion-text);border-radius:8px;cursor:pointer;font-size:.85rem">
+      Show raw source
+    </button>
+  </div>
+</div>
+</div>
+</div>
+<div id="wiki-vote" style="background:var(--acreetion-panel-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;padding:1.5rem;margin:2rem auto;max-width:600px;text-align:center">
+  <h3 style="color:var(--acreetion-text-bright);font-size:1rem;margin-bottom:0.75rem">
+    Would you like AI-generated AcreetionOS-specific documentation?
+  </h3>
+  <div id="vote-buttons" style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap">
+    <button class="vote-btn" data-vote="yes" style="padding:0.6rem 1.4rem;background:var(--acreetion-green);color:#000;border:none;border-radius:8px;font-weight:700;font-size:0.9rem;cursor:pointer;transition:transform 0.15s">Yes, I'd use that</button>
+    <button class="vote-btn" data-vote="no" style="padding:0.6rem 1.4rem;background:transparent;color:var(--acreetion-text);border:1px solid var(--acreetion-box-border);border-radius:8px;font-weight:600;font-size:0.9rem;cursor:pointer;transition:transform 0.15s">No, the Arch Wiki is enough</button>
+  </div>
+  <div id="vote-results" style="margin-top:1rem;font-size:0.85rem;color:var(--acreetion-text);display:none">
+  </div>
+</div>
+<script>
+(function(){
+  var votes = JSON.parse(localStorage.getItem('wikiVotes') || '{"yes":0,"no":0}');
+  function updateResults() {
+    var total = votes.yes + votes.no;
+    var el = document.getElementById('vote-results');
+    if (total === 0) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.innerHTML = '<strong style="color:var(--acreetion-green)">' + votes.yes + '</strong> Yes &middot; <strong style="color:var(--acreetion-text)">' + votes.no + '</strong> No &middot; <span style="color:#9a9a9a">(' + total + ' total votes)</span>';
+  }
+  function hasVoted() {
+    return localStorage.getItem('wikiVoted') === 'true';
+  }
+  if (hasVoted()) {
+    document.getElementById('vote-buttons').innerHTML = '<span style="color:var(--acreetion-text);font-size:0.9rem">Thanks for your feedback!</span>';
+    updateResults();
+  }
+  (function(){
+  var notice = document.getElementById('ai-status-notice');
+  if (notice && !localStorage.getItem('aiNoticeDismissed')) {
+    notice.style.display = 'block';
+  }
+  document.getElementById('dismiss-notice').addEventListener('click', function() {
+    notice.style.display = 'none';
+    localStorage.setItem('aiNoticeDismissed', 'true');
+  });
+})();
+document.querySelectorAll('.vote-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      if (hasVoted()) return;
+      var v = btn.getAttribute('data-vote');
+      votes[v]++;
+      localStorage.setItem('wikiVotes', JSON.stringify(votes));
+      localStorage.setItem('wikiVoted', 'true');
+      document.getElementById('vote-buttons').innerHTML = '<span style="color:var(--acreetion-green);font-size:0.9rem;font-weight:600">Thanks for your feedback!</span>';
+      updateResults();
+    });
+  });
+})();
+</script>
+<footer class="page-footer">
+  <p>
+    AcreetionOS is an independent project built on
+    <a href="https://archlinux.org" target="_blank" rel="noopener">
+      Arch Linux
+    </a>
+    . Grateful to the Arch community for their incredible work.
+  </p>
+  <p>
+    <a href="https://github.com/AcreetionOS-Code" target="_blank" rel="noopener">
+      <i class="bi bi-github">
+    </i>
+    GitHub
+  </a>
+  &middot;
+  <a href="https://gitlab.acreetionos.org">
+    <i class="bi bi-gitlab">
+  </i>
+  GitLab
+</a>
+</p>
+</footer>
+</div>
+</div>
+<script src="/js/sidebar.js?v=20260825" defer>
+</script>
+
+<script src="/js/wiki-page.js?v=20260830" defer>
+</script>
+<script src="/js/footer.js?v=20260825" defer>
+</script>
+<script src="/js/vendor/instantpage.min.js?v=20260825" type="module" defer></script>
+<script src="/js/tor-badge.js?v=20260825" defer></script>
+</body>
+</html>

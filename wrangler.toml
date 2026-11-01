@@ -1,5 +1,5 @@
 name = "acreetionos-worker"
-main = "index.js"
+main = "js/index.js"
 compatibility_date = "2026-04-26"
 account_id = "86a77a981dd5e5a634330a4819aaa2e0"
 

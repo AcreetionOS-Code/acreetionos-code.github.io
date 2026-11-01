@@ -17,34 +17,30 @@ AcreetionOS website is a static HTML/CSS/JS site hosted on GitHub Pages, built f
 
 ```
 /
-├── index.html          # Main landing page
-├── install.html        # Installation guide
-├── faq.html            # FAQ page
-├── compare.html        # Comparison page
-├── contact.html        # Contact page
-├── about.html          # About page
-├── developers.html     # Developer info
-├── blog.html           # Blog page
-├── requirements.html   # System requirements
-├── migrated.html       # Migration guide
-├── selfhelp.html       # Self-help resources
-
-├── changelog.html      # Release changelog (GitLab commit feed)
-├── TrumpOS/            # TrumpOS sub-site
-│   └── index.html
-├── docs/               # This documentation
-│   ├── README.md
-│   ├── architecture.md
-│   └── deployment.md
-├── wiki/               # Legacy (redirects to external wiki)
-├── contact.css         # Shared stylesheet
-├── sw.js               # Service worker (PWA)
-├── package.json         # Node dependencies
-├── playwright.config.js # Test configuration
-├── wrangler.jsonc       # Cloudflare Pages config
-└── tests/              # Playwright tests
-    └── run_firefox_local.sh
+├── index.html           # Main landing page
+├── *.html               # Public pages and root-route compatibility copies
+├── pages/                # Organized copies of root HTML pages
+├── assets/
+│   ├── fonts/            # Web fonts
+│   └── icons/            # Icon fonts
+├── css/
+│   ├── vendor/           # Third-party stylesheets
+│   └── *.css             # Site stylesheets
+├── js/
+│   ├── vendor/           # Third-party scripts
+│   └── *.js              # Site scripts and Cloudflare Worker entry
+├── Reviews/              # Community reviews
+├── newsletter-archive/   # Published newsletter pages
+├── wiki-guides/          # Individual wiki guides
+├── docs/                 # Project documentation
+├── frontend/             # Vite development wrapper
+├── tests/                # Playwright tests
+├── sw.js                 # Root-scoped service worker
+├── wrangler.toml         # Cloudflare Worker configuration
+└── package.json          # Node dependencies
 ```
+
+GitHub Pages serves the repository root directly. Root page and static-file copies remain available for existing public URLs; organized pages and assets use the directories above.
 
 ## Key Files
 
@@ -55,7 +51,7 @@ AcreetionOS website is a static HTML/CSS/JS site hosted on GitHub Pages, built f
 - `contact.html` - Contact form and community links
 
 ### Static Assets
-- `contact.css` - Shared stylesheet for all pages
+- `css/contact.css` - Shared stylesheet for all pages
 - `sw.js` - Service worker for offline caching (PWA)
 - `*.ttf`, `*.woff` - Custom fonts (FreeFont family)
 

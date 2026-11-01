@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
+  <meta name="robots" content="index, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="keywords" content="AcreetionOS changelog, release history, Linux distro updates, Arch Linux changelog, AcreetionOS releases">
+  <title>Release Changelog – AcreetionOS Linux</title>
+  <meta name="description" content="View the AcreetionOS release changelog. Filter by category — kernel updates, desktop changes, package updates, and security patches.">
+  <link rel="canonical" href="https://acreetionos.org/changelog.html">
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": ["WebPage", "CollectionPage"],
+  "@id": "https://acreetionos.org/changelog.html",
+  "name": "Release Changelog – AcreetionOS Linux",
+  "description": "AcreetionOS release changelog — kernel updates, desktop changes, package updates, and security patches.",
+  "url": "https://acreetionos.org/changelog.html",
+  "isPartOf": { "@id": "https://acreetionos.org/#website" },
+  "inLanguage": "en",
+  "publisher": { "@id": "https://acreetionos.org/#organization" },
+  "breadcrumb": {
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://acreetionos.org/" },
+      { "@type": "ListItem", "position": 2, "name": "Changelog", "item": "https://acreetionos.org/changelog.html" }
+    ]
+  }
+}
+  </script>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/changelog.html">
+  <meta property="og:title" content="Release Changelog – AcreetionOS">
+  <meta property="og:description" content="Track AcreetionOS release history with filterable changelogs.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Release Changelog – AcreetionOS">
+  <meta name="twitter:description" content="Track AcreetionOS releases.">
+  <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/sidebar.css?v=20260825"></noscript>
+  <link rel="preload" href="/assets/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825"></noscript>
+  <style>
+#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+html{touch-action:manipulation}input,textarea,select{font-size:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);line-height:1.6}
+.wrap{max-width:800px;margin:2rem auto;padding:0 1.5rem}
+.hero{text-align:center;padding:2rem 1rem}
+.hero h1{font-size:2rem;font-weight:800;margin-bottom:.5rem}
+.hero h1 span{color:var(--green)}
+.hero p{color:var(--text);font-size:.95rem;max-width:550px;margin:0 auto;line-height:1.7}
+.filter-bar{display:flex;gap:.5rem;margin:1.5rem 0;flex-wrap:wrap}
+.filter-btn{padding:.45rem 1rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text);cursor:pointer;font-size:.82rem;font-weight:500;transition:all.15s;font-family:var(--font-sans)}
+.filter-btn:hover{color:var(--text-bright);border-color:var(--green)}
+.filter-btn.active{background:var(--green);color:#000;border-color:var(--green)}
+.search-bar{width:100%;padding:.7rem 1rem;background:var(--panel);border:1px solid var(--border);border-radius:10px;color:var(--text-bright);font-size:.9rem;font-family:var(--font-sans);outline:none;margin-bottom:1rem}
+.search-bar:focus{border-color:var(--green)}
+.search-bar::placeholder{color:#555}
+.timeline{position:relative;padding-left:2rem;margin:1rem 0}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:var(--border)}
+.release{position:relative;margin-bottom:1.5rem;animation:fadeIn.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.release.hidden{display:none}
+.release-dot{position:absolute;left:-2rem;top:6px;width:14px;height:14px;border-radius:50%;background:var(--green);border:3px solid var(--bg);z-index:1}
+.release-card{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:1rem;transition:border-color.2s}
+.release-card:hover{border-color:var(--green)}
+.release-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:.5rem;margin-bottom:.4rem}
+.release-header .tag{font-family:var(--font-mono);font-size:.82rem;font-weight:700;color:var(--green)}
+.release-header .date{color:#777;font-size:.78rem}
+.release-header .category{font-size:.7rem;padding:.15rem .5rem;border-radius:4px;font-weight:600}
+.cat-kernel{background:rgba(97,175,239,.15);color:#61afef}
+.cat-desktop{background:rgba(46,204,113,.15);color:var(--green)}
+.cat-package{background:rgba(155,89,182,.15);color:#9b59b6}
+.cat-security{background:rgba(231,76,60,.15);color:#e74c3c}
+.cat-system{background:rgba(243,156,18,.15);color:#f39c12}
+.cat-edition{background:rgba(46,204,113,.15);color:var(--green)}
+.release-body{color:var(--text);font-size:.85rem;line-height:1.6}
+.release-body ul{padding-left:1.2rem;margin-bottom:0}
+.release-body li{margin-bottom:.2rem}
+.footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--border);color:#999;font-size:.85rem}
+.footer a{color:var(--green)}
+@media(max-width:600px){.hero h1{font-size:1.5rem}}
+  </style>
+</head>
+<body>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="/index.html" class="logo">
+            <img src="/assets/logo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">Acreetion <span>OS</span></span>
+          </a>
+          <nav class="main-nav">
+            <a href="/index.html">Home</a>
+            <a href="/flash.html">Downloads</a>
+          </nav>
+        </div>
+      </header>
+      <div class="wrap">
+        <div class="hero">
+          <h1><span>Release</span> Changelog</h1>
+          <p>Track every change to AcreetionOS — kernel bumps, desktop updates, package changes, security patches, and new editions — from the GitLab REST API on gitlab.acreetionos.org. Filter by category or search for specific packages.</p>
+        </div>
+
+        <input type="text" class="search-bar" id="search-input" placeholder="Search for a package, version, or keyword..." autocomplete="off">
+
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="kernel">Kernel</button>
+          <button class="filter-btn" data-filter="desktop">Desktop</button>
+          <button class="filter-btn" data-filter="package">Packages</button>
+          <button class="filter-btn" data-filter="security">Security</button>
+          <button class="filter-btn" data-filter="system">System</button>
+          <button class="filter-btn" data-filter="edition">Editions</button>
+        </div>
+
+        <div class="timeline" id="timeline">
+          <div class="loading" id="loading-indicator" style="text-align:center;padding:2rem;color:var(--text);font-family:var(--font-mono);font-size:.9rem"><div class="spin" style="display:inline-block;width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin.7s linear infinite;margin-bottom:.5rem"></div><br>Loading live changelog from GitLab...</div>
+          <!-- Static fallback: visible to crawlers and no-JS users; JS replaces it with the live list -->
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">hyperpick<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-edition">edition</span>
+                  <span class="date">2026-08-09</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">hyperpick: pick the right hypervisor for testing OS ISOs</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Natalie Spiva</p>
+                <a href="https://gitlab.acreetionos.org/natalie/hyperpick/-/commit/b264b9b94759f2f1ce5b2816ab02736a3ebbf649" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">Linux_App_Drawer<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-system">system</span>
+                  <span class="date">2026-08-08</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">Initial commit</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Natalie Spiva</p>
+                <a href="https://gitlab.acreetionos.org/natalie/Linux_App_Drawer/-/commit/cdb84df8fff4ce36af7ebdf27215d9da146b0c18" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">application_menu_search<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-system">system</span>
+                  <span class="date">2026-08-08</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">Initial commit</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Natalie Spiva</p>
+                <a href="https://gitlab.acreetionos.org/natalie/application_menu_search/-/commit/604bfe9d645a35c83860160c58dc34f7206d6a16" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">acreetionos<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-system">system</span>
+                  <span class="date">2026-08-06</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">Fix geocode-glib update conflict on installed systems</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Darren Clift</p>
+                <a href="https://gitlab.acreetionos.org/cobra3282000/acreetionos/-/commit/b6708d8ca65a6f1ec572d6f9a9a6367af180f5df" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">acreetionos-xlibre<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-package">package</span>
+                  <span class="date">2026-08-06</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">changes to packaget build to fix error with glib geo stuff</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Darren Clift</p>
+                <a href="https://gitlab.acreetionos.org/cobra3282000/acreetionos-xlibre/-/commit/85bd3ecc2d42002ed874705a695f5de56c17eade" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">acreetionos<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-edition">edition</span>
+                  <span class="date">2026-07-31</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">ci: publish ISO to the real public ISO server over SSH</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Natalie Spiva</p>
+                <a href="https://gitlab.acreetionos.org/natalie/acreetionos/-/commit/3c2519b1db7bfb4f0fe526770c1dd8d783acc1ef" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">acreetionos<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-edition">edition</span>
+                  <span class="date">2026-07-31</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">ci: publish:iso must not re-checkout (GIT_STRATEGY: none)</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Natalie Spiva</p>
+                <a href="https://gitlab.acreetionos.org/natalie/acreetionos/-/commit/7aad134d4d1f57dbb979011a65ad3cbab317b374" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+          <div class="release">
+            <div class="release-dot"></div>
+            <div class="release-card">
+              <div class="release-header">
+                <span class="tag">acreetionos<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span></span>
+                <div style="display:flex;gap:.4rem;align-items:center">
+                  <span class="category cat-edition">edition</span>
+                  <span class="date">2026-07-31</span>
+                </div>
+              </div>
+              <div class="release-body">
+                <p style="margin-bottom:.25rem">ci: drop 2.1GB ISO from job artifacts (nginx 413 limit)</p>
+                <p style="font-size:.75rem;color:#777;margin:0">by Natalie Spiva</p>
+                <a href="https://gitlab.acreetionos.org/natalie/acreetionos/-/commit/f4592e047ea476c3ceea9e353bf34df46bb247f3" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script src="/js/scale-page.js?v=20260824" defer></script>
+      <script src="/js/sidebar.js?v=20260825" defer></script>
+    </div>
+  </div>
+  <script>
+    var changelogData = [];
+    var currentFilter = 'all';
+
+    async function loadChangelog() {
+      try {
+        document.getElementById('loading-indicator').style.display = 'block';
+        var res = await fetch('/api/changelog');
+        var data = await res.json();
+        document.getElementById('loading-indicator').style.display = 'none';
+        if (data.error) throw new Error(data.error);
+        if (!data.entries || data.entries.length === 0) {
+          document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#777">No commits yet. Check back after the next push.</p>';
+          return;
+        }
+        changelogData = data.entries;
+        render();
+      } catch (e) {
+        document.getElementById('loading-indicator').style.display = 'none';
+        document.getElementById('timeline').innerHTML = '<p style="text-align:center;padding:2rem;color:#e74c3c">Changelog is coming soon!. Head to our Github or Gitlab!</p>'
+      }
+    }
+
+    function render() {
+      var q = document.getElementById('search-input').value.toLowerCase().trim();
+      var entries = changelogData.filter(function(e) {
+        if (currentFilter !== 'all' && e.category !== currentFilter) return false;
+        if (q) {
+          if (e.message.toLowerCase().indexOf(q) === -1 && e.repo.toLowerCase().indexOf(q) === -1 && (e.author || '').toLowerCase().indexOf(q) === -1) return false;
+        }
+        return true;
+      });
+
+      var html = '';
+      entries.forEach(function(e) {
+        var sourceBadge = e.source === 'GitLab' ? '<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(155,89,182,.15);color:#9b59b6;margin-left:.4rem">GitLab</span>' : '<span style="font-size:.7rem;padding:.1rem .4rem;border-radius:4px;background:rgba(97,175,239,.15);color:#61afef;margin-left:.4rem">GitHub</span>';
+        html += '<div class="release">' +
+          '<div class="release-dot"></div>' +
+          '<div class="release-card">' +
+          '<div class="release-header">' +
+          '<span class="tag">' + esc(e.repo || '') + sourceBadge + '</span>' +
+          '<div style="display:flex;gap:.4rem;align-items:center">' +
+          '<span class="category cat-' + e.category + '">' + e.category + '</span>' +
+          '<span class="date">' + (e.date || '') + '</span>' +
+          '</div></div>' +
+          '<div class="release-body">' +
+          '<p style="margin-bottom:.25rem">' + esc(e.message || '') + '</p>' +
+          (e.author ? '<p style="font-size:.75rem;color:#777;margin:0">by ' + esc(e.author) + '</p>' : '') +
+          (e.url ? '<a href="' + esc(e.url) + '" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--green);text-decoration:none;display:inline-block;margin-top:.25rem">View commit →</a>' : '') +
+          '</div></div></div>';
+      });
+
+      document.getElementById('timeline').innerHTML = html || '<p style="text-align:center;padding:2rem;color:#777">No entries match your filter.</p>';
+    }
+
+    function esc(s) { return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    document.querySelectorAll('.filter-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+        currentFilter = this.getAttribute('data-filter');
+        render();
+      });
+    });
+
+    document.getElementById('search-input').addEventListener('input', render);
+
+    loadChangelog();
+  </script>
+  <script src="/js/footer.js?v=20260825" defer></script>
+<script src="/js/vendor/instantpage.min.js?v=20260825" type="module" defer></script>
+<script src="/js/tor-badge.js?v=20260825" defer></script>
+</body>
+</html>

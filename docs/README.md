@@ -24,7 +24,7 @@ Welcome to the technical documentation for the AcreetionOS website.
 
 3. **Make your changes**
    - Edit HTML files directly
-   - Update `contact.css` for styling
+   - Update `css/contact.css` for styling
    - Test locally with `python3 -m http.server 8000`
 
 4. **Submit a pull request**
@@ -35,7 +35,7 @@ Welcome to the technical documentation for the AcreetionOS website.
 ### Code Style
 
 - Use semantic HTML5 elements
-- Follow existing CSS patterns (see `contact.css`)
+- Follow existing CSS patterns (see `css/contact.css`)
 - No frameworks - vanilla HTML/CSS/JS only
 - Mobile-responsive design required
 

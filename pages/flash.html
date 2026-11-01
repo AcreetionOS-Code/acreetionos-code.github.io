@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+  <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+    AcreetionOS ISO – Free Cinnamon Distro
+  </title>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://acreetionos.org/flash.html">
+  <meta property="og:title" content="USB Flasher - AcreetionOS">
+  <meta property="og:description" content="Flash AcreetionOS ISO to USB - download and create bootable media.">
+  <meta property="og:image" content="https://acreetionos.org/og-image.png">
+  <meta property="og:site_name" content="AcreetionOS">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://acreetionos.org/flash.html">
+  <meta property="twitter:title" content="USB Flasher - AcreetionOS">
+  <meta property="twitter:description" content="Flash AcreetionOS ISO to USB - download and create bootable media.">
+  <meta property="twitter:image" content="https://acreetionos.org/og-image.png">
+  <meta name="description" content="Download AcreetionOS ISOs for free. Cinnamon and XLibre editions available. Flash to USB with the official Media Writer app.">
+  <link rel="canonical" href="https://acreetionos.org/flash.html" >
+  <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://acreetionos.org/#organization",
+          "name": "AcreetionOS Project",
+          "url": "https://acreetionos.org",
+          "description": "A community-driven, user-friendly Linux distribution based on Arch Linux."
+        },
+        {
+          "@type": "OperatingSystem",
+          "name": "AcreetionOS",
+          "operatingSystem": "Linux",
+          "applicationCategory": "OperatingSystem"
+        }
+      ]
+    }
+    
+  </script>
+  <link rel="preload" href="/assets/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/vendor/icons-subset.css?v=20260825"></noscript>
+  <style>
+
+        #hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}html{touch-action:manipulation}input,textarea,select{font-size:16px}:root {
+            --acreetion-green: #2ecc71;
+            --acreetion-body-bg: #121212;
+            --acreetion-panel-bg: #1a1a1a;
+            --acreetion-box-bg: #222222;
+            --acreetion-box-border: #333333;
+            --acreetion-text-bright: #e5e5e5;
+            --acreetion-text: #b2b2b2;
+            --acreetion-code-bg: rgba(46, 204, 113, 0.1);
+            --storm-color: #61afef;
+            --flasher-color: #f39c12;
+            --acreetion-purple: #9b59b6;
+            --font-sans: 'Roboto', sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--acreetion-body-bg);
+            color: var(--acreetion-text-bright);
+            line-height: 1.6;
+            margin: 0;
+            background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        .page-header {
+            background-color: rgba(24, 26, 27, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 2px solid var(--acreetion-green);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--acreetion-text-bright);
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--acreetion-green); }
+
+        .main-nav a {
+            color: var(--acreetion-text);
+            text-decoration: none;
+            margin-left: 1.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            display: inline-block;
+            color: black;
+            text-decoration: none !important;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-family: var(--font-sans);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-cinnamon { background-color: var(--acreetion-green); }
+        .btn-maintainer{background:linear-gradient(135deg,var(--acreetion-purple),#8e44ad);color:#fff;padding:0.55rem 1rem;font-size:0.8rem;box-shadow:0 4px 14px rgba(155,89,182,0.3);margin-left:4px;transition:all.2s}
+        .btn-maintainer:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(155,89,182,0.45)}
+        .btn-storm { background-color: var(--storm-color); color: #fff; }
+        .btn-flasher { background-color: var(--flasher-color); }
+
+        .page-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .content-box {
+            background-color: var(--acreetion-box-bg);
+            border: 1px solid var(--acreetion-box-border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .box-header {
+            padding: 1rem 1.5rem;
+            background-color: #1a1a1a;
+            border-bottom: 1px solid var(--acreetion-box-border);
+        }
+
+        .box-body { padding: 2rem; }
+
+        .edition-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .edition-card {
+            background: rgba(46,204,113,0.05);
+            border: 1px solid var(--acreetion-box-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        pre {
+            background: #000;
+            color: var(--acreetion-green);
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.visible { display: flex; }
+        .modal-box {
+            background: var(--acreetion-box-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            position: relative;
+        }
+
+        .btn-github { background: #333; }
+        .loading-text { text-align: center; color: var(--acreetion-text); }
+        .divider { border: 0; border-top: 1px solid var(--acreetion-box-border); margin: 3rem 0; }
+        .h3-accent { color: var(--acreetion-green); }
+        .h3-accent.mt-2 { margin-top: 2rem; }
+        .info-box { background: rgba(46,204,113,0.05); border: 1px solid var(--acreetion-box-border); border-radius: 12px; padding: 1.5rem; }
+        .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; }
+        .form-label { display: block; margin-bottom: 0.5rem; }
+        .form-input { width: 100%; padding: 0.6rem; background: #111; color: #fff; border: 1px solid #444; border-radius: 6px; margin-bottom: 1rem; }
+        .dd-output { display: none; margin-top: 1rem; }
+        .modal-close-btn { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: #fff; cursor: pointer; font-size: 1.5rem; }
+        .modal-terminal { max-height: 300px; overflow-y: auto; }
+        .modal-result { margin-top: 1rem; }
+        .section-title-official { color: var(--acreetion-green); border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        .section-title-community { color: var(--storm-color); border-bottom: 1px solid #333; padding-bottom: 0.5rem; margin-top: 2.5rem; }
+        .card-title { margin: 0 0 0.5rem 0; color: var(--acreetion-text-bright); }
+        .card-desc { font-size: 0.85rem; color: var(--acreetion-text); margin-bottom: 1rem; }
+        .card-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+        .btn-mirror {
+            padding: 0.4rem 0.8rem;
+            font-size:0.75rem;
+            background: transparent;
+            border: 1px solid #fff;
+            color: #fff;
+        }
+        .btn-mirror:hover {
+            background: var(--storm-color);
+            filter: none;
+            transform: translateY(-1px);
+        }
+        .btn-download-flasher { display: inline-block; margin-top: 1rem; font-size: 1.1rem; padding: 0.8rem 1.6rem; }
+    
+  </style>
+  <link rel="icon" type="image/webp" href="/assets/acreetionoslogo.webp">
+  <link rel="stylesheet" href="/css/sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/css/sidebar.css?v=20260825"></noscript>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"Home","item":"https://acreetionos.org/"},
+  {"@type":"ListItem","position":2,"name":"Downloads","item":"https://acreetionos.org/flash.html"}
+]}
+</script>
+</head>
+<body>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="/index.html" class="logo">
+            <img src="/assets/logo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">
+              Acreetion
+              <span>
+                OS
+              </span>
+            </span>
+          </a>
+          <nav class="main-nav">
+            <a href="/index.html">
+              Home
+            </a>
+            <a href="/flash.html">
+              Downloads
+            </a>
+            <a href="https://wiki.acreetionos.org/">
+              Wiki
+            </a>
+            <a href="/status.html">
+              Status
+            </a>
+          </nav>
+        </div>
+      </header>
+      <div class="page-wrapper">
+        <main id="main-content">
+          <article class="content-box">
+            <div class="box-header">
+              <h1>
+              AcreetionOS ISO
+            </h1>
+          </div>
+          <div class="box-body">
+            <p>
+              Download the AcreetionOS ISO directly, or use our tools to flash to a USB drive.
+            </p>
+
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;margin:1.5rem 0">
+              <a href="https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso" style="flex:1;min-width:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:var(--acreetion-green);color:#000;border-radius:12px;text-decoration:none;font-weight:700;transition:transform 0.15s,box-shadow 0.15s;box-shadow:0 4px 14px rgba(46,204,113,0.3)">
+                <span style="font-size:0.7rem;opacity:0.8;letter-spacing:0.5px">STANDARD</span>
+                <span style="font-size:1.2rem;margin:0.25rem 0">Cinnamon Edition</span>
+                <span style="font-size:0.8rem;opacity:0.8"><i class="bi bi-download"></i> Download ISO</span>
+              </a>
+              <a href="https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso" style="flex:1;min-width:240px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;background:transparent;color:var(--acreetion-green);border:2px solid var(--acreetion-green);border-radius:12px;text-decoration:none;font-weight:700;transition:transform 0.15s,box-shadow 0.15s">
+                <span style="font-size:0.7rem;opacity:0.8;letter-spacing:0.5px">XLIBRE</span>
+                <span style="font-size:1.2rem;margin:0.25rem 0">XL (XLibre) Edition</span>
+                <span style="font-size:0.8rem;opacity:0.8"><i class="bi bi-download"></i> Download ISO</span>
+              </a>
+            </div>
+
+            <h3 class="h3-accent" style="margin-top:2rem">
+              <i class="bi bi-magnet"></i> Torrent &amp; Magnet Downloads
+            </h3>
+            <p style="margin:0.5rem 0 1.5rem 0;font-size:0.9rem;color:var(--acreetion-text)">
+              Resumable, web-seeded from our mirrors, and lighter on our servers when the community seeds.
+              Drop the <code>.torrent</code> file into your client, or click the magnet link to start immediately.
+            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;margin:1.5rem 0">
+              <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:0.6rem;padding:1.5rem;background:rgba(46,204,113,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px">
+                <span style="font-size:0.7rem;opacity:0.8;letter-spacing:0.5px;color:var(--acreetion-text)">STANDARD</span>
+                <span style="font-size:1.15rem;font-weight:700;color:var(--acreetion-text-bright)">Cinnamon Edition</span>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:0.5rem">
+                  <a href="https://iso.acreetionos.org/torrents/AcreetionOS-1.0-x86_64.iso.torrent" class="btn btn-cinnamon" style="font-size:0.85rem;padding:0.5rem 1rem"><i class="bi bi-download"></i> .torrent file</a>
+                  <a href="magnet:?xt=urn:btih:7DE9852787A8F5BBC76E590A0853AA010EB2B158&dn=AcreetionOS-1.0-x86_64.iso&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&ws=https%3A%2F%2Fiso.acreetionos.org%2Facreetion%2FAcreetionOS-1.0-x86_64.iso" class="btn btn-mirror" style="font-size:0.85rem;padding:0.5rem 1rem"><i class="bi bi-magnet"></i> magnet</a>
+                </div>
+              </div>
+              <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:0.6rem;padding:1.5rem;background:rgba(46,204,113,0.05);border:1px solid var(--acreetion-box-border);border-radius:12px">
+                <span style="font-size:0.7rem;opacity:0.8;letter-spacing:0.5px;color:var(--acreetion-text)">XLIBRE</span>
+                <span style="font-size:1.15rem;font-weight:700;color:var(--acreetion-text-bright)">XL (XLibre) Edition</span>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:0.5rem">
+                  <a href="https://iso.acreetionos.org/torrents/AcreetionOS_XL-1.0-x86_64.iso.torrent" class="btn btn-cinnamon" style="font-size:0.85rem;padding:0.5rem 1rem"><i class="bi bi-download"></i> .torrent file</a>
+                  <a href="magnet:?xt=urn:btih:810238307AF31F20943C747F7762543B39771BBD&dn=AcreetionOS_XL-1.0-x86_64.iso&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337%2Fannounce&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A6969%2Fannounce&tr=udp%3A%2F%2Fexodus.desync.com%3A6969%2Fannounce&ws=https%3A%2F%2Fiso.acreetionos.org%2Facreetion%2FAcreetionOS_XL-1.0-x86_64.iso" class="btn btn-mirror" style="font-size:0.85rem;padding:0.5rem 1rem"><i class="bi bi-magnet"></i> magnet</a>
+                </div>
+              </div>
+            </div>
+            <p style="margin:0.5rem 0 1.5rem 0;text-align:center;font-size:0.8rem;color:var(--acreetion-text)">
+              <i class="bi bi-info-circle"></i> New to BitTorrent? Install a client like
+              <a href="https://transmissionbt.com/" style="color:var(--acreetion-green)" target="_blank" rel="noopener">Transmission</a>,
+              <a href="https://www.qbittorrent.org/" style="color:var(--acreetion-green)" target="_blank" rel="noopener">qBittorrent</a>, or
+              <a href="https://deluge-torrent.org/" style="color:var(--acreetion-green)" target="_blank" rel="noopener">Deluge</a>,
+              then open the <code>.torrent</code> file or paste the magnet link. Please keep seeding after the download finishes &mdash; it helps everyone.
+            </p>
+
+            <p style="margin:0.5rem 0;text-align:center;font-size:0.8rem;color:var(--acreetion-text)">
+              <i class="bi bi-shield-lock"></i> Over Tor &mdash; this site:
+              <a href="http://sz3opx2vluaqk46bxmgjzslw5v2hldmldo7cr65eqhohstldghjaujyd.onion/flash.html" style="color:var(--acreetion-green);word-break:break-all">sz3opx2vluaqk46bxmgjzslw5v2hldmldo7cr65eqhohstldghjaujyd.onion</a>
+              &nbsp;|&nbsp; ISO mirror &amp; package repos:
+              <a href="http://drxoopx4vxhkkdtb4pjicjopvjfl5yuqr3qivjkmakehoxlpa3pcxwid.onion/acreetion/" style="color:var(--acreetion-green);word-break:break-all">drxoopx4vxhkkdtb4pjicjopvjfl5yuqr3qivjkmakehoxlpa3pcxwid.onion</a>
+            </p>
+
+            <div style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;margin:1.5rem 0">
+              <a href="/community-reviews.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);border-radius:8px;color:var(--acreetion-green);text-decoration:none;font-size:.85rem;font-weight:600;transition:all.15s" onmouseover="this.style.background='rgba(46,204,113,0.2)'" onmouseout="this.style.background=''"><i class="bi bi-play-btn"></i> Watch Reviews</a>
+              <a href="/features.html" style="display:inline-flex;align-items:center;gap:.4rem;padding:.5rem 1rem;background:rgba(46,204,113,0.1);border:1px solid rgba(46,204,113,0.3);border-radius:8px;color:var(--acreetion-green);text-decoration:none;font-size:.85rem;font-weight:600;transition:all.15s" onmouseover="this.style.background='rgba(46,204,113,0.2)'" onmouseout="this.style.background=''"><i class="bi bi-palette"></i> Feature Showcase</a>
+            </div>
+
+            <p style="margin:1rem 0;text-align:center">
+              <a href="/unofficial.html" style="color:var(--acreetion-text);font-size:0.9rem">Looking for community editions (MATE, LXQT, Plasma, GNOME, etc.)? &rarr;</a>
+            </p>
+
+            <hr class="divider">
+
+            <h3 class="h3-accent">
+            Option 1: Desktop App &mdash; Acreetion Media Writer
+          </h3>
+          <div class="info-box" style="border:2px solid var(--acreetion-green)">
+            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem">
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:rgba(46,204,113,0.15);border:1px solid var(--acreetion-green);border-radius:6px;font-size:0.75rem;color:var(--acreetion-green)"><i class="bi bi-windows"></i> Windows</span>
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:rgba(46,204,113,0.15);border:1px solid var(--acreetion-green);border-radius:6px;font-size:0.75rem;color:var(--acreetion-green)"><i class="bi bi-apple"></i> macOS</span>
+              <span style="display:inline-flex;align-items:center;gap:0.3rem;padding:0.25rem 0.6rem;background:rgba(46,204,113,0.15);border:1px solid var(--acreetion-green);border-radius:6px;font-size:0.75rem;color:var(--acreetion-green)"><i class="bi bi-ubuntu"></i> Linux</span>
+            </div>
+            <p style="font-size:0.95rem">
+              <strong style="color:var(--acreetion-text-bright)">The easiest way.</strong> A cross-platform desktop app that automatically detects your operating system and downloads the correct version. Select your edition, pick your USB drive, and flash with one click.
+            </p>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:1rem">
+              <a id="flasher-download-btn" href="https://github.com/spivanatalie64/AcreetionMediaWriter/releases" class="btn btn-flasher btn-download-flasher" style="font-size:1.1rem;padding:0.8rem 1.6rem">
+                <i class="bi bi-download"></i> Download Media Writer
+              </a>
+              <span style="font-size:0.8rem;color:var(--acreetion-text)"><span id="flasher-version-label"></span>Auto-detected for your OS &mdash; <a href="https://github.com/spivanatalie64/AcreetionMediaWriter/releases" style="color:var(--acreetion-green)">all releases</a></span>
+            </div>
+          </div>
+
+          <h3 class="h3-accent mt-2">
+          Option 2: Terminal
+          <code>
+          dd
+        </code>
+        Command
+      </h3>
+      <div class="info-box">
+        <label class="form-label">
+          1. Select Edition:
+        </label>
+        <select id="dd-edition" class="form-input">
+        </select>
+        <label class="form-label">
+          2. USB Device (e.g., /dev/sdX):
+        </label>
+        <input id="dd-device" type="text" value="/dev/sdX" class="form-input">
+        <button type="button" id="generate-dd-btn" class="btn btn-cinnamon">
+        Generate Command
+      </button>
+      <pre id="dd-output" class="dd-output">
+<code id="dd-code"></code>
+      </pre>
+    </div>
+
+    <!-- JS-loaded editions (enhancement) -->
+    <div id="editions-container" style="display:none">
+    </div>
+  </div>
+</article>
+</main>
+</div>
+<!-- Build Terminal Modal -->
+<div id="build-modal" class="modal-overlay">
+  <div class="modal-box">
+    <button type="button" id="build-modal-close" class="modal-close-btn">
+    &times;
+  </button>
+  <h2 id="build-title" class="h3-accent">
+  Building...
+</h2>
+<div id="build-status">
+</div>
+<pre id="build-terminal" class="modal-terminal">
+Waiting to start...
+</pre>
+<div id="build-result" class="modal-result">
+</div>
+</div>
+</div>
+<script src="/js/scale-page.js?v=20260824" defer>
+</script>
+<script src="/js/sidebar.js?v=20260825" defer>
+</script>
+</div>
+</div>
+<script src="/js/flash-page.js?v=20260824" defer>
+</script>
+<script>
+window.addEventListener('DOMContentLoaded',()=>{document.getElementById('generate-dd-btn').addEventListener('click',generateDD);});
+</script>
+<script src="/js/footer.js?v=20260825" defer>
+</script>
+<script src="/js/vendor/instantpage.min.js?v=20260825" type="module" defer></script>
+<script src="/js/tor-badge.js?v=20260825" defer></script>
+</body>
+</html>
