@@ -76,6 +76,16 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
 .card .links a.secondary{border:1px solid var(--border);color:var(--text)}
 .card .links a.secondary:hover{border-color:var(--green);color:var(--green)}
 .card .card-exp-note{margin-top:.6rem;color:var(--text);font-size:.78rem;line-height:1.5;font-style:italic}
+.card .badge-status{margin-left:.4rem}
+.card .badge-status.status-live{background:rgba(46,204,113,.18)}
+.card .badge-status.status-idle{background:rgba(230,162,60,.18);color:#e6a23c}
+.card .badge-status.status-inactive{background:rgba(178,178,178,.14);color:var(--text)}
+.card .badge-status.status-archived{background:rgba(209,92,100,.2);color:#d15c64}
+.card .links a.primary.status-no-iso,.card .links span.primary.status-no-iso{background:rgba(178,178,178,.1);color:var(--text);cursor:not-allowed;font-style:italic}
+.card .links span.primary.status-no-iso:hover{box-shadow:none}
+.card .status-meta{margin-top:.6rem;color:var(--text);font-size:.75rem}
+.card .pipe-note{margin-top:.35rem;font-size:.78rem;line-height:1.5}
+.card .pipe-note a{color:var(--green);text-decoration:underline;text-underline-offset:3px}
 .pipeline{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:2.5rem}
 .pipeline h2{font-family:'Fira Code',monospace;font-size:1.1rem;color:var(--text-bright);margin-bottom:.75rem}
 .pipeline h2 i{color:var(--green);margin-right:.5rem}
@@ -135,7 +145,7 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
       </p>
     </div>
     <div class="grid">
-      <div class="card">
+      <div class="card" data-repo="spivanatalie64/acreetionos-immutable">
         <div class="icon">
           <i class="bi bi-shield-lock">
         </i>
@@ -174,7 +184,7 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos32">
   <div class="icon">
     <i class="bi bi-cpu">
   </i>
@@ -213,7 +223,7 @@ Build Scripts
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-mate">
   <div class="icon">
     <i class="bi bi-grid-3x3-gap">
   </i>
@@ -252,7 +262,7 @@ Build Scripts
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-gnome">
   <div class="icon">
     <i class="bi bi-window">
   </i>
@@ -291,7 +301,7 @@ Build Scripts
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-plasma">
   <div class="icon">
     <i class="bi bi-display">
   </i>
@@ -330,7 +340,7 @@ Build Scripts
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-xfce">
   <div class="icon">
     <i class="bi bi-lightning-charge">
   </i>
@@ -369,7 +379,7 @@ Build Scripts
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-i3">
   <div class="icon">
     <i class="bi bi-columns-gap">
   </i>
@@ -408,7 +418,7 @@ Build Scripts
 </div>
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-openbox">
   <div class="icon">
     <i class="bi bi-layout-three-columns">
   </i>
@@ -448,7 +458,7 @@ Build Scripts
 <div class="card-exp-note">(experimental) This community edition is volunteer-built &mdash; a stable ISO may not be available underneath it.</div>
 </div>
 </div>
-<div class="card">
+<div class="card" data-repo="spivanatalie64/acreetionos-awesome">
   <div class="icon">
     <i class="bi bi-window-stack">
   </i>
@@ -541,6 +551,7 @@ for assistance.
 </div>
 </div>
 </div>
+<script src="unofficial-status.js?v=20261102a" defer></script>
 <script src="scale-page.js?v=20260824" defer>
 </script>
 <script src="sidebar.js?v=20260825" defer>
