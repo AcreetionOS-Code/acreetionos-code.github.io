@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-11-01T00:00:00Z</updated>
+  <updated>2026-11-02T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- November 02, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-11-02.html"/>
+    <id>tag:acreetionos.org,2026-11-02:newsletter</id>
+    <updated>2026-11-02T00:00:00Z</updated>
+    <published>2026-11-02T00:00:00Z</published>
+    <summary>AcreetionOS now ships kernel 7.2.15 stable Greg Kroah‑Hartman just tagged 7.2.15 as the final kernel release for the long‑term stable series, wrapping up the 7.2 cycle and giving AcreetionOS users a polished, bug‑tested kernel. Natalie and Darren have already merged 7.2.15 into the development branc…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- November 01, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-11-01.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-06-05T00:00:00Z</updated>
     <published>2026-06-05T00:00:00Z</published>
     <summary>Daily AcreetionOS Update - June 05, 2026. Here’s today’s AcreetionOS newsletter with the latest development focus, community momentum, and practical highlights. Development Updates. Today’s activity was driven less by a new internal release and more by the broader conversation around usability, migr…</summary>
-  </entry>
-  <entry>
-    <title>Daily AcreetionOS Update — June 04, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-04.html"/>
-    <id>tag:acreetionos.org,2026-06-04:newsletter</id>
-    <updated>2026-06-04T00:00:00Z</updated>
-    <published>2026-06-04T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 04, 2026. Today’s update focuses on upstream Linux movement, security awareness, and a strong wave of community attention around desktop alternatives. Development Updates. The team is tracking the newly released Arch Linux June ISO, which brings a fresh kernel and cor…</summary>
   </entry>
 </feed>
