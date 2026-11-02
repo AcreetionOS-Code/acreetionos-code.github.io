@@ -52,3 +52,29 @@ for (const path of PAGES) {
     expect(title.length).toBeGreaterThan(0);
   });
 }
+
+for (const path of ['/', '/status.html', '/private-browsing-myths.html', '/immutable.html']) {
+  test(`search bar fits mobile viewport on ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(path);
+
+    const bounds = await page.locator('.search-strip').evaluate((strip) => {
+      const container = strip.querySelector('.search-container').getBoundingClientRect();
+      const input = strip.querySelector('.search-input').getBoundingClientRect();
+      const button = strip.querySelector('.search-btn').getBoundingClientRect();
+      return {
+        containerRight: container.right,
+        inputHeight: input.height,
+        inputRight: input.right,
+        buttonHeight: button.height,
+        buttonLeft: button.left,
+        buttonRight: button.right,
+      };
+    });
+
+    expect(bounds.inputHeight).toBe(48);
+    expect(bounds.buttonHeight).toBe(48);
+    expect(bounds.inputRight).toBeLessThanOrEqual(bounds.buttonLeft);
+    expect(bounds.buttonRight).toBeLessThanOrEqual(bounds.containerRight + 1);
+  });
+}
