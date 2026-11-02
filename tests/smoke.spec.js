@@ -21,6 +21,7 @@ const PAGES = [
   '/lightweight.html',
   '/newsletter.html',
   '/privacy.html',
+  '/private-browsing-myths.html',
   '/requirements.html',
   '/status.html',
   '/translator.html',
@@ -78,3 +79,42 @@ for (const path of ['/', '/status.html', '/private-browsing-myths.html', '/immut
     expect(bounds.buttonRight).toBeLessThanOrEqual(bounds.containerRight + 1);
   });
 }
+
+for (const path of ['/', '/private-browsing-myths.html', '/immutable.html']) {
+  test(`mobile hamburger opens site navigation on ${path}`, async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(path);
+
+    const hamburger = page.locator('#hamburger');
+    await expect(hamburger).toBeVisible();
+    const mainBounds = await page.locator('main').boundingBox();
+    await hamburger.click();
+    await expect(page.locator('#sidebar')).toHaveClass(/open/);
+    await expect(hamburger).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#sidebar-overlay')).toHaveClass(/open/);
+    expect(await page.locator('main').boundingBox()).toEqual(mainBounds);
+
+    await page.locator('.sidebar-close').click();
+    await expect(page.locator('#sidebar')).not.toHaveClass(/open/);
+    await expect(hamburger).toHaveAttribute('aria-expanded', 'false');
+
+    await hamburger.click();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#sidebar')).not.toHaveClass(/open/);
+
+    await hamburger.click();
+    await page.locator('#sidebar-overlay').click({ position: { x: 350, y: 400 } });
+    await expect(page.locator('#sidebar')).not.toHaveClass(/open/);
+  });
+}
+
+test('immutable colored header links stay out of the header', async ({ page }) => {
+  await page.goto('/immutable.html');
+
+  const coloredLinks = page.locator('.main-nav > a.btn-storm');
+  await expect(coloredLinks).toHaveCount(5);
+  const displays = await coloredLinks.evaluateAll((links) =>
+    links.map((link) => getComputedStyle(link).display)
+  );
+  expect(displays).toEqual(['none', 'none', 'none', 'none', 'none']);
+});
