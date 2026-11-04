@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-11-03T00:00:00Z</updated>
+  <updated>2026-11-04T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- November 04, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-11-04.html"/>
+    <id>tag:acreetionos.org,2026-11-04:newsletter</id>
+    <updated>2026-11-04T00:00:00Z</updated>
+    <published>2026-11-04T00:00:00Z</published>
+    <summary>geocode-glib conflict resolved in acreetionos + acreetionos-xlibre If your maps broke after a recent update, the fix is in. The geocode-glib update conflict that was breaking location services on installed systems has been resolved with a clean merge from the repair branch, and it is already rolling…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- November 03, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-11-03.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-06-07T00:00:00Z</updated>
     <published>2026-06-07T00:00:00Z</published>
     <summary>Daily AcreetionOS Update - June 07, 2026 Good morning, AcreetionOS readers. There was no recent activity to report today, so this edition focuses on a clean status update and a few practical newsletter-writing reminders drawn from current best practices.[6][9] Development Updates The development tra…</summary>
-  </entry>
-  <entry>
-    <title>Daily AcreetionOS Update — June 06, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-06.html"/>
-    <id>tag:acreetionos.org,2026-06-06:newsletter</id>
-    <updated>2026-06-06T00:00:00Z</updated>
-    <published>2026-06-06T00:00:00Z</published>
-    <summary>Daily AcreetionOS Update - June 06, 2026. Welcome to today’s AcreetionOS update, with a focus on desktop polish, ecosystem security, and the growing conversation around easier alternatives to Windows. Development Updates. Today’s development attention is on keeping AcreetionOS approachable while sta…</summary>
   </entry>
 </feed>
