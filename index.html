@@ -166,43 +166,254 @@
 </style>
   <link rel="stylesheet" href="styles.css?v=20261102b" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="styles.css?v=20261102b"></noscript>
   <link rel="stylesheet" href="sidebar.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20260825"></noscript>
+  <link rel="stylesheet" href="search.css?v=20261103">
   <style>
-    .search-strip .search-form,
-    .search-strip .search-input,
-    .search-strip .search-btn {
-      border-radius: 8px;
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      align-items: center;
+      column-gap: 2rem;
+      padding: 2rem 1rem 0;
+      text-align: left;
+      width: calc(100% + 350px + 2rem);
+    }
+
+    .hero-logo,
+    .hero-title,
+    .hero-subtitle,
+    .hero-tagline {
+      grid-column: 1;
+    }
+
+    .hero-logo {
+      justify-self: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title,
+    .hero-subtitle {
+      text-align: center;
+    }
+
+    .hero-tagline {
+      max-width: none;
+      margin: 0 0 1.5rem;
+    }
+
+    .hero .screenshot-carousel {
+      grid-column: 2;
+      grid-row: 1 / span 4;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+
+    .hero .carousel-slides {
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
+
+    .home-feature-section {
+      width: calc(100% + 350px + 2rem);
+      max-width: none;
+    }
+
+    .home-feature-section .feature-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .home-benefits-section {
+      width: calc(100% + 350px + 2rem);
+      max-width: none;
+    }
+
+    .home-community-section {
+      width: calc(100% + 350px + 2rem);
+      text-align: center;
+    }
+
+    .home-community-section .community-links {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .content-feed > .home-community-panel {
+      width: calc(100% + 350px + 2rem);
+      max-width: none;
+    }
+
+    .home-spec-section {
+      width: calc(100% + 350px + 2rem);
+      max-width: none;
+    }
+
+    .home-spec-section h2 {
+      text-align: center;
+    }
+
+    .home-spec-section .spec-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    .home-team-mission-section {
+      width: calc(100% + 350px + 2rem);
+      max-width: none;
+    }
+
+    .home-team-mission-section h2 {
+      text-align: center;
+    }
+
+    .home-team-mission-section .team-members {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1.5rem;
+    }
+
+    .home-team-mission-section .team-member {
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.75rem;
+      min-height: 132px;
+      padding: 1.25rem;
+      background: var(--acreetion-panel-bg);
+      border: 1px solid var(--acreetion-box-border);
+      border-radius: 12px;
+      text-align: center;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .home-team-mission-section .team-member:hover {
+      border-color: var(--acreetion-green);
+      transform: translateY(-3px);
+    }
+
+    .home-team-mission-section .team-member-name a {
+      color: var(--acreetion-text-bright);
+      font-size: 1.05rem;
+      text-decoration: none;
+    }
+
+    .home-team-mission-section .team-member-name a:hover {
+      color: var(--acreetion-green);
+    }
+
+    .home-team-mission-section .team-member-role {
+      padding: 0.3rem 0.75rem;
+      color: var(--acreetion-green);
+      background: rgba(46, 204, 113, 0.1);
+      border: 1px solid rgba(46, 204, 113, 0.25);
+      border-radius: 999px;
+      font-size: 0.8rem;
+    }
+
+    .home-team-mission-section .team-member-role a {
+      color: inherit;
+    }
+
+    .home-team-mission-section .mt-1,
+    .home-team-mission-section h2 ~ p {
+      max-width: 960px;
+      margin-right: auto;
+      margin-left: auto;
+    }
+
+    .home-community-panel .community-stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .home-community-panel .box-header {
+      text-align: center;
+    }
+
+    .hero-cta,
+    .hero-links {
+      grid-column: 1 / -1;
+    }
+
+    .hero-cta {
+      margin-top: 1.25rem;
+    }
+
+    @media (max-width: 1024px) {
+      .hero,
+      .home-feature-section,
+      .home-benefits-section,
+      .home-community-section,
+      .content-feed > .home-community-panel,
+      .home-spec-section,
+      .home-team-mission-section {
+        width: auto;
+      }
+
+      .home-feature-section .feature-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-community-section .community-links {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-community-panel .community-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-spec-section .spec-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .home-team-mission-section .team-members {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .home-team-mission-section .team-member {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 0;
+        padding: 1.75rem 0.5rem 0;
+        text-align: center;
+      }
+
+      .hero-logo,
+      .hero-title,
+      .hero-subtitle,
+      .hero-tagline,
+      .hero .screenshot-carousel,
+      .hero-cta,
+      .hero-links {
+        grid-column: 1;
+        grid-row: auto;
+      }
+
+      .hero-tagline {
+        margin: 0 auto 1.5rem;
+      }
+
+      .hero .screenshot-carousel {
+        margin: 0 auto 1rem;
+      }
+
+      .hero-cta {
+        margin-top: 0;
+      }
     }
 
     @media (max-width: 600px) {
-      .search-strip .search-container {
-        padding: 0 1rem;
+      .home-feature-section .feature-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
 
-      .search-strip .search-form {
-        align-items: center;
-        gap: 0.5rem;
-        border: 0;
-        background: transparent;
-      }
-
-      .search-strip .search-input {
-        flex: 1;
-        min-width: 0;
-        height: 48px;
-        padding: 0.8rem 1rem;
-        border: 1px solid var(--acreetion-box-border);
-        background: var(--acreetion-body-bg);
-      }
-
-      .search-strip .search-btn {
-        flex: 0 0 96px;
-        width: 96px;
-        height: 48px;
-        padding: 0 0.75rem;
+      .home-spec-section .spec-grid {
+        grid-template-columns: minmax(0, 1fr);
       }
     }
   </style>
-  
 </head>
 <body>
   <a href="#main-content" class="skip-link">
@@ -249,12 +460,8 @@
     </div>
     <div class="page-wrapper">
       <main id="main-content" class="content-feed">
-        <article id="about" class="content-box">
-          <div class="box-body">
-            <div class="article-content">
-              
               <!-- 1. HERO SECTION -->
-              <div class="hero">
+              <section id="about" class="hero">
                 <img src="logo.webp" alt="AcreetionOS Logo" class="hero-logo" width="110" height="110" loading="eager" fetchpriority="high">
                 <h1 class="hero-title">AcreetionOS</h1>
                 <p class="hero-subtitle">Arch Linux, made approachable.</p>
@@ -375,8 +582,11 @@
                   <a href="immutable.html" class="hero-note--muted">AcreetionOS Immutable →</a>
                   <a href="unofficial.html" class="hero-note--muted">GNOME Edition →</a>
                 </div>
-              </div>
-              
+              </section>
+
+        <article class="content-box home-feature-section">
+          <div class="box-body">
+            <div class="article-content">
               <!-- 2. FEATURES SECTION -->
               <h2 class="section-title section-title--center-lg">Why AcreetionOS?</h2>
               <div class="feature-grid">
@@ -418,7 +628,13 @@
                 </div>
 
               </div>
+            </div>
+          </div>
+        </article>
 
+        <article class="content-box home-benefits-section">
+          <div class="box-body">
+            <div class="article-content">
               <!-- 3. GALLERY / SCREENSHOTS -->
               <h2 class="section-title section-title--center-lg">AcreetionOS Benefits</h2>
               <div class="benefit-grid">
@@ -442,7 +658,13 @@
                 </div>
 
               </div>
-              
+            </div>
+          </div>
+        </article>
+
+        <article class="content-box home-spec-section">
+          <div class="box-body">
+            <div class="article-content">
               <!-- 4. NEWSLETTER SIGNUP -->
               <!-- <div style="margin:2rem 0;padding:1.5rem;background:var(--acreetion-box-bg);border:1px solid var(--acreetion-box-border);border-radius:12px;text-align:center">
                 <h3 style="color:var(--acreetion-green);margin:0 0 0.5rem;font-size:1.2rem;border:none">
@@ -486,7 +708,13 @@
                 </div>
 
               </div>
+            </div>
+          </div>
+        </article>
 
+        <article class="content-box home-team-mission-section">
+          <div class="box-body">
+            <div class="article-content">
               <!-- 6. TEAM SECTION -->
               <h2 class="section-title section-title--block section-title--mt-sm">Our Team</h2>
               <div class="team-members">
@@ -525,6 +753,7 @@
           </div>
         </article>
               <!-- 8. COMMUNITY SPOTLIGHT -->
+              <section class="home-community-section">
               <h2 class="section-title section-title--block section-title--mt-lg">Community &amp; Reviews</h2>
               <div class="community-links">
                 <a href="features.html" class="community-link">
@@ -548,10 +777,11 @@
                   <div class="community-link-desc">AcreetionOS vs Arch, Mint, EndeavourOS &amp; more</div>
                 </a>
               </div>
+              </section>
 
 <div id="hosting-providers-container">
 </div>
-<div class="sidebar sidebar-spaced">
+<div class="sidebar sidebar-spaced home-community-panel">
   <div class="sidebar-box content-box" id="community-box">
     <div class="box-header"><h2><i class="bi bi-people"></i> Community</h2></div>
     <div class="box-body community-box-body" id="community-body">

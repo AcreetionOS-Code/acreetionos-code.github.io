@@ -1,0 +1,10 @@
+/* Keep colored action links in the footer instead of the immutable header. */
+.page-header .header-content .main-nav > a.btn-storm {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .page-header .header-content .main-nav {
+    display: none;
+  }
+}
