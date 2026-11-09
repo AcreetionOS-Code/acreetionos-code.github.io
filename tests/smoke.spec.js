@@ -53,3 +53,23 @@ for (const path of PAGES) {
     expect(title.length).toBeGreaterThan(0);
   });
 }
+
+test('reader renders an ingested document without its chrome', async ({ page }) => {
+  await page.goto('/reader.html?src=wiki-guides/wifi.html&source=Test%20Wiki');
+  await expect(page.locator('#reader-article')).toBeVisible();
+  await expect(page.locator('#reader-title')).not.toBeEmpty();
+  await expect(page.locator('#reader-source')).toContainText('Test Wiki');
+  await expect(page.locator('#reader-content script')).toHaveCount(0);
+});
+
+test('reader refuses an off-site document', async ({ page }) => {
+  await page.goto('/reader.html?src=https://example.com/page.html');
+  await expect(page.locator('#reader-status')).toBeVisible();
+  await expect(page.locator('#reader-status')).toContainText(/license/i);
+  await expect(page.locator('#reader-article')).toBeHidden();
+});
+
+test('reader explains itself with no document given', async ({ page }) => {
+  await page.goto('/reader.html');
+  await expect(page.locator('#reader-intro')).toBeVisible();
+});
