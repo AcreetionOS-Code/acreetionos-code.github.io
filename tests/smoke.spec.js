@@ -21,6 +21,7 @@ const PAGES = [
   '/lightweight.html',
   '/newsletter.html',
   '/privacy.html',
+  '/reader.html',
   '/requirements.html',
   '/status.html',
   '/translator.html',
