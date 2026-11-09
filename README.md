@@ -36,6 +36,23 @@ This website is the central hub for the AcreetionOS community, hosted via GitHub
 - **Testing:** Playwright for Firefox-specific validation
 - **Deployment:** Automated via GitHub Actions
 
+### Project Structure
+
+The site is plain static files -- there is no build step for the pages themselves, and everything is served as-is (custom domain in `CNAME`).
+
+- **Pages** -- every page is a single `.html` file in the repo root: `index.html` (the homepage), `flash.html` (downloads), `immutable.html`, `lightweight.html`, `beginner.html`, `status.html`, `changelog.html`, and so on. `404.html` is the error page.
+- **Shared CSS** -- `styles.css` holds the site's global styles and design variables; `sidebar.css` styles the header, sidebar, and navigation. Page-specific styles live in their own files next to the pages that use them (for example `contact.css`).
+- **Shared JavaScript** -- `sidebar.js` builds the header and sidebar navigation on every page; `footer.js`, `social-icons.js`, and `back-to-top.js` are shared components, and `sw.js` is the service worker. Page-specific behavior lives in `<page>-page.js` files (for example `flash-page.js`) or in a file named after its page (for example `faq.js`).
+- **`vendor/`** -- third-party code we ship but don't maintain; currently the Instantpage prefetch library.
+- **`docs/`** -- project documentation in Markdown: architecture, contributing, deployment, governance, security, and troubleshooting guides.
+- **`wiki-guides/`** -- the wiki's guide pages, served as static HTML.
+- **`Reviews/`** -- one page per community review video, plus an index page.
+- **`newsletters/` and `newsletter-archive/`** -- newsletter issues are stored as JSON data in `newsletters/` (with `list.json` and `status.json` as indexes) and rendered into static pages in `newsletter-archive/` by the generator scripts.
+- **`scripts/`** -- maintenance and deployment utilities: the sitemap, feed, and robots generators, the newsletter generators, ISO scanning and upload helpers, and search-engine submission scripts.
+- **`tests/`** -- the Playwright smoke test suite; see "Running Tests" below.
+- **`frontend/`** -- a small Vite sub-project, separate from the static pages.
+- **Site metadata** -- `robots.txt`, `sitemap.xml`, `feed.xml`, `llms.txt`, `.well-known/` (including `security.txt`), and `_headers` / `_redirects` for the hosting edge rules.
+
 ### Local Development
 
 To run the website locally for testing or development:
