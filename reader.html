@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reader -- AcreetionOS</title>
+  <meta name="description" content="A clean reading view for documents aggregated into the AcreetionOS site.">
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="stylesheet" href="styles.css?v=20261031b">
+  <link rel="stylesheet" href="reader.css?v=20261108">
+</head>
+<body>
+  <header class="reader-bar">
+    <a class="reader-home" href="index.html">AcreetionOS</a>
+    <span class="reader-label">Reader</span>
+  </header>
+
+  <main class="reader-wrap">
+    <div id="reader-intro" hidden>
+      <h1>Reader</h1>
+      <p>This is a clean reading view for documents that have been aggregated into
+         this site. Open it with the address of an ingested document, for example:</p>
+      <p><a href="reader.html?src=wiki-guides/wifi.html&amp;source=AcreetionOS%20Wiki%20Guides">Read a wiki guide in the reader</a></p>
+      <p>Documents whose license does not allow them to be copied are never opened
+         here. Those stay embedded on their own pages, with the reason shown --
+         see "External content and licensing" in the README.</p>
+    </div>
+
+    <p id="reader-status" class="reader-status" hidden></p>
+
+    <article id="reader-article" hidden>
+      <header class="reader-meta">
+        <h1 id="reader-title"></h1>
+        <p id="reader-source" class="reader-source"></p>
+      </header>
+      <div id="reader-content" class="reader-content"></div>
+    </article>
+  </main>
+
+  <script src="reader.js?v=20261108" defer></script>
+</body>
+</html>
