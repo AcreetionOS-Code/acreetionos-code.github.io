@@ -233,6 +233,116 @@
             transform: translateY(-1px);
         }
         .btn-download-flasher { display: inline-block; margin-top: 1rem; font-size: 1.1rem; padding: 0.8rem 1.6rem; }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0.75rem 1rem;
+            }
+
+            .logo {
+                gap: 0.6rem;
+                font-size: 1.5rem;
+            }
+
+            .page-wrapper {
+                margin: 1rem auto;
+                padding: 0 1rem;
+            }
+
+            .box-body {
+                padding: 1.5rem;
+            }
+
+            .edition-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .edition-card,
+            .info-box {
+                min-width: 0;
+            }
+
+            .form-input {
+                box-sizing: border-box;
+                max-width: 100%;
+            }
+
+            .box-body .btn {
+                max-width: 100%;
+                white-space: normal;
+                overflow-wrap: anywhere;
+            }
+
+            .box-body pre {
+                box-sizing: border-box;
+                max-width: 100%;
+            }
+
+            .modal-box {
+                box-sizing: border-box;
+                width: calc(100% - 2rem);
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-content {
+                padding: 0.75rem;
+            }
+
+            .logo {
+                gap: 0.5rem;
+                font-size: 1.35rem;
+            }
+
+            .logo-img {
+                width: 36px;
+                height: 36px;
+            }
+
+            .page-wrapper {
+                padding: 0 0.75rem;
+            }
+
+            .box-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .box-body {
+                padding: 1rem;
+            }
+
+            #main-content .box-body > div[style*="display:flex"] > a[href*=".iso"] {
+                flex: 1 1 100% !important;
+                width: 100%;
+                min-width: 0 !important;
+                padding: 1rem !important;
+            }
+
+            #main-content .box-body > div[style*="display:flex"] > div[style*="min-width:240px"] {
+                flex: 1 1 100% !important;
+                min-width: 0 !important;
+                padding: 1rem !important;
+            }
+
+            .box-body h3 {
+                font-size: 1.1rem;
+            }
+
+            .box-body .btn-download-flasher {
+                font-size: 1rem !important;
+                padding: 0.7rem 1rem !important;
+            }
+
+            .info-box,
+            .modal-box {
+                padding: 1rem;
+            }
+
+            .divider {
+                margin: 2rem 0;
+            }
+        }
     
   </style>
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
