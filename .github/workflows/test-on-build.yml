@@ -1,0 +1,36 @@
+name: Test Site (Playwright)
+
+# Runs the Playwright smoke suite (tests/smoke.spec.js) on every push to
+# main and on every pull request, so the site is tested every time it
+# builds -- including the HTML reader tests added with #638
+# (reader renders an ingested document, refuses an off-site document,
+# and explains itself with no document given).
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Install Firefox for Playwright
+        run: npx playwright install --with-deps firefox
+
+      - name: Run tests
+        run: npm test
