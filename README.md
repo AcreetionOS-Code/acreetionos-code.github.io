@@ -53,6 +53,21 @@ The site is plain static files -- there is no build step for the pages themselve
 - **`frontend/`** -- a small Vite sub-project, separate from the static pages.
 - **Site metadata** -- `robots.txt`, `sitemap.xml`, `feed.xml`, `llms.txt`, `.well-known/` (including `security.txt`), and `_headers` / `_redirects` for the hosting edge rules.
 
+### External content and licensing
+
+Parts of this site aggregate documentation from other open-source projects (for example, other distributions' wikis). We follow each source's license exactly:
+
+- Where a source's license allows its content to be copied, we may include the content here, with credit to the source.
+- Where a source's license does **not** allow copying, the content is never copied. It is embedded from the original site instead, with credit.
+
+Every embed carries its reason in two places: a visible note next to the embedded content explaining why it is embedded rather than copied, and an HTML comment in the page source recording the same reason for developers:
+
+```html
+<!-- Embed reason: this content is embedded, not copied, because the
+     source's license does not allow it to be taken. Original page,
+     shown with credit: [source name] -- [original URL] -->
+```
+
 ### Local Development
 
 To run the website locally for testing or development:
