@@ -201,6 +201,75 @@
         padding: 0 0.75rem;
       }
     }
+
+        /* Homepage hero layout */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+      align-items: center;
+      column-gap: 2rem;
+      row-gap: 1rem;
+      padding: 2rem 1rem 1.5rem;
+      text-align: left;
+      min-width: 0;
+    }
+
+    .hero .hero-content {
+      min-width: 0;
+    }
+
+    .hero .hero-content .hero-tagline {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .hero .screenshot-carousel {
+      grid-column: 2;
+      grid-row: 1;
+      width: 100%;
+      max-width: none;
+      min-width: 0;
+      margin: 0;
+    }
+
+    .hero .hero-cta,
+    .hero .hero-links {
+      grid-column: 1 / -1;
+    }
+
+    .hero .hero-cta {
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 760px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 1rem;
+        padding: 1.75rem 0.5rem 1rem;
+        text-align: center;
+      }
+
+      .hero .hero-content,
+      .hero .screenshot-carousel,
+      .hero .hero-cta,
+      .hero .hero-links {
+        grid-column: 1;
+        grid-row: auto;
+      }
+
+      .hero .hero-content .hero-tagline {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .hero .screenshot-carousel {
+        margin: 0 auto 1rem;
+      }
+
+      .hero .hero-cta {
+        margin-top: 0;
+      }
+    }
   </style>
   
 </head>
@@ -255,6 +324,7 @@
               
               <!-- 1. HERO SECTION -->
               <div class="hero">
+                <div class="hero-content">
                 <img src="logo.webp" alt="AcreetionOS Logo" class="hero-logo" width="110" height="110" loading="eager" fetchpriority="high">
                 <h1 class="hero-title">AcreetionOS</h1>
                 <p class="hero-subtitle">Arch Linux, made approachable.</p>
@@ -268,6 +338,7 @@
                   <p class="hero-quote-text">“I could give you an elevator pitch, but I would rather give honesty.”</p>
                   <p class="hero-quote-attribution">— Natalie</p>
                 </blockquote>
+                </div>
 
                 <!-- Screenshot Carousel - Suggested by our community member Garyw (https://discord.acreetionos.org). Great idea! Thank you so much Garyw for the suggestion! All screenshots and wallpapers from https://github.com/AcreetionOS-Code/AcreetionOS_Carousel_Wallpapers are displayed here. -->
                 <div class="screenshot-carousel" id="hero-carousel" aria-label="AcreetionOS screenshots">
