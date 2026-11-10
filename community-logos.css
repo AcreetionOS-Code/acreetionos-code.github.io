@@ -1,0 +1,55 @@
+.community-logo-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: min(100%, 1400px);
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.community-logo-group {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.community-logo-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  color: #fff !important;
+  font-size: 1.15rem;
+  text-decoration: none !important;
+  transition: opacity 0.2s ease;
+}
+
+.community-logo-link svg {
+  display: block;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.community-logo-link:hover {
+  opacity: 0.72;
+}
+
+.community-logo-link:focus-visible {
+  outline: 2px solid var(--acreetion-green, #2ecc71);
+  outline-offset: -2px;
+}
+
+.community-logo-links--header {
+  margin-bottom: 0.25rem;
+}
+
+.community-logo-links--footer {
+  margin-bottom: 0.75rem;
+}
+
+@media (max-width: 480px) {
+  .community-logo-links {
+    padding: 0 0.5rem;
+  }
+}

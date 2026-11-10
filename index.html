@@ -595,64 +595,8 @@
             </div>
           </div>
         </article>
-              <!-- 8. COMMUNITY SPOTLIGHT -->
-              <h2 class="section-title section-title--block section-title--mt-lg">Community &amp; Reviews</h2>
-              <div class="community-links">
-                <a href="features.html" class="community-link">
-                  <i class="bi bi-palette"></i>
-                  <div class="community-link-title">Feature Showcase</div>
-                  <div class="community-link-desc">Desktop tweaks, app alternatives &amp; privacy tools</div>
-                </a>
-                <a href="community-reviews.html" class="community-link">
-                  <i class="bi bi-play-btn"></i>
-                  <div class="community-link-title">Video Reviews</div>
-                  <div class="community-link-desc">Watch community first looks and deep dives</div>
-                </a>
-                <a href="changelog.html" class="community-link">
-                  <i class="bi bi-clock-history"></i>
-                  <div class="community-link-title">Changelog</div>
-                  <div class="community-link-desc">Track kernel, desktop &amp; package updates</div>
-                </a>
-                <a href="compare.html" class="community-link">
-                  <i class="bi bi-columns-gap"></i>
-                  <div class="community-link-title">Compare Distros</div>
-                  <div class="community-link-desc">AcreetionOS vs Arch, Mint, EndeavourOS &amp; more</div>
-                </a>
-              </div>
-
 <div id="hosting-providers-container">
 </div>
-<div class="sidebar sidebar-spaced">
-  <div class="sidebar-box content-box" id="community-box">
-    <div class="box-header"><h2><i class="bi bi-people"></i> Community</h2></div>
-    <div class="box-body community-box-body" id="community-body">
-      <p class="community-intro">AcreetionOS is built by a community of volunteers. See live stats, explore repos, and find ways to contribute.</p>
-      <div id="community-stats" class="community-stats">
-        <div class="community-stat"><div class="community-stat-value" id="stat-repos">-</div><div class="community-stat-label">Repos</div></div>
-        <div class="community-stat"><div class="community-stat-value" id="stat-stars">-</div><div class="community-stat-label">Stars</div></div>
-        <div class="community-stat"><div class="community-stat-value" id="stat-issues">-</div><div class="community-stat-label">Issues</div></div>
-        <div class="community-stat"><div class="community-stat-value" id="stat-contrib">-</div><div class="community-stat-label">Team</div></div>
-      </div>
-      <a href="contributors.html" class="btn-contributors">View Contributor Hub →</a>
-    </div>
-  </div>
-</div>
-<script>
-  (function(){
-    var loadStats = function(){
-      fetch('/api/community/stats').then(function(r){return r.json()}).then(function(d){
-        var t = d.totals || {};
-        document.getElementById('stat-repos').textContent = t.repos || 0;
-        document.getElementById('stat-stars').textContent = t.stars || 0;
-        document.getElementById('stat-issues').textContent = t.open_issues || 0;
-        document.getElementById('stat-contrib').textContent = t.members || 0;
-      }).catch(function(){});
-    };
-    if ('requestIdleCallback' in window) { requestIdleCallback(loadStats, { timeout: 4000 }); }
-    else { setTimeout(loadStats, 200); }
-  })();
-</script>
-
 <script src="sidebar.js?v=20260825" defer>
 </script>
 </div>
@@ -664,6 +608,120 @@
 <script src="index-providers.js?v=20260825" defer>
 </script>
 <script src="footer.js?v=20260825" defer>
+</script>
+<style>
+  .homepage-footer-community {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .homepage-footer-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+  }
+
+  .homepage-footer-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 44px;
+    padding: 0;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .homepage-footer-toggle svg {
+    width: 12px;
+    height: 12px;
+    transition: transform 0.2s ease;
+  }
+
+  .homepage-footer-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  .homepage-footer-toggle:focus-visible {
+    outline: 2px solid var(--acreetion-green, #2ecc71);
+    outline-offset: -2px;
+  }
+
+  .homepage-footer-links-panel {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    max-width: calc(100vw - 2rem);
+    overflow-x: auto;
+  }
+
+  .homepage-footer-links-panel .community-logo-link {
+    flex: 0 0 44px;
+  }
+
+  .homepage-footer-links-panel[hidden] {
+    display: none;
+  }
+</style>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var footer = document.querySelector("#page-scale > .page-footer, .page-footer");
+    if (!footer) return;
+
+    var communityLinks = footer.querySelector(".community-logo-links--footer");
+    var socialLinks = footer.querySelector(".footer-social");
+    if (!communityLinks || !socialLinks) return;
+
+    var primaryLinks = Array.from(communityLinks.querySelectorAll("a"));
+    var extraLinks = Array.from(socialLinks.querySelectorAll("a")).filter(function (link) {
+      return link.getAttribute("aria-label") !== "GitHub" &&
+        link.getAttribute("aria-label") !== "Discord";
+    });
+
+    communityLinks.remove();
+    socialLinks.remove();
+
+    var menu = document.createElement("div");
+    menu.className = "homepage-footer-community";
+
+    var primaryRow = document.createElement("div");
+    primaryRow.className = "homepage-footer-primary";
+    primaryLinks.forEach(function (link) {
+      primaryRow.appendChild(link);
+    });
+
+    var toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "homepage-footer-toggle";
+    toggle.setAttribute("aria-label", "Show more community links");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", "homepage-footer-extra-links");
+    toggle.innerHTML = '<svg viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M2.2 5.2 8 11l5.8-5.8-1.4-1.4L8 8.2 3.6 3.8 2.2 5.2Z"/></svg>';
+    primaryRow.appendChild(toggle);
+
+    var extraRow = document.createElement("div");
+    extraRow.className = "homepage-footer-links-panel";
+    extraRow.id = "homepage-footer-extra-links";
+    extraRow.hidden = true;
+    extraLinks.forEach(function (link) {
+      extraRow.appendChild(link);
+    });
+
+    toggle.addEventListener("click", function () {
+      var expanded = toggle.getAttribute("aria-expanded") === "true";
+      toggle.setAttribute("aria-expanded", String(!expanded));
+      toggle.setAttribute("aria-label", expanded ? "Show more community links" : "Hide community links");
+      extraRow.hidden = expanded;
+    });
+
+    menu.append(primaryRow, extraRow);
+    var documentationLinks = footer.querySelector("p:last-child");
+    footer.insertBefore(menu, documentationLinks || null);
+  });
 </script>
 <script src="vendor/instantpage.min.js?v=20260825" type="module" defer crossorigin="anonymous"></script>
 <script src="tor-badge.js?v=20260825" defer></script>
