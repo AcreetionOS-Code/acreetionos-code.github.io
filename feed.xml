@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-11-09T00:00:00Z</updated>
+  <updated>2026-11-10T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- November 10, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-11-10.html"/>
+    <id>tag:acreetionos.org,2026-11-10:newsletter</id>
+    <updated>2026-11-10T00:00:00Z</updated>
+    <published>2026-11-10T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - November 10, 2026 Breaking News: OpenIndiana 2026.10 Released! We&#x27;re excited to announce that OpenIndiana 2026.10 has been released, featuring a range of improvements and bug fixes. This release includes updates to the kernel, LibreOffice, Rsync, and more. You can read the f…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- November 09, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-11-09.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-06-13T00:00:00Z</updated>
     <published>2026-06-13T00:00:00Z</published>
     <summary>The AcreetionOS continuous integration pipeline has been fine-tuned once again, with the latest improvement ensuring that the latest ISO images resolve correctly on the host web root using relative symlinks, and this change is now documented on our changelog page at https://acreetionos.org/changelog…</summary>
-  </entry>
-  <entry>
-    <title>AcreetionOS Update — June 12, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-12.html"/>
-    <id>tag:acreetionos.org,2026-06-12:newsletter</id>
-    <updated>2026-06-12T00:00:00Z</updated>
-    <published>2026-06-12T00:00:00Z</published>
-    <summary>The AcreetionOS continuous integration pipeline has been further refined with the introduction of relative symlinks for the latest ISO images, building on the recent improvement of per-pipeline staging directories to avoid publish races between concurrent builds. This change ensures that the latest …</summary>
   </entry>
 </feed>
