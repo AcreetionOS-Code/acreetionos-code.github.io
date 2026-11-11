@@ -10,11 +10,11 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" >
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com" >
     <title>
-    AcreetionOS Status – Real-Time Service Monitoring & Uptime
+    AcreetionOS Status – Live Service Reachability Checks
   </title>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
-  <meta name="description" content="Real-time status monitoring for all AcreetionOS services: website, ISO mirrors, GitLab, and build pipelines. Check if services are operational." >
+  <meta name="description" content="Live reachability checks for the AcreetionOS website, ISO mirror, and GitLab, run from your browser." >
   <link rel="canonical" href="https://acreetionos.org/status.html" >
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
   <!-- Open Graph / Facebook -->
@@ -130,7 +130,7 @@
       <div class="search-strip">
         <div class="search-container">
           <form class="search-form" action="https://www.qwant.com/" method="GET" target="_blank">
-            <input type="text" name="q" class="search-input" placeholder="Is AcreetionOS Better than Arch?" aria-label="Search the web with SearX">
+            <input type="text" name="q" class="search-input" placeholder="Is AcreetionOS Better than Arch?" aria-label="Search the web with Qwant">
             <button type="submit" class="search-btn">
             Search
           </button>
@@ -216,8 +216,8 @@
       responseTime: null
     },
     {
-      name: 'GitHub Actions (ISO Build)',
-      url: 'https://api.github.com/repos/AcreetionOS-Code/acreetionos-iso',
+      name: 'GitLab (ISO Build & Publish)',
+      url: 'https://gitlab.acreetionos.org',
       icon: 'bi-gear',
       status: 'checking',
       statusText: 'Checking...',
