@@ -153,7 +153,7 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
       <h2>
       Immutable
       <span class="badge">
-        stable
+        alpha
       </span>
     </h2>
     <div class="desc">
@@ -171,7 +171,7 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
       </li>
     </ul>
     <div class="links">
-      <a href="https://github.com/spivanatalie64/acreetionos-immutable/releases/latest" class="primary">
+      <a href="https://github.com/spivanatalie64/acreetionos-immutable/releases" class="primary">
         <i class="bi bi-download">
       </i>
       Download ISO
@@ -288,11 +288,11 @@ GNOME
   </li>
 </ul>
 <div class="links">
-  <a href="https://github.com/spivanatalie64/acreetionos-gnome/releases/latest" class="primary">
-    <i class="bi bi-download">
-  </i>
-  Download ISO
-</a>
+  <span class="primary" aria-disabled="true" style="opacity:.55;cursor:default">
+<i class="bi bi-download">
+</i>
+No release yet
+</span>
 <a href="https://github.com/spivanatalie64/acreetionos-gnome" class="secondary">
   <i class="bi bi-github">
 </i>
@@ -327,11 +327,11 @@ Plasma
   </li>
 </ul>
 <div class="links">
-  <a href="https://github.com/spivanatalie64/acreetionos-plasma/releases/latest" class="primary">
-    <i class="bi bi-download">
-  </i>
-  Download ISO
-</a>
+  <span class="primary" aria-disabled="true" style="opacity:.55;cursor:default">
+<i class="bi bi-download">
+</i>
+No release yet
+</span>
 <a href="https://github.com/spivanatalie64/acreetionos-plasma" class="secondary">
   <i class="bi bi-github">
 </i>
@@ -512,7 +512,7 @@ via GitHub Actions. The pipeline clones the main AcreetionOS source, applies edi
 <code>
 mkarchiso
 </code>
-inside Docker, and uploads the finished ISO to Cloudflare R2 for free downloads.
+inside Docker, and uploads the finished ISO to GitHub Releases for free downloads.
 </p>
 <ul>
   <li>
@@ -529,7 +529,7 @@ inside Docker, and uploads the finished ISO to Cloudflare R2 for free downloads.
   inside a Docker container
 </li>
 <li>
-  Uploads the finished ISO to Cloudflare R2 for free downloads
+  Uploads the finished ISO to GitHub Releases for free downloads
 </li>
 </ul>
 <p style="color:var(--text);font-size:.85rem;margin-top:.5rem">
