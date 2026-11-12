@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-11-11T00:00:00Z</updated>
+  <updated>2026-11-12T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- November 12, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-11-12.html"/>
+    <id>tag:acreetionos.org,2026-11-12:newsletter</id>
+    <updated>2026-11-12T00:00:00Z</updated>
+    <published>2026-11-12T00:00:00Z</published>
+    <summary>AcreetionOS Newsletter - November 12, 2026 Exciting News: Zellij 0.46 Released! We&#x27;re thrilled to announce that Zellij 0.46 has been released! Zellij is a highly customizable and powerful terminal emulator that&#x27;s now available for AcreetionOS. This release brings several new features and improvement…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- November 11, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-11-11.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-06-15T00:00:00Z</updated>
     <published>2026-06-15T00:00:00Z</published>
     <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, with the latest improvement ensuring that the latest ISO images resolve correctly on the host web root using relative symlinks, a change that is now documented on our changelog page at https://acreetionos.org/changelog.h…</summary>
-  </entry>
-  <entry>
-    <title>AcreetionOS Update — June 14, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-14.html"/>
-    <id>tag:acreetionos.org,2026-06-14:newsletter</id>
-    <updated>2026-06-14T00:00:00Z</updated>
-    <published>2026-06-14T00:00:00Z</published>
-    <summary>Our continuous integration pipeline just got a significant boost with the introduction of per-pipeline staging directories, which will help avoid publish races between concurrent builds, and relative symlinks for the latest ISO images, ensuring they resolve correctly on the host web root. This impro…</summary>
   </entry>
 </feed>
