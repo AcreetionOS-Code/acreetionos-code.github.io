@@ -3343,13 +3343,17 @@ async function checkAIHealth(env) {
 
   try {
     const start = Date.now();
+    // Probe wording matters: generateGuide() rejects provider content of
+    // 10 chars or fewer (extractContent), so a one-word "OK" probe scored
+    // every healthy provider as "empty content" and fired false DOWN alerts
+    // while real (long-form) generation worked. Ask for a full sentence.
     const result = await generateGuide(
       env,
       [
-        { role: 'system', content: 'Reply with exactly one word: OK' },
-        { role: 'user', content: 'Say OK' }
+        { role: 'system', content: 'You are a health check. Reply with exactly this sentence: AcreetionOS guide generation is working.' },
+        { role: 'user', content: 'Confirm status.' }
       ],
-      10,
+      40,
       { useCache: false }
     );
     responseTime = Date.now() - start;
