@@ -2653,14 +2653,23 @@ export default {
       const MIRRORS = [
         { name: 'Cloudflare R2', base: 'https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/' },
         { name: 'Linode (Chicago)', base: 'https://isoimages.us-ord-10.linodeobjects.com/' },
+        { name: 'OSUOSL', base: 'https://ftp2.osuosl.org/pub/acreetionos/' },
+        { name: 'RWTH Aachen (Germany)', base: 'https://ftp.halifax.rwth-aachen.de/acreetionos/' },
         { name: 'AWS (US East)', base: 'https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/' },
         { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' },
       ];
       const probe = async (m) => {
         const t0 = Date.now();
+        const hit = async (path) => {
+          const r = await fetch(m.base + path, { method: 'GET', headers: { 'Range': 'bytes=0-63' } });
+          return r.status === 200 || r.status === 206;
+        };
         try {
-          const r = await fetch(m.base + 'SHA256SUMS.txt', { method: 'GET', headers: { 'Range': 'bytes=0-63' } });
-          return { name: m.name, base: m.base, ok: r.status === 200 || r.status === 206, ms: Date.now() - t0 };
+          // Primary signal: the sums file. Fallback: the Standard ISO itself
+          // (some mirrors, e.g. OSUOSL, carry the ISOs without the sums file).
+          let ok = await hit('SHA256SUMS.txt');
+          if (!ok) ok = await hit('AcreetionOS-1.0-x86_64.iso');
+          return { name: m.name, base: m.base, ok, ms: Date.now() - t0 };
         } catch (e) {
           return { name: m.name, base: m.base, ok: false, ms: null };
         }
