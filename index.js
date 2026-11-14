@@ -2645,6 +2645,30 @@ export default {
       });
     }
 
+    // Mirror health for download-page steering: which ISO mirrors actually
+    // hold the files right now. The mirrors send no CORS headers, so the page
+    // cannot check this itself; the worker checks server-side and the page
+    // combines it with its own reachability/latency probes. Edge-cached 60s.
+    if (url.pathname === '/api/mirror-health') {
+      const MIRRORS = [
+        { name: 'Cloudflare R2', base: 'https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/' },
+        { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' },
+      ];
+      const probe = async (m) => {
+        const t0 = Date.now();
+        try {
+          const r = await fetch(m.base + 'SHA256SUMS.txt', { method: 'GET', headers: { 'Range': 'bytes=0-63' } });
+          return { name: m.name, base: m.base, ok: r.status === 200 || r.status === 206, ms: Date.now() - t0 };
+        } catch (e) {
+          return { name: m.name, base: m.base, ok: false, ms: null };
+        }
+      };
+      const endpoints = await Promise.all(MIRRORS.map(probe));
+      return new Response(JSON.stringify({ endpoints, checked: new Date().toISOString() }), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'public, max-age=60' }
+      });
+    }
+
     // R2 ISO listing for AcreetionOS Immutable downloads
     if (url.pathname === '/api/r2/list') {
       const cfToken = env.CLOUDFLARE_API_TOKEN;
