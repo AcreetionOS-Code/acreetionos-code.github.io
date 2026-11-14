@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metalink xmlns="urn:ietf:params:xml:ns:metalink">
+  <published>2026-11-14T00:00:00Z</published>
+  <file name="AcreetionOS_Wayland-Experimental-1.0-x86_64.iso">
+    <identity>AcreetionOS</identity>
+    <version>1.0</version>
+    <size>2342518784</size>
+    <hash type="sha-256">5714dd8eaa2ed91bafbabdf561980e7af7d84816fb3ce316bec3799f78d6e463</hash>
+    <url priority="1">https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
+    <url priority="2">https://iso.acreetionos.org/acreetion/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
+  </file>
+</metalink>

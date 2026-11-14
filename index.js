@@ -223,7 +223,7 @@ function securityHeaders(nonce) {
     'Referrer-Policy': 'strict-origin-when-cross-origin',
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Cross-Origin-Embedder-Policy': 'require-corp',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com"
   };
 }
 
@@ -2645,6 +2645,30 @@ export default {
       });
     }
 
+    // Mirror health for download-page steering: which ISO mirrors actually
+    // hold the files right now. The mirrors send no CORS headers, so the page
+    // cannot check this itself; the worker checks server-side and the page
+    // combines it with its own reachability/latency probes. Edge-cached 60s.
+    if (url.pathname === '/api/mirror-health') {
+      const MIRRORS = [
+        { name: 'Cloudflare R2', base: 'https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/' },
+        { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' },
+      ];
+      const probe = async (m) => {
+        const t0 = Date.now();
+        try {
+          const r = await fetch(m.base + 'SHA256SUMS.txt', { method: 'GET', headers: { 'Range': 'bytes=0-63' } });
+          return { name: m.name, base: m.base, ok: r.status === 200 || r.status === 206, ms: Date.now() - t0 };
+        } catch (e) {
+          return { name: m.name, base: m.base, ok: false, ms: null };
+        }
+      };
+      const endpoints = await Promise.all(MIRRORS.map(probe));
+      return new Response(JSON.stringify({ endpoints, checked: new Date().toISOString() }), {
+        headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'public, max-age=60' }
+      });
+    }
+
     // R2 ISO listing for AcreetionOS Immutable downloads
     if (url.pathname === '/api/r2/list') {
       const cfToken = env.CLOUDFLARE_API_TOKEN;
@@ -3030,7 +3054,7 @@ export default {
 
     // Chat endpoint
     if (request.method !== 'POST' || url.pathname !== '/api/chat') {
-      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
+      const csp = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com; base-uri 'self'; form-action 'self' https://www.qwant.com";
       return new Response('AcreetionOS Worker — POST /api/chat | POST /api/translate-document | POST /api/news/ai', {
         status: 200,
         headers: { 'Content-Type': 'text/plain', 'Content-Security-Policy': csp, ...corsHeaders(request) }
@@ -3157,7 +3181,7 @@ export default {
 const WORKERS_AI_MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
-const GITHUB_MODELS_URL = 'https://models.inference.ai.azure.com/chat/completions';
+const GITHUB_MODELS_URL = 'https://models.github.ai/inference/chat/completions';
 const GITHUB_MODELS_MODEL = 'meta-llama-3.3-70b-instruct';
 const GUIDE_CACHE_DAYS = 30;
 
@@ -3241,11 +3265,17 @@ async function generateGuide(env, messages, maxTokens, opts = {}) {
     providers.push({
       name: 'workers-ai',
       run: async () => {
-        const out = await env.AI.run(WORKERS_AI_MODEL, {
-          messages: injectNoTrain(messages),
-          max_tokens: maxTokens,
-          temperature: 0.3,
-        });
+        // Workers AI can hang until its own internal timeout (~120s,
+        // error 3046), which poisons the whole chain sample and made
+        // health checks report 120s response times. Race it at 25s.
+        const out = await Promise.race([
+          env.AI.run(WORKERS_AI_MODEL, {
+            messages: injectNoTrain(messages),
+            max_tokens: maxTokens,
+            temperature: 0.3,
+          }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('timeout after 25s')), 25000)),
+        ]);
         const content = (out && typeof out.response === 'string' && out.response.trim().length > 10) ? out.response : null;
         return { content, note: content ? '' : 'empty response' };
       },
@@ -3343,15 +3373,21 @@ async function checkAIHealth(env) {
 
   try {
     const start = Date.now();
-    const result = await generateGuide(
-      env,
-      [
-        { role: 'system', content: 'Reply with exactly one word: OK' },
-        { role: 'user', content: 'Say OK' }
-      ],
-      10,
-      { useCache: false }
-    );
+    // Probe with a NATURAL mini-guide request, not a dictation test.
+    // History: a one-word "OK" probe scored healthy providers as "empty
+    // content" (extractContent needs >10 chars); an exact-sentence probe
+    // still drew empty replies from the free router. A small real request
+    // is the same shape as user traffic, so it measures what users get.
+    // One retry inside the check: the free chain is a lottery, and a
+    // single lost draw is not an outage.
+    const probeMessages = [
+      { role: 'system', content: 'You write short, clear software guides for the AcreetionOS wiki.' },
+      { role: 'user', content: 'In one short paragraph, explain how to install Firefox on AcreetionOS.' }
+    ];
+    let result = await generateGuide(env, probeMessages, 220, { useCache: false });
+    if (!result.ok) {
+      result = await generateGuide(env, probeMessages, 220, { useCache: false });
+    }
     responseTime = Date.now() - start;
     healthy = result.ok && result.content.trim().length > 0;
     if (!healthy) errorMsg = result.error || 'Empty response';
@@ -3363,6 +3399,7 @@ async function checkAIHealth(env) {
 
     // Persist status
     const status = {
+      ...lastStatus,
       healthy,
       last_checked: new Date().toISOString(),
       checked_at: new Date().toISOString(),
@@ -3370,11 +3407,15 @@ async function checkAIHealth(env) {
     error: errorMsg || null,
     last_healthy: healthy ? new Date().toISOString() : (lastStatus.last_healthy || null),
     last_failure: healthy ? (lastStatus.last_failure || null) : new Date().toISOString(),
+    consecutive_failures: healthy ? 0 : ((lastStatus.consecutive_failures || 0) + 1),
   };
   await putR2(env, 'acreetionos-hosting', AI_STATUS_KEY, status);
 
-  // Send alert if unhealthy and no alert sent in the last 12 hours
-  if (!healthy) {
+  // Send alert only on a SUSTAINED outage: second consecutive failed
+  // check, and no alert sent in the last 12 hours. A single failed sample
+  // of a free-tier chain is weather, not news -- alerting on it spammed
+  // the announcements channel three times in one night (2026-11-13).
+  if (!healthy && status.consecutive_failures >= 2) {
     const lastAlert = lastStatus.last_alert_sent ? new Date(lastStatus.last_alert_sent).getTime() : 0;
     if (now - lastAlert > TWELVE_HOURS) {
       console.log('AI health check FAILED — sending alert email');

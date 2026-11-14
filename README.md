@@ -1,6 +1,6 @@
-# AcreetionOS: The User-Friendly Arch Linux Experience
+# AcreetionOS: Arch Linux With a Safety Buffer
 
-**AcreetionOS** is a modern, privacy-focused Linux distribution built on the powerful **Arch Linux** foundation. Designed for stability and ease of use, it bridges the gap between the bleeding-edge performance of Arch and the reliability required for daily driving.
+**AcreetionOS** is Arch Linux with a safety buffer -- a beginner-friendly Cinnamon desktop where every update is tested for a week before it reaches you, X11 and XLibre stay alive, and nothing about you is ever collected.
 
 ![AcreetionOS Logo](https://acreetionos.org/logo.webp)
 

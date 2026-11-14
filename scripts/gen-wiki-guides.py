@@ -502,6 +502,7 @@ def render_guide_html(guide):
       gap: 1rem;
     }}
   </style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="o6LG+Kcq+miQXsnNotVUHw" async></script>
 </head>
 <body>
   <div class="breadcrumbs">
@@ -687,6 +688,7 @@ def render_index_html(guides):
     }}
     footer a {{ color: var(--green); text-decoration: none; }}
   </style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="o6LG+Kcq+miQXsnNotVUHw" async></script>
 </head>
 <body>
   <div class="breadcrumbs">
