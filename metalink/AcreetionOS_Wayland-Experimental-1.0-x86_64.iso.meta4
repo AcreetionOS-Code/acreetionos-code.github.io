@@ -8,6 +8,7 @@
     <hash type="sha-256">5714dd8eaa2ed91bafbabdf561980e7af7d84816fb3ce316bec3799f78d6e463</hash>
     <url priority="1">https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
     <url priority="2">https://isoimages.us-ord-10.linodeobjects.com/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
-    <url priority="3">https://iso.acreetionos.org/acreetion/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
+    <url priority="3">https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
+    <url priority="4">https://iso.acreetionos.org/acreetion/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
   </file>
 </metalink>

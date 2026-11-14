@@ -8,6 +8,7 @@
     <hash type="sha-256">17b39c153bbcd67f395eca2d6ac17ca15c7787e3193840e00969d0a197405b2f</hash>
     <url priority="1">https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/AcreetionOS-1.0-x86_64.iso</url>
     <url priority="2">https://isoimages.us-ord-10.linodeobjects.com/AcreetionOS-1.0-x86_64.iso</url>
-    <url priority="3">https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso</url>
+    <url priority="3">https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS-1.0-x86_64.iso</url>
+    <url priority="4">https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso</url>
   </file>
 </metalink>

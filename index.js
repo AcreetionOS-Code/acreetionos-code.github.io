@@ -2653,6 +2653,7 @@ export default {
       const MIRRORS = [
         { name: 'Cloudflare R2', base: 'https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/' },
         { name: 'Linode (Chicago)', base: 'https://isoimages.us-ord-10.linodeobjects.com/' },
+        { name: 'AWS (US East)', base: 'https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/' },
         { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' },
       ];
       const probe = async (m) => {
