@@ -7,6 +7,7 @@
     <size>2351628288</size>
     <hash type="sha-256">83455f9b1e62d933b117aade156d4815d6197a7c1c4c8d97da2d6f68d57bd324</hash>
     <url priority="1">https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/AcreetionOS_XL-1.0-x86_64.iso</url>
-    <url priority="2">https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso</url>
+    <url priority="2">https://isoimages.us-ord-10.linodeobjects.com/AcreetionOS_XL-1.0-x86_64.iso</url>
+    <url priority="3">https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso</url>
   </file>
 </metalink>
