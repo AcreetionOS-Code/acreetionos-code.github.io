@@ -423,6 +423,9 @@
               <a style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="https://mega.nz/file/6y5mxZQL#hLPvT_fc1Z76nfi-Xy21mZfo4fVI7ovQADQl_ndLWyo">MEGA -- Standard</a>
               <a style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="https://mega.nz/file/Gnpy2CSA#VGjwD0UxweyHfVKkEKyJsZBvYb7xYdeT0hbnugCfAmc">MEGA -- XL</a>
               <a style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="https://mega.nz/file/KihnjTiC#QA2KJF5RMW_Bp6SPK-3wKkXZ5km_KvDjDa3g8AL7_-0">MEGA -- Wayland</a>
+              <a data-static="1" style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS-1.0-x86_64.iso">AWS -- Standard</a>
+              <a data-static="1" style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS_XL-1.0-x86_64.iso">AWS -- XL</a>
+              <a data-static="1" style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso">AWS -- Wayland</a>
               <a style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="metalink/AcreetionOS-1.0-x86_64.iso.meta4">Metalink -- Standard</a>
               <a style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="metalink/AcreetionOS_XL-1.0-x86_64.iso.meta4">Metalink -- XL</a>
               <a style="font-size:0.8rem;padding:0.4rem 0.8rem" class="btn btn-mirror" href="metalink/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso.meta4">Metalink -- Wayland</a>
@@ -605,6 +608,7 @@ window.addEventListener('DOMContentLoaded',()=>{document.getElementById('generat
         var r2 = up.filter(function (r) { return r.base === POOL[0].base; })[0];
         if (r2 && r2.ms <= best.ms + 200) best = r2;
         document.querySelectorAll('a[href]').forEach(function (a) {
+          if (a.hasAttribute('data-static')) return;
           var href = a.getAttribute('href');
           if (!href) return;
           for (var i = 0; i < POOL.length; i++) {
