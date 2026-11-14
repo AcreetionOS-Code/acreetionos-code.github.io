@@ -193,6 +193,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://acreetionos.org/wiki-guides/building-your-own-iso.html</loc>
+    <lastmod>2026-11-14</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://acreetionos.org/wiki-guides/firewall.html</loc>
     <lastmod>2026-11-14</lastmod>
     <changefreq>monthly</changefreq>
