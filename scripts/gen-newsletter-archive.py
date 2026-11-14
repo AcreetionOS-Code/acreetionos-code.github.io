@@ -211,6 +211,7 @@ def render_issue_html(date_str, data):
       gap: 1rem;
     }}
   </style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="o6LG+Kcq+miQXsnNotVUHw" async></script>
 </head>
 <body>
   <div class="breadcrumbs">
@@ -382,6 +383,7 @@ def render_archive_index(entries):
     }}
     footer a {{ color: var(--green); text-decoration: none; }}
   </style>
+<script src="https://analytics.ahrefs.com/analytics.js" data-key="o6LG+Kcq+miQXsnNotVUHw" async></script>
 </head>
 <body>
   <div class="breadcrumbs">

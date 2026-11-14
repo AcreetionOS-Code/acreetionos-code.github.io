@@ -27,7 +27,7 @@ Important URLS:
 - [Contributors](https://acreetionos.org/contributors.html): Contributor hub, live development stats, how to contribute.
 - [Governance](https://acreetionos.org/governance.html): Project governance model and decision-making.
 - [Status](https://acreetionos.org/status.html): Live project status, services, and infrastructure.
-- [Privacy Policy](https://acreetionos.org/privacy.html): No telemetry, no tracking, no data collection.
+- [Privacy Policy](https://acreetionos.org/privacy.html): No telemetry, no tracking, no data collection in the OS. Website uses cookie-free Ahrefs Web Analytics for aggregate traffic.
 - [Newsletter](https://acreetionos.org/newsletter.html): Project news and updates.
 - [Newsletter Archive](https://acreetionos.org/newsletter-archive/index.html): All past issues (HTML).
 - [News Feed (Atom)](https://acreetionos.org/feed.xml): Machine-readable update feed.
