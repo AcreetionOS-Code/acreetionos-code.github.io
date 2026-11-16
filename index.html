@@ -202,7 +202,13 @@
       }
     }
 
-        /* Homepage hero layout */
+    @media (min-width: 1025px) {
+      .page-wrapper {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* Homepage hero layout */
     .hero {
       display: grid;
       grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
