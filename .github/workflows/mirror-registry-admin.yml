@@ -8,7 +8,7 @@ on:
         required: true
         default: 'show'
         type: choice
-        options: [show, remove, init]
+        options: [show, remove, init, diagnose]
       base:
         description: 'Exact base URL to remove (action=remove only)'
         required: false
@@ -24,6 +24,7 @@ jobs:
       - name: Registry admin
         env:
           CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_TOKEN_GH: ${{ secrets.CLOUDFLARE_TOKEN_GITHUB }}
           CF_ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           ACTION: ${{ inputs.action }}
           BASE: ${{ inputs.base }}
@@ -31,6 +32,20 @@ jobs:
           set -e
           BUCKETS="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets"
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
+          if [ "$ACTION" = "diagnose" ]; then
+            echo "--- accounts visible to the worker token (CLOUDFLARE_TOKEN_GITHUB) ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[] | .id + "  " + .name'
+            echo "--- worker token verify in CF_ACCOUNT ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/tokens/verify" | jq -c '{success, errors, status: .result.status}'
+            echo "--- buckets in CF_ACCOUNT per worker token ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "$BUCKETS" | jq -r '.result.buckets[]?.name // (.errors | tostring)'
+            echo "--- registry GET with worker token ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "$URL"
+            echo
+            echo "--- registry PUT probe with worker token (writes current content back) ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "$URL" -o registry.json || true
+            curl -s -X PUT -H "Authorization: Bearer $CF_TOKEN_GH" -H "Content-Type: application/json" --data-binary @registry.json "$URL" | jq -c '{success, errors}'
+          fi
           if [ "$ACTION" = "init" ]; then
             echo "--- creating bucket acreetionos-hosting (ok if it already exists) ---"
             curl -s -X POST -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data '{"name":"acreetionos-hosting"}' "$BUCKETS"
