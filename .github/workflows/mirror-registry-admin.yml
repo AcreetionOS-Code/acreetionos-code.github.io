@@ -44,24 +44,18 @@ jobs:
           fi
           if [ "$ACTION" = "diagnose" ]; then
             echo "lenA=$(( ${#CF_API_TOKEN} + 100 )) lenG=$(( ${#CF_TOKEN_GH} + 100 ))"
-            echo "--- CF_ACCOUNT identity (via CLOUDFLARE_API_TOKEN) ---"
-            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT" | jq -r '.result | .id + "  " + .name'
-            echo "--- all accounts visible to CLOUDFLARE_API_TOKEN ---"
-            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[] | .id + "  " + .name'
-            echo "--- accounts call with worker token, raw ---"
-            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts" | jq -c '{success, errors, names: [.result[]?.name]}'
-            echo "--- accounts visible to the worker token (CLOUDFLARE_TOKEN_GITHUB) ---"
-            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[] | .id + "  " + .name'
-            echo "--- worker token verify in CF_ACCOUNT ---"
-            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/tokens/verify" | jq -c '{success, errors, status: .result.status}'
-            echo "--- buckets in CF_ACCOUNT per worker token ---"
-            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "$BUCKETS" | jq -r '.result.buckets[]?.name // (.errors | tostring)'
-            echo "--- registry GET with worker token ---"
-            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "$URL"
-            echo
-            echo "--- registry PUT probe with worker token (writes current content back) ---"
-            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "$URL" -o registry.json || true
-            curl -s -X PUT -H "Authorization: Bearer $CF_TOKEN_GH" -H "Content-Type: application/json" --data-binary @registry.json "$URL" | jq -c '{success, errors}'
+            echo "--- [API] buckets in CF_ACCOUNT ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "$BUCKETS" | jq -r '.result.buckets[]?.name // (.errors | tostring)'
+            echo "--- [API] buckets in OTHER account 6a46b418508c26278ae2d3373f41da81 ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/r2/buckets" | jq -r '.result.buckets[]?.name // (.errors | tostring)'
+            echo "--- [API] worker secret names in CF_ACCOUNT ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/acreetionos-worker/secrets" | jq -c '{success, errors, names: [.result[]?.name]}'
+            echo "--- [GH] worker secret names in CF_ACCOUNT ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/acreetionos-worker/secrets" | jq -c '{success, errors, names: [.result[]?.name]}'
+            echo "--- [GH] worker secret names in OTHER account ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts/6a46b418508c26278ae2d3373f41da81/workers/scripts/acreetionos-worker/secrets" | jq -c '{success, errors, names: [.result[]?.name]}'
+            echo "--- [API] verify own token ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/tokens/verify" | jq -c '{success, errors, status: .result.status}'
           fi
           if [ "$ACTION" = "init" ]; then
             echo "--- creating bucket acreetionos-hosting (ok if it already exists) ---"
