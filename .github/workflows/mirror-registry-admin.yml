@@ -8,7 +8,7 @@ on:
         required: true
         default: 'show'
         type: choice
-        options: [show, remove, init, diagnose]
+        options: [show, remove, init, diagnose, probe]
       base:
         description: 'Exact base URL to remove (action=remove only)'
         required: false
@@ -32,6 +32,11 @@ jobs:
           set -e
           BUCKETS="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets"
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
+          if [ "$ACTION" = "probe" ]; then
+            echo '{"mirrors":[],"lastCheck":"PROBE-2026-11-17"}' > registry.probe.json
+            curl -s -X PUT -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @registry.probe.json "$URL" | jq -c '{success, errors}'
+            echo "--- probe written: lastCheck=PROBE-2026-11-17 ---"
+          fi
           if [ "$ACTION" = "diagnose" ]; then
             echo "--- CF_ACCOUNT identity (via CLOUDFLARE_API_TOKEN) ---"
             curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT" | jq -r '.result | .id + "  " + .name'
