@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       action:
-        description: 'show the registry, or remove one mirror by base URL'
+        description: 'show the registry, remove one mirror by base URL, or init (create bucket + empty registry)'
         required: true
         default: 'show'
         type: choice
-        options: [show, remove]
+        options: [show, remove, init]
       base:
         description: 'Exact base URL to remove (action=remove only)'
         required: false
@@ -29,10 +29,25 @@ jobs:
           BASE: ${{ inputs.base }}
         run: |
           set -e
-          URL="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets/acreetionos-hosting/objects/mirrors/registry.json"
+          BUCKETS="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets"
+          URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
+          if [ "$ACTION" = "init" ]; then
+            echo "--- creating bucket acreetionos-hosting (ok if it already exists) ---"
+            curl -s -X POST -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data '{"name":"acreetionos-hosting"}' "$BUCKETS"
+            echo
+          fi
           curl -s -H "Authorization: Bearer $CF_API_TOKEN" "$URL" -o registry.json || true
           echo "--- current registry ---"
           cat registry.json 2>/dev/null || echo "(none)"
+          if [ "$ACTION" = "init" ]; then
+            if ! grep -q '"mirrors"' registry.json; then
+              echo '{"mirrors":[],"lastCheck":null}' > registry.empty.json
+              curl -s -X PUT -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @registry.empty.json "$URL"
+              echo "--- empty registry written ---"
+            else
+              echo "--- registry already exists, left untouched ---"
+            fi
+          fi
           if [ "$ACTION" = "remove" ]; then
             jq --arg b "$BASE" '.mirrors |= map(select(.base != $b))' registry.json > registry.new.json
             curl -s -X PUT -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @registry.new.json "$URL"
