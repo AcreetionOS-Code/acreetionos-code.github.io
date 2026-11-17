@@ -2545,6 +2545,236 @@ async function handleCVEFix(request, env) {
   }
 }
 
+// ─── Registered mirrors (self-registration from mirrors.html) ──────
+//
+// A mirror operator submits the form on mirrors.html; the Worker
+// verifies the mirror actually serves the current release BEFORE it is
+// listed: its SHA256SUMS.txt must match the origin's exactly, and every
+// ISO must be present at the same byte size as the origin's. Only then
+// is the record stored (one JSON blob in the hosting bucket) and listed
+// by GET /api/mirrors, which mirrors.html renders. The scheduled
+// handler re-verifies twice a week; two failed checks in a row remove
+// the listing. Natalie is emailed (site mail queue) on registration
+// and on removal, with the Discord alert channel as backup.
+
+const MIRROR_BUCKET = 'acreetionos-hosting';
+const MIRROR_REGISTRY_KEY = 'mirrors/registry.json';
+const MIRROR_ORIGIN_BASE = 'https://iso.acreetionos.org/acreetion/';
+const MIRROR_NOTIFY_EMAIL = 'natalie@acreetionos.org';
+const MIRROR_FILES = [
+  'AcreetionOS-1.0-x86_64.iso',
+  'AcreetionOS_XL-1.0-x86_64.iso',
+  'AcreetionOS_Wayland-Experimental-1.0-x86_64.iso',
+];
+
+function parseMirrorSums(text) {
+  const out = {};
+  for (const line of String(text || '').split('\n')) {
+    const t = line.trim();
+    if (!t || t.startsWith('#')) continue;
+    const parts = t.split(/\s+/);
+    if (parts.length < 2) continue;
+    const hash = parts[0].toLowerCase();
+    const name = parts[parts.length - 1].replace(/^\*/, '');
+    if (/^[0-9a-f]{64}$/.test(hash)) out[name] = hash;
+  }
+  return out;
+}
+
+async function fetchMirrorSums(url) {
+  try {
+    const r = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (!r.ok) return null;
+    const sums = parseMirrorSums(await r.text());
+    return Object.keys(sums).length ? sums : null;
+  } catch (e) { return null; }
+}
+
+async function remoteFileSize(url) {
+  // Size of a remote file without downloading it: HEAD first, then a
+  // one-byte range GET (parsing Content-Range) for hosts without HEAD.
+  try {
+    const h = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(20000) });
+    const hl = parseInt(h.headers.get('content-length') || '', 10);
+    if (h.ok && Number.isFinite(hl)) return hl;
+  } catch (e) {}
+  try {
+    const r = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: AbortSignal.timeout(20000) });
+    const cr = r.headers.get('content-range') || '';
+    const m = cr.match(/\/(\d+)\s*$/);
+    let size = null;
+    if (m) size = parseInt(m[1], 10);
+    else {
+      const cl = parseInt(r.headers.get('content-length') || '', 10);
+      if ((r.status === 200 || r.status === 206) && Number.isFinite(cl)) size = cl;
+    }
+    try { await r.body.cancel(); } catch (e) {}
+    return size;
+  } catch (e) { return null; }
+}
+
+async function getMirrorOriginState() {
+  const sums = await fetchMirrorSums(MIRROR_ORIGIN_BASE + 'SHA256SUMS.txt');
+  if (!sums) return null;
+  const sizes = {};
+  for (const f of MIRROR_FILES) sizes[f] = await remoteFileSize(MIRROR_ORIGIN_BASE + f);
+  return { sums, sizes };
+}
+
+// The live check itself, shared by registration and the twice-weekly
+// re-verification. Returns { ok } or { ok: false, reason } with a
+// plain-language reason the operator can act on.
+async function verifyMirrorLive(base, origin) {
+  const sums = await fetchMirrorSums(base + 'SHA256SUMS.txt');
+  if (!sums) return { ok: false, reason: 'We could not fetch SHA256SUMS.txt from your mirror. Make sure the mirror is synced and the file is publicly readable.' };
+  for (const f of MIRROR_FILES) {
+    if (!sums[f]) return { ok: false, reason: 'Your SHA256SUMS.txt does not list ' + f + ' yet. If you just synced, give it a few minutes and try again.' };
+    if (sums[f] !== origin.sums[f]) return { ok: false, reason: 'Your copy of ' + f + ' does not match the current release checksum, so the mirror is out of sync. Run a fresh sync and try again.' };
+    if (origin.sizes[f]) {
+      const size = await remoteFileSize(base + f);
+      if (size === null) return { ok: false, reason: 'We could not read the size of ' + f + ' on your mirror, so we cannot confirm the file is really there.' };
+      if (size !== origin.sizes[f]) return { ok: false, reason: 'Your ' + f + ' is ' + size + ' bytes, but the current release is ' + origin.sizes[f] + ' bytes. The mirror is out of sync.' };
+    }
+  }
+  return { ok: true };
+}
+
+async function getMirrorRegistry(env) {
+  const reg = await getR2(env, MIRROR_BUCKET, MIRROR_REGISTRY_KEY);
+  if (reg && Array.isArray(reg.mirrors)) return reg;
+  return { mirrors: [], lastCheck: null };
+}
+
+async function putMirrorRegistry(env, reg) {
+  return putR2(env, MIRROR_BUCKET, MIRROR_REGISTRY_KEY, reg);
+}
+
+function publicMirror(m) {
+  return {
+    name: m.name, org: m.org || '', org_url: m.org_url || '',
+    base: m.base, rsync: m.rsync || '', location: m.location,
+    sync: m.sync || '', registered_at: m.registered_at,
+  };
+}
+
+async function notifyMirrorEvent(env, subject, text) {
+  try { await sendHostingEmail(env, MIRROR_NOTIFY_EMAIL, subject, text); } catch (e) { console.error('Mirror notify email failed:', e.message); }
+  await sendDiscordWebhook(env, '**\u{1FA9E} ' + subject + '**\n' + text);
+}
+
+function cleanMirrorField(v, max) {
+  return String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, max);
+}
+
+async function handleMirrorRegister(request, env) {
+  const json = (obj, status) => new Response(JSON.stringify(obj), { status: status || 200, headers: { 'Content-Type': 'application/json', ...corsHeaders(request) } });
+  if (checkRateLimit(getClientIP(request), 3, 3600000)) {
+    return json({ error: 'Too many registration attempts. Please try again in an hour.' }, 429);
+  }
+  let body;
+  try { body = await request.json(); } catch (e) { return json({ error: 'Invalid request body.' }, 400); }
+
+  const name = cleanMirrorField(body.name, 80);
+  const location = cleanMirrorField(body.location, 120);
+  const contact = cleanMirrorField(body.contact_email, 120);
+  const org = cleanMirrorField(body.org, 80);
+  const orgUrl = cleanMirrorField(body.org_url, 300);
+  const rsync = cleanMirrorField(body.rsync_url, 300);
+  const sync = ['hourly', 'daily', 'weekly'].includes(body.sync) ? body.sync : 'daily';
+  let base = cleanMirrorField(body.base_url, 300);
+
+  if (!name || !location || !base) return json({ error: 'Mirror name, mirror URL, and location are required.' }, 400);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact)) return json({ error: 'A valid contact email is required.' }, 400);
+  let baseParsed;
+  try { baseParsed = new URL(base); } catch (e) { return json({ error: 'The mirror URL is not a valid URL.' }, 400); }
+  if (baseParsed.protocol !== 'https:') return json({ error: 'The mirror URL must start with https://' }, 400);
+  if (!base.endsWith('/')) base += '/';
+  if (orgUrl && !/^https?:\/\//i.test(orgUrl)) return json({ error: 'The organization URL must start with http:// or https://' }, 400);
+  if (rsync && !rsync.startsWith('rsync://')) return json({ error: 'The rsync URL must start with rsync://' }, 400);
+
+  const origin = await getMirrorOriginState();
+  if (!origin) return json({ error: 'We could not reach our own origin server to compare checksums. Please try again in a few minutes.' }, 503);
+
+  const verdict = await verifyMirrorLive(base, origin);
+  if (!verdict.ok) return json({ error: verdict.reason }, 422);
+
+  const reg = await getMirrorRegistry(env);
+  const now = new Date().toISOString();
+  const existing = reg.mirrors.find(m => m.base === base);
+  if (existing && existing.status === 'active') {
+    return json({ error: 'This mirror is already registered and listed.' }, 409);
+  }
+  const record = {
+    id: existing ? existing.id : 'm_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8),
+    name, org, org_url: orgUrl, base, rsync, location, contact, sync,
+    status: 'active', failures: 0,
+    registered_at: existing ? existing.registered_at : now,
+    last_check: now, last_ok: now, last_failure_reason: '',
+  };
+  if (existing) Object.assign(existing, record); else reg.mirrors.push(record);
+  if (!(await putMirrorRegistry(env, reg))) return json({ error: 'Storage error -- the registration could not be saved. Please try again.' }, 500);
+
+  await notifyMirrorEvent(env,
+    'New AcreetionOS mirror registered: ' + name,
+    'A mirror just registered on the website and passed live verification.\n\n' +
+    'Name: ' + name + '\nLocation: ' + location + '\nHTTPS: ' + base + '\n' +
+    (rsync ? 'rsync: ' + rsync + '\n' : '') +
+    (org ? 'Organization: ' + org + '\n' : '') +
+    'Contact: ' + contact + '\nSync: ' + sync + '\n\n' +
+    'It is listed on https://acreetionos.org/mirrors.html now. Registered mirrors are re-checked twice a week; two failed checks in a row remove the listing, and you will get another email if that happens.');
+
+  return json({ success: true, mirror: publicMirror(record) });
+}
+
+async function handleMirrorList(request, env) {
+  const reg = await getMirrorRegistry(env);
+  const mirrors = reg.mirrors.filter(m => m.status === 'active').map(publicMirror);
+  return new Response(JSON.stringify({ mirrors, checked: reg.lastCheck }), {
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'public, max-age=300' }
+  });
+}
+
+// Twice-weekly liveness pass over registered mirrors. The cron fires
+// every 30 minutes; this self-gates on the stored lastCheck so a round
+// runs only when the last one is more than 3.5 days old. A mirror that
+// fails two rounds in a row is removed from the listing and Natalie is
+// notified. If the origin itself is unreachable, the round is skipped
+// without touching lastCheck, so it retries on the next tick.
+async function checkRegisteredMirrors(env) {
+  const reg = await getMirrorRegistry(env);
+  const nowMs = Date.now();
+  if (reg.lastCheck && nowMs - new Date(reg.lastCheck).getTime() < 3.5 * 24 * 3600 * 1000) return;
+  const active = reg.mirrors.filter(m => m.status === 'active');
+  if (!active.length) {
+    reg.lastCheck = new Date().toISOString();
+    await putMirrorRegistry(env, reg);
+    return;
+  }
+  const origin = await getMirrorOriginState();
+  if (!origin) { console.log('Mirror check skipped: origin unreachable'); return; }
+  const removed = [];
+  for (const m of active) {
+    const v = await verifyMirrorLive(m.base, origin);
+    m.last_check = new Date().toISOString();
+    if (v.ok) { m.failures = 0; m.last_ok = m.last_check; m.last_failure_reason = ''; }
+    else {
+      m.failures = (m.failures || 0) + 1;
+      m.last_failure_reason = v.reason;
+      if (m.failures >= 2) { m.status = 'removed'; m.removed_at = m.last_check; removed.push(m); }
+    }
+  }
+  reg.lastCheck = new Date().toISOString();
+  await putMirrorRegistry(env, reg);
+  for (const m of removed) {
+    await notifyMirrorEvent(env,
+      'AcreetionOS mirror removed: ' + m.name,
+      'A registered mirror failed its twice-weekly liveness check twice in a row and has been removed from https://acreetionos.org/mirrors.html.\n\n' +
+      'Name: ' + m.name + '\nLocation: ' + m.location + '\nHTTPS: ' + m.base + '\nContact: ' + m.contact + '\n' +
+      'Last successful check: ' + (m.last_ok || 'never') + '\nReason: ' + (m.last_failure_reason || 'unreachable') + '\n\n' +
+      'If the operator fixes the mirror, they can register again with the form on the mirrors page.');
+  }
+}
+
 
 export default {
   async fetch(request, env, ctx) {
@@ -2679,6 +2909,14 @@ export default {
       return new Response(JSON.stringify({ endpoints, checked: new Date().toISOString() }), {
         headers: { 'Content-Type': 'application/json', ...corsHeaders(request), 'Cache-Control': 'public, max-age=60' }
       });
+    }
+
+    // Registered mirrors (self-registration from mirrors.html)
+    if (url.pathname === '/api/mirrors' && request.method === 'GET') {
+      return handleMirrorList(request, env);
+    }
+    if (url.pathname === '/api/mirrors/register' && request.method === 'POST') {
+      return handleMirrorRegister(request, env);
     }
 
     // R2 ISO listing for AcreetionOS Immutable downloads
@@ -3180,6 +3418,11 @@ export default {
     // AI health check (at most twice a day)
     ctx.waitUntil(checkAIHealth(env).catch(e => {
       console.error('AI health check failed:', e.message);
+    }));
+
+    // Registered-mirror liveness (self-gates to twice a week)
+    ctx.waitUntil(checkRegisteredMirrors(env).catch(e => {
+      console.error('Mirror registry check failed:', e.message);
     }));
   }
 };
