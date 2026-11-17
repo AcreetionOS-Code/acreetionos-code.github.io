@@ -11,7 +11,8 @@
     <url priority="3">https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS-1.0-x86_64.iso</url>
     <url priority="4">https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS-1.0-x86_64.iso</url>
     <url priority="5">https://mirror.accum.se/mirror/acreetionos.org/AcreetionOS-1.0-x86_64.iso</url>
-    <url priority="6">https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS-1.0-x86_64.iso</url>
-    <url priority="7">https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso</url>
+    <url priority="6">https://ftp.nluug.nl/pub/os/Linux/distr/AcreetionOS/iso_images/AcreetionOS-1.0-x86_64.iso</url>
+    <url priority="7">https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS-1.0-x86_64.iso</url>
+    <url priority="8">https://iso.acreetionos.org/acreetion/AcreetionOS-1.0-x86_64.iso</url>
   </file>
 </metalink>
