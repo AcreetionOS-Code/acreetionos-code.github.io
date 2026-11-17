@@ -36,6 +36,12 @@ jobs:
             REAL="86a77a981dd5e5a634330a4819aaa2e0"
             ZONE=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones?name=acreetionos.org" | jq -r '.result[0].id')
             echo "zone found: $([ -n "$ZONE" ] && [ "$ZONE" != "null" ] && echo yes || echo no)"
+            echo "--- routing settings raw ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones/$ZONE/email/routing" | jq -c '{success, errors, result: (.result | {enabled, status, name})}'
+            echo "--- rules raw status ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones/$ZONE/email/routing/rules" | jq -c '{success, errors, count: (.result | length)}'
+            echo "--- account destination addresses ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$REAL/email/routing/addresses" | jq -c '{success, errors, count: (.result | length), verified: [.result[]?.verified]}'
             curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones/$ZONE/email/routing/rules" -o rules.json
             echo "existing rules: $(jq -r '.result | length' rules.json)"
             DEST=$(jq -c '[.result[] | select(.matchers[]? | .value == "natalie@acreetionos.org") | .actions[] | select(.type == "forward") | .value[]] | unique' rules.json)
