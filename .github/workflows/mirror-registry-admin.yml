@@ -34,7 +34,7 @@ jobs:
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
           if [ "$ACTION" = "fix-secret" ]; then
             jq -n --arg t "$CF_API_TOKEN" '{name:"CLOUDFLARE_API_TOKEN", text:$t, type:"secret_text"}' > secret.json
-            curl -s -X PUT -H "Authorization: Bearer $CF_TOKEN_GH" -H "Content-Type: application/json" --data-binary @secret.json "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/acreetionos-worker/secrets" | jq -c '{success, errors}'
+            curl -s -X PUT -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @secret.json "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/acreetionos-worker/secrets" | jq -c '{success, errors}'
             echo "--- worker CLOUDFLARE_API_TOKEN secret set from the R2-capable token ---"
           fi
           if [ "$ACTION" = "probe" ]; then
