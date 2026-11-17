@@ -8,7 +8,7 @@ on:
         required: true
         default: 'show'
         type: choice
-        options: [show, remove, init, diagnose, probe, fix-secret, init-real, fix-secret-real]
+        options: [show, remove, init, diagnose, probe, fix-secret, init-real, fix-secret-real, email-route]
       base:
         description: 'Exact base URL to remove (action=remove only)'
         required: false
@@ -32,6 +32,21 @@ jobs:
           set -e
           BUCKETS="https://api.cloudflare.com/client/v4/accounts/86a77a981dd5e5a634330a4819aaa2e0/r2/buckets"
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
+          if [ "$ACTION" = "email-route" ]; then
+            REAL="86a77a981dd5e5a634330a4819aaa2e0"
+            ZONE=$(curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones?name=acreetionos.org" | jq -r '.result[0].id')
+            echo "zone found: $([ -n "$ZONE" ] && [ "$ZONE" != "null" ] && echo yes || echo no)"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones/$ZONE/email/routing/rules" -o rules.json
+            echo "existing rules: $(jq -r '.result | length' rules.json)"
+            DEST=$(jq -c '[.result[] | select(.matchers[]? | .value == "natalie@acreetionos.org") | .actions[] | select(.type == "forward") | .value[]] | unique' rules.json)
+            echo "natalie@ forward destinations found: $(echo "$DEST" | jq 'length')"
+            if [ "$(echo "$DEST" | jq 'length')" -gt 0 ]; then
+              jq -n --argjson dest "$DEST" '{name: "register_mirror intake", enabled: true, matchers: [{type: "literal", field: "to", value: "registermirror@acreetionos.org"}], actions: [{type: "forward", value: $dest}]}' > newrule.json
+              curl -s -X POST -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @newrule.json "https://api.cloudflare.com/client/v4/zones/$ZONE/email/routing/rules" | jq -c '{success, errors, rule: (.result.name // null), enabled: (.result.enabled // null)}'
+            fi
+            echo "--- rules after ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/zones/$ZONE/email/routing/rules" | jq -r '.result[] | .name + " -> " + ([.matchers[]?.value] | join(","))'
+          fi
           if [ "$ACTION" = "fix-secret-real" ]; then
             REAL="86a77a981dd5e5a634330a4819aaa2e0"
             jq -n --arg t "$CF_API_TOKEN" '{name:"CLOUDFLARE_API_TOKEN", text:$t, type:"secret_text"}' > secret.json
