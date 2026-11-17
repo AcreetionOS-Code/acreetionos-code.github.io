@@ -38,6 +38,7 @@ jobs:
             echo "--- probe written: lastCheck=PROBE-2026-11-17 ---"
           fi
           if [ "$ACTION" = "diagnose" ]; then
+            echo "token lengths: CLOUDFLARE_API_TOKEN=${#CF_API_TOKEN} CLOUDFLARE_TOKEN_GITHUB=${#CF_TOKEN_GH}"
             echo "--- CF_ACCOUNT identity (via CLOUDFLARE_API_TOKEN) ---"
             curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT" | jq -r '.result | .id + "  " + .name'
             echo "--- all accounts visible to CLOUDFLARE_API_TOKEN ---"
