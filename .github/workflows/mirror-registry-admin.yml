@@ -30,7 +30,7 @@ jobs:
           BASE: ${{ inputs.base }}
         run: |
           set -e
-          BUCKETS="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets"
+          BUCKETS="https://api.cloudflare.com/client/v4/accounts/86a77a981dd5e5a634330a4819aaa2e0/r2/buckets"
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
           if [ "$ACTION" = "fix-secret-real" ]; then
             REAL="86a77a981dd5e5a634330a4819aaa2e0"
