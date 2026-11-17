@@ -2889,6 +2889,7 @@ export default {
         { name: 'OSUOSL', base: 'https://ftp2.osuosl.org/pub/acreetionos/' },
         { name: 'RWTH Aachen (Germany)', base: 'https://ftp.halifax.rwth-aachen.de/acreetionos/' },
         { name: 'ACC (Sweden)', base: 'https://mirror.accum.se/mirror/acreetionos.org/' },
+        { name: 'NLUUG (Netherlands)', base: 'https://ftp.nluug.nl/pub/os/Linux/distr/AcreetionOS/iso_images/' },
         { name: 'AWS (US East)', base: 'https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/' },
         { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' },
       ];
