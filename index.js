@@ -2730,6 +2730,17 @@ async function handleMirrorRegister(request, env) {
 }
 
 async function handleMirrorList(request, env) {
+  // TEMPORARY DEBUG (remove after R2 diagnosis): ?debug=1 shows the raw
+  // Cloudflare API answer for the registry read.
+  if (new URL(request.url).searchParams.get('debug') === '1') {
+    const out = { hasToken: !!env.CLOUDFLARE_API_TOKEN, tokenLen: (env.CLOUDFLARE_API_TOKEN || '').length, account: env.CLOUDFLARE_ACCOUNT_ID || null };
+    try {
+      const r = await fetch(`https://api.cloudflare.com/client/v4/accounts/${env.CLOUDFLARE_ACCOUNT_ID}/r2/buckets/${MIRROR_BUCKET}/objects/${MIRROR_REGISTRY_KEY}`, { headers: { 'Authorization': `Bearer ${env.CLOUDFLARE_API_TOKEN}` } });
+      out.status = r.status;
+      out.body = (await r.text()).slice(0, 300);
+    } catch (e) { out.fetchError = String((e && e.message) || e); }
+    return new Response(JSON.stringify(out), { headers: { 'Content-Type': 'application/json' } });
+  }
   const reg = await getMirrorRegistry(env);
   const mirrors = reg.mirrors.filter(m => m.status === 'active').map(publicMirror);
   return new Response(JSON.stringify({ mirrors, checked: reg.lastCheck }), {
