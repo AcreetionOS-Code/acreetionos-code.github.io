@@ -33,6 +33,12 @@ jobs:
           BUCKETS="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets"
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
           if [ "$ACTION" = "diagnose" ]; then
+            echo "--- CF_ACCOUNT identity (via CLOUDFLARE_API_TOKEN) ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT" | jq -r '.result | .id + "  " + .name'
+            echo "--- all accounts visible to CLOUDFLARE_API_TOKEN ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[] | .id + "  " + .name'
+            echo "--- accounts call with worker token, raw ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts" | jq -c '{success, errors, names: [.result[]?.name]}'
             echo "--- accounts visible to the worker token (CLOUDFLARE_TOKEN_GITHUB) ---"
             curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "https://api.cloudflare.com/client/v4/accounts" | jq -r '.result[] | .id + "  " + .name'
             echo "--- worker token verify in CF_ACCOUNT ---"
