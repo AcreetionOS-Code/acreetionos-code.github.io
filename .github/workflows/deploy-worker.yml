@@ -31,7 +31,7 @@ jobs:
           #   LIMIT_SALT (shared limiter hash salt, bead ray)
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           BRAIN_JUICE: ${{ secrets.OPENROUTER_API_KEY }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN_GITHUB }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           SECRET_SAUCE: ${{ secrets.ADMIN_KEY }}
           ALERT_SIREN: ${{ secrets.DISCORD_WEBHOOK_URL }}
           SCAN_MASTER: ${{ secrets.VIRUSTOTAL_API_KEY }}
