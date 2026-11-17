@@ -8,7 +8,7 @@ on:
         required: true
         default: 'show'
         type: choice
-        options: [show, remove, init, diagnose, probe, fix-secret]
+        options: [show, remove, init, diagnose, probe, fix-secret, init-real]
       base:
         description: 'Exact base URL to remove (action=remove only)'
         required: false
@@ -32,6 +32,19 @@ jobs:
           set -e
           BUCKETS="https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/r2/buckets"
           URL="$BUCKETS/acreetionos-hosting/objects/mirrors/registry.json"
+          if [ "$ACTION" = "init-real" ]; then
+            REAL="86a77a981dd5e5a634330a4819aaa2e0"
+            RB="https://api.cloudflare.com/client/v4/accounts/$REAL/r2/buckets"
+            echo "--- [API] buckets in REAL account ---"
+            curl -s -H "Authorization: Bearer $CF_API_TOKEN" "$RB" | jq -r '.result.buckets[]?.name // (.errors | tostring)'
+            echo "--- [GH] buckets in REAL account ---"
+            curl -s -H "Authorization: Bearer $CF_TOKEN_GH" "$RB" | jq -r '.result.buckets[]?.name // (.errors | tostring)'
+            echo "--- [API] create bucket in REAL account ---"
+            curl -s -X POST -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data '{"name":"acreetionos-hosting"}' "$RB" | jq -c '{success, errors}'
+            echo "--- [API] write empty registry in REAL account ---"
+            echo '{"mirrors":[],"lastCheck":null}' > registry.empty.json
+            curl -s -X PUT -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @registry.empty.json "$RB/acreetionos-hosting/objects/mirrors/registry.json" | jq -c '{success, errors}'
+          fi
           if [ "$ACTION" = "fix-secret" ]; then
             jq -n --arg t "$CF_API_TOKEN" '{name:"CLOUDFLARE_API_TOKEN", text:$t, type:"secret_text"}' > secret.json
             curl -s -X PUT -H "Authorization: Bearer $CF_API_TOKEN" -H "Content-Type: application/json" --data-binary @secret.json "https://api.cloudflare.com/client/v4/accounts/$CF_ACCOUNT/workers/scripts/acreetionos-worker/secrets" | jq -c '{success, errors}'
