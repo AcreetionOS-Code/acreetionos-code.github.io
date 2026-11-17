@@ -44,6 +44,16 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
 .principle code{font-family:var(--font-mono);font-size:.82rem;color:var(--text-bright)}
 .footer{text-align:center;padding:2rem;margin-top:3rem;border-top:1px solid var(--border);color:#999;font-size:.85rem}
 .footer a{color:var(--green)}
+.mform label{display:block;margin:.9rem 0 .3rem;color:var(--text);font-size:.9rem;font-weight:600}
+.mform input,.mform select{width:100%;padding:.65rem;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text-bright);font-size:1rem}
+.mform input:focus,.mform select:focus{outline:none;border-color:var(--green)}
+.mform .row{display:grid;grid-template-columns:1fr 1fr;gap:0 1rem}
+.mform button{margin-top:1.1rem;background:var(--green);color:#000;border:none;padding:.75rem 1.6rem;border-radius:10px;font-weight:700;font-size:1rem;cursor:pointer}
+.mform button:disabled{opacity:.5;cursor:wait}
+#mf-msg{margin-top:1rem;font-size:.95rem;line-height:1.6;min-height:1.2em}
+#mf-msg.ok{color:var(--green)}
+#mf-msg.err{color:#e74c3c}
+@media(max-width:600px){.mform .row{grid-template-columns:1fr}}
 @media(max-width:600px){.hero h1{font-size:1.5rem}}
   </style>
 <script src="https://analytics.ahrefs.com/analytics.js" data-key="o6LG+Kcq+miQXsnNotVUHw" async></script>
@@ -107,9 +117,36 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
           rsync: <code>rsync://mirror.accum.se/mirror/acreetionos.org/</code></p>
         </div>
 
+        <div id="registered-mirrors"></div>
+
         <div class="principle">
           <h3><i class="bi bi-plus-circle"></i>Run a mirror</h3>
-          <p>We publish three x86_64 ISO images (about 7.2 GB total) plus SHA256SUMS.txt, rebuilt weekly on Sundays under the same filenames. The rsync source is public and read-only: <code>rsync://us.iso.acreetionos.org/iso_images/</code> -- the same files are also served over HTTPS at <a href="https://iso.acreetionos.org/acreetion/">iso.acreetionos.org/acreetion/</a> if you prefer to sync over HTTP. A daily sync is more than enough. If you set one up, tell us at <a href="mailto:natalie@acreetionos.org">natalie@acreetionos.org</a> and we will register you on this page and in the download steering. AcreetionOS is free, takes no money, and collects no data from anyone -- mirrors are how a small project reaches people far from our one US server.</p>
+          <p>We publish three x86_64 ISO images (about 7.2 GB total) plus SHA256SUMS.txt, rebuilt weekly on Sundays under the same filenames. The rsync source is public and read-only: <code>rsync://us.iso.acreetionos.org/iso_images/</code> -- the same files are also served over HTTPS at <a href="https://iso.acreetionos.org/acreetion/">iso.acreetionos.org/acreetion/</a> if you prefer to sync over HTTP. A daily sync is more than enough. If you set one up, register it with the form below -- it goes on this page as soon as our checker confirms it is live and in sync. Questions go to <a href="mailto:registermirror@acreetionos.org">registermirror@acreetionos.org</a>. AcreetionOS is free, takes no money, and collects no data from anyone -- mirrors are how a small project reaches people far from our one US server.</p>
+        </div>
+
+        <div class="principle" id="register">
+          <h3><i class="bi bi-clipboard"></i>Register your mirror</h3>
+          <p>Once your mirror is synced, fill this in. Our worker fetches your SHA256SUMS.txt, checks it against the current release, and confirms the ISOs are really there at the right size. If the check passes, your mirror goes on this page immediately. We re-check twice a week, and a mirror that fails two checks in a row comes off the page. Questions: <a href="mailto:registermirror@acreetionos.org">registermirror@acreetionos.org</a>.</p>
+          <form class="mform" id="mirror-form">
+            <div class="row">
+              <div><label for="mf-name">Mirror name *</label><input id="mf-name" type="text" required maxlength="80" placeholder="e.g. ACC"></div>
+              <div><label for="mf-location">Location *</label><input id="mf-location" type="text" required maxlength="120" placeholder="City, Country"></div>
+            </div>
+            <label for="mf-url">Mirror URL (HTTPS) *</label>
+            <input id="mf-url" type="url" required maxlength="300" placeholder="https://mirror.example.org/acreetionos/">
+            <div class="row">
+              <div><label for="mf-email">Contact email *</label><input id="mf-email" type="email" required maxlength="120" placeholder="mirror-admin@example.org"></div>
+              <div><label for="mf-sync">Sync frequency</label><select id="mf-sync"><option value="daily" selected>Daily</option><option value="hourly">Hourly</option><option value="weekly">Weekly</option></select></div>
+            </div>
+            <div class="row">
+              <div><label for="mf-org">Organization (optional)</label><input id="mf-org" type="text" maxlength="80" placeholder="University, club, or company"></div>
+              <div><label for="mf-orgurl">Organization URL (optional)</label><input id="mf-orgurl" type="url" maxlength="300" placeholder="https://example.org/"></div>
+            </div>
+            <label for="mf-rsync">rsync URL (optional)</label>
+            <input id="mf-rsync" type="text" maxlength="300" placeholder="rsync://mirror.example.org/acreetionos/">
+            <button type="submit" id="mf-submit">Verify and list my mirror</button>
+            <p id="mf-msg" role="status"></p>
+          </form>
         </div>
 
         <p style="color:var(--text);font-size:.9rem;text-align:center">Manual fallbacks (MEGA and Google Drive) are listed on the <a href="flash.html" style="color:var(--green)">download page</a>.</p>
@@ -121,5 +158,78 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
   <script src="footer.js?v=20260825" defer></script>
 <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
 <script src="tor-badge.js?v=20260825" defer></script>
+
+<script>
+(function () {
+  var slot = document.getElementById('registered-mirrors');
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function card(m) {
+    var d = el('div', 'principle');
+    var h = el('h3');
+    h.appendChild(el('i', 'bi bi-hdd-network'));
+    h.appendChild(document.createTextNode((m.name || 'Mirror') + ' -- ' + (m.location || '')));
+    d.appendChild(h);
+    var p = el('p');
+    if (m.org) {
+      p.appendChild(document.createTextNode('Run by '));
+      if (m.org_url) { var a = el('a', null, m.org); a.href = m.org_url; p.appendChild(a); }
+      else p.appendChild(document.createTextNode(m.org));
+      p.appendChild(document.createTextNode('. '));
+    }
+    if (m.sync) p.appendChild(document.createTextNode('Syncs ' + m.sync + '.'));
+    p.appendChild(el('br'));
+    p.appendChild(document.createTextNode('HTTPS: '));
+    var link = el('a', null, String(m.base || '').replace(/^https:\/\//, ''));
+    link.href = m.base;
+    p.appendChild(link);
+    if (m.rsync) {
+      p.appendChild(el('br'));
+      p.appendChild(document.createTextNode('rsync: '));
+      p.appendChild(el('code', null, m.rsync));
+    }
+    d.appendChild(p);
+    return d;
+  }
+  function load() {
+    fetch('/api/mirrors').then(function (r) { return r.json(); }).then(function (data) {
+      slot.innerHTML = '';
+      (data.mirrors || []).forEach(function (m) { slot.appendChild(card(m)); });
+    }).catch(function () {});
+  }
+  if (slot) load();
+  var form = document.getElementById('mirror-form');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var btn = document.getElementById('mf-submit');
+      var msg = document.getElementById('mf-msg');
+      function v(id) { var n = document.getElementById(id); return n ? n.value.trim() : ''; }
+      var data = { name: v('mf-name'), base_url: v('mf-url'), location: v('mf-location'), contact_email: v('mf-email'), org: v('mf-org'), org_url: v('mf-orgurl'), rsync_url: v('mf-rsync'), sync: v('mf-sync') };
+      btn.disabled = true;
+      msg.className = '';
+      msg.textContent = 'Checking your mirror against the current release. This can take a few seconds...';
+      fetch('/api/mirrors/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (res) {
+          btn.disabled = false;
+          if (res.ok) {
+            msg.className = 'ok';
+            msg.textContent = 'Verified -- your mirror is listed on this page now. Thank you for mirroring AcreetionOS.';
+            form.reset();
+            load();
+          } else {
+            msg.className = 'err';
+            msg.textContent = res.d.error || 'Registration failed. Please check the form and try again.';
+          }
+        })
+        .catch(function () {
+          btn.disabled = false;
+          msg.className = 'err';
+          msg.textContent = 'Could not reach the registration service. Please try again in a few minutes.';
+        });
+    });
+  }
+})();
+</script>
 </body>
 </html>
