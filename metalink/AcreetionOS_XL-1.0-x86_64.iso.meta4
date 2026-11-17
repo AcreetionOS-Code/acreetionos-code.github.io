@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metalink xmlns="urn:ietf:params:xml:ns:metalink">
-  <published>2026-11-14T00:00:00Z</published>
+  <published>2026-11-17T00:00:00Z</published>
   <file name="AcreetionOS_XL-1.0-x86_64.iso">
     <identity>AcreetionOS</identity>
     <version>1.0</version>
-    <size>2351628288</size>
-    <hash type="sha-256">83455f9b1e62d933b117aade156d4815d6197a7c1c4c8d97da2d6f68d57bd324</hash>
+    <size>2392555520</size>
+    <hash type="sha-256">69b0ad13fa5f902b5f76fd439ef0d7805180e9c382eba50b5f3096fd31ca60fc</hash>
     <url priority="1">https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/AcreetionOS_XL-1.0-x86_64.iso</url>
     <url priority="2">https://isoimages.us-ord-10.linodeobjects.com/AcreetionOS_XL-1.0-x86_64.iso</url>
     <url priority="3">https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso</url>
     <url priority="4">https://ftp.halifax.rwth-aachen.de/acreetionos/AcreetionOS_XL-1.0-x86_64.iso</url>
-    <url priority="5">https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS_XL-1.0-x86_64.iso</url>
-    <url priority="6">https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso</url>
+    <url priority="5">https://mirror.accum.se/mirror/acreetionos.org/AcreetionOS_XL-1.0-x86_64.iso</url>
+    <url priority="6">https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/AcreetionOS_XL-1.0-x86_64.iso</url>
+    <url priority="7">https://iso.acreetionos.org/acreetion/AcreetionOS_XL-1.0-x86_64.iso</url>
   </file>
 </metalink>
