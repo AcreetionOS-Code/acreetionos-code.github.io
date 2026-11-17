@@ -2560,6 +2560,9 @@ async function handleCVEFix(request, env) {
 const MIRROR_BUCKET = 'acreetionos-hosting';
 const MIRROR_REGISTRY_KEY = 'mirrors/registry.json';
 const MIRROR_ORIGIN_BASE = 'https://iso.acreetionos.org/acreetion/';
+// The origin nginx drops requests with an empty User-Agent (444), and
+// Worker subrequests send none -- so every mirror fetch carries one.
+const MIRROR_UA = 'AcreetionOS-MirrorCheck/1.0 (+https://acreetionos.org/mirrors.html)';
 const MIRROR_NOTIFY_EMAIL = 'natalie@acreetionos.org';
 const MIRROR_FILES = [
   'AcreetionOS-1.0-x86_64.iso',
@@ -2583,7 +2586,7 @@ function parseMirrorSums(text) {
 
 async function fetchMirrorSums(url) {
   try {
-    const r = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    const r = await fetch(url, { headers: { 'User-Agent': MIRROR_UA }, signal: AbortSignal.timeout(20000) });
     if (!r.ok) return null;
     const sums = parseMirrorSums(await r.text());
     return Object.keys(sums).length ? sums : null;
@@ -2594,12 +2597,12 @@ async function remoteFileSize(url) {
   // Size of a remote file without downloading it: HEAD first, then a
   // one-byte range GET (parsing Content-Range) for hosts without HEAD.
   try {
-    const h = await fetch(url, { method: 'HEAD', signal: AbortSignal.timeout(20000) });
+    const h = await fetch(url, { method: 'HEAD', headers: { 'User-Agent': MIRROR_UA }, signal: AbortSignal.timeout(20000) });
     const hl = parseInt(h.headers.get('content-length') || '', 10);
     if (h.ok && Number.isFinite(hl)) return hl;
   } catch (e) {}
   try {
-    const r = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0' }, signal: AbortSignal.timeout(20000) });
+    const r = await fetch(url, { method: 'GET', headers: { Range: 'bytes=0-0', 'User-Agent': MIRROR_UA }, signal: AbortSignal.timeout(20000) });
     const cr = r.headers.get('content-range') || '';
     const m = cr.match(/\/(\d+)\s*$/);
     let size = null;
@@ -2892,7 +2895,7 @@ export default {
       const probe = async (m) => {
         const t0 = Date.now();
         const hit = async (path) => {
-          const r = await fetch(m.base + path, { method: 'GET', headers: { 'Range': 'bytes=0-63' } });
+          const r = await fetch(m.base + path, { method: 'GET', headers: { 'Range': 'bytes=0-63', 'User-Agent': MIRROR_UA } });
           return r.status === 200 || r.status === 206;
         };
         try {
