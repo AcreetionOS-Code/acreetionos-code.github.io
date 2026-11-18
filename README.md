@@ -68,9 +68,28 @@ Every embed carries its reason in two places: a visible note next to the embedde
      shown with credit: [source name] -- [original URL] -->
 ```
 
+### Workflow for latest contributors (read this first)
+
+This is the workflow we use — it matches `AGENTS.md:1-8` and keeps `main` releasable. Follow it for every change.
+
+1. **File the issue first.** `gh issue create` (or GitHub UI). Assign to yourself. Body must state the problem, what "done" looks like, and the **approach being attempted** — posted as a comment on the issue before any code exists.
+2. **Branch off `development` (or `main` if `development` doesn't exist yet).** Never commit directly to `main` or `development`. Prefixes: `features/`, `bug/`, `build/`, `automation/`.
+3. **Comment the "why" in the code**, not the "what". Future readers need the reasoning.
+4. **Commit with an appropriate message**, then add a **`git notes`** on the commit explaining why the change was made.
+5. **Comment on the issue** with why the changes were made and link the branch.
+6. **Open a PR back into `development`** (not `main`) referencing the issue. The PR is what gets reviewed. **Nothing merges to `main` until the maintainer says so** — `development` is then PR'd into `main`.
+7. **Update the project board** when the repo has one (see below).
+8. **One thing at a time.** Do not bundle unrelated work into the same branch.
+
+Other rules we enforce in review:
+
+- **Run it before you claim it works** — `npm test` (Playwright, Firefox) must pass; show real output.
+- **Non-interactive shell flags** — `cp -f`, `mv -f`, `rm -f`, `rm -rf`, `scp -o BatchMode=yes`, `ssh -o BatchMode=yes` (bare `cp`/`mv`/`rm` hang on prompts).
+- **Branching & testing:** `other branches → development → main`. Anything pushed to `development` is automatically built to **`https://testing-website.acreetionos.org`** — preview there. See `AGENTS.md` for the full maintainer checklist.
+
 ### Branching & deployment
 
-All feature work goes in `features/*`, `bug/*`, `build/*`, or `automation/*` branches off `main` — never direct to `main`. The flow is:
+All feature work goes in `features/*`, `bug/*`, `build/*`, or `automation/*` branches — never direct to `main`/`development`. The flow is:
 
 ```
 other branches → development → main
@@ -79,6 +98,12 @@ other branches → development → main
 - **`development`** is the integration branch. Every feature/bug branch is PR'd into `development` first, built and tested there, then `development` is PR'd into `main`.
 - **`main`** is production (`https://acreetionos.org`, deployed via GitHub Pages + Cloudflare).
 - **Testing deployments:** anything pushed to `development` is automatically built and published to **`https://testing-website.acreetionos.org`** — if you want to see a testing deployment, look there for the latest `development` build. To preview a feature, merge/PR it into `development` and check the testing site.
+
+### Quarterly documentation & project boards
+
+- **Milestone [`quarterly-documentation`](https://github.com/AcreetionOS-Code/acreetionos-code.github.io/milestone/3)** — the documentation database for how the website is laid out and how it works (pages, shared CSS/JS, `vendor/`, `wiki-guides/`, `newsletter-archive/`, scripts, tests, metadata, workflows). Issues labeled `quarterly-documentation` live here and are worked quarterly.
+- **Sprint [`Sprint — docs workflow & testing preview`](https://github.com/AcreetionOS-Code/acreetionos-code.github.io/milestone/4)** — current sprint tracking `#667`–`#671` (GTM, disclosure, testing preview, this workflow doc).
+- **Sprint [`Sprint — project boards`](https://github.com/AcreetionOS-Code/acreetionos-code.github.io/milestone/5)** — next sprint to set up GitHub Project boards (To do / In Progress / Done), link issues, and automate moves on PR close. Update the board on every PR as required by the workflow above.
 
 ### Local Development
 
