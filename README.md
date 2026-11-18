@@ -68,6 +68,18 @@ Every embed carries its reason in two places: a visible note next to the embedde
      shown with credit: [source name] -- [original URL] -->
 ```
 
+### Branching & deployment
+
+All feature work goes in `features/*`, `bug/*`, `build/*`, or `automation/*` branches off `main` — never direct to `main`. The flow is:
+
+```
+other branches → development → main
+```
+
+- **`development`** is the integration branch. Every feature/bug branch is PR'd into `development` first, built and tested there, then `development` is PR'd into `main`.
+- **`main`** is production (`https://acreetionos.org`, deployed via GitHub Pages + Cloudflare).
+- **Testing deployments:** anything pushed to `development` is automatically built and published to **`https://testing-website.acreetionos.org`** — if you want to see a testing deployment, look there for the latest `development` build. To preview a feature, merge/PR it into `development` and check the testing site.
+
 ### Local Development
 
 To run the website locally for testing or development:
@@ -81,6 +93,21 @@ cd acreetionos-code.github.io
 python3 -m http.server 8000
 # Access at http://localhost:8000
 ```
+
+### Building everything (sitemaps, feeds, archives)
+
+The site is mostly static, but a few generated files must be rebuilt before pushing:
+
+```bash
+python3 scripts/gen-sitemap.py        # -> sitemap.xml (now includes analytics.html)
+python3 scripts/gen-sitemap-index.py  # -> sitemap_index.xml
+python3 scripts/gen-feed.py           # -> feed.xml
+python3 scripts/gen-robots.py         # -> robots.txt
+python3 scripts/gen-newsletter-archive.py  # -> newsletter-archive/
+python3 scripts/gen-wiki-guides.py         # -> wiki-guides/
+```
+
+CI does not regenerate these — commit the result so `main` and `development` are deployable as-is.
 
 ### Running Tests
 

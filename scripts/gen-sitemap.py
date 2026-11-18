@@ -40,6 +40,7 @@ STATIC_PAGES = [
     ("/immutable.html", "monthly", "0.7"),
     ("/lightweight.html", "monthly", "0.8"),
     ("/newsletter.html", "weekly", "0.7"),
+    ("/analytics.html", "yearly", "0.4"),
     ("/privacy.html", "yearly", "0.4"),
     ("/requirements.html", "monthly", "0.7"),
     ("/status.html", "daily", "0.6"),
