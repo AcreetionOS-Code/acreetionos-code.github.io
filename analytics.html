@@ -74,8 +74,14 @@ td{color:var(--text)}
           <p class="meta">Last updated: 2026-11-18 &middot; Related: <a href="privacy.html">Privacy Policy</a> &middot; Issue <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/668">#668</a> &middot; Blocked by <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/667">#667</a></p>
         </div>
 
+        <div class="card" style="border-color:var(--green);background:rgba(46,204,113,.08)">
+          <h2><i class="bi bi-shield-check"></i> Our guarantee — no ads, ever</h2>
+          <p><strong style="color:var(--text-bright)">AcreetionOS will never serve ads on this website or in the operating system.</strong> No ad slots, no sponsored placements, no selling of attention. Period.</p>
+          <p>We are adding Google Tag Manager + Ahrefs <strong>only</strong> for <strong>compliance</strong> (GDPR / UK GDPR / ePrivacy consent-gating, auditability) and <strong>relationship-building</strong> (understanding which docs, mirrors, and release notes actually help people, and keeping community communication relevant). If a tag would enable ad serving, it will not be added. This guarantee is part of <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/668">#668</a> and will be enforced in GTM container policy.</p>
+        </div>
+
         <div class="notice">
-          <p><strong style="color:var(--text-bright)">TL;DR:</strong> This site uses <strong>Ahrefs Web Analytics</strong> (cookie-free, aggregate) and, when enabled, <strong>Google Tag Manager (GTM)</strong> to load GA4/Google Ads tags. All GTM tags are gated by Consent Mode v2 (default <code>denied</code>) — nothing fires until you consent. Block the scripts with a content blocker or use the consent banner to withdraw at any time. See <a href="#opt-out">How to opt out</a>.</p>
+          <p><strong style="color:var(--text-bright)">TL;DR:</strong> This site uses <strong>Ahrefs Web Analytics</strong> (cookie-free, aggregate) and, when enabled, <strong>Google Tag Manager (GTM)</strong> to load strictly <strong>compliance &amp; relationship-building</strong> tags only (e.g. GA4 page/conversion measurement). No ads. All GTM tags are gated by Consent Mode v2 (default <code>denied</code>) — nothing fires until you consent. Block the scripts with a content blocker or use the consent banner to withdraw at any time. See <a href="#opt-out">How to opt out</a>.</p>
         </div>
 
         <div class="card">
@@ -86,8 +92,8 @@ td{color:var(--text)}
               <tbody>
                 <tr><td><strong>Ahrefs Web Analytics</strong></td><td><code>https://analytics.ahrefs.com/analytics.js</code><br><span style="color:#888">key <code>o6LG+Kcq+miQXsnNotVUHw</code></span></td><td>Aggregate page views, referrers, device/browser family, country — no cross-site tracking</td><td>Via GTM; requires <code>analytics_storage: granted</code></td></tr>
                 <tr><td><strong>Google Tag Manager</strong></td><td><code>https://www.googletagmanager.com/gtm.js?id=GTM-XXXXXXX</code></td><td>Container that loads other tags (GA4, Ads) per trigger rules — no tracking by itself</td><td>Consent Mode v2 defaults <code>denied</code></td></tr>
-                <tr><td><strong>Google Analytics 4</strong> (via GTM)</td><td><code>https://www.google-analytics.com / https://www.googletagmanager.com</code><br><span style="color:#888">ID <code>G-XXXXXXX</code> (placeholder)</span></td><td>Funnel &amp; conversion measurement (e.g., ISO downloads, newsletter signups)</td><td>Requires <code>analytics_storage: granted</code></td></tr>
-                <tr><td><strong>Google Ads / other</strong> (via GTM, if enabled)</td><td>GTM-managed</td><td>Campaign attribution</td><td>Requires <code>ad_storage: granted</code></td></tr>
+                <tr><td><strong>Google Analytics 4</strong> (via GTM)</td><td><code>https://www.google-analytics.com / https://www.googletagmanager.com</code><br><span style="color:#888">ID <code>G-XXXXXXX</code> (placeholder)</span></td><td>Compliance &amp; relationship-building only — funnel &amp; conversion measurement (e.g., ISO downloads, newsletter signups). <strong>No ad serving.</strong></td><td>Requires <code>analytics_storage: granted</code></td></tr>
+                <tr><td><strong>Other GTM tags</strong></td><td>GTM-managed</td><td colspan="2" style="color:#2ecc71;font-weight:700">Ads and any ad-serving tags are explicitly excluded by policy (see guarantee above). If ever proposed, they will be rejected in GTM container review.</td></tr>
               </tbody>
             </table>
           </div>
@@ -95,13 +101,14 @@ td{color:var(--text)}
         </div>
 
         <div class="card">
-          <h2><i class="bi bi-info-circle"></i> 2. Why we measure</h2>
-          <p>To understand which pages help users, where downloads fail (mirrors/ISOs), and which campaigns drive real installs — without editing 80+ HTML files for every new tag. GTM gives a single auditable place to add, gate, and disable tags.</p>
-          <h3>What we don't do</h3>
+          <h2><i class="bi bi-info-circle"></i> 2. Why we measure — compliance &amp; relationship-building only</h2>
+          <p>We measure for two reasons only: <strong>compliance</strong> (a single, auditable place to enforce Consent Mode v2, honor GDPR/UK GDPR/ePrivacy, and document what loads) and <strong>relationship-building</strong> (which docs, mirrors, and release notes actually help people, where downloads fail, what to improve next) — without editing 80+ HTML files for every tag. GTM gives that single auditable place to add, gate, and disable tags.</p>
+          <h3>What we don't do — and never will</h3>
           <ul>
+            <li><strong style="color:var(--text-bright)">No ads — ever.</strong> No ad slots, no sponsored placements, no ad-serving tags in GTM. This is a binding guarantee for this site and the OS.</li>
             <li>No OS telemetry — AcreetionOS itself collects nothing (see <a href="privacy.html">Privacy</a>).</li>
             <li>No selling or sharing of analytics data.</li>
-            <li>No fingerprinting or cross-site tracking beyond what the listed processors do under consent.</li>
+            <li>No fingerprinting or cross-site tracking beyond what the listed processors do under explicit consent.</li>
           </ul>
         </div>
 
