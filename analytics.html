@@ -120,7 +120,8 @@ td{color:var(--text)}
           <dl class="kv">
             <dt>Controller</dt><dd>AcreetionOS (community project) — contact via <a href="contact.html">contact page</a>.</dd>
             <dt>Processors</dt><dd>Ahrefs Pte. Ltd. (Ahrefs Analytics — cookie-free); Google LLC (GTM + GA4 as configured, with identifiability refused).</dd>
-            <dt>Legal basis</dt><dd>Consent (GDPR Art. 6(1)(a) / UK GDPR, ePrivacy) for GTM/GA4; legitimate interest for aggregate, cookie-free Ahrefs counts where consent not required — migrated to consent-gated via GTM.</dd>
+            <dt>Legal basis (EU/UK)</dt><dd>Consent (GDPR Art. 6(1)(a) / UK GDPR, ePrivacy) for GTM/GA4; legitimate interest for aggregate, cookie-free Ahrefs counts where consent not required — migrated to consent-gated via GTM.</dd>
+            <dt>Legal basis (US)</dt><dd>Consent where required (e.g., opt-in for sensitive contexts) + opt-out rights honored everywhere (CCPA/CPRA, VCDPA, CPA, CTDPA, UCPA, TDPSA, Oregon CPA). No sale/share of personal information (see §4).</dd>
             <dt>Data categories</dt><dd>Ahrefs: aggregate page views, referrer, country/region, device/browser family (no IP stored with analytics, no user ID). GA4 (if consented, anonymized): aggregate page events, coarse/approximate location, device class — <strong>no user ID, no cross-site ID, IP anonymized/truncated</strong> before storage; any feature that would identify you is disabled and refused.</dd>
             <dt>Cookies / storage</dt><dd><strong>Default: none.</strong> Ahrefs: none (cookie-free, always). GTM/GA4: we refuse identifiable cookies. If consented and enabled, only <strong>anonymous, non-identifiable</strong> measurement is allowed (e.g., GA4 with <code>anonymize_ip</code>, consent-aware, no <code>_gcl_*</code> ad IDs, no User-ID, no Google Signals) — and only after <code>analytics_storage: granted</code>. Identifiable cookies such as ad personalization IDs are not set, period.</dd>
             <dt>Retention</dt><dd>Ahrefs: per Ahrefs policy (aggregate). GA4 (anonymized): 2 / 14 months, aggregate only (configurable; disclosed when finalized). GTM itself stores no analytics data.</dd>
@@ -128,8 +129,29 @@ td{color:var(--text)}
           </dl>
         </div>
 
+        <div class="card">
+          <h2><i class="bi bi-flag"></i> 4. U.S. compliance disclosure — CCPA/CPRA &amp; state privacy laws</h2>
+          <p style="color:var(--text-bright);font-weight:700">We apply the same anonymous, no-identification standard to U.S. visitors — and we meet U.S. disclosure and opt-out duties.</p>
+          <h3>What U.S. law requires here</h3>
+          <ul>
+            <li><strong>CCPA as amended by CPRA (California)</strong> + <strong>CalOPPA</strong> — we disclose categories collected (aggregate page analytics, not personal identifiers), purposes (compliance &amp; aggregate relationship-building), retention, and that we <strong>do not sell or share personal information</strong> and do not use/share sensitive personal information beyond what is necessary. No sale/share means no "Do Not Sell/Share" sale to opt out of, but we still honor your opt-out signals.</li>
+            <li><strong>State privacy laws</strong> — Virginia (VCDPA), Colorado (CPA), Connecticut (CTDPA), Utah (UCPA), Texas (TDPSA), Oregon (OCPA), Montana, Delaware, Iowa, Nebraska, New Hampshire, New Jersey, Tennessee, Indiana and others — we honor the rights they grant where you live: right to know/access, delete, correct (where applicable), opt out of sale/share/targeted advertising, and non-discrimination for exercising rights.</li>
+            <li><strong>FTC Act / common law</strong> — no deceptive tracking; this disclosure and the consent banner are the notice and choice mechanism.</li>
+          </ul>
+          <h3>Your U.S. rights — how to exercise</h3>
+          <ul>
+            <li><strong>Do Not Sell or Share:</strong> we do not sell or share personal information (as defined by CCPA/CPRA). You don't need to opt out of a sale that doesn't happen — blocking the analytics scripts (see §5) guarantees it.</li>
+            <li><strong>Opt out of analytics:</strong> use the <a href="#opt-out">opt-out controls in §5</a> (Reject in the consent banner, or block <code>analytics.ahrefs.com</code> / <code>googletagmanager.com</code>). The site remains fully usable.</li>
+            <li><strong>Global Privacy Control (GPC):</strong> we honor GPC as an opt-out of any sale/share and as a request to treat you as having opted out of analytics where GPC is a valid signal under CCPA/CPRA and Colorado CPA. No separate form needed.</li>
+            <li><strong>Know / delete / correct:</strong> because we collect only aggregate, non-identifiable counts (and refuse identifiable cookies — see §3), there is typically no personal information about you to know/delete/correct. If you believe we hold something identifiable, <a href="contact.html">contact us</a> — we respond within 45 days (CCPA/CPRA timeline) and we will not discriminate against you for exercising rights.</li>
+            <li><strong>Minors:</strong> this site is not directed to children under 13 (COPPA) and we do not knowingly collect personal information from children.</li>
+          </ul>
+          <p style="color:#888;font-size:.82rem">Plain-language required notice: Categories: aggregate website analytics (page views, referrers, coarse country/region, device/browser family — no name, email, address, or cross-site IDs). Sources: your browser when you visit. Purposes: compliance (auditable consent) and aggregate relationship-building (improving docs/mirrors). Retention: Ahrefs aggregate per Ahrefs policy; GA4 anonymized aggregate 2/14 months (when finalized). Disclosure: Ahrefs Pte. Ltd. (Singapore) and Google LLC (U.S., anonymized only, SCCs where required). No sale/share. For questions or rights requests: <a href="contact.html">contact page</a>.</p>
+          <p style="color:#888;font-size:.82rem">If future U.S. state laws add new duties, this page will be updated and versioned (last-updated date in the header). No material change will add identifiable tracking or ads — those remain prohibited by the guarantees in §1–2.</p>
+        </div>
+
         <div class="card" id="opt-out">
-          <h2><i class="bi bi-sliders"></i> 4. How to opt out / withdraw consent</h2>
+          <h2><i class="bi bi-sliders"></i> 5. How to opt out / withdraw consent</h2>
           <ul>
             <li><strong>Consent banner:</strong> choose <em>Reject</em> or open <em>Manage preferences</em> to toggle Analytics / Ads (Consent Mode v2). Re-open via the footer link or the banner's gear icon.</li>
             <li><strong>Content blocker:</strong> block <code>analytics.ahrefs.com</code> and <code>googletagmanager.com</code> / <code>google-analytics.com</code> — the site remains fully usable.</li>
@@ -140,7 +162,7 @@ td{color:var(--text)}
         </div>
 
         <div class="card">
-          <h2><i class="bi bi-link-45deg"></i> 5. Related pages</h2>
+          <h2><i class="bi bi-link-45deg"></i> 6. Related pages</h2>
           <p><a href="privacy.html">Privacy Policy</a> — OS-level guarantees and overall site privacy. This disclosure is the canonical detail for website tags.</p>
           <p style="color:#888;font-size:.8rem">Footer link: every page footer now includes <strong>Analytics Disclosure</strong> alongside Privacy and community links. Banner "Learn more" also points here.</p>
         </div>
