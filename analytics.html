@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="analytics disclosure, tracking disclosure, privacy, GTM, Google Tag Manager, Ahrefs">
+  <title>Analytics Disclosure — Google Tag Manager + Ahrefs | AcreetionOS</title>
+  <meta name="description" content="How AcreetionOS.org uses Ahrefs Web Analytics and Google Tag Manager (GTM): what loads, why, cookies/storage, retention, and how to opt out.">
+  <link rel="canonical" href="https://acreetionos.org/analytics.html">
+  <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+  <style>
+#hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
+html{touch-action:manipulation}input,textarea,select{font-size:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);line-height:1.6}
+.wrap{max-width:840px;margin:2rem auto;padding:0 1.5rem}
+.hero{text-align:center;padding:2rem 1rem 1rem}
+.hero h1{font-size:2rem;font-weight:800;color:var(--text-bright);margin-bottom:.4rem;line-height:1.2}
+.hero h1 span{color:var(--green)}
+.hero p{color:var(--text);font-size:1.02rem;max-width:640px;margin:0 auto;line-height:1.7}
+.badge{display:inline-flex;align-items:center;gap:.4rem;margin-top:.8rem;padding:.3rem .7rem;border:1px solid var(--border);border-radius:20px;color:var(--text);font-size:.78rem;background:var(--panel)}
+.meta{color:#888;font-size:.8rem;text-align:center;margin-top:.6rem}
+.meta a{color:var(--green)}
+.card{margin:1.4rem 0;padding:1.25rem;background:var(--panel);border:1px solid var(--border);border-radius:12px}
+.card h2{color:var(--green);font-size:1.05rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.45rem}
+.card h3{color:var(--text-bright);font-size:.95rem;margin:1rem 0 .3rem}
+.card p{color:var(--text);font-size:.92rem;line-height:1.65;margin:0 0 .7rem}
+.card ul{margin:.2rem 0 .7rem 1.2rem;color:var(--text);font-size:.9rem;line-height:1.6}
+.card li{margin-bottom:.25rem}
+.card a{color:var(--green)}
+.kv{display:grid;grid-template-columns:160px 1fr;gap:.5rem 1rem;margin:.6rem 0}
+.kv dt{color:var(--text-bright);font-weight:700;font-size:.85rem}
+.kv dd{color:var(--text);font-size:.85rem}
+.notice{border-left:3px solid var(--green);padding:.7rem .9rem;background:rgba(46,204,113,.07);border-radius:8px;margin:.8rem 0}
+.notice p{margin:0;color:var(--text);font-size:.88rem}
+.btn{display:inline-flex;align-items:center;gap:.4rem;background:var(--green);color:#000;padding:.75rem 1.4rem;border-radius:10px;font-weight:700;text-decoration:none}
+.btn:hover{filter:brightness(1.05)}
+.table-wrap{overflow-x:auto;margin:.6rem 0}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{border:1px solid var(--border);padding:.55rem .6rem;text-align:left}
+th{background:#1e1e1e;color:var(--text-bright)}
+td{color:var(--text)}
+@media(max-width:600px){.hero h1{font-size:1.5rem}.kv{grid-template-columns:1fr}}
+  </style>
+  <script src="https://analytics.ahrefs.com/analytics.js" data-key="o6LG+Kcq+miQXsnNotVUHw" async></script>
+</head>
+<body>
+  <div id="page-wrap">
+    <div id="page-scale">
+      <header class="page-header">
+        <div class="header-content">
+          <a href="index.html" class="logo">
+            <img src="logo.webp" alt="AcreetionOS" class="logo-img" width="40" height="40">
+            <span class="logo-text">Acreetion <span>OS</span></span>
+          </a>
+          <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="flash.html">Downloads</a>
+          </nav>
+        </div>
+      </header>
+      <div class="wrap">
+        <div class="hero">
+          <h1>Analytics <span>Disclosure</span></h1>
+          <p>What AcreetionOS.org loads to measure the website (not the OS), why, and how to opt out. The operating system itself still collects <strong style="color:var(--text-bright)">zero telemetry</strong>.</p>
+          <div class="badge"><i class="bi bi-shield-check"></i> Mockup — pending GTM container ID</div>
+          <p class="meta">Last updated: 2026-11-18 &middot; Related: <a href="privacy.html">Privacy Policy</a> &middot; Issue <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/668">#668</a> &middot; Blocked by <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/667">#667</a></p>
+        </div>
+
+        <div class="notice">
+          <p><strong style="color:var(--text-bright)">TL;DR:</strong> This site uses <strong>Ahrefs Web Analytics</strong> (cookie-free, aggregate) and, when enabled, <strong>Google Tag Manager (GTM)</strong> to load GA4/Google Ads tags. All GTM tags are gated by Consent Mode v2 (default <code>denied</code>) — nothing fires until you consent. Block the scripts with a content blocker or use the consent banner to withdraw at any time. See <a href="#opt-out">How to opt out</a>.</p>
+        </div>
+
+        <div class="card">
+          <h2><i class="bi bi-bullseye"></i> 1. What loads</h2>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Tag</th><th>Source</th><th>Purpose</th><th>Gating</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Ahrefs Web Analytics</strong></td><td><code>https://analytics.ahrefs.com/analytics.js</code><br><span style="color:#888">key <code>o6LG+Kcq+miQXsnNotVUHw</code></span></td><td>Aggregate page views, referrers, device/browser family, country — no cross-site tracking</td><td>Via GTM; requires <code>analytics_storage: granted</code></td></tr>
+                <tr><td><strong>Google Tag Manager</strong></td><td><code>https://www.googletagmanager.com/gtm.js?id=GTM-XXXXXXX</code></td><td>Container that loads other tags (GA4, Ads) per trigger rules — no tracking by itself</td><td>Consent Mode v2 defaults <code>denied</code></td></tr>
+                <tr><td><strong>Google Analytics 4</strong> (via GTM)</td><td><code>https://www.google-analytics.com / https://www.googletagmanager.com</code><br><span style="color:#888">ID <code>G-XXXXXXX</code> (placeholder)</span></td><td>Funnel &amp; conversion measurement (e.g., ISO downloads, newsletter signups)</td><td>Requires <code>analytics_storage: granted</code></td></tr>
+                <tr><td><strong>Google Ads / other</strong> (via GTM, if enabled)</td><td>GTM-managed</td><td>Campaign attribution</td><td>Requires <code>ad_storage: granted</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p style="color:#888;font-size:.8rem">GTM container ID and GA4 measurement ID are placeholders in this mockup; final IDs will be documented here when #667 lands.</p>
+        </div>
+
+        <div class="card">
+          <h2><i class="bi bi-info-circle"></i> 2. Why we measure</h2>
+          <p>To understand which pages help users, where downloads fail (mirrors/ISOs), and which campaigns drive real installs — without editing 80+ HTML files for every new tag. GTM gives a single auditable place to add, gate, and disable tags.</p>
+          <h3>What we don't do</h3>
+          <ul>
+            <li>No OS telemetry — AcreetionOS itself collects nothing (see <a href="privacy.html">Privacy</a>).</li>
+            <li>No selling or sharing of analytics data.</li>
+            <li>No fingerprinting or cross-site tracking beyond what the listed processors do under consent.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h2><i class="bi bi-cookie"></i> 3. Cookies, storage &amp; data</h2>
+          <dl class="kv">
+            <dt>Controller</dt><dd>AcreetionOS (community project) — contact via <a href="contact.html">contact page</a>.</dd>
+            <dt>Processors</dt><dd>Ahrefs Pte. Ltd. (Ahrefs Analytics); Google LLC (GTM + GA4/Ads as configured).</dd>
+            <dt>Legal basis</dt><dd>Consent (GDPR Art. 6(1)(a) / UK GDPR, ePrivacy) for GTM/GA4/Ads; legitimate interest for aggregate, cookie-free Ahrefs page counts where consent not required — migrated to consent-gated via GTM.</dd>
+            <dt>Data categories</dt><dd>Ahrefs: aggregate page views, referrer, country/region, device/browser family (no IP stored with analytics). GA4 (if consented): page events, approximate location, device, consent-aware session IDs; IP truncated/anonymized per Google settings.</dd>
+            <dt>Cookies / storage</dt><dd>Ahrefs: none (cookie-free). GTM/GA4/Ads (if consented): <code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_gcl_*</code>, and related localStorage — only after <code>granted</code>.</dd>
+            <dt>Retention</dt><dd>Ahrefs: per Ahrefs policy (aggregate). GA4: 2 / 14 months (configurable; disclosed when finalized). GTM itself stores no analytics data.</dd>
+            <dt>Transfers</dt><dd>Google may process in the US; Standard Contractual Clauses (SCCs) apply where required. Ahrefs: Singapore.</dd>
+          </dl>
+        </div>
+
+        <div class="card" id="opt-out">
+          <h2><i class="bi bi-sliders"></i> 4. How to opt out / withdraw consent</h2>
+          <ul>
+            <li><strong>Consent banner:</strong> choose <em>Reject</em> or open <em>Manage preferences</em> to toggle Analytics / Ads (Consent Mode v2). Re-open via the footer link or the banner's gear icon.</li>
+            <li><strong>Content blocker:</strong> block <code>analytics.ahrefs.com</code> and <code>googletagmanager.com</code> / <code>google-analytics.com</code> — the site remains fully usable.</li>
+            <li><strong>Browser:</strong> enable Do Not Track / GPC where honored, or clear cookies for this site; GTM respects <code>ad_storage</code>/<code>analytics_storage</code> denied.</li>
+          </ul>
+          <p><a href="#" onclick="alert('Mockup: consent preferences would open here.');return false;" class="btn"><i class="bi bi-gear"></i> Manage consent (mock)</a></p>
+          <p style="color:#888;font-size:.8rem">This button is a mockup placeholder — the real CMP will be wired when #667 implements GTM.</p>
+        </div>
+
+        <div class="card">
+          <h2><i class="bi bi-link-45deg"></i> 5. Related pages</h2>
+          <p><a href="privacy.html">Privacy Policy</a> — OS-level guarantees and overall site privacy. This disclosure is the canonical detail for website tags.</p>
+          <p style="color:#888;font-size:.8rem">Footer link: every page footer now includes <strong>Analytics Disclosure</strong> alongside Privacy and community links. Banner "Learn more" also points here.</p>
+        </div>
+
+        <div class="card" style="text-align:center">
+          <p>Questions? <a href="contact.html">Contact us</a> or comment on <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/668">#668</a>.</p>
+        </div>
+      </div>
+      <script src="scale-page.js?v=20260824" defer></script>
+      <script src="sidebar.js?v=20260825" defer></script>
+    </div>
+  </div>
+  <script src="footer.js?v=20260825" defer></script>
+  <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
+  <script src="tor-badge.js?v=20260825" defer></script>
+</body>
+</html>
