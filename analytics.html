@@ -75,9 +75,10 @@ td{color:var(--text)}
         </div>
 
         <div class="card" style="border-color:var(--green);background:rgba(46,204,113,.08)">
-          <h2><i class="bi bi-shield-check"></i> Our guarantee — no ads, ever</h2>
-          <p><strong style="color:var(--text-bright)">AcreetionOS will never serve ads on this website or in the operating system.</strong> No ad slots, no sponsored placements, no selling of attention. Period.</p>
-          <p>We are adding Google Tag Manager + Ahrefs <strong>only</strong> for <strong>compliance</strong> (GDPR / UK GDPR / ePrivacy consent-gating, auditability) and <strong>relationship-building</strong> (understanding which docs, mirrors, and release notes actually help people, and keeping community communication relevant). If a tag would enable ad serving, it will not be added. This guarantee is part of <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/668">#668</a> and will be enforced in GTM container policy.</p>
+          <h2><i class="bi bi-shield-check"></i> Our guarantees — no ads, no identifiable cookies, we don't want to know who you are</h2>
+          <p><strong style="color:var(--text-bright)">AcreetionOS will never serve ads</strong> on this website or in the operating system. No ad slots, no sponsored placements, no selling of attention. Period.</p>
+          <p><strong style="color:var(--text-bright)">We refuse any cookie or storage that identifies you.</strong> We don't want to know who you are — only whether a page or mirror helped (aggregate counts, not people). Any tag that would set an identifiable cookie, fingerprint you, or track you across sites will be refused in GTM container review. Ahrefs is cookie-free by design; GA4 (if consented) is configured for anonymized, non-identifiable measurement only — and if it can't be made anonymous, it won't be used.</p>
+          <p>We are adding GTM + Ahrefs <strong>only</strong> for <strong>compliance</strong> (GDPR / UK GDPR / ePrivacy consent-gating, auditability) and <strong>relationship-building</strong> (which docs and mirrors are useful, in aggregate). This guarantee is part of <a href="https://github.com/AcreetionOS-Code/acreetionos-code.github.io/issues/668">#668</a> and is enforced in GTM policy.</p>
         </div>
 
         <div class="notice">
@@ -105,23 +106,25 @@ td{color:var(--text)}
           <p>We measure for two reasons only: <strong>compliance</strong> (a single, auditable place to enforce Consent Mode v2, honor GDPR/UK GDPR/ePrivacy, and document what loads) and <strong>relationship-building</strong> (which docs, mirrors, and release notes actually help people, where downloads fail, what to improve next) — without editing 80+ HTML files for every tag. GTM gives that single auditable place to add, gate, and disable tags.</p>
           <h3>What we don't do — and never will</h3>
           <ul>
-            <li><strong style="color:var(--text-bright)">No ads — ever.</strong> No ad slots, no sponsored placements, no ad-serving tags in GTM. This is a binding guarantee for this site and the OS.</li>
+            <li><strong style="color:var(--text-bright)">No ads — ever.</strong> No ad slots, no sponsored placements, no ad-serving tags in GTM.</li>
+            <li><strong style="color:var(--text-bright)">No identifiable cookies — ever.</strong> We refuse any cookie/storage that identifies you. We don't want to know who you are; we measure pages, not people (aggregate only).</li>
             <li>No OS telemetry — AcreetionOS itself collects nothing (see <a href="privacy.html">Privacy</a>).</li>
             <li>No selling or sharing of analytics data.</li>
-            <li>No fingerprinting or cross-site tracking beyond what the listed processors do under explicit consent.</li>
+            <li>No fingerprinting or cross-site tracking — refused by container policy, even under consent.</li>
           </ul>
         </div>
 
         <div class="card">
-          <h2><i class="bi bi-cookie"></i> 3. Cookies, storage &amp; data</h2>
+          <h2><i class="bi bi-cookie"></i> 3. Cookies, storage &amp; data — anonymous by design</h2>
+          <div class="notice" style="border-left-color:#2ecc71"><p><strong style="color:var(--text-bright)">We don't want to know who you are.</strong> We refuse identifiable cookies and any storage that would let us (or a processor) single you out. Measurement is aggregate and anonymous — if a configuration would identify you, we won't use it.</p></div>
           <dl class="kv">
             <dt>Controller</dt><dd>AcreetionOS (community project) — contact via <a href="contact.html">contact page</a>.</dd>
-            <dt>Processors</dt><dd>Ahrefs Pte. Ltd. (Ahrefs Analytics); Google LLC (GTM + GA4/Ads as configured).</dd>
-            <dt>Legal basis</dt><dd>Consent (GDPR Art. 6(1)(a) / UK GDPR, ePrivacy) for GTM/GA4/Ads; legitimate interest for aggregate, cookie-free Ahrefs page counts where consent not required — migrated to consent-gated via GTM.</dd>
-            <dt>Data categories</dt><dd>Ahrefs: aggregate page views, referrer, country/region, device/browser family (no IP stored with analytics). GA4 (if consented): page events, approximate location, device, consent-aware session IDs; IP truncated/anonymized per Google settings.</dd>
-            <dt>Cookies / storage</dt><dd>Ahrefs: none (cookie-free). GTM/GA4/Ads (if consented): <code>_ga</code>, <code>_ga_&lt;ID&gt;</code>, <code>_gcl_*</code>, and related localStorage — only after <code>granted</code>.</dd>
-            <dt>Retention</dt><dd>Ahrefs: per Ahrefs policy (aggregate). GA4: 2 / 14 months (configurable; disclosed when finalized). GTM itself stores no analytics data.</dd>
-            <dt>Transfers</dt><dd>Google may process in the US; Standard Contractual Clauses (SCCs) apply where required. Ahrefs: Singapore.</dd>
+            <dt>Processors</dt><dd>Ahrefs Pte. Ltd. (Ahrefs Analytics — cookie-free); Google LLC (GTM + GA4 as configured, with identifiability refused).</dd>
+            <dt>Legal basis</dt><dd>Consent (GDPR Art. 6(1)(a) / UK GDPR, ePrivacy) for GTM/GA4; legitimate interest for aggregate, cookie-free Ahrefs counts where consent not required — migrated to consent-gated via GTM.</dd>
+            <dt>Data categories</dt><dd>Ahrefs: aggregate page views, referrer, country/region, device/browser family (no IP stored with analytics, no user ID). GA4 (if consented, anonymized): aggregate page events, coarse/approximate location, device class — <strong>no user ID, no cross-site ID, IP anonymized/truncated</strong> before storage; any feature that would identify you is disabled and refused.</dd>
+            <dt>Cookies / storage</dt><dd><strong>Default: none.</strong> Ahrefs: none (cookie-free, always). GTM/GA4: we refuse identifiable cookies. If consented and enabled, only <strong>anonymous, non-identifiable</strong> measurement is allowed (e.g., GA4 with <code>anonymize_ip</code>, consent-aware, no <code>_gcl_*</code> ad IDs, no User-ID, no Google Signals) — and only after <code>analytics_storage: granted</code>. Identifiable cookies such as ad personalization IDs are not set, period.</dd>
+            <dt>Retention</dt><dd>Ahrefs: per Ahrefs policy (aggregate). GA4 (anonymized): 2 / 14 months, aggregate only (configurable; disclosed when finalized). GTM itself stores no analytics data.</dd>
+            <dt>Transfers</dt><dd>Google may process in the US (anonymized data only); Standard Contractual Clauses (SCCs) apply where required. Ahrefs: Singapore (aggregate, no IP).</dd>
           </dl>
         </div>
 
