@@ -78,7 +78,7 @@ other branches → development → main
 
 - **`development`** is the integration branch. Every feature/bug branch is PR'd into `development` first, built and tested there, then `development` is PR'd into `main`.
 - **`main`** is production (`https://acreetionos.org`, deployed via GitHub Pages + Cloudflare).
-- **Testing deployments:** anything pushed to `development` is automatically built and published to **`https://testing.website.acreetionos.org`** — if you want to see a testing deployment, look there for the latest `development` build. To preview a feature, merge/PR it into `development` and check the testing site.
+- **Testing deployments:** anything pushed to `development` is automatically built and published to **`https://testing-website.acreetionos.org`** — if you want to see a testing deployment, look there for the latest `development` build. To preview a feature, merge/PR it into `development` and check the testing site.
 
 ### Local Development
 
