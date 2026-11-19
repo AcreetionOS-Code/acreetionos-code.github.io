@@ -31,14 +31,7 @@
     right: 12px;
   }
 
-  /* Allow the shared sidebar drawer to work on this page. */
-  .page-wrapper {
-    transition: transform 0.3s ease;
-  }
 
-  body.sidebar-open .page-wrapper {
-    transform: translateX(300px);
-  }
 
   #sidebar-overlay {
     display: block;
@@ -66,10 +59,6 @@
 }
 
 @media (max-width: 480px) {
-  body.sidebar-open .page-wrapper {
-    transform: translateX(85vw);
-  }
-
   #sidebar {
     width: 85vw;
   }
