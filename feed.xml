@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-11-19T00:00:00Z</updated>
+  <updated>2026-11-20T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- November 20, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-11-20.html"/>
+    <id>tag:acreetionos.org,2026-11-20:newsletter</id>
+    <updated>2026-11-20T00:00:00Z</updated>
+    <published>2026-11-20T00:00:00Z</published>
+    <summary>Subject: Calamares init failure fixed — shellprocess2 sequence entry was the culprit The installer boots again. Darren (cobra3282000) found and fixed the shellprocess2 sequence entry that was killing Calamares at init — the kind of single misplaced line that makes a whole ISO die before you ever rea…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- November 19, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-11-19.html"/>
@@ -1197,14 +1205,6 @@
     <id>tag:acreetionos.org,2026-06-23:newsletter</id>
     <updated>2026-06-23T00:00:00Z</updated>
     <published>2026-06-23T00:00:00Z</published>
-    <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, with recent changes making our release process even more reliable and efficient, and you can find all the details on our changelog page at https://acreetionos.org/changelog.html. This is a great example of how our commun…</summary>
-  </entry>
-  <entry>
-    <title>AcreetionOS Update — June 22, 2026</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-22.html"/>
-    <id>tag:acreetionos.org,2026-06-22:newsletter</id>
-    <updated>2026-06-22T00:00:00Z</updated>
-    <published>2026-06-22T00:00:00Z</published>
     <summary>The AcreetionOS continuous integration pipeline has just been fine-tuned again, with recent changes making our release process even more reliable and efficient, and you can find all the details on our changelog page at https://acreetionos.org/changelog.html. This is a great example of how our commun…</summary>
   </entry>
 </feed>
