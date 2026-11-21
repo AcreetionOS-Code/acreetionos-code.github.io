@@ -42,9 +42,9 @@
   <meta name="twitter:description" content="Celebrating the people who make AcreetionOS possible.">
   <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" data-acss><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+  <link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" data-acss><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
   <style>
     #hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}
     #hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}
@@ -94,12 +94,7 @@
     @media(max-width:600px){.hero h1{font-size:1.6rem}.stats{grid-template-columns:1fr 1fr}}
   </style>
 <!-- Google tag (gtag.js) -- GTM-WW9RFH5B -- compliance + relationship-building only, no ads, no identifiable cookies, Consent Mode v2 default denied -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
-  gtag('js', new Date());
-</script>
+<script src="consent-init.js"></script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B"></script>
 </head>
 <body>
