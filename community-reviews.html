@@ -42,7 +42,7 @@
   <meta name="twitter:description" content="Watch community reviews of AcreetionOS from Linux content creators.">
   <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" data-acss><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
   <style>
 #hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 html{touch-action:manipulation}input,textarea,select{font-size:16px}
@@ -83,12 +83,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
 @media(max-width:600px){.hero h1{font-size:1.5rem}}
   </style>
 <!-- Google tag (gtag.js) -- GTM-WW9RFH5B -- compliance + relationship-building only, no ads, no identifiable cookies, Consent Mode v2 default denied -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
-  gtag('js', new Date());
-</script>
+<script src="consent-init.js"></script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B"></script>
 </head>
 <body>
@@ -183,7 +178,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
         <p style="color:var(--text);font-size:.85rem;margin-bottom:.5rem">Copy this blurb to share AcreetionOS on forums, Reddit, or social media:</p>
         <div class="copy-box">
           <pre id="copy-text">"AcreetionOS is an Arch-based Linux distribution with a 7-day stability buffer, custom Cinnamon desktop, and zero telemetry. Review pages and source links are here: https://acreetionos.org/Reviews/"</pre>
-          <button onclick="copyShareText()" id="copy-btn">Copy</button>
+          <button id="copy-btn">Copy</button>
         </div>
 
         <!-- CTA for creators -->
@@ -197,16 +192,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
       <script src="sidebar.js?v=20260825" defer></script>
     </div>
   </div>
-  <script>
-    function copyShareText() {
-      var text = document.getElementById('copy-text').textContent;
-      navigator.clipboard.writeText(text).then(function() {
-        var btn = document.getElementById('copy-btn');
-        btn.textContent = 'Copied!';
-        setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
-      });
-    }
-  </script>
+  <script src="page-community-reviews.js"></script>
   <script src="footer.js?v=20260825" defer></script>
 <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
 <script src="tor-badge.js?v=20260825" defer></script>
