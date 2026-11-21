@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
   <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://wiki.archlinux.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com https://text.pollinations.ai https://www.google.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://wiki.archlinux.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com https://text.pollinations.ai https://www.google.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <title>
@@ -24,9 +24,9 @@
   <meta name="twitter:title" content="AcreetionOS vs Other Distributions">
   <meta name="twitter:description" content="We built AcreetionOS so people don't get screwed by Big Tech. See how we compare.">
   <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
-  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" data-acss><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" data-acss><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
   <style>
 
 #hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}html{touch-action:manipulation}input,textarea,select{font-size:16px}:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--red:#e74c3c;--amber:#f39c12}
@@ -74,12 +74,7 @@ body{background:var(--bg);color:var(--text-bright);font-family:'Roboto',sans-ser
 ]}
 </script>
 <!-- Google tag (gtag.js) -- GTM-WW9RFH5B -- compliance + relationship-building only, no ads, no identifiable cookies, Consent Mode v2 default denied -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
-  gtag('js', new Date());
-</script>
+<script src="consent-init.js"></script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B"></script>
 </head>
 <body>
