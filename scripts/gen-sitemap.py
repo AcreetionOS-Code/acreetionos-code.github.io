@@ -45,6 +45,7 @@ STATIC_PAGES = [
     ("/analytics.html", "yearly", "0.4"),
     ("/privacy.html", "yearly", "0.4"),
     ("/private-browsing-myths", "monthly", "0.6"),
+    ("/how-it-works.html", "monthly", "0.6"),
     ("/requirements.html", "monthly", "0.7"),
     ("/status.html", "daily", "0.6"),
     ("/translator.html", "monthly", "0.7"),
