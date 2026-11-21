@@ -86,7 +86,7 @@ def render_issue_html(date_str, data):
   <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <title>{html.escape(subject)} | AcreetionOS Newsletter</title>
+  <title>{html.escape(subject)}</title>
   <meta name="description" content="{html.escape(meta_desc)}">
   <link rel="canonical" href="{BASE_URL}/newsletter-archive/{date_str}.html">
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="{BASE_URL}/feed.xml">
@@ -259,7 +259,7 @@ def render_archive_index(entries):
   <meta name="msvalidate.01" content="8738943710B70112309DBE6476B55A91">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-  <title>AcreetionOS Daily Newsletter Archive – Project News & Updates</title>
+  <title>AcreetionOS Newsletter Archive – Project News & Updates</title>
   <meta name="description" content="Browse the complete archive of daily AcreetionOS newsletters. Track Arch Linux distribution updates, development commits, community news, and tips.">
   <meta name="keywords" content="AcreetionOS newsletter archive, Linux distro news, Arch Linux daily updates, open source newsletter">
   <link rel="canonical" href="{BASE_URL}/newsletter-archive/index.html">
