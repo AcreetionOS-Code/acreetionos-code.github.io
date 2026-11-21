@@ -28,6 +28,7 @@ STATIC_PAGES = [
     ("/blog.html", "daily", "0.9"),
     ("/changelog.html", "weekly", "0.8"),
     ("/community-reviews.html", "monthly", "0.8"),
+    ("/community.html", "monthly", "0.7"),
     ("/compare.html", "monthly", "0.8"),
     ("/contact.html", "yearly", "0.4"),
     ("/contributors.html", "monthly", "0.7"),
@@ -39,14 +40,15 @@ STATIC_PAGES = [
     ("/hosting.html", "monthly", "0.6"),
     ("/immutable.html", "monthly", "0.7"),
     ("/lightweight.html", "monthly", "0.8"),
+    ("/mirrors.html", "weekly", "0.8"),
     ("/newsletter.html", "weekly", "0.7"),
     ("/analytics.html", "yearly", "0.4"),
     ("/privacy.html", "yearly", "0.4"),
+    ("/private-browsing-myths", "monthly", "0.6"),
     ("/requirements.html", "monthly", "0.7"),
     ("/status.html", "daily", "0.6"),
     ("/translator.html", "monthly", "0.7"),
     ("/unofficial.html", "monthly", "0.6"),
-    ("/wiki.html", "monthly", "0.8"),
 ]
 
 # Video review pages
