@@ -5,7 +5,7 @@
     <meta charset="UTF-8" >
     <meta name="robots" content="index, follow" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://wiki.archlinux.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com https://text.pollinations.ai https://www.google.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://wiki.archlinux.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com https://text.pollinations.ai https://www.google.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
     <meta http-equiv="Permissions-Policy" content="browsing-topics=(), interest-cohort=()" >
     <meta name="referrer" content="strict-origin-when-cross-origin" >
     <title>
@@ -35,7 +35,7 @@
   <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebPage","name":"ISO Hosting Providers - AcreetionOS","description":"Register as an AcreetionOS ISO hosting provider or browse current mirror providers.","url":"https://acreetionos.org/hosting.html","provider":{"@type":"Organization","name":"AcreetionOS"}}
   </script>
-  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" data-acss><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
   {"@type":"ListItem","position":1,"name":"Home","item":"https://acreetionos.org/"},
@@ -43,12 +43,7 @@
 ]}
 </script>
 <!-- Google tag (gtag.js) -- GTM-WW9RFH5B -- compliance + relationship-building only, no ads, no identifiable cookies, Consent Mode v2 default denied -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
-  gtag('js', new Date());
-</script>
+<script src="consent-init.js"></script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B"></script>
 </head>
 <body>
@@ -274,17 +269,7 @@ Submit Request
 
 <script src="hosting-page.js?v=20260824" defer>
 </script>
-<script>
-
-document.addEventListener('DOMContentLoaded',function(){
-document.querySelectorAll('.tab-btn').forEach(function(btn){
-btn.addEventListener('click',function(){switchTab(this.getAttribute('data-tab'));});
-});
-document.getElementById('register-form').addEventListener('submit',registerProvider);
-document.getElementById('manage-form').addEventListener('submit',manageListing);
-});
-
-</script>
+<script src="page-hosting.js"></script>
 <script src="footer.js?v=20260825" defer>
 </script>
 <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
