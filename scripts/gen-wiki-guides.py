@@ -26,7 +26,7 @@ GUIDES_DATA = [
         "slug": "system-maintenance",
         "title": "System Maintenance Guide – AcreetionOS Arch Linux",
         "headline": "AcreetionOS System Maintenance Guide: Keeping Arch Clean & Stable",
-        "description": "Learn essential system maintenance for AcreetionOS: updating packages with pacman, cleaning package caches, managing journal logs, and checking systemd services.",
+        "description": "Learn system maintenance for AcreetionOS: updating packages with pacman, cleaning package caches, managing journal logs, and checking systemd services.",
         "keywords": "AcreetionOS maintenance, Arch Linux update guide, pacman maintenance, systemd troubleshooting, Arch Linux clean cache",
         "content_html": """
     <h2>1. What is System Maintenance on AcreetionOS?</h2>
@@ -555,7 +555,7 @@ def render_index_html(guides):
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
   <title>AcreetionOS Wiki Guides – Arch Linux Step-by-Step Tutorials</title>
-  <meta name="description" content="Explore essential step-by-step guides for AcreetionOS: WiFi setup, software installation, NVIDIA GPU drivers, system maintenance, Bluetooth, and firewall configuration.">
+  <meta name="description" content="Explore step-by-step guides for AcreetionOS: WiFi setup, software installation, NVIDIA GPU drivers, system maintenance, Bluetooth, and firewall configuration.">
   <meta name="keywords" content="AcreetionOS guides, Arch Linux tutorials, Linux beginners guide, Cinnamon desktop guides, AcreetionOS troubleshooting">
   <link rel="canonical" href="{BASE_URL}/wiki-guides/index.html">
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="{BASE_URL}/feed.xml">
