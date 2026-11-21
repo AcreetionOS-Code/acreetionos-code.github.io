@@ -8,12 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
     <meta name="keywords" content="AcreetionOS, status, service status, uptime, server monitoring" >
     <meta name="referrer" content="strict-origin-when-cross-origin" >
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://wiki.archlinux.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com https://text.pollinations.ai https://www.google.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com https://analytics.ahrefs.com https://ajax.cloudflare.com https://www.google.com https://www.gstatic.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https: https://www.googletagmanager.com https://www.google-analytics.com; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; connect-src 'self' https://api.github.com https://gitlab.acreetionos.org https://iso.acreetionos.org:8448 https://wiki.archlinux.org https://cloudflareinsights.com https://static.cloudflareinsights.com https://analytics.ahrefs.com https://text.pollinations.ai https://www.google.com https://www.googletagmanager.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://www.google.com https://recaptcha.google.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self' https://www.qwant.com; frame-ancestors 'none'" >
     <title>
     AcreetionOS Status – Live Service Reachability Checks
   </title>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" data-acss><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
   <meta name="description" content="Live reachability checks for the AcreetionOS website, ISO mirror, and GitLab, run from your browser." >
   <link rel="canonical" href="https://acreetionos.org/status.html" >
   <link rel="alternate" type="application/atom+xml" title="AcreetionOS News" href="https://acreetionos.org/feed.xml" >
@@ -31,7 +31,7 @@
   <meta property="twitter:description" content="Real-time uptime and status monitoring for all AcreetionOS services." >
   <meta property="twitter:image" content="https://acreetionos.org/og-image.png" >
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" data-acss><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
@@ -94,12 +94,7 @@
 ]}
 </script>
 <!-- Google tag (gtag.js) -- GTM-WW9RFH5B -- compliance + relationship-building only, no ads, no identifiable cookies, Consent Mode v2 default denied -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
-  gtag('js', new Date());
-</script>
+<script src="consent-init.js"></script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B"></script>
 </head>
 <body>
@@ -159,7 +154,7 @@
 
         <div class="status-controls">
           <span class="note"><i class="bi bi-info-circle"></i>Status is checked from your browser — results may vary by location</span>
-          <button class="btn-refresh" id="refresh-btn" onclick="checkAllServices()">
+          <button class="btn-refresh" id="refresh-btn">
             <i class="bi bi-arrow-counterclockwise"></i> Refresh
           </button>
         </div>
@@ -192,222 +187,7 @@
 <script src="footer.js?v=20260825" defer>
 </script>
 
-<script>
-(function() {
-  'use strict';
-
-  var services = [
-    {
-      name: 'Website',
-      url: 'https://acreetionos.org',
-      icon: 'bi-globe',
-      status: 'checking',
-      statusText: 'Checking...',
-      lastChecked: null,
-      responseTime: null
-    },
-    {
-      name: 'ISO Mirror',
-      url: 'https://iso.acreetionos.org:8448',
-      icon: 'bi-hdd-stack',
-      status: 'checking',
-      statusText: 'Checking...',
-      lastChecked: null,
-      responseTime: null
-    },
-    {
-      name: 'GitLab',
-      url: 'https://gitlab.acreetionos.org',
-      icon: 'bi-gitlab',
-      status: 'checking',
-      statusText: 'Checking...',
-      lastChecked: null,
-      responseTime: null
-    },
-    {
-      name: 'GitLab (ISO Build & Publish)',
-      url: 'https://gitlab.acreetionos.org',
-      icon: 'bi-gear',
-      status: 'checking',
-      statusText: 'Checking...',
-      lastChecked: null,
-      responseTime: null
-    }
-  ];
-
-  function renderCards() {
-    var grid = document.getElementById('services-grid');
-    var html = '';
-    for (var i = 0; i < services.length; i++) {
-      var s = services[i];
-      var dotClass, txtClass;
-      switch (s.status) {
-        case 'operational': dotClass = 'green'; txtClass = 'green'; break;
-        case 'down': dotClass = 'red'; txtClass = 'red'; break;
-        case 'degraded': dotClass = 'yellow'; txtClass = 'yellow'; break;
-        default: dotClass = 'grey'; txtClass = 'grey';
-      }
-      var metaHtml = '';
-      if (s.responseTime !== null) {
-        metaHtml = '<div class="service-meta"><div><span class="label">Response</span><div class="value">' + s.responseTime + 'ms</div></div></div>';
-      } else if (s.status === 'operational' || s.status === 'down') {
-        metaHtml = '<div class="service-meta"><div><span class="label">Status</span><div class="value">' + (s.httpStatus || '—') + '</div></div></div>';
-      }
-      html += '<div class="service-card" id="card-' + i + '">' +
-        '<div class="service-icon"><i class="bi ' + s.icon + '"></i></div>' +
-        '<div class="service-info">' +
-          '<div class="service-name">' + s.name + '</div>' +
-          '<div class="service-url">' + s.url + '</div>' +
-        '</div>' +
-        '<div class="service-status">' +
-          '<span class="status-dot ' + dotClass + '"></span>' +
-          '<span class="status-text ' + txtClass + '">' + s.statusText + '</span>' +
-        '</div>' +
-        metaHtml +
-      '</div>';
-    }
-    grid.innerHTML = html;
-  }
-
-  function updateSummary() {
-    var summary = document.getElementById('summary-text');
-    var dotEl = document.querySelector('#status-summary .dot');
-    var operational = 0, down = 0, checking = 0;
-    for (var i = 0; i < services.length; i++) {
-      if (services[i].status === 'operational') operational++;
-      else if (services[i].status === 'down') down++;
-      else checking++;
-    }
-    if (checking === services.length) {
-      dotEl.className = 'dot yellow';
-      summary.textContent = 'Checking services...';
-    } else if (down > 0) {
-      dotEl.className = 'dot red';
-      summary.textContent = operational + ' operational, ' + down + ' down';
-    } else if (checking > 0) {
-      dotEl.className = 'dot yellow';
-      summary.textContent = operational + ' operational, ' + checking + ' checking';
-    } else {
-      dotEl.className = 'dot green';
-      summary.textContent = 'All ' + services.length + ' services operational';
-    }
-  }
-
-  function updateLastChecked() {
-    var now = new Date();
-    var time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    var date = now.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
-    document.getElementById('last-checked').textContent = date + ' at ' + time;
-  }
-
-  function checkService(idx) {
-    var s = services[idx];
-    s.status = 'checking';
-    s.statusText = 'Checking...';
-    s.responseTime = null;
-    s.httpStatus = null;
-    renderCards();
-
-    var card = document.getElementById('card-' + idx);
-    if (card) {
-      var dot = card.querySelector('.status-dot');
-      var txt = card.querySelector('.status-text');
-      dot.className = 'status-dot yellow';
-      txt.className = 'status-text yellow';
-      txt.textContent = 'Checking...';
-    }
-
-    var startTime = performance.now();
-
-    fetch(s.url, { method: 'HEAD', mode: 'no-cors', cache: 'no-store' })
-      .then(function(response) {
-        // no-cors gives opaque response — we can't read the status, but if it resolves, it's reachable
-        var elapsed = Math.round(performance.now() - startTime);
-        s.status = 'operational';
-        s.statusText = 'Operational';
-        s.responseTime = elapsed;
-        s.httpStatus = response.type === 'opaque' ? '—' : response.status;
-        updateCard(idx);
-      })
-      .catch(function() {
-        // retry with GET fallback if HEAD fails
-        return fetch(s.url, { method: 'GET', mode: 'no-cors', cache: 'no-store' })
-          .then(function(response) {
-            var elapsed = Math.round(performance.now() - startTime);
-            s.status = 'operational';
-            s.statusText = 'Operational';
-            s.responseTime = elapsed;
-            s.httpStatus = response.type === 'opaque' ? '—' : response.status;
-            updateCard(idx);
-          })
-          .catch(function() {
-            var elapsed = Math.round(performance.now() - startTime);
-            s.status = 'down';
-            s.statusText = 'Down';
-            s.responseTime = elapsed;
-            s.httpStatus = 'ERR';
-            updateCard(idx);
-          });
-      });
-  }
-
-  function updateCard(idx) {
-    var s = services[idx];
-    var card = document.getElementById('card-' + idx);
-    if (!card) return;
-
-    var dot = card.querySelector('.status-dot');
-    var txt = card.querySelector('.status-text');
-    var metaDiv = card.querySelector('.service-meta');
-
-    var dotClass, txtClass;
-    if (s.status === 'operational') { dotClass = 'green'; txtClass = 'green'; }
-    else if (s.status === 'down') { dotClass = 'red'; txtClass = 'red'; }
-    else { dotClass = 'yellow'; txtClass = 'yellow'; }
-
-    dot.className = 'status-dot ' + dotClass;
-    txt.className = 'status-text ' + txtClass;
-    txt.textContent = s.statusText;
-
-    if (s.responseTime !== null) {
-      if (metaDiv) {
-        var valueEl = metaDiv.querySelector('.value');
-        if (valueEl) {
-          valueEl.textContent = s.responseTime + 'ms';
-        }
-      } else {
-        var newMeta = document.createElement('div');
-        newMeta.className = 'service-meta';
-        newMeta.innerHTML = '<div><span class="label">Response</span><div class="value">' + s.responseTime + 'ms</div></div>';
-        card.appendChild(newMeta);
-      }
-    }
-
-    updateSummary();
-    updateLastChecked();
-  }
-
-  function checkAllServices() {
-    var btn = document.getElementById('refresh-btn');
-    btn.disabled = true;
-    btn.classList.add('spin');
-    for (var i = 0; i < services.length; i++) {
-      checkService(i);
-    }
-    setTimeout(function() {
-      btn.disabled = false;
-      btn.classList.remove('spin');
-    }, 5000);
-  }
-
-  // init
-  renderCards();
-  updateSummary();
-  updateLastChecked();
-  // start checking after a short delay so the page renders first
-  setTimeout(checkAllServices, 300);
-})();
-</script>
+<script src="page-status.js"></script>
 <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
 <script src="tor-badge.js?v=20260825" defer></script>
 </body>
