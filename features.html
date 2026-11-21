@@ -42,9 +42,9 @@
   <meta name="twitter:description" content="See what makes AcreetionOS different.">
   <meta name="twitter:image" content="https://acreetionos.org/og-image.png">
   <link rel="icon" type="image/webp" href="acreetionoslogo.webp">
-  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
+  <link rel="stylesheet" href="sidebar.css?v=20261113" media="print" data-acss><noscript><link rel="stylesheet" href="sidebar.css?v=20261113"></noscript>
   <link rel="preload" href="vendor/icons/icons-subset.woff2?v=2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
+<link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825" media="print" data-acss><noscript><link rel="stylesheet" href="vendor/icons/icons-subset.css?v=20260825"></noscript>
   <style>
 #hamburger{position:absolute;top:6px;right:14px;z-index:1001;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:none;border:none;width:36px;height:36px;padding:4px}#hamburger span{display:block;width:22px;height:2px;background:var(--acreetion-text-bright,#e5e5e5);border-radius:2px}#sidebar{position:fixed;visibility:hidden}#sidebar-overlay{position:fixed;display:none}.main-nav{display:none}:root{--green:#2ecc71;--bg:#121212;--panel:#1a1a1a;--border:#333;--text:#b2b2b2;--text-bright:#e5e5e5;--font-sans:'Roboto',sans-serif;--font-mono:'Fira Code',monospace}
 html{touch-action:manipulation}input,textarea,select{font-size:16px}
@@ -98,12 +98,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
 @media(max-width:600px){.hero h1{font-size:1.5rem}.tab-bar{flex-direction:column}.tab-btn{border-bottom:1px solid var(--border)}.tab-btn.active{border-bottom-color:var(--green)}}
   </style>
 <!-- Google tag (gtag.js) -- GTM-WW9RFH5B -- compliance + relationship-building only, no ads, no identifiable cookies, Consent Mode v2 default denied -->
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('consent', 'default', {ad_storage:'denied',analytics_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',functionality_storage:'denied',personalization_storage:'denied',security_storage:'granted'});
-  gtag('js', new Date());
-</script>
+<script src="consent-init.js"></script>
 <script async src="https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B"></script>
 </head>
 <body>
@@ -212,7 +207,7 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
 
           <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center">
             <a href="acreetionos-fastfetch.jsonc" download class="btn" style="background:var(--green);color:#000;padding:.6rem 1.2rem;border-radius:8px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;font-size:.85rem"><i class="bi bi-download"></i> Download Config</a>
-            <button class="copy-cmd-btn" onclick="copyFastFetchCmd()" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--green);color:var(--green);border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;font-family:var(--font-sans)"><i class="bi bi-clipboard"></i> Copy Install Command</button>
+            <button class="copy-cmd-btn" style="padding:.6rem 1.2rem;background:transparent;border:1px solid var(--green);color:var(--green);border-radius:8px;font-weight:600;cursor:pointer;font-size:.85rem;font-family:var(--font-sans)"><i class="bi bi-clipboard"></i> Copy Install Command</button>
             <span style="color:#777;font-size:.78rem">Requires <code style="background:rgba(46,204,113,.1);padding:.15em .4em;border-radius:4px;font-family:var(--font-mono);font-size:.8rem">fastfetch</code> (install via pacman)</span>
           </div>
         </div>
@@ -223,53 +218,12 @@ body{font-family:var(--font-sans);background:var(--bg);color:var(--text-bright);
           <a href="flash.html" class="btn" style="background:var(--green);color:#000;padding:.9rem 2rem;border-radius:10px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:.5rem"><i class="bi bi-download"></i> Download AcreetionOS</a>
         </div>
       </div>
-      <script>
-        function copyFastFetchCmd() {
-          var text = 'curl -sL https://acreetionos.org/acreetionos-fastfetch.jsonc -o ~/.config/fastfetch/config.jsonc && sudo pacman -S --noconfirm fastfetch && fastfetch';
-          navigator.clipboard.writeText(text).then(function() {
-            var btn = document.querySelector('.copy-cmd-btn');
-            btn.innerHTML = '<i class="bi bi-check"></i> Copied!';
-            setTimeout(function() { btn.innerHTML = '<i class="bi bi-clipboard"></i> Copy Install Command'; }, 2500);
-          });
-        }
-      </script>
+      <script src="page-features.js"></script>
       <script src="scale-page.js?v=20260824" defer></script>
       <script src="sidebar.js?v=20260825" defer></script>
     </div>
   </div>
-  <script>
-    // Tab switching
-    document.querySelectorAll('.tab-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
-        document.querySelectorAll('.tab-panel').forEach(function(p){p.classList.remove('active')});
-        this.classList.add('active');
-        document.getElementById('tab-' + this.getAttribute('data-tab')).classList.add('active');
-      });
-    });
-
-    // Before/After slider drag — click anywhere on slider to move handle
-    var slider = document.getElementById('slider');
-    var after = document.getElementById('slider-after');
-    var handle = document.getElementById('slider-handle');
-    var isDragging = false;
-
-    function setSlider(x) {
-      var rect = slider.getBoundingClientRect();
-      var pct = Math.max(0, Math.min(100, ((x - rect.left) / rect.width) * 100));
-      after.style.clipPath = 'inset(0 ' + (100 - pct) + '% 0 0)';
-      handle.style.left = pct + '%';
-    }
-
-    // Drag the handle OR click anywhere on the slider to set position
-    slider.addEventListener('mousedown', function(e) { isDragging = true; setSlider(e.clientX); e.preventDefault(); });
-    document.addEventListener('mousemove', function(e) { if (isDragging) setSlider(e.clientX); });
-    document.addEventListener('mouseup', function() { isDragging = false; });
-
-    slider.addEventListener('touchstart', function(e) { isDragging = true; setSlider(e.touches[0].clientX); e.preventDefault(); });
-    document.addEventListener('touchmove', function(e) { if (isDragging) setSlider(e.touches[0].clientX); });
-    document.addEventListener('touchend', function() { isDragging = false; });
-  </script>
+  <script src="page-features-tabs.js"></script>
   <script src="footer.js?v=20260825" defer></script>
 <script src="vendor/instantpage.min.js?v=20260825" type="module" defer></script>
 <script src="tor-badge.js?v=20260825" defer></script>
