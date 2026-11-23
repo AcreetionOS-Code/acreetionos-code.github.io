@@ -12,7 +12,6 @@
     { name: 'ACC (Sweden)', base: 'https://mirror.accum.se/mirror/acreetionos.org/' },
     { name: 'NLUUG (Netherlands)', base: 'https://ftp.nluug.nl/pub/os/Linux/distr/AcreetionOS/iso_images/' },
     { name: 'Masaryk University (Czech Republic)', base: 'https://ftp.fi.muni.cz/pub/linux/acreetion/' },
-    { name: 'AWS (US East)', base: 'https://acreetionos-398861427116-us-east-1-an.s3.us-east-1.amazonaws.com/' },
     { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' }
   ];
   var FILES = ['AcreetionOS-1.0-x86_64.iso', 'AcreetionOS_XL-1.0-x86_64.iso', 'AcreetionOS_Wayland-Experimental-1.0-x86_64.iso'];
