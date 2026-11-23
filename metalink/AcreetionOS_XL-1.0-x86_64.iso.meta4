@@ -4,8 +4,8 @@
   <file name="AcreetionOS_XL-1.0-x86_64.iso">
     <identity>AcreetionOS</identity>
     <version>1.0</version>
-    <size>2392555520</size>
-    <hash type="sha-256">69b0ad13fa5f902b5f76fd439ef0d7805180e9c382eba50b5f3096fd31ca60fc</hash>
+    <size>2397208576</size>
+    <hash type="sha-256">a2fcaff2228a300b7412804f4d3f627416c2d2f6e12de589a1066ffde1294f1d</hash>
     <url priority="1">https://pub-6f2e9495adfd40eb84a9b137eb384073.r2.dev/AcreetionOS_XL-1.0-x86_64.iso</url>
     <url priority="2">https://isoimages.us-ord-10.linodeobjects.com/AcreetionOS_XL-1.0-x86_64.iso</url>
     <url priority="3">https://ftp2.osuosl.org/pub/acreetionos/AcreetionOS_XL-1.0-x86_64.iso</url>
