@@ -2891,6 +2891,7 @@ export default {
         { name: 'ACC (Sweden)', base: 'https://mirror.accum.se/mirror/acreetionos.org/' },
         { name: 'NLUUG (Netherlands)', base: 'https://ftp.nluug.nl/pub/os/Linux/distr/AcreetionOS/iso_images/' },
         { name: 'Masaryk University (Czech Republic)', base: 'https://ftp.fi.muni.cz/pub/linux/acreetion/' },
+        { name: 'Lysator (Sweden)', base: 'https://ftp.lysator.liu.se/pub/acreetionos/iso_images/' },
         { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' },
       ];
       const probe = async (m) => {

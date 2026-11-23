@@ -13,6 +13,7 @@
     <url priority="5">https://mirror.accum.se/mirror/acreetionos.org/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
     <url priority="6">https://ftp.nluug.nl/pub/os/Linux/distr/AcreetionOS/iso_images/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
     <url priority="7">https://ftp.fi.muni.cz/pub/linux/acreetion/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
+    <url priority="8">https://ftp.lysator.liu.se/pub/acreetionos/iso_images/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
     <url priority="9">https://iso.acreetionos.org/acreetion/AcreetionOS_Wayland-Experimental-1.0-x86_64.iso</url>
   </file>
 </metalink>
