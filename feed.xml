@@ -4,9 +4,17 @@
   <subtitle>Daily project updates from the AcreetionOS team — an independent, privacy-focused Arch Linux distribution.</subtitle>
   <link href="https://acreetionos.org/"/>
   <link rel="self" href="https://acreetionos.org/feed.xml"/>
-  <updated>2026-11-25T00:00:00Z</updated>
+  <updated>2026-11-26T00:00:00Z</updated>
   <author><name>AcreetionOS Team</name><uri>https://acreetionos.org/about.html</uri></author>
   <id>tag:acreetionos.org,2026:feed</id>
+  <entry>
+    <title>Daily AcreetionOS Update -- November 26, 2026</title>
+    <link href="https://acreetionos.org/newsletter-archive/2026-11-26.html"/>
+    <id>tag:acreetionos.org,2026-11-26:newsletter</id>
+    <updated>2026-11-26T00:00:00Z</updated>
+    <published>2026-11-26T00:00:00Z</published>
+    <summary>Subject: Bottom-bar icons are clickable again in acreetionos and acreetionos-xlibre The panel icons that refused to open on click are fixed, and the patch landed in both acreetionos and acreetionos-xlibre — commit message included the smiley, so you know it was personal. If you&#x27;ve been right-clickin…</summary>
+  </entry>
   <entry>
     <title>Daily AcreetionOS Update -- November 25, 2026</title>
     <link href="https://acreetionos.org/newsletter-archive/2026-11-25.html"/>
@@ -1198,13 +1206,5 @@
     <updated>2026-06-29T00:00:00Z</updated>
     <published>2026-06-29T00:00:00Z</published>
     <summary>Recent updates to our continuous integration pipeline have significantly improved the reliability of our ISO build process, with changes such as per-pipeline staging directories to avoid publish races between concurrent builds, and the use of relative symlinks for the latest.iso file, ensuring it re…</summary>
-  </entry>
-  <entry>
-    <title>Take Back Control - Privacy Tips for Your AcreetionOS Setup</title>
-    <link href="https://acreetionos.org/newsletter-archive/2026-06-28.html"/>
-    <id>tag:acreetionos.org,2026-06-28:newsletter</id>
-    <updated>2026-06-28T00:00:00Z</updated>
-    <published>2026-06-28T00:00:00Z</published>
-    <summary>Hey AcreetionOS family, Happy weekend! We hope you have been enjoying the smooth ride that rolling release can bring. Today we want to talk about something close to our hearts: your privacy and system sovereignty. AcreetionOS is built on the idea that your computer should work for you, not the other…</summary>
   </entry>
 </feed>
