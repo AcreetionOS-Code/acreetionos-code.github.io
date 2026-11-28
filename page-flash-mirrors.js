@@ -14,6 +14,7 @@
     { name: 'Masaryk University (Czech Republic)', base: 'https://ftp.fi.muni.cz/pub/linux/acreetion/' },
     { name: 'Lysator (Sweden)', base: 'https://ftp.lysator.liu.se/pub/acreetionos/iso_images/' },
     { name: 'TU Chemnitz (Germany)', base: 'https://ftp.tu-chemnitz.de/pub/linux/acreetionos/' },
+    { name: 'AARNet (Australia)', base: 'https://mirror.aarnet.edu.au/pub/acreetionos/' },
     { name: 'Origin (US)', base: 'https://iso.acreetionos.org/acreetion/' }
   ];
   var FILES = ['AcreetionOS-1.0-x86_64.iso', 'AcreetionOS_XL-1.0-x86_64.iso', 'AcreetionOS_Wayland-Experimental-1.0-x86_64.iso'];
