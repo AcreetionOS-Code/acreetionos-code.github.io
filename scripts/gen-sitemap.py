@@ -44,7 +44,7 @@ STATIC_PAGES = [
     ("/newsletter.html", "weekly", "0.7"),
     ("/analytics.html", "yearly", "0.4"),
     ("/privacy.html", "yearly", "0.4"),
-    ("/private-browsing-myths", "monthly", "0.6"),
+    ("/private-browsing-myths.html", "monthly", "0.6"),
     ("/how-it-works.html", "monthly", "0.6"),
     ("/requirements.html", "monthly", "0.7"),
     ("/status.html", "daily", "0.6"),
@@ -63,65 +63,56 @@ REVIEW_PAGES = [
 ]
 
 
+def file_lastmod(rel_path):
+    """Last-modified date (YYYY-MM-DD) of a repo file, or None if unknown."""
+    try:
+        mtime = os.path.getmtime(os.path.join(ROOT, rel_path))
+    except OSError:
+        return None
+    return date.fromtimestamp(mtime).isoformat()
+
+
+def url_entry(loc, freq, prio, rel_path):
+    """One <url> entry; <lastmod> is the backing file's real mtime date,
+    omitted when the file (and therefore the date) is unknown."""
+    lines = ["  <url>", f"    <loc>{loc}</loc>"]
+    lastmod = file_lastmod(rel_path)
+    if lastmod:
+        lines.append(f"    <lastmod>{lastmod}</lastmod>")
+    lines.append(f"    <changefreq>{freq}</changefreq>")
+    lines.append(f"    <priority>{prio}</priority>")
+    lines.append("  </url>")
+    return "\n".join(lines)
+
+
 def main():
-    today = date.today().isoformat()
     entries = []
 
     # 1. Main Static Pages
     for path, freq, prio in STATIC_PAGES:
-        entries.append(f"""  <url>
-    <loc>{BASE}{path}</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>{freq}</changefreq>
-    <priority>{prio}</priority>
-  </url>""")
+        rel = "index.html" if path == "/" else path.lstrip("/")
+        entries.append(url_entry(f"{BASE}{path}", freq, prio, rel))
 
     # 2. Reviews Directory & Pages
     for path, freq, prio in REVIEW_PAGES:
-        entries.append(f"""  <url>
-    <loc>{BASE}{path}</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>{freq}</changefreq>
-    <priority>{prio}</priority>
-  </url>""")
+        rel = "Reviews/index.html" if path == "/Reviews/" else path.lstrip("/")
+        entries.append(url_entry(f"{BASE}{path}", freq, prio, rel))
 
     # 3. Wiki Guides (Static, crawlable)
     guides = sorted(glob.glob(os.path.join(ROOT, "wiki-guides", "*.html")))
-    for g in guides:
-        name = os.path.basename(g)
-        if name == "index.html":
-            entries.append(f"""  <url>
-    <loc>{BASE}/wiki-guides/index.html</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>""")
-        else:
-            entries.append(f"""  <url>
-    <loc>{BASE}/wiki-guides/{name}</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>""")
+    for guide in guides:
+        name = os.path.basename(guide)
+        freq = "weekly" if name == "index.html" else "monthly"
+        entries.append(url_entry(f"{BASE}/wiki-guides/{name}", freq, "0.7", f"wiki-guides/{name}"))
 
     # 4. Newsletter Archive Pages
     archive = sorted(glob.glob(os.path.join(ROOT, "newsletter-archive", "2026-*.html")))
-    for a in archive:
-        name = os.path.basename(a)
-        entries.append(f"""  <url>
-    <loc>{BASE}/newsletter-archive/{name}</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.5</priority>
-  </url>""")
+    for page in archive:
+        name = os.path.basename(page)
+        entries.append(url_entry(f"{BASE}/newsletter-archive/{name}", "yearly", "0.5", f"newsletter-archive/{name}"))
 
     # 5. Newsletter Archive Index
-    entries.append(f"""  <url>
-    <loc>{BASE}/newsletter-archive/index.html</loc>
-    <lastmod>{today}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>""")
+    entries.append(url_entry(f"{BASE}/newsletter-archive/index.html", "daily", "0.8", "newsletter-archive/index.html"))
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
