@@ -1,7 +1,10 @@
 // gtm.js — single injection point for GTM-WW9RFH5B (#667)
 // Why: compliance + relationship-building only, no ads, no identifiable cookies.
 // Consent Mode v2 defaults to denied; tags fire only after user grants.
-// This file is loaded on every page (via <script src="gtm.js"> added to each HTML or via generator scripts).
+// NOT LOADED on any page (corrected 2026-11-27, #696). No HTML file references
+// this file. The live mechanism is consent-init.js: loaded once per page before
+// the GTM container, it sets the Consent Mode v2 denied defaults and loads
+// GTM-WW9RFH5B. This file is an earlier, unused loader kept for reference only.
 // It respects the guarantees in analytics.html: no ad_storage, no identifiable cookies.
 (function () {
   // dataLayer as required by GTM - must exist before gtm.js loads

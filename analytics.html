@@ -107,7 +107,7 @@ td{color:var(--text)}
               <thead><tr><th>Tag</th><th>Source</th><th>Purpose</th><th>Gating</th></tr></thead>
               <tbody>
                 <tr><td><strong>Ahrefs Web Analytics</strong></td><td><code>https://analytics.ahrefs.com/analytics.js</code><br><span style="color:#888">key <code>o6LG+Kcq+miQXsnNotVUHw</code></span></td><td>Aggregate page views, referrers, device/browser family, country -- no cross-site tracking</td><td>Via GTM; Consent Mode v2 defaults <code>denied</code></td></tr>
-                <tr><td><strong>Google Tag Manager</strong></td><td><code>https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B</code></td><td>Container that loads other tags per trigger rules -- no tracking by itself</td><td>Consent Mode v2 defaults <code>denied</code> (via <code>gtm.js</code>)</td></tr>
+                <tr><td><strong>Google Tag Manager</strong></td><td><code>https://www.googletagmanager.com/gtm.js?id=GTM-WW9RFH5B</code></td><td>Container that loads other tags per trigger rules -- no tracking by itself</td><td>Consent Mode v2 defaults <code>denied</code> (via <code>consent-init.js</code>)</td></tr>
                 <tr><td><strong>Other GTM tags</strong></td><td>GTM-managed</td><td colspan="2" style="color:#2ecc71;font-weight:700">Ads and any ad-serving tags are explicitly excluded by policy (see guarantee above). If ever proposed, they will be rejected in GTM container review.</td></tr>
               </tbody>
             </table>
